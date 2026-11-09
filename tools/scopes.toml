@@ -24,6 +24,8 @@ paths = [
     "README.es.md",
     "README.md",
     "docs/requirements/repo.md",
+    "package-lock.json",
+    "package.json",
     "pyproject.toml",
     "src/dokime/__init__.py",
     "src/dokime/py.typed",

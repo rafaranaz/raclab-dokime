@@ -1,0 +1,12 @@
+{
+  "name": "raclab-dokime-tooling",
+  "private": true,
+  "description": "Node tooling used by the repository gates: the Mermaid renderer.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "12.2.0"
+  }
+}

@@ -47,6 +47,14 @@ jobs:
         run: uv run python -m tools.check_links
       - name: Spanish translations up to date
         run: uv run python -m tools.check_translations
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install the pinned Mermaid renderer
+        run: npm ci --no-audit --no-fund
+      - name: Mermaid diagrams render
+        run: uv run python -m tools.check_mermaid
       - name: No tracked file is ignored
         run: |
           ignored="$(git ls-files --cached --ignored --exclude-standard)"

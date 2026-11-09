@@ -39,6 +39,12 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 
 - **REPO-050** When a relative link in a Markdown file points to a path that does not exist, the link check shall report the file and the link.
 
+## Mermaid diagrams (`tools/check_mermaid.py`)
+
+- **REPO-070** When the Mermaid renderer rejects a Markdown file that contains a Mermaid block, the Mermaid check shall report the file with the error message of the renderer.
+- **REPO-071** If the Mermaid renderer cannot be run, then the Mermaid check shall fail with a message naming the renderer.
+- **REPO-072** The Mermaid check shall pass Markdown files without Mermaid blocks to no renderer.
+
 ## Translations (`tools/check_translations.py`)
 
 - **REPO-060** When a documentation file has no Spanish translation next to it, the translation check shall report the missing translation.

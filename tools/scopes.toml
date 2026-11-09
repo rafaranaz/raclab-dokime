@@ -1,0 +1,35 @@
+# Closed lists used by the commit and scope checks.
+# A module gets its scope here when its branch of work is opened.
+
+types = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "revert", "style", "test"]
+
+# Commit types whose message must explain the reason for the change in a body.
+body_required = ["feat", "fix", "refactor", "perf"]
+
+# Paths any branch may touch, whatever its scope.
+shared = ["docs/adr/**", "docs/ROADMAP.md"]
+
+[scopes.repo]
+description = "Repository governance: tooling, CI, working agreement, development skills."
+paths = [
+    ".claude/**",
+    ".github/**",
+    ".gitignore",
+    ".python-version",
+    "CLAUDE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "README.md",
+    "docs/requirements/repo.md",
+    "pyproject.toml",
+    "src/dokime/__init__.py",
+    "src/dokime/py.typed",
+    "tests/__init__.py",
+    "tests/repo/**",
+    "tools/**",
+    "uv.lock",
+]
+
+[scopes.arch]
+description = "Reference architecture: documents and diagrams under docs/architecture."
+paths = ["docs/architecture/**"]

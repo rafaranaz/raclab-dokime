@@ -65,8 +65,10 @@ Optional-Trailer: value
 
 ## Pull requests
 
-- Small enough to review in one sitting. The template asks for the scope, the affected
-  requirements and the gates.
+- Small enough to review in one sitting. The template asks for the scope and the affected
+  requirements, and lists only the points a review has to judge. It has no checkbox for anything
+  CI already enforces: a manual tick next to a mechanical gate adds nothing but a chance to be
+  wrong.
 - Human approval is the decision gate: CI says whether the change is correct according to the
   rules; review says whether it is the change we want.
 - Never merge with CI red or with an open review finding.

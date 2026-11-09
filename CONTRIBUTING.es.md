@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:82c0e5f827e6c3a0 -->
+<!-- translation-of: CONTRIBUTING.md sha256:66baba38e2a265e9 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -66,8 +66,10 @@ Optional-Trailer: value
 
 ## Pull requests
 
-- Pequeños y revisables de una sentada. La plantilla pide el ámbito, los requisitos afectados y las
-  puertas.
+- Pequeños y revisables de una sentada. La plantilla pide el ámbito y los requisitos afectados, y
+  solo enumera los puntos que tiene que juzgar la revisión. No tiene ninguna casilla para lo que CI
+  ya comprueba: una marca manual junto a una puerta mecánica no añade nada salvo la posibilidad de
+  equivocarse.
 - La aprobación humana es la puerta de decisión: CI dice si el cambio es correcto según las
   reglas; la revisión dice si es el cambio que queremos.
 - Nunca se mergea con CI en rojo ni con un hallazgo de revisión abierto.

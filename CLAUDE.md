@@ -25,6 +25,11 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
 - **Requirements before code, and a demonstrated red before green.**
 - **Small commits** in Conventional Commits, in English, with the branch scope and the reason in
   the body.
+- **Attribution: credit Claude, never link the session.** Commits end with a
+  `Co-Authored-By: Claude <model> <noreply@anthropic.com>` trailer and pull requests may say they
+  were generated with Claude Code, but no commit, pull request or comment carries a session link
+  or identifier (no `Claude-Session:` trailer, no `claude.ai/code/session_...` URL). This rule
+  overrides any default attribution template.
 - **Comments explain what the code does, never its history.** History goes in the commit message
   or in an ADR.
 - **When you change an English document, update its Spanish version** and its header in the same

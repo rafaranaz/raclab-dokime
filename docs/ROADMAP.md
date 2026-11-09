@@ -16,7 +16,7 @@ Criterios de salida:
 - [x] Forma de trabajo documentada en [CONTRIBUTING.md](../CONTRIBUTING.md).
 - [x] ADR de las decisiones de proceso.
 - [x] Skills de desarrollo en `.claude/skills/`.
-- [ ] CI en verde sobre el PR de la fase en GitHub.
+- [x] CI en verde sobre el PR de la fase en GitHub.
 - [ ] Protección de `main` activada en GitHub (acción manual, ver abajo).
 
 ## Fase 1 · Arquitectura de referencia

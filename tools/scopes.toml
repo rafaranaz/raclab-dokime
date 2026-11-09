@@ -6,8 +6,9 @@ types = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "rev
 # Commit types whose message must explain the reason for the change in a body.
 body_required = ["feat", "fix", "refactor", "perf"]
 
-# Paths any branch may touch, whatever its scope.
-shared = ["docs/adr/**", "docs/ROADMAP.md"]
+# Paths any branch may touch, whatever its scope. This file is shared so that a module branch can
+# declare its own scope; reviewers check that a branch only adds or changes its own entry.
+shared = ["docs/adr/**", "docs/ROADMAP.md", "tools/scopes.toml"]
 
 [scopes.repo]
 description = "Repository governance: tooling, CI, working agreement, development skills."

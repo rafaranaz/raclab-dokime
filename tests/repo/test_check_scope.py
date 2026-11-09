@@ -35,6 +35,10 @@ def test_accepts_files_inside_the_scope_or_shared_paths() -> None:
     assert check_changes(files, "repo", CONFIG) == []
 
 
+def test_any_scope_may_declare_itself_in_the_scopes_file() -> None:
+    assert check_changes(["tools/scopes.toml", "docs/architecture/c4.md"], "arch", CONFIG) == []
+
+
 def test_lists_every_file_outside_the_scope() -> None:
     files = ["tools/check_scope.py", "docs/architecture/c4.md", "src/dokime/graph/x.py"]
     message = check_changes(files, "repo", CONFIG)

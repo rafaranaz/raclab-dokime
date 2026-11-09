@@ -1,74 +1,82 @@
-# Hoja de ruta
+# Roadmap
 
-Cada fase tiene criterios de salida. **La siguiente fase no se abre hasta que la anterior los
-cumple todos** ([ADR-0003](adr/0003-reglas-verificadas-en-ci.md)). Si un criterio resulta imposible
-o equivocado, se cambia aquí en un PR propio y con su razón, no se salta.
+*Leer en [español](ROADMAP.es.md).*
 
-## Fase 0 · Forma de trabajo y puertas — en curso
+Each phase has exit criteria. **The next phase does not open until the previous one meets all of
+them** ([ADR-0003](adr/0003-rules-enforced-in-ci.md)). If a criterion turns out to be impossible or
+wrong, it is changed here in its own pull request with its reason, not skipped.
 
-Reglas de trabajo, pipeline de CI y skills de desarrollo, sin código del harness.
+## Phase 0 · Working agreement and gates — in progress
 
-Criterios de salida:
+Working rules, CI pipeline and development skills, with no harness code.
 
-- [x] Entorno reproducible: Python fijado, dependencias en `uv.lock`, instalación con `--locked`.
-- [x] Puertas de calidad, gobierno, disciplina y auditoría en CI, cada una con requisitos EARS y
-  tests ([docs/requirements/repo.md](requirements/repo.md)).
-- [x] Forma de trabajo documentada en [CONTRIBUTING.md](../CONTRIBUTING.md).
-- [x] ADR de las decisiones de proceso.
-- [x] Skills de desarrollo en `.claude/skills/`.
-- [x] CI en verde sobre el PR de la fase en GitHub.
-- [ ] Protección de `main` activada en GitHub (acción manual, ver abajo).
+Exit criteria:
 
-## Fase 1 · Arquitectura de referencia
+- [x] Reproducible environment: pinned Python, dependencies in `uv.lock`, installed with
+  `--locked`.
+- [x] Quality, governance, discipline and audit gates in CI, each with EARS requirements and tests
+  ([docs/requirements/repo.md](requirements/repo.md)).
+- [x] Working agreement documented in [CONTRIBUTING.md](../CONTRIBUTING.md).
+- [x] ADRs for the process decisions.
+- [x] Development skills in `.claude/skills/`.
+- [x] Documentation in English and Spanish, with translations checked in CI.
+- [ ] CI green on the phase pull request in GitHub.
+- [ ] Protection of `main` enabled in GitHub (manual action, see below).
 
-Revisión crítica del diseño de `dokime` (sus documentos 01 a 08, los incidentes registrados y las
-mediciones sobre su código) para fijar la arquitectura de este repositorio. Se entrega en varios
-PR del ámbito `arch`, revisables por separado:
+## Phase 1 · Reference architecture
 
-1. **Contexto y módulos.** Diagrama de contexto (C4 nivel 1) y diagrama de módulos con las
-   dependencias permitidas.
-2. **Estados y flujos.** Máquina de estados global, composición por modo y sub-máquina TDD con el
-   enrutado de fallos.
-3. **Datos y confianza.** Modelo del grafo de código, ledger y trazabilidad, secuencia de una
-   historia de punta a punta y fronteras de confianza (sandbox, repositorio no confiable,
-   secretos).
+A critical review of the `dokime` design (its documents 01 to 08, the recorded incidents and the
+measurements of its code) to settle the architecture of this repository. It is delivered in
+several pull requests of the `arch` scope, reviewable separately:
 
-Decisiones a revisar con evidencia, cada una en su ADR: grafo con tree-sitter frente a SCIP, motor
-de estados propio frente a uno existente, niveles de verificación formal, alcance del MVP (modos,
-lenguajes, dashboard y daemon) e interfaz de entrega independiente de GitHub.
+1. **Context and modules.** Context diagram (C4 level 1) and module diagram with the allowed
+   dependencies.
+2. **States and flows.** Global state machine, composition per mode and TDD sub-machine with
+   failure routing.
+3. **Data and trust.** Code graph model, ledger and traceability, end-to-end sequence of a story,
+   and trust boundaries (sandbox, untrusted repository, secrets).
 
-Puertas que se añaden en esta fase, porque dependen de la arquitectura:
+Decisions to review with evidence, each in its own ADR:
 
-- Contratos de importación entre módulos (import-linter), generados a partir del diagrama de
-  módulos.
-- Validación de los diagramas Mermaid.
+- Code graph built on tree-sitter or on SCIP.
+- Own state engine or an existing one.
+- Levels of formal verification.
+- MVP scope: modes, languages, dashboard and daemon.
+- Delivery interface independent of GitHub.
+- Bilingual interaction: how the user works in Spanish or English while internal artifacts and
+  prompts stay in English ([ADR-0005](adr/0005-languages.md)).
 
-Criterios de salida:
+Gates added in this phase, because they depend on the architecture:
 
-- Cada módulo tiene interfaz pública, requisitos EARS de alto nivel y puerta de cierre definidos.
-- Los ocho diagramas están en `docs/architecture/` y pasan la validación.
-- Los contratos de importación están en CI.
-- La arquitectura está aprobada en revisión.
+- Import contracts between modules (import-linter), derived from the module diagram.
+- Validation of the Mermaid diagrams.
 
-## Fase 2 · Porte módulo a módulo
+Exit criteria:
 
-Un módulo abierto a la vez, cada uno con su ámbito, su rama y su PR, en este orden provisional
-(se confirmará al cerrar la Fase 1):
+- Every module has a public interface, high-level EARS requirements and a closing gate defined.
+- The eight diagrams are in `docs/architecture/` and pass validation.
+- The import contracts are in CI.
+- The architecture is approved in review.
 
-`core` → `graph` → `sandbox` → `gateway` → `verify` → `engine` (solo modo delta) → `spec` →
+## Phase 2 · Module-by-module port
+
+One module open at a time, each with its scope, its branch and its pull request, in this
+provisional order (to be confirmed when phase 1 closes):
+
+`core` → `graph` → `sandbox` → `gateway` → `verify` → `engine` (delta mode only) → `spec` →
 `delivery` → `interfaces`
 
-Alcance inicial de lenguajes: Python y Java. Go y TypeScript entran cuando el núcleo esté cerrado.
+Initial language scope: Python and Java. Go and TypeScript come in once the core is closed.
 
-Criterios de salida de cada módulo: los de la definición de terminado de
-[CONTRIBUTING.md](../CONTRIBUTING.md#definición-de-terminado-de-un-ámbito).
+Exit criteria for each module: the definition of done in
+[CONTRIBUTING.md](../CONTRIBUTING.md#definition-of-done-for-a-scope).
 
-## Acciones manuales pendientes
+## Pending manual actions
 
-Configuración de GitHub que no se puede versionar en el repositorio:
+GitHub settings that cannot be versioned in the repository:
 
-- **Protección de `main`** (Settings → Rules → Rulesets, o Branches): exigir PR para integrar,
-  exigir que pasen los checks de CI (`lint, types and tests`, `governance checks`,
-  `commits and branch scope`, `dependency audit`), exigir historial lineal y bloquear el push
-  forzado y el borrado.
-- **Métodos de merge** (Settings → General → Pull Requests): permitir solo *Rebase and merge*.
+- **Protection of `main`** (Settings → Rules → Rulesets, or Branches): require a pull request to
+  merge, require the CI checks to pass (`lint, types and tests`, `governance checks`,
+  `commits and branch scope`, `dependency audit`), require a linear history, and block force
+  pushes and deletion.
+- **Merge methods** (Settings → General → Pull Requests): allow only *Rebase and merge*.

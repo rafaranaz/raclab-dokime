@@ -1,33 +1,33 @@
 # raclab-dokime
 
-Pipeline de desarrollo guiado por especificación para agentes de código: de una petición en
-lenguaje natural a un cambio publicado, donde cada paso lo propone un agente y lo acepta o
-rechaza una verificación mecánica. Ningún resultado se da por bueno por la palabra del agente
-que lo produjo.
+*Leer en [español](README.es.md).*
 
-## Estado
+A spec-driven pipeline for coding agents: from a natural-language request to a published change,
+where every step is proposed by an agent and accepted or rejected by a mechanical check. No result
+is taken as good on the word of the agent that produced it.
 
-En construcción. El repositorio está en la **Fase 0** (forma de trabajo y puertas de calidad);
-todavía no contiene código del harness. Las fases, su alcance y sus criterios de salida están en
+## Status
+
+Under construction. The repository is in **phase 0** (working agreement and quality gates); it does
+not contain any harness code yet. The phases, their scope and their exit criteria are in
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Dónde está cada cosa
+## Where things are
 
-| Qué | Dónde |
+| What | Where |
 |---|---|
-| Cómo se trabaja: ramas, commits, puertas, definición de terminado | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Decisiones de diseño y de proceso | [docs/adr/](docs/adr/README.md) |
-| Requisitos EARS de cada módulo | [docs/requirements/](docs/requirements/) |
-| Fases y criterios de salida | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| How we work: branches, commits, gates, definition of done | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Design and process decisions | [docs/adr/](docs/adr/README.md) |
+| EARS requirements of each scope | [docs/requirements/](docs/requirements/) |
+| Phases and exit criteria | [docs/ROADMAP.md](docs/ROADMAP.md) |
 
-## Desarrollo
+## Development
 
-Requiere [uv](https://docs.astral.sh/uv/).
+Requires [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync --locked
 uv run pytest
 ```
 
-Las mismas puertas que ejecuta CI se describen en
-[CONTRIBUTING.md](CONTRIBUTING.md#puertas-de-calidad).
+The gates CI runs are listed in [CONTRIBUTING.md](CONTRIBUTING.md#quality-gates).

@@ -1,48 +1,50 @@
-# Cómo se trabaja en raclab-dokime
+# How we work on raclab-dokime
 
-El harness se basa en un principio: **cada paso lo propone alguien (un agente o una persona) y lo
-acepta o rechaza una verificación mecánica**. Este repositorio aplica ese mismo principio a su
-propio desarrollo. Las reglas de este documento no dependen de la buena voluntad: cada una tiene
-una puerta en CI que la comprueba.
+*Leer en [español](CONTRIBUTING.es.md).*
 
-| Principio del harness | Cómo se aplica aquí |
+The harness rests on one principle: **every step is proposed by someone (an agent or a person) and
+accepted or rejected by a mechanical check**. This repository applies the same principle to its own
+development. The rules in this document do not depend on goodwill: each one has a gate in CI that
+checks it.
+
+| Harness principle | How it applies here |
 |---|---|
-| Decisión + verificación mecánica | Todo entra por PR; se mergea solo con CI en verde y aprobación humana |
-| Contrato EARS | Cada ámbito tiene sus requisitos en `docs/requirements/<ámbito>.md` antes del código |
-| Trazabilidad requisito ↔ test | Cada fichero de test declara qué requisitos prueba; CI falla si alguno queda sin test |
-| Radio de impacto acotado | Cada rama declara un ámbito y CI rechaza cambios fuera de sus rutas |
-| Registro de decisiones | ADR en `docs/adr/`; la historia vive en git, no en el código |
-| Criterios de salida | Cada fase de [docs/ROADMAP.md](docs/ROADMAP.md) tiene los suyos; la siguiente no se abre sin cumplirlos |
+| Decision + mechanical verification | Everything goes through a pull request; it is merged only with CI green and human approval |
+| EARS contract | Each scope has its requirements in `docs/requirements/<scope>.md` before any code |
+| Requirement ↔ test traceability | Every test file declares which requirements it proves; CI fails if any is left without a test |
+| Bounded blast radius | Every branch declares one scope and CI rejects changes outside its paths |
+| Decision record | ADRs in `docs/adr/`; history lives in git, not in the code |
+| Exit criteria | Each phase of [docs/ROADMAP.md](docs/ROADMAP.md) has its own; the next one does not open until they are met |
 
-## Ciclo de un ámbito
+## Lifecycle of a scope
 
-Un ámbito es un módulo del harness (`core`, `graph`, `spec`...) o una pieza de gobierno (`repo`,
-`arch`). Su lista cerrada está en [tools/scopes.toml](tools/scopes.toml), con las rutas que le
-pertenecen.
+A scope is a harness module (`core`, `graph`, `spec`...) or a governance piece (`repo`, `arch`).
+The closed list is in [tools/scopes.toml](tools/scopes.toml), with the paths that belong to each.
 
-1. **Abrir.** Se declara el ámbito en `tools/scopes.toml`, se crea la rama y se escriben los
-   requisitos EARS. Ver la skill [abrir-modulo](.claude/skills/abrir-modulo/SKILL.md).
-2. **Construir con TDD.** Cada requisito pasa por un test en rojo demostrado antes de la
-   implementación. Ver la skill [tdd](.claude/skills/tdd/SKILL.md).
-3. **Cerrar.** Se ejecutan todas las puertas en local, se redacta el informe de cierre y se abre o
-   actualiza el PR. Ver la skill [cerrar-modulo](.claude/skills/cerrar-modulo/SKILL.md).
+1. **Open.** Declare the scope in `tools/scopes.toml`, create the branch and write the EARS
+   requirements. See the [open-scope](.claude/skills/open-scope/SKILL.md) skill.
+2. **Build with TDD.** Every requirement goes through a demonstrated red test before its
+   implementation. See the [tdd](.claude/skills/tdd/SKILL.md) skill.
+3. **Close.** Run every gate locally, write the closing report and open or update the pull
+   request. See the [close-scope](.claude/skills/close-scope/SKILL.md) skill.
 
-**Solo hay un ámbito de módulo abierto a la vez.** El siguiente no se abre hasta que el anterior
-está mergeado.
+**Only one module scope is open at a time.** The next one does not open until the previous one is
+merged.
 
-## Ramas
+## Branches
 
-- `main` está protegida: sin push directo, solo merge por PR con CI en verde.
-- Formato: `tipo/ámbito-descripción`, en minúsculas y con guiones. Por ejemplo
-  `feat/graph-ambiguity-confidence` o `docs/arch-c4-context`.
-- `tipo` es un tipo de Conventional Commits y `ámbito` uno de `tools/scopes.toml`. Los ámbitos no
-  llevan guiones, porque el primer guion separa el ámbito de la descripción.
-- Las ramas viven poco: si una rama crece más de lo que se puede revisar de una sentada, se parte.
-- El merge es **por rebase**: el historial de `main` es lineal y cada commit se conserva.
+- `main` is protected: no direct pushes, only merges through pull requests with CI green.
+- Format: `type/scope-description`, lower case with hyphens. For example
+  `feat/graph-ambiguity-confidence` or `docs/arch-c4-context`.
+- `type` is a Conventional Commits type and `scope` is one from `tools/scopes.toml`. Scopes have no
+  hyphens, because the first hyphen separates the scope from the description.
+- Branches are short-lived: if a branch grows beyond what can be reviewed in one sitting, it is
+  split.
+- Merges are done **by rebase**: the history of `main` is linear and every commit is kept.
 
 ## Commits
 
-Formato [Conventional Commits](https://www.conventionalcommits.org/), en inglés:
+[Conventional Commits](https://www.conventionalcommits.org/) format, in English:
 
 ```
 type(scope): imperative description in lower case
@@ -54,78 +56,90 @@ Optional-Trailer: value
 ```
 
 - `type`: `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, `test`.
-- `scope` es obligatorio y debe ser el ámbito de la rama.
-- La cabecera tiene como máximo 72 caracteres.
-- `feat`, `fix`, `refactor` y `perf` necesitan cuerpo. Los trailers (`Co-Authored-By:`...) no
-  cuentan como cuerpo.
-- Un commit es una unidad de cambio lógica y autocontenida, no el volcado de una sesión.
-- No hay commits de merge en las ramas: se rebasan sobre `main`.
+- `scope` is required and must be the scope of the branch.
+- The header is at most 72 characters long.
+- `feat`, `fix`, `refactor` and `perf` need a body. Trailers (`Co-Authored-By:`...) do not count as
+  a body.
+- A commit is a logical, self-contained unit of change, not the dump of a work session.
+- There are no merge commits on branches: they are rebased onto `main`.
 
 ## Pull requests
 
-- Pequeños y revisables de una sentada. La plantilla pide el ámbito, los requisitos afectados y las
-  puertas.
-- La aprobación humana es la puerta de decisión: CI dice si el cambio es correcto según las
-  reglas; la revisión dice si es el cambio que queremos.
-- Nunca se mergea con CI en rojo ni con un hallazgo de revisión abierto.
+- Small enough to review in one sitting. The template asks for the scope, the affected
+  requirements and the gates.
+- Human approval is the decision gate: CI says whether the change is correct according to the
+  rules; review says whether it is the change we want.
+- Never merge with CI red or with an open review finding.
 
-## Puertas de calidad
+## Quality gates
 
-Todas se ejecutan en CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) y se pueden ejecutar
-en local con los mismos comandos.
+All of them run in CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) and can be run locally
+with the same commands.
 
-| Puerta | Comando | Umbral |
+| Gate | Command | Threshold |
 |---|---|---|
-| Lint, incluida seguridad (`S`) y complejidad ciclomática | `uv run ruff check .` | Sin hallazgos; complejidad ≤ 10 por función |
-| Formato | `uv run ruff format --check .` | Sin diferencias |
-| Tipos | `uv run mypy` | Modo estricto, sin errores |
-| Tests y cobertura | `uv run pytest --cov` | Todos en verde; cobertura de ramas ≥ 90 % |
-| Historia en el código | `uv run python -m tools.check_history` | Sin hallazgos |
-| Sintaxis EARS | `uv run python -m tools.check_ears` | Sin hallazgos |
-| Trazabilidad | `uv run python -m tools.check_traceability` | Todo requisito con test; todo test con marcador |
-| Enlaces en Markdown | `uv run python -m tools.check_links` | Sin enlaces rotos |
-| Ficheros versionados e ignorados | `git ls-files --cached --ignored --exclude-standard` | Salida vacía |
-| Commits | `uv run python -m tools.check_commits --base origin/main --branch <rama>` | Sin hallazgos |
-| Ámbito de la rama | `uv run python -m tools.check_scope --base origin/main --branch <rama>` | Sin hallazgos |
-| Dependencias | `pip-audit` sobre las dependencias del lockfile | Sin vulnerabilidades conocidas |
+| Lint, including security (`S`) and cyclomatic complexity | `uv run ruff check .` | No findings; complexity ≤ 10 per function |
+| Formatting | `uv run ruff format --check .` | No differences |
+| Types | `uv run mypy` | Strict mode, no errors |
+| Tests and coverage | `uv run pytest --cov` | All green; branch coverage ≥ 90 % |
+| History in code | `uv run python -m tools.check_history` | No findings |
+| EARS syntax | `uv run python -m tools.check_ears` | No findings |
+| Traceability | `uv run python -m tools.check_traceability` | Every requirement with a test; every test with a marker |
+| Markdown links | `uv run python -m tools.check_links` | No broken links |
+| Spanish translations | `uv run python -m tools.check_translations` | Every document translated and up to date |
+| Tracked files that are ignored | `git ls-files --cached --ignored --exclude-standard` | Empty output |
+| Commits | `uv run python -m tools.check_commits --base origin/main --branch <branch>` | No findings |
+| Branch scope | `uv run python -m tools.check_scope --base origin/main --branch <branch>` | No findings |
+| Dependencies | `pip-audit` over the locked dependencies | No known vulnerabilities |
 
-Las fronteras entre módulos (contratos de importación) y la validación de diagramas Mermaid se
-añaden en la Fase 1, cuando exista la arquitectura que las define.
+Import contracts between modules and the validation of Mermaid diagrams are added in phase 1, when
+the architecture that defines them exists.
 
-## Requisitos y trazabilidad
+## Requirements and traceability
 
-Cada ámbito tiene un fichero `docs/requirements/<ámbito>.md`. Cada requisito ocupa una línea:
+Each scope has a `docs/requirements/<scope>.md` file. Each requirement takes one line:
 
 ```
 - **CORE-001** When a gate rejects an attempt, the runner shall route to the state named by the gate.
 ```
 
-- El identificador es el nombre del fichero en mayúsculas, un guion y tres dígitos.
-- La frase sigue una de las cinco plantillas EARS, contiene un solo `shall` y no usa términos
-  vagos. La skill [requisitos-ears](.claude/skills/requisitos-ears/SKILL.md) explica cómo
-  escribirlos.
-- Cada fichero de test declara en su primera línea no vacía qué requisitos prueba:
+- The identifier is the file name in upper case, a hyphen and three digits.
+- The statement follows one of the five EARS templates, contains a single `shall` and uses no
+  vague terms. The [ears-requirements](.claude/skills/ears-requirements/SKILL.md) skill explains
+  how to write them.
+- Every test file declares on its first non-empty line which requirements it proves:
 
   ```python
   # SDD-EARS: CORE-001 CORE-002
   ```
 
-## Comentarios y documentación
+## Languages
 
-- **El código explica qué hace y por qué, no cómo se llegó ahí.** Nada de identificadores de tarea,
-  versiones, fechas ni relatos de incidentes en comentarios o docstrings: eso está en git y en los
-  ADR. `tools/check_history.py` lo rechaza.
-- Un comentario que no aporta nada que el código no diga ya, sobra.
-- Toda referencia a un documento debe apuntar a un fichero que existe en el repositorio.
-- Idiomas: la documentación va en español; el código, los identificadores, los comentarios, los
-  mensajes de commit y los requisitos EARS van en inglés ([ADR-0005](docs/adr/0005-idiomas.md)).
+Following [ADR-0005](docs/adr/0005-languages.md):
 
-## Definición de terminado de un ámbito
+- **English** for code and everything around it: source, identifiers, comments, docstrings,
+  commit messages, EARS requirements, module READMEs and the files agents read (`CLAUDE.md`,
+  `.claude/skills/`, the pull request template).
+- **English and Spanish** for human-facing documentation (README, CONTRIBUTING, roadmap, ADRs,
+  architecture). English is the source; the Spanish version lives next to it as `<name>.es.md`.
+- The first line of a Spanish version records the hash of the English text it translates. When the
+  English file changes, `tools/check_translations.py` fails and prints the new header line to set
+  once the translation has been reviewed.
 
-- Requisitos EARS escritos y revisados.
-- Cada requisito con al menos un test, rojo demostrado antes de su implementación.
-- Interfaz pública documentada en un README breve del módulo: qué hace y cómo se usa.
-- Todas las puertas en verde, en local y en CI.
-- ADR para cada decisión con consecuencias.
-- Informe de cierre en la descripción del PR.
-- Criterios de salida de la fase actualizados en [docs/ROADMAP.md](docs/ROADMAP.md).
+## Comments and documentation
+
+- **Code explains what it does and why, not how it got there.** No task identifiers, versions,
+  dates or incident stories in comments or docstrings: that belongs in git and in the ADRs.
+  `tools/check_history.py` rejects it.
+- A comment that adds nothing the code does not already say should go.
+- Every reference to a document must point to a file that exists in the repository.
+
+## Definition of done for a scope
+
+- EARS requirements written and reviewed.
+- Every requirement with at least one test, red demonstrated before its implementation.
+- Public interface documented in a short module README: what it does and how to use it.
+- Every gate green, locally and in CI.
+- An ADR for every decision with consequences.
+- Closing report in the pull request description.
+- Exit criteria of the phase updated in [docs/ROADMAP.md](docs/ROADMAP.md).

@@ -6,7 +6,7 @@ Each phase has exit criteria. **The next phase does not open until the previous 
 them** ([ADR-0003](adr/0003-rules-enforced-in-ci.md)). If a criterion turns out to be impossible or
 wrong, it is changed here in its own pull request with its reason, not skipped.
 
-## Phase 0 · Working agreement and gates — in progress
+## Phase 0 · Working agreement and gates — done
 
 Working rules, CI pipeline and development skills, with no harness code.
 
@@ -21,7 +21,7 @@ Exit criteria:
 - [x] Development skills in `.claude/skills/`.
 - [x] Documentation in English and Spanish, with translations checked in CI.
 - [x] CI green on the phase pull request in GitHub.
-- [ ] Protection of `main` enabled in GitHub (manual action, see below).
+- [x] Protection of `main` enforced in GitHub (see below).
 
 ## Phase 1 · Reference architecture
 
@@ -71,12 +71,16 @@ Initial language scope: Python and Java. Go and TypeScript come in once the core
 Exit criteria for each module: the definition of done in
 [CONTRIBUTING.md](../CONTRIBUTING.md#definition-of-done-for-a-scope).
 
-## Pending manual actions
+## GitHub settings
 
-GitHub settings that cannot be versioned in the repository:
+Settings that live in GitHub and cannot be versioned in the repository. The repository is public,
+which is what makes GitHub enforce the ruleset on a personal account.
 
-- **Protection of `main`** (Settings → Rules → Rulesets, or Branches): require a pull request to
-  merge, require the CI checks to pass (`lint, types and tests`, `governance checks`,
-  `commits and branch scope`, `dependency audit`), require a linear history, and block force
-  pushes and deletion.
-- **Merge methods** (Settings → General → Pull Requests): allow only *Rebase and merge*.
+A ruleset on `main` (Settings → Rules → Rulesets):
+
+- Pull request required to merge, with *Rebase* as the only merge method. No approval count is
+  required, because GitHub does not let authors approve their own pull requests; merging is the
+  approval.
+- The four CI checks must pass (`lint, types and tests`, `governance checks`,
+  `commits and branch scope`, `dependency audit`), on a branch that is up to date with `main`.
+- Linear history required; force pushes and deletion blocked.

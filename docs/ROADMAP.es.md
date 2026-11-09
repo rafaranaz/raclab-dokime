@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:dbab96c1fa900635 -->
+<!-- translation-of: ROADMAP.md sha256:50142fb0d265d0a6 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -7,7 +7,7 @@ Cada fase tiene criterios de salida. **La siguiente fase no se abre hasta que la
 cumple todos** ([ADR-0003](adr/0003-rules-enforced-in-ci.es.md)). Si un criterio resulta imposible
 o equivocado, se cambia aquí en un PR propio y con su razón, no se salta.
 
-## Fase 0 · Forma de trabajo y puertas — en curso
+## Fase 0 · Forma de trabajo y puertas — terminada
 
 Reglas de trabajo, pipeline de CI y skills de desarrollo, sin código del harness.
 
@@ -21,7 +21,7 @@ Criterios de salida:
 - [x] Skills de desarrollo en `.claude/skills/`.
 - [x] Documentación en inglés y en español, con las traducciones comprobadas en CI.
 - [x] CI en verde sobre el PR de la fase en GitHub.
-- [ ] Protección de `main` activada en GitHub (acción manual, ver abajo).
+- [x] Protección de `main` aplicada en GitHub (ver abajo).
 
 ## Fase 1 · Arquitectura de referencia
 
@@ -73,12 +73,15 @@ Alcance inicial de lenguajes: Python y Java. Go y TypeScript entran cuando el n�
 Criterios de salida de cada módulo: la definición de terminado de
 [CONTRIBUTING.es.md](../CONTRIBUTING.es.md#definición-de-terminado-de-un-ámbito).
 
-## Acciones manuales pendientes
+## Configuración de GitHub
 
-Configuración de GitHub que no se puede versionar en el repositorio:
+Ajustes que viven en GitHub y no se pueden versionar en el repositorio. El repositorio es público,
+que es lo que hace que GitHub aplique el ruleset en una cuenta personal.
 
-- **Protección de `main`** (Settings → Rules → Rulesets, o Branches): exigir PR para integrar,
-  exigir que pasen los checks de CI (`lint, types and tests`, `governance checks`,
-  `commits and branch scope`, `dependency audit`), exigir historial lineal y bloquear el push
-  forzado y el borrado.
-- **Métodos de merge** (Settings → General → Pull Requests): permitir solo *Rebase and merge*.
+Un ruleset sobre `main` (Settings → Rules → Rulesets):
+
+- PR obligatorio para integrar, con *Rebase* como único método de merge. No se exige ninguna
+  aprobación, porque GitHub no deja a los autores aprobar sus propios PR; mergear es la aprobación.
+- Los cuatro checks de CI tienen que pasar (`lint, types and tests`, `governance checks`,
+  `commits and branch scope`, `dependency audit`), sobre una rama al día con `main`.
+- Historial lineal obligatorio; push forzado y borrado bloqueados.

@@ -21,6 +21,7 @@ uv run python -m tools.check_ears
 uv run python -m tools.check_traceability
 uv run python -m tools.check_links
 uv run python -m tools.check_translations
+npm ci && uv run python -m tools.check_mermaid
 git ls-files --cached --ignored --exclude-standard
 uv run python -m tools.check_commits --base origin/main --branch "$(git branch --show-current)"
 uv run python -m tools.check_scope --base origin/main --branch "$(git branch --show-current)"

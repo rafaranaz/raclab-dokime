@@ -89,13 +89,14 @@ with the same commands.
 | Traceability | `uv run python -m tools.check_traceability` | Every requirement with a test; every test with a marker |
 | Markdown links | `uv run python -m tools.check_links` | No broken links |
 | Spanish translations | `uv run python -m tools.check_translations` | Every document translated and up to date |
+| Mermaid diagrams | `npm ci` once, then `uv run python -m tools.check_mermaid` | Every diagram renders; fails if the renderer is missing |
 | Tracked files that are ignored | `git ls-files --cached --ignored --exclude-standard` | Empty output |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <branch>` | No findings |
 | Branch scope | `uv run python -m tools.check_scope --base origin/main --branch <branch>` | No findings |
 | Dependencies | `pip-audit` over the locked dependencies | No known vulnerabilities |
 
-Import contracts between modules and the validation of Mermaid diagrams are added in phase 1, when
-the architecture that defines them exists.
+Import contracts between modules are added in phase 1, when the architecture that defines them
+exists.
 
 ## Requirements and traceability
 

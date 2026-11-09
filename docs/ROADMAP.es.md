@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:50142fb0d265d0a6 -->
+<!-- translation-of: ROADMAP.md sha256:327db507da8267cc -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -50,7 +50,7 @@ Decisiones a revisar con evidencia, cada una en su ADR:
 Puertas que se añaden en esta fase, porque dependen de la arquitectura:
 
 - Contratos de importación entre módulos (import-linter), derivados del diagrama de módulos.
-- Validación de los diagramas Mermaid.
+- Validación de los diagramas Mermaid, activa antes de escribir el primer diagrama.
 
 Criterios de salida:
 

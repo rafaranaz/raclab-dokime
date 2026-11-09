@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:66baba38e2a265e9 -->
+<!-- translation-of: CONTRIBUTING.md sha256:66b5475039460e23 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -90,13 +90,14 @@ en local con los mismos comandos.
 | Trazabilidad | `uv run python -m tools.check_traceability` | Todo requisito con test; todo test con marcador |
 | Enlaces en Markdown | `uv run python -m tools.check_links` | Sin enlaces rotos |
 | Traducciones al español | `uv run python -m tools.check_translations` | Todo documento traducido y al día |
+| Diagramas Mermaid | `npm ci` una vez, y luego `uv run python -m tools.check_mermaid` | Todo diagrama se renderiza; falla si falta el renderizador |
 | Ficheros versionados e ignorados | `git ls-files --cached --ignored --exclude-standard` | Salida vacía |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <rama>` | Sin hallazgos |
 | Ámbito de la rama | `uv run python -m tools.check_scope --base origin/main --branch <rama>` | Sin hallazgos |
 | Dependencias | `pip-audit` sobre las dependencias del lockfile | Sin vulnerabilidades conocidas |
 
-Los contratos de importación entre módulos y la validación de los diagramas Mermaid se añaden en la
-Fase 1, cuando exista la arquitectura que los define.
+Los contratos de importación entre módulos se añaden en la Fase 1, cuando exista la arquitectura que
+los define.
 
 ## Requisitos y trazabilidad
 

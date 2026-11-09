@@ -49,7 +49,7 @@ Decisions to review with evidence, each in its own ADR:
 Gates added in this phase, because they depend on the architecture:
 
 - Import contracts between modules (import-linter), derived from the module diagram.
-- Validation of the Mermaid diagrams.
+- Validation of the Mermaid diagrams, in place before the first diagram is written.
 
 Exit criteria:
 

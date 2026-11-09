@@ -20,7 +20,7 @@ Exit criteria:
 - [x] ADRs for the process decisions.
 - [x] Development skills in `.claude/skills/`.
 - [x] Documentation in English and Spanish, with translations checked in CI.
-- [ ] CI green on the phase pull request in GitHub.
+- [x] CI green on the phase pull request in GitHub.
 - [ ] Protection of `main` enabled in GitHub (manual action, see below).
 
 ## Phase 1 · Reference architecture

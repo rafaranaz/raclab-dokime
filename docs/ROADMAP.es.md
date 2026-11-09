@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:d6ddcfcf03dfe778 -->
+<!-- translation-of: ROADMAP.md sha256:dbab96c1fa900635 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -20,7 +20,7 @@ Criterios de salida:
 - [x] ADR de las decisiones de proceso.
 - [x] Skills de desarrollo en `.claude/skills/`.
 - [x] Documentación en inglés y en español, con las traducciones comprobadas en CI.
-- [ ] CI en verde sobre el PR de la fase en GitHub.
+- [x] CI en verde sobre el PR de la fase en GitHub.
 - [ ] Protección de `main` activada en GitHub (acción manual, ver abajo).
 
 ## Fase 1 · Arquitectura de referencia

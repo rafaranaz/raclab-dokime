@@ -8,7 +8,7 @@ body_required = ["feat", "fix", "refactor", "perf"]
 
 # Paths any branch may touch, whatever its scope. This file is shared so that a module branch can
 # declare its own scope; reviewers check that a branch only adds or changes its own entry.
-shared = ["docs/adr/**", "docs/ROADMAP.md", "tools/scopes.toml"]
+shared = ["docs/adr/**", "docs/ROADMAP.md", "docs/ROADMAP.es.md", "tools/scopes.toml"]
 
 [scopes.repo]
 description = "Repository governance: tooling, CI, working agreement, development skills."
@@ -18,8 +18,10 @@ paths = [
     ".gitignore",
     ".python-version",
     "CLAUDE.md",
+    "CONTRIBUTING.es.md",
     "CONTRIBUTING.md",
     "LICENSE",
+    "README.es.md",
     "README.md",
     "docs/requirements/repo.md",
     "pyproject.toml",

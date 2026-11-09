@@ -45,6 +45,8 @@ jobs:
         run: uv run python -m tools.check_traceability
       - name: Markdown links
         run: uv run python -m tools.check_links
+      - name: Spanish translations up to date
+        run: uv run python -m tools.check_translations
       - name: No tracked file is ignored
         run: |
           ignored="$(git ls-files --cached --ignored --exclude-standard)"

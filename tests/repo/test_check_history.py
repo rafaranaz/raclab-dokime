@@ -56,6 +56,16 @@ def test_reports_references_to_missing_markdown_files() -> None:
     assert "docs/definicion/20_DISENO.md" in findings[0].message
 
 
+def test_ignores_bare_extensions_after_placeholders() -> None:
+    source = "# Translations live next to the source as `<name>.es.md`.\n"
+    assert scan_source(source, "tools/a.py", EXISTING) == []
+
+
+def test_resolves_references_relative_to_the_file() -> None:
+    source = "# See ../ROADMAP.md.\n"
+    assert scan_source(source, "docs/adr/a.py", EXISTING | {"docs/ROADMAP.md"}) == []
+
+
 def test_main_scans_tracked_python_files(repo: Path, git: GitRunner) -> None:
     write(repo, "src/ok.py", "# Explains what it does.\nx = 1\n")
     write(repo, "notes/ignored.py", "# T1.1 outside the scanned folders\n")

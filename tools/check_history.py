@@ -25,7 +25,7 @@ HISTORY_MARKERS = (
         re.compile(r"\b(used to|root cause|was changed|before this change|after the fix)\b", re.I),
     ),
 )
-MARKDOWN_REFERENCE = re.compile(r"(?<![\w/.-])([\w./-]+\.md)\b")
+MARKDOWN_REFERENCE = re.compile(r"(?<![\w/.-])((?:\.{1,2}/)*\w[\w./-]*\.md)\b")
 
 _DOCSTRING_PREDECESSORS = {
     tokenize.INDENT,

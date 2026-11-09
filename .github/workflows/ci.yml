@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: lint, types and tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format
+        run: uv run ruff format --check .
+      - name: Types
+        run: uv run mypy
+      - name: Tests and coverage
+        run: uv run pytest --cov
+
+  governance:
+    name: governance checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked
+      - name: No history in code
+        run: uv run python -m tools.check_history
+      - name: EARS syntax
+        run: uv run python -m tools.check_ears
+      - name: Requirement to test traceability
+        run: uv run python -m tools.check_traceability
+      - name: Markdown links
+        run: uv run python -m tools.check_links
+      - name: Spanish translations up to date
+        run: uv run python -m tools.check_translations
+      - name: No tracked file is ignored
+        run: |
+          ignored="$(git ls-files --cached --ignored --exclude-standard)"
+          if [ -n "$ignored" ]; then echo "Tracked files matched by .gitignore:"; echo "$ignored"; exit 1; fi
+
+  discipline:
+    name: commits and branch scope
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    env:
+      BASE: origin/${{ github.base_ref }}
+      BRANCH: ${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked
+      - name: Conventional Commits with the branch scope
+        run: uv run python -m tools.check_commits --base "$BASE" --branch "$BRANCH"
+      - name: Changes stay inside the branch scope
+        run: uv run python -m tools.check_scope --base "$BASE" --branch "$BRANCH"
+
+  audit:
+    name: dependency audit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked
+      - name: Known vulnerabilities in locked dependencies
+        run: |
+          uv export --frozen --no-emit-project --format requirements-txt -o "$RUNNER_TEMP/requirements.txt"
+          uv run pip-audit --strict --disable-pip --require-hashes -r "$RUNNER_TEMP/requirements.txt"

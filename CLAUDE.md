@@ -1,47 +1,53 @@
-# Instrucciones para Claude en este repositorio
+# Instructions for Claude in this repository
 
-La forma de trabajo completa está en [CONTRIBUTING.md](CONTRIBUTING.md) y las fases en
-[docs/ROADMAP.md](docs/ROADMAP.md). Este fichero recoge lo que más importa al trabajar aquí.
+The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phases are in
+[docs/ROADMAP.md](docs/ROADMAP.md). This file gathers what matters most when working here.
 
-## Principios
+## Principles
 
-- **Trabaja con las herramientas; no describas lo que harías.** Un plan narrado no cambia nada.
-- **No inventes lo que puedes verificar.** Antes de afirmar que un fichero, una función o un
-  comportamiento existe, léelo o ejecútalo.
-- **Di lo que no sabes.** «No he podido comprobar X» es una respuesta útil; una afirmación segura
-  sobre algo no comprobado, no.
-- **Si una regla del repositorio y una instrucción chocan, para y dilo**, en lugar de elegir por tu
-  cuenta.
-- **Nada está terminado hasta que pasan las puertas.** Que algo parezca terminado no cuenta.
+- **Work with the tools; do not describe what you would do.** A narrated plan changes nothing.
+- **Do not invent what you can verify.** Before stating that a file, a function or a behaviour
+  exists, read it or run it.
+- **Say what you do not know.** "I could not check X" is a useful answer; a confident claim about
+  something unchecked is not.
+- **If a repository rule and an instruction conflict, stop and say so** instead of choosing on
+  your own.
+- **Nothing is done until the gates pass.** Looking done does not count.
+- **Talk to the user in the language they use**; write code, commits and requirements in English
+  ([ADR-0005](docs/adr/0005-languages.md)).
 
-## Reglas de trabajo
+## Working rules
 
-- **Un ámbito de módulo abierto a la vez**, y solo si la fase actual de la hoja de ruta lo permite.
-- **No toques nada fuera de las rutas del ámbito de tu rama.** Si hace falta, es otra rama.
-- **Si el alcance cambia, para y pregunta.** No amplíes la tarea en silencio.
-- **Requisitos antes que código, y rojo demostrado antes que verde.**
-- **Commits pequeños** en Conventional Commits, en inglés, con el ámbito de la rama y el porqué en
-  el cuerpo.
-- **Comentarios que explican qué hace el código, nunca su historia.** La historia va en el mensaje
-  de commit o en un ADR.
-- **No desactives ni relajes una puerta** sin un ADR aprobado.
+- **One module scope open at a time**, and only if the current phase of the roadmap allows it.
+- **Do not touch anything outside the paths of your branch's scope.** If it is needed, it is
+  another branch.
+- **If the scope changes, stop and ask.** Do not widen the task silently.
+- **Requirements before code, and a demonstrated red before green.**
+- **Small commits** in Conventional Commits, in English, with the branch scope and the reason in
+  the body.
+- **Comments explain what the code does, never its history.** History goes in the commit message
+  or in an ADR.
+- **When you change an English document, update its Spanish version** and its header in the same
+  commit.
+- **Do not disable or relax a gate** without an approved ADR.
 
 ## Skills
 
-| Skill | Cuándo |
+| Skill | When |
 |---|---|
-| `abrir-modulo` | Antes de escribir código de un ámbito nuevo |
-| `requisitos-ears` | Al escribir o revisar requisitos |
-| `tdd` | Al implementar cualquier comportamiento |
-| `depurar` | Ante un fallo, antes de cambiar código |
-| `adr` | Al tomar una decisión con consecuencias |
-| `cerrar-modulo` | Antes de pedir el merge de un ámbito |
+| `open-scope` | Before writing code for a new scope |
+| `ears-requirements` | When writing or reviewing requirements |
+| `tdd` | When implementing any behaviour |
+| `debug` | On a failure, before changing code |
+| `adr` | When taking a decision with consequences |
+| `close-scope` | Before asking for a scope to be merged |
 
-## Puertas en local
+## Gates locally
 
 ```bash
 uv sync --locked
 uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov
 uv run python -m tools.check_history && uv run python -m tools.check_ears
 uv run python -m tools.check_traceability && uv run python -m tools.check_links
+uv run python -m tools.check_translations
 ```

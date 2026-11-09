@@ -1,15 +1,16 @@
-## Qué cambia y por qué
+## What changes and why
 
-<!-- Una o dos frases. El detalle de cada paso está en los commits. -->
+<!-- One or two sentences. The detail of each step is in the commits. -->
 
-## Ámbito
+## Scope
 
-- Rama: `tipo/ámbito-descripción`
-- Requisitos afectados: <!-- p. ej. CORE-001, CORE-004, o "ninguno" -->
+- Branch: `type/scope-description`
+- Affected requirements: <!-- e.g. CORE-001, CORE-004, or "none" -->
 
-## Puertas
+## Gates
 
-- [ ] CI en verde (calidad, gobierno, disciplina, auditoría)
-- [ ] Todo requisito nuevo o cambiado tiene su test, con el marcador `SDD-EARS`
-- [ ] Si hubo una decisión relevante, hay un ADR nuevo o que sustituye a otro
-- [ ] Si cierra un módulo, incluye el informe de cierre (ver `.claude/skills/cerrar-modulo`)
+- [ ] CI green (quality, governance, discipline, audit)
+- [ ] Every new or changed requirement has its test, with the `SDD-EARS` marker
+- [ ] Every changed document has its Spanish version updated
+- [ ] If there was a relevant decision, there is a new ADR or one that supersedes another
+- [ ] If it closes a scope, it includes the closing report (see `.claude/skills/close-scope`)

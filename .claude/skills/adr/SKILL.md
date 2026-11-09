@@ -1,49 +1,51 @@
 ---
 name: adr
-description: Redactar un ADR en docs/adr/. Usar cuando se toma una decisión con consecuencias sobre la arquitectura, las herramientas o el proceso.
+description: Write an ADR in docs/adr/. Use when taking a decision with consequences on the architecture, the tools or the process.
 ---
 
 # ADR
 
-Un ADR documenta una decisión con consecuencias, no un resumen de lo hecho. Si al leerlo dentro de
-un año no se entiende por qué **no** se eligió la alternativa, el ADR ha fallado.
+An ADR records a decision with consequences, not a summary of what was done. If, reading it a year
+from now, it is not clear why the alternative was **not** chosen, the ADR has failed.
 
-## Cuándo escribir uno
+## When to write one
 
-- Se elige entre alternativas reales y la elección condiciona trabajo futuro.
-- Se cambia una regla de proceso o una puerta de CI.
-- Se acepta una limitación conocida.
+- A choice is made between real alternatives and it conditions future work.
+- A process rule or a CI gate changes.
+- A known limitation is accepted.
 
-No hace falta para cambios cuyo porqué cabe en el mensaje de commit.
+It is not needed for changes whose reason fits in the commit message.
 
-## Formato
+## Format
 
-Fichero `docs/adr/NNNN-titulo-en-minusculas.md`, con el siguiente número libre, y una fila nueva en
-el índice `docs/adr/README.md`.
+File `docs/adr/NNNN-title-in-lower-case.md`, with the next free number, its Spanish version
+`docs/adr/NNNN-title-in-lower-case.es.md`, and a new row in both indexes (`docs/adr/README.md` and
+`docs/adr/README.es.md`).
 
 ```markdown
-# ADR-NNNN · Título que nombra la decisión
+# ADR-NNNN · Title that names the decision
 
-**Estado:** propuesta | aceptada | sustituida por ADR-MMMM
+**Status:** proposed | accepted | superseded by ADR-MMMM
 
-## Contexto
-Las fuerzas en juego: restricciones reales y evidencia, no deseos.
+## Context
+The forces at play: real constraints and evidence, not wishes.
 
-## Decisión
-Lo que se elige, en presente y en voz activa («Usamos X»).
+## Decision
+What is chosen, in the present tense and active voice ("We use X").
 
-## Alternativas descartadas
-Al menos una, cada una con la razón concreta por la que se descartó.
+## Alternatives considered
+At least one, each with the concrete reason it was discarded.
 
-## Consecuencias
-Lo bueno y lo malo. Toda decisión tiene un coste; si no lo encuentras, no has entendido la decisión.
+## Consequences
+The good and the bad. Every decision has a cost; if you cannot find it, you have not understood
+the decision.
 ```
 
-## Reglas
+## Rules
 
-- **Un ADR, una decisión.** Si el título lleva una «y», son dos.
-- **Los ADR aceptados no se editan, se sustituyen.** Cambiar de opinión es legítimo; reescribir la
-  historia inutiliza el registro. Lo único que se toca en un ADR antiguo es su estado.
-- **No repitas lo que el código ya dice.** El ADR recoge lo que el código no puede decir: por qué
-  esto y no aquello.
-- **Un ADR nace como `propuesta`** y pasa a `aceptada` cuando su PR se aprueba.
+- **One ADR, one decision.** If the title has an "and" joining two choices, it is two ADRs.
+- **Accepted ADRs are not edited, they are superseded.** Changing one's mind is legitimate;
+  rewriting history makes the record useless. The only thing changed in an old ADR is its status.
+- **Do not repeat what the code already says.** The ADR records what the code cannot say: why this
+  and not that.
+- **An ADR is born as `proposed`** and becomes `accepted` when its pull request is approved.

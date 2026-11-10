@@ -10,6 +10,12 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
   exists, read it or run it.
 - **Say what you do not know.** "I could not check X" is a useful answer; a confident claim about
   something unchecked is not.
+- **Look outward before proposing.** Before recommending a design or answering a design question,
+  search for how existing tools, standards and published studies handle it, and search for
+  evidence against the first idea as well as for it. Report three things apart: what was verified,
+  what was looked for and not found, and what is only reasoning. An earlier implementation is not
+  evidence. A decision may rest on reasoning alone; it then says so, lists the alternatives
+  considered and, where it is worth the cost, the test that would confirm it.
 - **If a repository rule and an instruction conflict, stop and say so** instead of choosing on
   your own.
 - **Nothing is done until the gates pass.** Looking done does not count.

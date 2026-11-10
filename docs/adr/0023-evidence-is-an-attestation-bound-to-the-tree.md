@@ -27,8 +27,13 @@ rebase, and GitHub rewrites the commits when it does, so a commit identifier cha
   the answers of people, the outputs of models and the list of unstable tests, so a replay command
   can run the gates again from the stored artifacts without asking anyone. Sealed gates can be
   replayed only where the key is.
+- Evidence is produced for every finished run, whatever its verdict, and attested the same way. A
+  rejected change has evidence and no delivery.
 - A command of its own, which depends only on the `evidence` and `core` modules, verifies an
-  evidence file.
+  evidence file. It checks the signatures against the list of allowed signers
+  ([ADR-0024](0024-approval-attestation-and-commit-are-signed-separately.md)), the schema, that
+  the digest of the subject matches the tree, the chain of the ledger, and the gates against the
+  flow file. It runs nothing again; that is the replay.
 
 ## Basis
 

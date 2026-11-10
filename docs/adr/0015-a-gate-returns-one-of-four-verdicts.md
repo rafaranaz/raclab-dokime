@@ -37,4 +37,6 @@ change for an unrelated failure.
 ## Consequences
 
 - Every consumer of a verdict has to handle four cases.
-- In a mode without questions, reaching a question ends the run as rejected with that reason.
+- In a mode without questions, reaching a question ends the run as pending a person, with that
+  reason. It neither rejects nor passes: the check of the pull request stays pending until a
+  person answers and the run is repeated.

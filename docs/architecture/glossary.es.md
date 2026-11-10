@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:a19730b118a99723 -->
+<!-- translation-of: glossary.md sha256:66d202eed8f9a1a0 -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -45,5 +45,5 @@ término.
 | Estado final | Un estado del flujo sin puerta ni transición. O entrega o no entrega |
 | Identidad | Quién tomó una decisión humana, junto con cómo se estableció: firmada, declarada, o a través de un cliente y sin verificar |
 | Repetición | Recalcular el veredicto de una ejecución desde su registro y sus artefactos guardados, sin preguntar a nadie |
-| Entrega | Producir el commit y la evidencia de un cambio. Solo puede hacerlo un estado del flujo que entrega |
+| Entrega | Producir el commit de un cambio y adjuntarle su evidencia. Solo puede hacerlo un estado del flujo que entrega. Hay evidencia de toda ejecución terminada, se entregue o no |
 | Respuesta delegada | Una respuesta a una pregunta de la entrevista que una persona dejó a un modelo. Va marcada, y nunca aprueba un ejemplo ni un contrato ni responde a una puerta |

@@ -43,5 +43,5 @@ a decision needs another meaning, it needs another term.
 | Final state | A state of the flow with no gate and no transition. It either delivers or it does not |
 | Identity | Who took a human decision, together with how that was established: signed, declared, or through a client and unverified |
 | Replay | Recomputing the verdict of a run from its ledger and stored artifacts, without asking anyone |
-| Delivery | Producing the commit and the evidence of a change. Only a state of the flow that delivers can do it |
+| Delivery | Producing the commit of a change and attaching its evidence. Only a state of the flow that delivers can do it. Evidence exists for every finished run, delivered or not |
 | Delegated answer | An answer to an interview question that a person left to a model. It is marked, and it never approves an example or a contract nor answers a gate |

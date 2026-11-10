@@ -1,4 +1,4 @@
-<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:9c9bbe4761ba1ba3 -->
+<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:260781376e01e6a0 -->
 # ADR-0031 · Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición
 
 **Estado:** propuesta
@@ -19,9 +19,9 @@ y el 80 % de los casos estudiados.
 - Los adaptadores (`sandbox`, `agents`, `gateway`) importan solo `core` e implementan sus puertos.
   Solo `interfaces`, la raíz de composición, importa adaptadores.
 - `evidence` no importa nada más que `core`, para que verificar una evidencia se pueda instalar
-  por separado.
-- Todo puerto tiene dos adaptadores previstos desde el principio, y toma la forma de un estándar
-  existente donde lo hay.
+  solo con esos dos módulos.
+- Todo puerto tiene al menos dos adaptadores previstos desde el principio, y toma la forma de un
+  estándar existente donde lo hay.
 - Estas reglas son contratos de importación comprobados en CI.
 
 ## Base

@@ -1,4 +1,4 @@
-<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:7070f08872ca81c3 -->
+<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:c2b2b3842e9fd4eb -->
 # ADR-0020 · Aislar al agente es opcional; la adopción es una escalera
 
 **Estado:** propuesta
@@ -21,7 +21,7 @@ garantías del producto no salen de dónde corrió el agente.
 - El envoltorio está desactivado salvo que el usuario o la política lo pidan. La copia de trabajo
   también es opcional: el agente puede trabajar en el repositorio del usuario, en una rama, desde
   un árbol limpio.
-- **La clave de los ejemplos sellados vive solo en CI.** La máquina de un desarrollador no puede
+- **La clave de los lotes sellados vive solo en CI.** La máquina de un desarrollador no puede
   descifrarlos. Su secreto empieza en el reparto: antes, los ejemplos están en claro donde se
   especifica el contrato, así que la evidencia registra la barrera entre ese sitio y el agente:
   otra máquina, el envoltorio, otro usuario del sistema, o ninguna.

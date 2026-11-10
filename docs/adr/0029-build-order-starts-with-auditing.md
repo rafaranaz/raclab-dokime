@@ -15,7 +15,7 @@ it:
 | Block | What is built | Modules, in order |
 |---|---|---|
 | A · Audit | Verify a finished patch against a hand-written contract | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` |
-| B · Hold out | Sealed and derived examples | `oracle`, `verify`, `bench` |
+| B · Hold out | Held-out and derived examples | `oracle`, `verify`, `bench` |
 | C · Launch | The harness drives an agent, with the loop and disputes | `sandbox` (work), `agents`, `engine` |
 | D · Protect | Changed-line coverage, impact map, behaviour differences | `verify` |
 | E · Attest | Signatures, independent verification, re-verification in CI | `evidence`, `delivery` |

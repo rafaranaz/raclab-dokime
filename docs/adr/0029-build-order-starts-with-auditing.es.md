@@ -1,4 +1,4 @@
-<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:95fe56d639a9f697 -->
+<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:c8c067214bc0bddc -->
 # ADR-0029 · El orden de construcción empieza por auditar un cambio que ya existe
 
 **Estado:** propuesta
@@ -16,7 +16,7 @@ de módulo abierto a la vez:
 | Bloque | Qué se construye | Módulos, en orden |
 |---|---|---|
 | A · Auditar | Verificar un parche terminado contra un contrato escrito a mano | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `verify`, `evidence`, `interfaces` |
-| B · Reservar | Ejemplos sellados y derivados | `oracle`, `verify`, `bench` |
+| B · Reservar | Ejemplos reservados y derivados | `oracle`, `verify`, `bench` |
 | C · Lanzar | El arnés dirige a un agente, con el bucle y las impugnaciones | `sandbox` (trabajo), `agents`, `engine` |
 | D · Proteger | Cobertura de líneas cambiadas, mapa de impacto, diferencias de comportamiento | `verify` |
 | E · Atestar | Firmas, verificación independiente, repetición en CI | `evidence`, `delivery` |

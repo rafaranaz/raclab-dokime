@@ -19,7 +19,7 @@ product do not come from where the agent ran.
 
 - The wrapper is off unless the user or the policy asks for it. A working copy is also optional:
   the agent may work in the user's repository on a branch, from a clean tree.
-- **The key of the sealed examples lives only in CI.** A developer's machine cannot decrypt them.
+- **The key of the sealed batches lives only in CI.** A developer's machine cannot decrypt them.
   Their secrecy starts at the split: before it the examples are in clear where the contract is
   specified, so the evidence records the barrier between that place and the agent: another
   machine, the wrapper, another system user, or none.

@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:1e4543ec53df8f12 -->
+<!-- translation-of: glossary.md sha256:a19730b118a99723 -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -39,6 +39,11 @@ término.
 | Origen | Quién respalda el resultado esperado de una comprobación: `human`, `derived`, `model` o `existing` |
 | Puerta | Un paso del flujo que devuelve un veredicto |
 | Puerta opcional | Una puerta que la política permite omitir. Todas las demás son obligatorias |
-| Veredicto | `PASS`, `FAIL`, `ASK` o `ERROR` |
+| Veredicto | `PASS`, `FAIL`, `ASK` o `ERROR`. Una puerta devuelve uno; el veredicto de un cambio es su agregación |
+| No aplicable | Una puerta que no tiene sobre qué actuar en este cambio, por una condición leída del contrato o del nivel del pack |
+| No alcanzada | Una puerta a la que el flujo no llegó, porque una anterior lo detuvo |
+| Estado final | Un estado del flujo sin puerta ni transición. O entrega o no entrega |
+| Identidad | Quién tomó una decisión humana, junto con cómo se estableció: firmada, declarada, o a través de un cliente y sin verificar |
+| Repetición | Recalcular el veredicto de una ejecución desde su registro y sus artefactos guardados, sin preguntar a nadie |
 | Entrega | Producir el commit y la evidencia de un cambio. Solo puede hacerlo un estado del flujo que entrega |
 | Respuesta delegada | Una respuesta a una pregunta de la entrevista que una persona dejó a un modelo. Va marcada, y nunca aprueba un ejemplo ni un contrato ni responde a una puerta |

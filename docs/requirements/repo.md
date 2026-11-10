@@ -51,6 +51,12 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-061** When the source hash recorded in a translation differs from the hash of its English source, the translation check shall report the translation as out of date with a message containing the current source hash.
 - **REPO-062** If a Spanish translation has no English source next to it or no source header on its first line, then the translation check shall reject the translation.
 
+## Decision records (`tools/check_adrs.py`)
+
+- **REPO-090** When a decision record numbered 0008 or higher has no `Basis` section with text, the decision-record check shall report the record.
+- **REPO-091** When a decision record has no row in the index of decision records, the decision-record check shall report the record.
+- **REPO-092** When the status of a decision record differs from the status in its index row, the decision-record check shall report both statuses.
+
 ## Pull request descriptions (`tools/clean_pr_body.py`)
 
 - **REPO-080** When a pull request description contains an attribution line added by tooling, the description cleaner shall remove that line together with the separator line directly above it.

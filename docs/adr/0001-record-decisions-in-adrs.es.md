@@ -1,13 +1,13 @@
-<!-- translation-of: 0001-record-decisions-in-adrs.md sha256:53489583cd75fe22 -->
+<!-- translation-of: 0001-record-decisions-in-adrs.md sha256:1317da31b535f791 -->
 # ADR-0001 · Registrar las decisiones con ADR
 
 **Estado:** aceptada
 
 ## Contexto
 
-En `dokime` las decisiones quedaron repartidas entre comentarios de código, documentos de plan,
-registros de deuda técnica y mensajes de commit. Averiguar por qué algo era como era exigía leer la
-historia entera, y el código acabó explicando su propio pasado en lugar de lo que hace.
+Cuando las decisiones quedan repartidas entre comentarios de código, documentos de plan, registros
+de deuda técnica y mensajes de commit, averiguar por qué algo es como es exige leer la historia
+entera, y el código acaba explicando su propio pasado en lugar de lo que hace.
 
 ## Decisión
 

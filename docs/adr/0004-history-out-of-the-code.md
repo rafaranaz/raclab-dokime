@@ -4,10 +4,9 @@
 
 ## Context
 
-In `dokime` production code had about 27,600 lines of prose against 31,200 lines of code, and
-1,296 references to task identifiers. Comments told how each line came to be and pointed to
-documents that no longer existed in the repository. Auditing what a function did meant separating
-its explanation from its history.
+Comments that tell how each line came to be grow until a file holds as much prose as code, cite
+task identifiers and point to documents that no longer exist in the repository. Auditing what a
+function does then means separating its explanation from its history.
 
 ## Decision
 

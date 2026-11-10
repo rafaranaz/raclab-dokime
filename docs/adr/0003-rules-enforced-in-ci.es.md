@@ -1,13 +1,13 @@
-<!-- translation-of: 0003-rules-enforced-in-ci.md sha256:41278f34ee930e87 -->
+<!-- translation-of: 0003-rules-enforced-in-ci.md sha256:dffee51f7303ff6e -->
 # ADR-0003 · Las reglas se verifican en CI; las skills solo guían
 
 **Estado:** aceptada
 
 ## Contexto
 
-`dokime` tenía un plan con criterios de salida por fase y puntos de parada explícitos. Se saltaron:
-unas 38 semanas de plan se ejecutaron en 16 días, con los benchmarks que debían frenar el avance
-diferidos. Las reglas estaban escritas, pero nada impedía saltárselas.
+Un plan con criterios de salida por fase y puntos de parada explícitos no se sostiene por estar
+escrito. Cuando se va deprisa los puntos de parada se saltan y las mediciones que debían frenar el
+avance se difieren, porque nada lo impide.
 
 Las skills de desarrollo (`.claude/skills/`) describen cómo trabajar, pero son instrucciones: un día
 en que se va deprisa, se pueden ignorar.
@@ -20,11 +20,11 @@ la única garantía de una regla.
 
 ## Alternativas descartadas
 
-- **Reglas solo en documentación y skills.** Es lo que falló en `dokime`.
+- **Reglas solo en documentación y skills.** Nada impide saltárselas bajo presión.
 - **Adoptar una metodología externa completa** (por ejemplo, la biblioteca de skills Superpowers).
   Traería un segundo proceso, con su propio formato de planes y su uso de subagentes en paralelo,
-  que es justo el tipo de aceleración que se quiere evitar. En su lugar se reutilizan y adaptan las
-  skills de metodología de `dokime`.
+  que es justo el tipo de aceleración que se quiere evitar. En su lugar el repositorio mantiene
+  unas pocas skills propias y breves.
 
 ## Consecuencias
 

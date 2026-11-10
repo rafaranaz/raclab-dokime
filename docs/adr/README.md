@@ -10,7 +10,7 @@ decision changes, a new one supersedes the previous one. The
 | No. | Decision | Status |
 |---|---|---|
 | [0001](0001-record-decisions-in-adrs.md) | Record decisions in ADRs | Accepted |
-| [0002](0002-new-repository-ported-by-module.md) | New repository, ported module by module from `dokime` | Superseded by 0008 |
+| [0002](0002-new-repository-ported-by-module.md) | New repository, ported module by module | Superseded by 0008 |
 | [0003](0003-rules-enforced-in-ci.md) | Rules are enforced in CI; skills only guide | Accepted |
 | [0004](0004-history-out-of-the-code.md) | History lives in git and in the ADRs, not in the code | Accepted |
 | [0005](0005-languages.md) | English for code, bilingual documentation and a bilingual product | Accepted |

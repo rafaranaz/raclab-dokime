@@ -1,4 +1,4 @@
-<!-- translation-of: 0005-languages.md sha256:726457597e56823d -->
+<!-- translation-of: 0005-languages.md sha256:a0e4c0b82155a796 -->
 # ADR-0005 · Inglés en el código, documentación bilingüe y producto bilingüe
 
 **Estado:** aceptada
@@ -8,8 +8,7 @@
 El equipo trabaja en español. El harness genera y analiza requisitos EARS con las palabras clave
 canónicas en inglés (`When`, `While`, `If ... then`, `Where`, `shall`), y los agentes que trabajan
 sobre el código rinden mejor y cuestan menos con identificadores, comentarios y prompts en inglés.
-En `dokime` convivían los dos idiomas sin regla, lo que obligó a traducir después skills y
-validadores.
+Dos idiomas que conviven sin regla obligan a traducir después skills y validadores.
 
 Las personas que usen el harness deberían poder trabajar con él en español o en inglés.
 
@@ -26,8 +25,8 @@ Las personas que usen el harness deberían poder trabajar con él en español o 
 - **El producto permite al usuario elegir español o inglés** en todo lo que lee o escribe:
   entrevistas, la petición, las preguntas de aclaración, las puertas de aprobación y los informes.
   Los artefactos internos y los prompts a los modelos siguen en inglés. Cómo se implementa esa
-  frontera (traducir en el borde o conversar directamente en el idioma elegido) se decide en la
-  fase de arquitectura, en su propio ADR.
+  frontera (traducir en el borde o conversar directamente en el idioma elegido) se decide en el
+  [ADR-0032](0032-bilingual-interaction-signs-what-was-shown.es.md).
 
 ## Alternativas descartadas
 

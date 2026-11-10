@@ -1,4 +1,4 @@
-<!-- translation-of: 0008-built-new-nothing-is-ported.md sha256:22511693dbd237e6 -->
+<!-- translation-of: 0008-built-new-nothing-is-ported.md sha256:fd33d5d267711840 -->
 # ADR-0008 · El producto se construye nuevo; no se porta nada
 
 **Estado:** propuesta
@@ -34,4 +34,7 @@ funcione.
 
 - Más código que escribir, y ningún atajo para el primer bloque.
 - Cada decisión se puede rastrear hasta su base y no hasta una costumbre previa.
-- Los ADR aceptados 0001 a 0007 conservan su contexto original, porque un ADR aceptado no se edita.
+- Los ADR aceptados 0001 a 0007 se editaron una vez, con la aprobación del mantenedor, para que
+  expongan sus razones sin citar una implementación anterior. Sus decisiones no cambiaron. Es una
+  excepción a la regla de que un ADR aceptado no se edita, hecha porque se rehízo todo el diseño;
+  no sienta precedente.

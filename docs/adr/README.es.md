@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:43a1f256d74264ad -->
+<!-- translation-of: README.md sha256:2f29030ec5fbd43a -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -11,7 +11,7 @@ decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
 | Nº | Decisión | Estado |
 |---|---|---|
 | [0001](0001-record-decisions-in-adrs.es.md) | Registrar las decisiones con ADR | Aceptada |
-| [0002](0002-new-repository-ported-by-module.es.md) | Repositorio nuevo, portado módulo a módulo desde `dokime` | Sustituida por el 0008 |
+| [0002](0002-new-repository-ported-by-module.es.md) | Repositorio nuevo, portado módulo a módulo | Sustituida por el 0008 |
 | [0003](0003-rules-enforced-in-ci.es.md) | Las reglas se verifican en CI; las skills solo guían | Aceptada |
 | [0004](0004-history-out-of-the-code.es.md) | La historia vive en git y en los ADR, no en el código | Aceptada |
 | [0005](0005-languages.es.md) | Inglés en el código, documentación bilingüe y producto bilingüe | Aceptada |

@@ -4,9 +4,9 @@
 
 ## Context
 
-`dokime` had a plan with exit criteria per phase and explicit stopping points. They were skipped:
-about 38 weeks of plan were executed in 16 days, with the benchmarks that were meant to stop the
-progress deferred. The rules were written down, but nothing prevented skipping them.
+A plan with exit criteria per phase and explicit stopping points does not hold by being written
+down. When work goes fast the stopping points are skipped and the measurements that were meant to
+stop the progress are deferred, because nothing prevents it.
 
 The development skills (`.claude/skills/`) describe how to work, but they are instructions: on a
 day when things go fast, they can be ignored.
@@ -19,11 +19,12 @@ only guarantee of a rule.
 
 ## Alternatives considered
 
-- **Rules only in documentation and skills.** That is what failed in `dokime`.
+- **Rules only in documentation and skills.** Nothing stops them from being skipped under
+  pressure.
 - **Adopting a complete external methodology** (for example the Superpowers skills library). It
   would bring a second process, with its own plan format and its use of parallel subagents, which
-  is exactly the kind of acceleration to avoid. The methodology skills from `dokime` are reused
-  and adapted instead.
+  is exactly the kind of acceleration to avoid. The repository keeps a few short skills of its
+  own instead.
 
 ## Consequences
 

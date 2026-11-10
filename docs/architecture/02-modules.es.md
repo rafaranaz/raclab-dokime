@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:d49adc1ccaf0a0e9 -->
+<!-- translation-of: 02-modules.md sha256:e06e52a03455149b -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -109,7 +109,7 @@ primer bloque.
 
 ## Orden de construcción
 
-Los módulos se construyen en seis bloques, empezando por auditar
+Los módulos se construyen en siete bloques, empezando por auditar
 ([ADR-0029](../adr/0029-build-order-starts-with-auditing.es.md),
 [hoja de ruta](../ROADMAP.es.md)).
 

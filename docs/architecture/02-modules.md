@@ -107,7 +107,7 @@ block.
 
 ## Build order
 
-The modules are built in six blocks, audit first
+The modules are built in seven blocks, audit first
 ([ADR-0029](../adr/0029-build-order-starts-with-auditing.md), [roadmap](../ROADMAP.md)).
 
 ## What is reused and what is built

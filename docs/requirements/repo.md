@@ -50,3 +50,9 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-060** When a documentation file has no Spanish translation next to it, the translation check shall report the missing translation.
 - **REPO-061** When the source hash recorded in a translation differs from the hash of its English source, the translation check shall report the translation as out of date with a message containing the current source hash.
 - **REPO-062** If a Spanish translation has no English source next to it or no source header on its first line, then the translation check shall reject the translation.
+
+## Pull request descriptions (`tools/clean_pr_body.py`)
+
+- **REPO-080** When a pull request description contains an attribution line added by tooling, the description cleaner shall remove that line together with the separator line directly above it.
+- **REPO-081** When a pull request description contains a line that is only a link to a Claude session, the description cleaner shall remove that line.
+- **REPO-082** The description cleaner shall leave unchanged every line that is not an attribution line, its separator, a session link or a trailing blank line.

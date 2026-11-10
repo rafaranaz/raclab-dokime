@@ -16,6 +16,11 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
   what was looked for and not found, and what is only reasoning. An earlier implementation is not
   evidence. A decision may rest on reasoning alone; it then says so, lists the alternatives
   considered and, where it is worth the cost, the test that would confirm it.
+- **Decide what is yours to decide.** What follows from rules and decisions already agreed is
+  done without asking: the next step of the plan, a correction of wording, a change of status.
+  A design decision, where more than one answer is reasonable, goes to the maintainer with a
+  recommendation and the alternatives. Asking permission for what is already clear is a cost to
+  the maintainer, not a courtesy.
 - **If a repository rule and an instruction conflict, stop and say so** instead of choosing on
   your own.
 - **Nothing is done until the gates pass.** Looking done does not count.
@@ -24,7 +29,7 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
 
 ## Working rules
 
-- **One module scope open at a time**, and only if the current phase of the roadmap allows it.
+- **One module scope open at a time**, inside the block of the roadmap that is open.
 - **Do not touch anything outside the paths of your branch's scope.** If it is needed, it is
   another branch.
 - **If the scope changes, stop and ask.** Do not widen the task silently.
@@ -62,6 +67,6 @@ uv sync --locked
 uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov
 uv run python -m tools.check_history && uv run python -m tools.check_ears
 uv run python -m tools.check_traceability && uv run python -m tools.check_links
-uv run python -m tools.check_translations
+uv run python -m tools.check_translations && uv run python -m tools.check_adrs
 npm ci && uv run python -m tools.check_mermaid
 ```

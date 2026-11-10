@@ -33,6 +33,11 @@ The forces at play: real constraints and evidence, not wishes.
 ## Decision
 What is chosen, in the present tense and active voice ("We use X").
 
+## Basis
+What the decision rests on: published evidence, a measurement of ours, or reasoning. Reasoning
+alone is a valid basis; say that it is, and name the test that would confirm it and the block of
+the roadmap where it runs.
+
 ## Alternatives considered
 At least one, each with the concrete reason it was discarded.
 
@@ -48,4 +53,12 @@ the decision.
   rewriting history makes the record useless. The only thing changed in an old ADR is its status.
 - **Do not repeat what the code already says.** The ADR records what the code cannot say: why this
   and not that.
+- **Every ADR states its basis.** CI rejects an ADR from 0008 on without a `Basis` section, and
+  one whose status differs from its row in the index.
+- **Effort follows the cost of undoing.** A decision that is cheap to reverse needs a reasonable
+  alternative, not the best one. One that is expensive to reverse deserves the search for
+  evidence against it.
+- **A decision that states or changes an invariant is checked against it** before it is accepted:
+  does the invariant have one reading, does it follow from the decisions in every mode, and does
+  its mechanism enforce what it says. The invariants are in `docs/architecture/README.md`.
 - **An ADR is born as `proposed`** and becomes `accepted` when its pull request is approved.

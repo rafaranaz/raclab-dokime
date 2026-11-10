@@ -1,7 +1,7 @@
-<!-- translation-of: 0002-new-repository-ported-by-module.md sha256:f15c0ce3f07a0b73 -->
+<!-- translation-of: 0002-new-repository-ported-by-module.md sha256:95b452c76de10418 -->
 # ADR-0002 · Repositorio nuevo, portado módulo a módulo desde `dokime`
 
-**Estado:** aceptada
+**Estado:** sustituida por el [ADR-0008](0008-built-new-nothing-is-ported.es.md)
 
 ## Contexto
 

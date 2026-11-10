@@ -72,6 +72,10 @@ Optional-Trailer: value
 - Human approval is the decision gate: CI says whether the change is correct according to the
   rules; review says whether it is the change we want.
 - Never merge with CI red or with an open review finding.
+- A description carries one attribution line, the one in the template. Tooling that opens or edits
+  pull requests may append its own footer or a session link; a workflow
+  ([.github/workflows/pr-description.yml](.github/workflows/pr-description.yml)) removes them every
+  time a description is opened or edited, so nobody has to do it by hand.
 
 ## Quality gates
 

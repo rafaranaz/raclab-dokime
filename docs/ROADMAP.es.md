@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:327db507da8267cc -->
+<!-- translation-of: ROADMAP.md sha256:f935f1f828ed0f4d -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -25,50 +25,51 @@ Criterios de salida:
 
 ## Fase 1 · Arquitectura de referencia
 
-Revisión crítica del diseño de `dokime` (sus documentos 01 a 08, los incidentes registrados y las
-mediciones sobre su código) para fijar la arquitectura de este repositorio. Se entrega en varios
-PR del ámbito `arch`, revisables por separado:
+La arquitectura del producto, decidida con evidencia. Cada decisión es un ADR que dice en qué se
+apoya (literatura, razonamiento o una prueba) y las alternativas consideradas
+([ADR-0008](adr/0008-built-new-nothing-is-ported.es.md)). Se entrega en varios pull requests del
+ámbito `arch`, revisables por separado:
 
-1. **Contexto y módulos.** Diagrama de contexto (C4 nivel 1) y diagrama de módulos con las
-   dependencias permitidas.
-2. **Estados y flujos.** Máquina de estados global, composición por modo y sub-máquina TDD con el
-   enrutado de fallos.
-3. **Datos y confianza.** Modelo del grafo de código, ledger y trazabilidad, secuencia de una
-   historia de punta a punta y fronteras de confianza (sandbox, repositorio no confiable,
-   secretos).
+1. **Mapa y decisiones.** Qué es el producto y qué afirma, los invariantes, el contexto, las zonas
+   de confianza, los módulos con sus dependencias permitidas, y los ADR 0008 a 0032.
+2. **Estados y flujos.** La máquina de estados, su composición por modo, la tubería de
+   verificación con sus rutas de fallo y los presupuestos.
+3. **Datos y evidencia.** Los formatos del contrato y de los ejemplos, el predicado de la
+   evidencia, el registro y la secuencia de extremo a extremo de un cambio.
 
-Decisiones a revisar con evidencia, cada una en su ADR:
-
-- Grafo de código sobre tree-sitter o sobre SCIP.
-- Motor de estados propio o uno existente.
-- Niveles de verificación formal.
-- Alcance del MVP: modos, lenguajes, dashboard y daemon.
-- Interfaz de entrega independiente de GitHub.
-- Interacción bilingüe: cómo trabaja el usuario en español o en inglés mientras los artefactos
-  internos y los prompts siguen en inglés ([ADR-0005](adr/0005-languages.es.md)).
+Cada módulo recibe sus requisitos EARS de alto nivel cuando se abre su ámbito en la fase 2.
 
 Puertas que se añaden en esta fase, porque dependen de la arquitectura:
 
 - Contratos de importación entre módulos (import-linter), derivados del diagrama de módulos.
-- Validación de los diagramas Mermaid, activa antes de escribir el primer diagrama.
+- Una comprobación de que cada ADR dice en qué se apoya.
 
 Criterios de salida:
 
-- Cada módulo tiene definidos su interfaz pública, sus requisitos EARS de alto nivel y su puerta
-  de cierre.
-- Los ocho diagramas están en `docs/architecture/` y pasan la validación.
+- Los documentos anteriores están en `docs/architecture/` y sus diagramas pasan la validación.
+- Cada ADR desde el 0008 está aceptado o queda expresamente como hipótesis con su prueba.
 - Los contratos de importación están en CI.
 - La arquitectura está aprobada en revisión.
 
-## Fase 2 · Porte módulo a módulo
+## Fase 2 · Construcción por bloques
 
-Un módulo abierto a la vez, cada uno con su ámbito, su rama y su PR, en este orden provisional (se
-confirmará al cerrar la Fase 1):
+Seis bloques, cada uno con una orden que alguien puede usar
+([ADR-0029](adr/0029-build-order-starts-with-auditing.es.md)). Dentro de un bloque hay un solo
+ámbito de módulo abierto a la vez, en el orden indicado. Un bloque se cierra cuando su criterio de
+salida, un número medido sobre el conjunto de casos
+([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md)), se cumple y
+se publica.
 
-`core` → `graph` → `sandbox` → `gateway` → `verify` → `engine` (solo modo delta) → `spec` →
-`delivery` → `interfaces`
+| Bloque | Módulos, en orden | Criterio de salida |
+|---|---|---|
+| A · Auditar | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `verify`, `evidence`, `interfaces` | Ningún falso aprobado en parches que fallan ejemplos visibles, modifican tests o rompen tests existentes |
+| B · Reservar | `oracle`, `verify`, `bench` | Ningún falso aprobado en las cuatro técnicas de trampa; valor de la reserva medido |
+| C · Lanzar | `sandbox` (trabajo), `agents`, `engine` | El mismo cambio completa el circuito con dos perfiles de agente, uno con un modelo de pesos abiertos |
+| D · Proteger | `verify` | Las regresiones inyectadas en código cubierto se detectan; tasa de preguntas medida |
+| E · Atestar | `evidence`, `delivery` | Alguien sin el arnés instalado verifica un fichero de evidencia |
+| F · Especificar | `gateway`, `spec` | Minutos de persona por contrato medidos; prueba de atención hecha |
 
-Alcance inicial de lenguajes: Python y Java. Go y TypeScript entran cuando el núcleo esté cerrado.
+Lenguaje inicial: Python. Java es el segundo.
 
 Criterios de salida de cada módulo: la definición de terminado de
 [CONTRIBUTING.es.md](../CONTRIBUTING.es.md#definición-de-terminado-de-un-ámbito).

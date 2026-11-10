@@ -1,6 +1,6 @@
 # ADR-0025 · The interview works on files and ends by coverage
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0018 · The flow is a state machine declared in a YAML file
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

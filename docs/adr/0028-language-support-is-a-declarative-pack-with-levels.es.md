@@ -1,7 +1,7 @@
-<!-- translation-of: 0028-language-support-is-a-declarative-pack-with-levels.md sha256:2d1b4543fd7ac1c9 -->
+<!-- translation-of: 0028-language-support-is-a-declarative-pack-with-levels.md sha256:ec7caaa83a116519 -->
 # ADR-0028 · El soporte de un lenguaje es un pack declarativo con niveles
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

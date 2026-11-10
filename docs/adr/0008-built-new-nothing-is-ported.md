@@ -1,6 +1,6 @@
 # ADR-0008 · The product is built new; nothing is ported
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

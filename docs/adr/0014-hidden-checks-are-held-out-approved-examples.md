@@ -1,6 +1,6 @@
 # ADR-0014 · Hidden checks are approved examples held out by case, plus approved relations
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

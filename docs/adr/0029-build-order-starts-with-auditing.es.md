@@ -1,7 +1,7 @@
-<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:c2c3d0e3edb1bddc -->
+<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:a145659c8c16ce06 -->
 # ADR-0029 · El orden de construcción empieza por auditar un cambio que ya existe
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

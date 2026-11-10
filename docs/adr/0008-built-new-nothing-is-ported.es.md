@@ -1,7 +1,7 @@
-<!-- translation-of: 0008-built-new-nothing-is-ported.md sha256:fd33d5d267711840 -->
+<!-- translation-of: 0008-built-new-nothing-is-ported.md sha256:dfce345e641a7777 -->
 # ADR-0008 · El producto se construye nuevo; no se porta nada
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

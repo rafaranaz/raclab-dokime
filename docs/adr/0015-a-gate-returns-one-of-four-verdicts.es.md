@@ -1,7 +1,7 @@
-<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:812e148acbef2757 -->
+<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:a718c43e55dfd865 -->
 # ADR-0015 · Una puerta devuelve uno de cuatro veredictos
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

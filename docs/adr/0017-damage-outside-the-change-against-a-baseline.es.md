@@ -1,7 +1,7 @@
-<!-- translation-of: 0017-damage-outside-the-change-against-a-baseline.md sha256:75df6377b7c0f23f -->
+<!-- translation-of: 0017-damage-outside-the-change-against-a-baseline.md sha256:e5b11a245dad97db -->
 # ADR-0017 · El daño fuera del cambio se encuentra comparando con una línea base
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

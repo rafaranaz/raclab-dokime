@@ -1,7 +1,7 @@
-<!-- translation-of: 0014-hidden-checks-are-held-out-approved-examples.md sha256:530e57da9d34e167 -->
+<!-- translation-of: 0014-hidden-checks-are-held-out-approved-examples.md sha256:90e258cc780d6875 -->
 # ADR-0014 · Las comprobaciones ocultas son ejemplos aprobados y reservados por caso, más relaciones aprobadas
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

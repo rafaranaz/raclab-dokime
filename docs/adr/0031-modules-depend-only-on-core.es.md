@@ -1,7 +1,7 @@
-<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:d3de19c387b5371c -->
+<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:10de6a3c5ef19dee -->
 # ADR-0031 · Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

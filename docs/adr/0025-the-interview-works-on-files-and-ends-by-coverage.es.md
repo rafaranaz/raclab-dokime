@@ -1,7 +1,7 @@
-<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:f613c2a53f5d2d22 -->
+<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:520a6635e1486e27 -->
 # ADR-0025 · La entrevista trabaja sobre ficheros y termina por cobertura
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

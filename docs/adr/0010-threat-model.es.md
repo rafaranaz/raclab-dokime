@@ -1,7 +1,7 @@
-<!-- translation-of: 0010-threat-model.md sha256:90613edfbdb5f864 -->
+<!-- translation-of: 0010-threat-model.md sha256:4b484cbf84224bba -->
 # ADR-0010 · El modelo de amenazas dice qué se defiende y qué no
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

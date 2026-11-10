@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:2f29030ec5fbd43a -->
+<!-- translation-of: README.md sha256:51fd89d9e4e3a953 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -17,28 +17,28 @@ decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
 | [0005](0005-languages.es.md) | Inglés en el código, documentación bilingüe y producto bilingüe | Aceptada |
 | [0006](0006-linear-history-and-closed-scopes.es.md) | Historial lineal con rebase y ámbitos de commit cerrados | Aceptada |
 | [0007](0007-mit-license.es.md) | Licencia MIT | Aceptada |
-| [0008](0008-built-new-nothing-is-ported.es.md) | El producto se construye nuevo; no se porta nada | Propuesta |
-| [0009](0009-verification-and-evidence-layer.es.md) | El producto es una capa de verificación y evidencia alrededor de agentes existentes | Propuesta |
-| [0010](0010-threat-model.es.md) | El modelo de amenazas dice qué se defiende y qué no | Propuesta |
-| [0011](0011-contract-of-requirements-and-approved-examples.es.md) | Un contrato son requisitos EARS más ejemplos aprobados por una persona | Propuesta |
-| [0012](0012-examples-are-observations-at-a-boundary.es.md) | Un ejemplo es una observación en una frontera, comparada fuera del proceso del sujeto | Propuesta |
-| [0013](0013-provenance-decides-what-a-check-can-do.es.md) | El origen de una comprobación decide qué puede hacer su fallo | Propuesta |
-| [0014](0014-hidden-checks-are-held-out-approved-examples.es.md) | Las comprobaciones ocultas son ejemplos aprobados y reservados por caso, más relaciones aprobadas | Propuesta |
-| [0015](0015-a-gate-returns-one-of-four-verdicts.es.md) | Una puerta devuelve uno de cuatro veredictos | Propuesta |
-| [0016](0016-verification-in-a-container-on-base-plus-patch.es.md) | La verificación corre en un contenedor sin red, sobre el commit base más el parche | Propuesta |
-| [0017](0017-damage-outside-the-change-against-a-baseline.es.md) | El daño fuera del cambio se encuentra comparando con una línea base | Propuesta |
-| [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.es.md) | El flujo es una máquina de estados declarada en un fichero YAML | Propuesta |
-| [0019](0019-the-harness-launches-the-installed-agent-through-files.es.md) | El arnés lanza el agente instalado y se comunica con él por ficheros | Propuesta |
-| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md) | Aislar al agente es opcional; la adopción es una escalera | Propuesta |
-| [0021](0021-the-agent-disputes-a-check-instead-of-editing-it.es.md) | El agente impugna una comprobación en vez de modificarla | Propuesta |
-| [0022](0022-model-calls-of-the-harness-go-through-a-port.es.md) | Las llamadas del arnés a un modelo pasan por un puerto con tres vías | Propuesta |
-| [0023](0023-evidence-is-an-attestation-bound-to-the-tree.es.md) | La evidencia es una atestación in-toto atada al árbol resultante | Propuesta |
-| [0024](0024-approval-attestation-and-commit-are-signed-separately.es.md) | La aprobación, la atestación y el commit se firman por separado | Propuesta |
-| [0025](0025-the-interview-works-on-files-and-ends-by-coverage.es.md) | La entrevista trabaja sobre ficheros y termina por cobertura | Propuesta |
-| [0026](0026-formal-consistency-is-checked-per-requirement.es.md) | La consistencia formal se comprueba por requisito, y sus hallazgos preguntan | Propuesta |
-| [0027](0027-memory-has-one-layout-and-three-scopes.es.md) | La memoria tiene una estructura, dos almacenamientos y tres alcances | Propuesta |
-| [0028](0028-language-support-is-a-declarative-pack-with-levels.es.md) | El soporte de un lenguaje es un pack declarativo con niveles | Propuesta |
-| [0029](0029-build-order-starts-with-auditing.es.md) | El orden de construcción empieza por auditar un cambio que ya existe | Propuesta |
-| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Propuesta |
-| [0031](0031-modules-depend-only-on-core.es.md) | Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición | Propuesta |
-| [0032](0032-bilingual-interaction-signs-what-was-shown.es.md) | La persona trabaja en su idioma, y la aprobación firma lo que se le mostró | Propuesta |
+| [0008](0008-built-new-nothing-is-ported.es.md) | El producto se construye nuevo; no se porta nada | Aceptada |
+| [0009](0009-verification-and-evidence-layer.es.md) | El producto es una capa de verificación y evidencia alrededor de agentes existentes | Aceptada |
+| [0010](0010-threat-model.es.md) | El modelo de amenazas dice qué se defiende y qué no | Aceptada |
+| [0011](0011-contract-of-requirements-and-approved-examples.es.md) | Un contrato son requisitos EARS más ejemplos aprobados por una persona | Aceptada |
+| [0012](0012-examples-are-observations-at-a-boundary.es.md) | Un ejemplo es una observación en una frontera, comparada fuera del proceso del sujeto | Aceptada |
+| [0013](0013-provenance-decides-what-a-check-can-do.es.md) | El origen de una comprobación decide qué puede hacer su fallo | Aceptada |
+| [0014](0014-hidden-checks-are-held-out-approved-examples.es.md) | Las comprobaciones ocultas son ejemplos aprobados y reservados por caso, más relaciones aprobadas | Aceptada |
+| [0015](0015-a-gate-returns-one-of-four-verdicts.es.md) | Una puerta devuelve uno de cuatro veredictos | Aceptada |
+| [0016](0016-verification-in-a-container-on-base-plus-patch.es.md) | La verificación corre en un contenedor sin red, sobre el commit base más el parche | Aceptada |
+| [0017](0017-damage-outside-the-change-against-a-baseline.es.md) | El daño fuera del cambio se encuentra comparando con una línea base | Aceptada |
+| [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.es.md) | El flujo es una máquina de estados declarada en un fichero YAML | Aceptada |
+| [0019](0019-the-harness-launches-the-installed-agent-through-files.es.md) | El arnés lanza el agente instalado y se comunica con él por ficheros | Aceptada |
+| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md) | Aislar al agente es opcional; la adopción es una escalera | Aceptada |
+| [0021](0021-the-agent-disputes-a-check-instead-of-editing-it.es.md) | El agente impugna una comprobación en vez de modificarla | Aceptada |
+| [0022](0022-model-calls-of-the-harness-go-through-a-port.es.md) | Las llamadas del arnés a un modelo pasan por un puerto con tres vías | Aceptada |
+| [0023](0023-evidence-is-an-attestation-bound-to-the-tree.es.md) | La evidencia es una atestación in-toto atada al árbol resultante | Aceptada |
+| [0024](0024-approval-attestation-and-commit-are-signed-separately.es.md) | La aprobación, la atestación y el commit se firman por separado | Aceptada |
+| [0025](0025-the-interview-works-on-files-and-ends-by-coverage.es.md) | La entrevista trabaja sobre ficheros y termina por cobertura | Aceptada |
+| [0026](0026-formal-consistency-is-checked-per-requirement.es.md) | La consistencia formal se comprueba por requisito, y sus hallazgos preguntan | Aceptada |
+| [0027](0027-memory-has-one-layout-and-three-scopes.es.md) | La memoria tiene una estructura, dos almacenamientos y tres alcances | Aceptada |
+| [0028](0028-language-support-is-a-declarative-pack-with-levels.es.md) | El soporte de un lenguaje es un pack declarativo con niveles | Aceptada |
+| [0029](0029-build-order-starts-with-auditing.es.md) | El orden de construcción empieza por auditar un cambio que ya existe | Aceptada |
+| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Aceptada |
+| [0031](0031-modules-depend-only-on-core.es.md) | Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición | Aceptada |
+| [0032](0032-bilingual-interaction-signs-what-was-shown.es.md) | La persona trabaja en su idioma, y la aprobación firma lo que se le mostró | Aceptada |

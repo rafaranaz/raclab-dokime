@@ -1,7 +1,7 @@
-<!-- translation-of: 0013-provenance-decides-what-a-check-can-do.md sha256:8ab85cc4e96a8225 -->
+<!-- translation-of: 0013-provenance-decides-what-a-check-can-do.md sha256:9fbd54f389a76701 -->
 # ADR-0013 · El origen de una comprobación decide qué puede hacer su fallo
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

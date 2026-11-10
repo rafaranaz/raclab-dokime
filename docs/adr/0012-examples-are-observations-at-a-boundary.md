@@ -1,6 +1,6 @@
 # ADR-0012 · An example is an observation at a boundary, compared outside the subject's process
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

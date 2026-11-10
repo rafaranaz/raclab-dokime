@@ -1,7 +1,7 @@
-<!-- translation-of: 0018-the-flow-is-a-state-machine-in-a-yaml-file.md sha256:888eb105b766029e -->
+<!-- translation-of: 0018-the-flow-is-a-state-machine-in-a-yaml-file.md sha256:f2b78a3737b4f093 -->
 # ADR-0018 · El flujo es una máquina de estados declarada en un fichero YAML
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

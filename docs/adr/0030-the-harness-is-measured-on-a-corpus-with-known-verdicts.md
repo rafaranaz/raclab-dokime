@@ -1,6 +1,6 @@
 # ADR-0030 · The harness is measured on a corpus with known verdicts
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

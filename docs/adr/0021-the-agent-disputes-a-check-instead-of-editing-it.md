@@ -1,6 +1,6 @@
 # ADR-0021 · The agent disputes a check instead of editing it
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,7 +1,7 @@
-<!-- translation-of: 0009-verification-and-evidence-layer.md sha256:78a0697a0f616ff1 -->
+<!-- translation-of: 0009-verification-and-evidence-layer.md sha256:e4d573f4ea37ef4c -->
 # ADR-0009 · El producto es una capa de verificación y evidencia alrededor de agentes existentes
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

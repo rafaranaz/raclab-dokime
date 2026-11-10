@@ -1,6 +1,6 @@
 # ADR-0010 · The threat model names what is defended and what is not
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,7 +1,7 @@
-<!-- translation-of: 0026-formal-consistency-is-checked-per-requirement.md sha256:92d4f1182bbd25ad -->
+<!-- translation-of: 0026-formal-consistency-is-checked-per-requirement.md sha256:c642e3ca36a6edb3 -->
 # ADR-0026 · La consistencia formal se comprueba por requisito, y sus hallazgos preguntan
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

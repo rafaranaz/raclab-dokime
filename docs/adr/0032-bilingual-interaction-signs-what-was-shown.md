@@ -1,6 +1,6 @@
 # ADR-0032 · The person works in their language, and the approval signs what was shown
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0016 · Verification runs in a container without network, on the base commit plus the patch
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

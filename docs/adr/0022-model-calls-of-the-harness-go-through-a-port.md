@@ -1,6 +1,6 @@
 # ADR-0022 · The model calls of the harness go through a port with three routes
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

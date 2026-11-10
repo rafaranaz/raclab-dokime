@@ -1,7 +1,7 @@
-<!-- translation-of: 0021-the-agent-disputes-a-check-instead-of-editing-it.md sha256:dc39b67e561ba6bf -->
+<!-- translation-of: 0021-the-agent-disputes-a-check-instead-of-editing-it.md sha256:4a90fdbf2ff05d22 -->
 # ADR-0021 · El agente impugna una comprobación en vez de modificarla
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

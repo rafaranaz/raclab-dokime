@@ -1,7 +1,7 @@
-<!-- translation-of: 0012-examples-are-observations-at-a-boundary.md sha256:d2aa6084c5fdcf7e -->
+<!-- translation-of: 0012-examples-are-observations-at-a-boundary.md sha256:ff10df88e96a47aa -->
 # ADR-0012 · Un ejemplo es una observación en una frontera, comparada fuera del proceso del sujeto
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

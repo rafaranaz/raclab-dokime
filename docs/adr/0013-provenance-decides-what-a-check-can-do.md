@@ -1,6 +1,6 @@
 # ADR-0013 · The origin of a check decides what its failure can do
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

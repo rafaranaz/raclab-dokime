@@ -1,6 +1,6 @@
 # ADR-0020 · Isolating the agent is optional; adoption climbs a ladder
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

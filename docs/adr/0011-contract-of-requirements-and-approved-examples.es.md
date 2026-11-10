@@ -1,7 +1,7 @@
-<!-- translation-of: 0011-contract-of-requirements-and-approved-examples.md sha256:507606225947a727 -->
+<!-- translation-of: 0011-contract-of-requirements-and-approved-examples.md sha256:c2f51b2c3b42eb2d -->
 # ADR-0011 · Un contrato son requisitos EARS más ejemplos aprobados por una persona
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

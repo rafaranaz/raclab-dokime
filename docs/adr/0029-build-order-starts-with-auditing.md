@@ -1,6 +1,6 @@
 # ADR-0029 · The build order starts with auditing a change that already exists
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

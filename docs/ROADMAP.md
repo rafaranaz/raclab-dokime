@@ -46,7 +46,7 @@ scope is opened in phase 2.
 Exit criteria:
 
 - [ ] The documents above are in `docs/architecture/` and their diagrams pass validation.
-- [ ] Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
+- [x] Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
 - [ ] The check that every ADR states its basis and the import contracts are in CI.
 - [ ] The architecture is approved in review.
 

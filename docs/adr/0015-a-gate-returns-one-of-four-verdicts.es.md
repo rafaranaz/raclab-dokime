@@ -1,4 +1,4 @@
-<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:cdadbbd856c4faba -->
+<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:812e148acbef2757 -->
 # ADR-0015 · Una puerta devuelve uno de cuatro veredictos
 
 **Estado:** propuesta
@@ -38,5 +38,6 @@ un fallo ajeno.
 ## Consecuencias
 
 - Todo consumidor de un veredicto tiene que tratar cuatro casos.
-- En un modo sin preguntas, llegar a una pregunta termina la ejecución como rechazada con ese
-  motivo.
+- En un modo sin preguntas, llegar a una pregunta termina la ejecución como pendiente de una
+  persona, con ese motivo. Ni rechaza ni pasa: el check del pull request queda pendiente hasta que
+  una persona responde y la ejecución se repite.

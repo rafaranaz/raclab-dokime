@@ -1,4 +1,4 @@
-<!-- translation-of: 0024-approval-attestation-and-commit-are-signed-separately.md sha256:f10a4031e1ee483d -->
+<!-- translation-of: 0024-approval-attestation-and-commit-are-signed-separately.md sha256:f887c83f656da847 -->
 # ADR-0024 · La aprobación, la atestación y el commit se firman por separado
 
 **Estado:** propuesta
@@ -18,6 +18,11 @@ clave estaba en la máquina, no que la persona revisara nada. "Quién aprobó qu
 
 - La firma pasa por el agente de claves del sistema. El arnés nunca carga una clave privada, y el
   envoltorio, cuando se usa, deniega al agente los sockets de los agentes de claves.
+- Aprobar es siempre esta firma, sea cual sea el canal que mostró el contrato. La evidencia
+  registra si el gesto estaba forzado, por un agente de claves que pide confirmación en cada uso o
+  por una llave física, o no.
+- Quién puede firmar aprobaciones y atestaciones es una lista de firmantes permitidos guardada en
+  el repositorio, en las rutas protegidas. Solo cambia mediante un pull request.
 - Los commits firmados se exigen en las ramas, no en `main`.
 - El agente de programación figura como coautor del commit.
 

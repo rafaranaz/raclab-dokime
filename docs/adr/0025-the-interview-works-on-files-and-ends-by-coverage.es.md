@@ -1,4 +1,4 @@
-<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:8c317fa1a9200933 -->
+<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:f613c2a53f5d2d22 -->
 # ADR-0025 · La entrevista trabaja sobre ficheros y termina por cobertura
 
 **Estado:** propuesta
@@ -26,10 +26,13 @@ Preguntar ayuda, y un entrevistador guiado por una estructura de categorías des
 - Una pregunta es un dato, con las restricciones de los formularios de MCP. Superficies: ficheros
   y terminal; formularios de MCP cuando se entra al arnés desde un editor, solo para preguntas de
   aclaración; un modo sin preguntas para CI.
-- Los ejemplos y el contrato se aprueban en un canal donde el arnés habla directamente con la
-  persona: ficheros o terminal. Una respuesta que llega por un formulario de MCP se registra como
-  llegada a través del cliente, sin verificar, porque el cliente puede leer el formulario y
-  responder en lugar de la persona.
+- Durante la entrevista la persona acepta o corrige cada ejemplo; lo que los aprueba es la firma
+  del contrato que los contiene
+  ([ADR-0024](0024-approval-attestation-and-commit-are-signed-separately.es.md)), sea cual sea el
+  canal que lo mostró. Una respuesta que llega por un formulario de MCP se registra como llegada a
+  través del cliente, sin verificar, porque el cliente puede leer el formulario y responder en
+  lugar de la persona; un fichero lo puede escribir un agente en la misma máquina, así que una
+  respuesta dada en un fichero se registra como declarada.
 
 ## Base
 

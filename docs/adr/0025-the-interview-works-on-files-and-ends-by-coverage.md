@@ -25,10 +25,12 @@ interviewer guided by a structure of categories discovers far more.
 - A question is data, with the restrictions of MCP forms. Surfaces: files and the terminal; MCP
   forms when the harness is entered from an editor, for clarifying questions only; a mode without
   questions for CI.
-- Examples and the contract are approved in a channel where the harness talks to the person
-  directly: files or the terminal. An answer that arrives through an MCP form is recorded as
-  coming through the client, unverified, because the client can read the form and answer in the
-  person's place.
+- During the interview the person accepts or corrects each example; what approves them is the
+  signature of the contract that contains them
+  ([ADR-0024](0024-approval-attestation-and-commit-are-signed-separately.md)), whatever channel
+  showed it. An answer that arrives through an MCP form is recorded as coming through the client,
+  unverified, because the client can read the form and answer in the person's place; a file can be
+  written by an agent on the same machine, so an answer given in a file is recorded as declared.
 
 ## Basis
 

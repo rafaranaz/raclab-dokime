@@ -1,4 +1,4 @@
-<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:b5e84315e68ee82c -->
+<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:a09ff7583541ea76 -->
 # ADR-0023 · La evidencia es una atestación in-toto atada al árbol resultante
 
 **Estado:** propuesta
@@ -30,8 +30,13 @@ cambia al integrar.
   modo que una orden de repetición puede volver a ejecutar las puertas desde los artefactos
   guardados sin preguntar a nadie. Las puertas selladas solo se pueden repetir donde está la
   clave.
+- Se produce evidencia de toda ejecución terminada, sea cual sea su veredicto, y se atesta igual.
+  Un cambio rechazado tiene evidencia y no tiene entrega.
 - Una orden propia, que solo depende de los módulos `evidence` y `core`, verifica un fichero de
-  evidencia.
+  evidencia. Comprueba las firmas contra la lista de firmantes permitidos
+  ([ADR-0024](0024-approval-attestation-and-commit-are-signed-separately.es.md)), el esquema, que
+  la huella del sujeto coincide con el árbol, la cadena del registro, y las puertas contra el
+  fichero de flujo. No vuelve a ejecutar nada; eso es la repetición.
 
 ## Base
 

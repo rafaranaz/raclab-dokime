@@ -17,6 +17,11 @@ the key was on the machine, not that the person reviewed anything. "Who approved
 
 - Signing goes through the system's key agent. The harness never loads a private key, and the
   wrapper, when used, denies the agent the sockets of the key agents.
+- Approving is always this signature, whatever channel showed the contract. The evidence records
+  whether the gesture was enforced, by a key agent that asks for confirmation on each use or by a
+  hardware key, or not.
+- Who may sign approvals and attestations is a list of allowed signers kept in the repository,
+  under the protected paths. It changes only through a pull request.
 - Signed commits are required on branches, not on `main`.
 - The coding agent appears as co-author of the commit.
 

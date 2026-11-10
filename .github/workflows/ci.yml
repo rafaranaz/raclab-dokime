@@ -47,6 +47,8 @@ jobs:
         run: uv run python -m tools.check_links
       - name: Spanish translations up to date
         run: uv run python -m tools.check_translations
+      - name: Decision records state their basis and match the index
+        run: uv run python -m tools.check_adrs
       - uses: actions/setup-node@v7
         with:
           node-version: 22

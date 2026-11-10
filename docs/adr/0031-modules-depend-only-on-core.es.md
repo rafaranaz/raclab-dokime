@@ -1,4 +1,4 @@
-<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:260781376e01e6a0 -->
+<!-- translation-of: 0031-modules-depend-only-on-core.md sha256:d3de19c387b5371c -->
 # ADR-0031 · Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición
 
 **Estado:** propuesta
@@ -16,7 +16,7 @@ y el 80 % de los casos estudiados.
 - Los módulos de dominio (`contract`, `oracle`, `evidence`, `packs`) importan solo `core`;
   `oracle` importa además `contract`. Los servicios de dominio (`spec`, `verify`, `delivery`)
   importan esos y no se importan entre sí. `engine` importa los servicios.
-- Los adaptadores (`sandbox`, `agents`, `gateway`) importan solo `core` e implementan sus puertos.
+- Los adaptadores (`sandbox`, `agents`, `gateway`, `platform`) importan solo `core` e implementan sus puertos.
   Solo `interfaces`, la raíz de composición, importa adaptadores.
 - `evidence` no importa nada más que `core`, para que verificar una evidencia se pueda instalar
   solo con esos dos módulos.

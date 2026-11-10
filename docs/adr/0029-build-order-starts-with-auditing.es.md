@@ -1,4 +1,4 @@
-<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:c8c067214bc0bddc -->
+<!-- translation-of: 0029-build-order-starts-with-auditing.md sha256:c2c3d0e3edb1bddc -->
 # ADR-0029 · El orden de construcción empieza por auditar un cambio que ya existe
 
 **Estado:** propuesta
@@ -15,11 +15,11 @@ de módulo abierto a la vez:
 
 | Bloque | Qué se construye | Módulos, en orden |
 |---|---|---|
-| A · Auditar | Verificar un parche terminado contra un contrato escrito a mano | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `verify`, `evidence`, `interfaces` |
-| B · Reservar | Ejemplos reservados y derivados | `oracle`, `verify`, `bench` |
+| A · Auditar | Verificar un parche terminado contra un contrato escrito a mano | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `platform` (almacenes y reloj), `verify`, `evidence`, `interfaces` |
+| B · Reservar | Ejemplos reservados y derivados | `oracle`, `platform` (almacén de lo sellado), `verify`, `bench` |
 | C · Lanzar | El arnés dirige a un agente, con el bucle y las impugnaciones | `sandbox` (trabajo), `agents`, `engine` |
 | D · Proteger | Cobertura de líneas cambiadas, mapa de impacto, diferencias de comportamiento | `verify` |
-| E · Atestar | Firmas, verificación independiente, repetición en CI | `evidence`, `delivery` |
+| E · Atestar | Firmas, verificación independiente, repetición en CI | `platform` (firma y forja), `evidence`, `delivery` |
 | F · Especificar | Entrevista, propuestas de ejemplos, detectores, solucionador | `gateway`, `spec` |
 | G · Generalizar | Un segundo lenguaje, más agentes, uso en equipo | `packs`, `agents`, `delivery` |
 

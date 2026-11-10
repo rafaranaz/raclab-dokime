@@ -31,6 +31,7 @@ flowchart TB
         sandbox["sandbox<br/>verification runtime, work isolation"]
         agents["agents<br/>headless and ACP drivers"]
         gateway["gateway<br/>model clients"]
+        platform["platform<br/>signing, stores, forge, clock"]
     end
 
     interfaces --> engine
@@ -51,9 +52,11 @@ flowchart TB
     interfaces --> sandbox
     interfaces --> agents
     interfaces --> gateway
+    interfaces --> platform
     sandbox --> core
     agents --> core
     gateway --> core
+    platform --> core
 ```
 
 ## What each module does
@@ -72,6 +75,7 @@ flowchart TB
 | `sandbox` | Adapters for the verification runtime and for isolating the agent | Decide policy. It receives it |
 | `agents` | Adapters that launch agents | Interpret the result. The harness computes the patch |
 | `gateway` | Model adapters, registered prompts, validation of answers against a schema | Decide |
+| `platform` | Adapters of the signer, the sealed store, the evidence store and the forge, and the system clock and randomness | Decide, or hold domain logic |
 | `interfaces` | The command, the human channel, the composition root | Hold domain logic |
 | `bench` | Run the measurement corpus and compute the metrics | Ship with the installed product |
 
@@ -83,7 +87,7 @@ They become import contracts in CI ([ADR-0031](../adr/0031-modules-depend-only-o
 2. The modules of the domain layer import only `core`, and `oracle` also imports `contract`.
 3. The domain services import the domain layer and `core`. They do not import each other.
 4. `engine` imports the domain services, the domain layer and `core`.
-5. `sandbox`, `agents` and `gateway` import only `core`. They implement ports defined there.
+5. `sandbox`, `agents`, `gateway` and `platform` import only `core`. They implement ports defined there.
 6. Only `interfaces` imports adapters. It is the single composition root, and `bench` uses it.
 7. `evidence` imports nothing but `core`.
 
@@ -104,6 +108,11 @@ block.
 | Evidence store | Store and retrieve evidence by the digest of its subject | ① file, git notes, the forge's attestation store |
 | Forge | Create a branch, publish, open a pull request | GitHub; local without a forge |
 | Clock, random | Sources of time and randomness that can be injected | System; fixed for replay |
+
+Where the adapters live: the verification runtime and the work isolation in `sandbox`; the agent
+launcher in `agents`; the model gateway in `gateway`; the human channel in `interfaces`; the
+signer, the sealed store, the evidence store, the forge, the clock and the randomness in
+`platform`. No domain module talks to the outside.
 
 ## Build order
 

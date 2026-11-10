@@ -19,12 +19,15 @@ product do not come from where the agent ran.
 
 - The wrapper is off unless the user or the policy asks for it. A working copy is also optional:
   the agent may work in the user's repository on a branch, from a clean tree.
-- **The key of the sealed examples lives only in CI.** A developer's machine cannot decrypt them,
-  so their secrecy does not depend on local isolation. A single developer without CI keeps the key
-  locally, and the evidence states it as best effort.
-- When the wrapper is on, it denies the local network towards the harness, and it is probed before
-  each launch.
-- The evidence records the step and whether a wrapper was used.
+- **The key of the sealed examples lives only in CI.** A developer's machine cannot decrypt them.
+  Their secrecy starts at the split: before it the examples are in clear where the contract is
+  specified, so the evidence records the barrier between that place and the agent: another
+  machine, the wrapper, another system user, or none.
+- A single developer without CI keeps the key locally. Held-out content is then decrypted only in
+  memory, never written to disk, and the evidence states it as best effort.
+- When the wrapper is on, it denies the local network towards the harness and reading the state
+  directory of the harness (ledger, key and sealed store), and it is probed before each launch.
+- The evidence records the step, whether a wrapper was used and the barrier used when specifying.
 
 ## Basis
 

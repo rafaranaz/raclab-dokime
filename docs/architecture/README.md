@@ -25,6 +25,7 @@ the same, the evidence says so.
 |---|---|
 | [01-context.md](01-context.md) | Who the system talks to, and the trust zones |
 | [02-modules.md](02-modules.md) | Modules, ports and allowed dependencies |
+| [glossary.md](glossary.md) | The terms the invariants and the decisions rely on |
 | [Decisions](../adr/README.md) | ADRs 0008 to 0032, each with its basis and alternatives |
 
 States and flows, and data and evidence, come in the next pull requests of this phase
@@ -37,13 +38,13 @@ it is broken ([ADR-0030](../adr/0030-the-harness-is-measured-on-a-corpus-with-kn
 
 | Id | Invariant | Enforced by |
 |---|---|---|
-| INV-1 | No path leads from a model output to a `PASS` or `FAIL` without a human approval or a mechanical derivation | The verdict type carries the origin; a property test on the aggregator |
+| INV-1 | No path leads from a model output to a `PASS` or `FAIL` without a human approval or a mechanical derivation. A passing check of origin `model` supports nothing; the suite the project already had counts as approved | The verdict type carries the origin; a property test on the aggregator |
 | INV-2 | Code written by the agent never runs in a process that holds an expected value of a sealed example | Only inputs enter the verification zone; a test searches the zone for a sentinel string |
-| INV-3 | No file readable from where the agent works contains sealed material | Each sealed batch carries a sentinel string; a test searches for it |
+| INV-3 | From the split on, no file readable from where the agent works contains held-out content in clear. For a single developer without CI this is best effort, and the evidence says so | Each sealed batch carries a sentinel string; a test searches for it in clear before each launch of the agent and before each sealed run. It does not see content transformed on purpose, which is hostile code, outside the threat model |
 | INV-4 | The verdict is a function of base, patch, contract, image, policy, flow and seed, all identified by digest | A replay command recomputes the verdict from the ledger |
 | INV-5 | Every state has an exit gate; every loop has a budget; exhausting a budget asks a person | The validator of the flow file |
-| INV-6 | Nothing is delivered with an unresolved `ERROR` | A property test on the aggregator |
-| INV-7 | Every gate of the flow appears in the evidence as run, skipped with a reason, or not applicable | Schema validation when the evidence is built |
+| INV-6 | Nothing is delivered with an unresolved `ERROR`, and nobody can accept one | The validator rejects a flow with a transition from `ERROR` or `FAIL` to a state that delivers; a property test on the aggregator |
+| INV-7 | Every gate of the flow appears in the evidence as run, skipped because the policy declares it optional, or not applicable | Schema validation when the evidence is built |
 | INV-8 | Every human decision is an event with an identity, and every delegated answer is marked | The human channel returns answers only with who answered and the delegation flag |
 | INV-9 | `core`, `contract`, `oracle`, `verify` and `evidence` import no adapter of an agent, a model or a language | Import contracts |
 | INV-10 | Evidence is validated by a command that depends only on the `evidence` module and standard tools | A test that installs only that module |

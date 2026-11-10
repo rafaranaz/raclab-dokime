@@ -1,4 +1,4 @@
-<!-- translation-of: 0014-hidden-checks-are-held-out-approved-examples.md sha256:266f03cc25c0c04f -->
+<!-- translation-of: 0014-hidden-checks-are-held-out-approved-examples.md sha256:530e57da9d34e167 -->
 # ADR-0014 · Las comprobaciones ocultas son ejemplos aprobados y reservados por caso, más relaciones aprobadas
 
 **Estado:** propuesta
@@ -13,6 +13,12 @@ modelo, la puerta decisiva la escribe un modelo que nadie revisa.
 
 - La persona aprueba **todos** los ejemplos. Al aprobar el contrato, el arnés reserva una parte al
   azar, con una semilla guardada en el fichero sellado. La persona no elige cuáles.
+- Desde ese reparto, el contenido de los ejemplos reservados existe solo cifrado: las copias en
+  claro se quitan de los ficheros del contrato, y el registro guarda su huella, no su contenido.
+  Antes del reparto todo el conjunto está en claro donde se especifica el contrato; el
+  [ADR-0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md) y el
+  [ADR-0022](0022-model-calls-of-the-harness-go-through-a-port.es.md) dicen qué lo protege
+  entonces.
 - La reserva es por caso: todo caso conserva al menos un ejemplo visible; solo los casos con dos o
   más ejemplos ceden uno a la reserva. Un requisito sin ningún caso repetido no tiene reserva, y
   la evidencia lo dice.
@@ -21,7 +27,10 @@ modelo, la puerta decisiva la escribe un modelo que nadie revisa.
   nuevas generadas con una semilla registrada.
 - Lo sellado solo se ejecuta cuando lo visible pasa. Cada lote sellado lleva un canario: un
   ejemplo con el valor esperado mal a propósito; si pasa, la tubería está rota.
-- Ante un fallo de lo sellado, el agente recibe el requisito y la clase de fallo, nunca valores.
+- Nada de lo que se escribe en la sesión de trabajo contiene contenido reservado. Ante un fallo de
+  lo sellado, el agente recibe el requisito y la clase de fallo, nunca valores; tampoco los llevan
+  la lista de tests en riesgo ni ninguna otra realimentación.
+- La salida de una ejecución sellada no se imprime en los registros.
 
 ## Base
 

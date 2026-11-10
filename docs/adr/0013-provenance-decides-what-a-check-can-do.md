@@ -23,6 +23,12 @@ Every check carries its origin, and the origin fixes the effect of a failure:
 A model may **propose** examples. They become `human` when a person approves them. Mutation score
 and model review are information in the evidence, never a gate.
 
+A check of origin `model` that passes is information only: it never supports a `PASS`. A
+requirement whose checks are all of origin `model` is listed as not checked.
+
+The suite the project already had counts as approved by a person, because it entered through
+changes a person approved. That includes the tests an agent wrote in an earlier change.
+
 ## Basis
 
 Literature. [Second-model tests](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESEM.2026.11),

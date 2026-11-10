@@ -12,6 +12,11 @@ decisive gate is written by a model that nobody reviews.
 
 - The person approves **all** examples. When the contract is approved, the harness holds out part
   of them at random, with a seed kept in the sealed file. The person does not choose which.
+- From that split on, the content of the held-out examples exists only encrypted: the clear copies
+  are removed from the contract files, and the ledger keeps their digest, not their content.
+  Before the split the whole set is in clear where the contract is specified;
+  [ADR-0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.md) and
+  [ADR-0022](0022-model-calls-of-the-harness-go-through-a-port.md) say what protects it then.
 - Hold-out is by case: every case keeps at least one visible example; only cases with two or more
   examples give one to the hold-out. A requirement with no repeated case has no hold-out, and the
   evidence says so.
@@ -20,7 +25,10 @@ decisive gate is written by a model that nobody reviews.
   new inputs generated with a recorded seed.
 - Sealed checks run only when the visible ones pass. Each sealed batch carries a canary: an
   example whose expected value is wrong on purpose; if it passes, the pipeline is broken.
-- On a sealed failure the agent receives the requirement and the class of failure, never values.
+- Nothing written into the work session contains held-out content. On a sealed failure the agent
+  receives the requirement and the class of failure, never values; the list of tests at risk and
+  any other feedback carry none either.
+- The output of a sealed run is not printed in logs.
 
 ## Basis
 

@@ -1,4 +1,4 @@
-<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:cdc01a89ef8d9e64 -->
+<!-- translation-of: 0015-a-gate-returns-one-of-four-verdicts.md sha256:cdadbbd856c4faba -->
 # ADR-0015 · Una puerta devuelve uno de cuatro veredictos
 
 **Estado:** propuesta
@@ -12,11 +12,16 @@ cuenta como fallo del cambio.
 
 - Una puerta devuelve `PASS`, `FAIL`, `ASK` o `ERROR`.
 - `ERROR` significa que la puerta no pudo evaluar. Se reintenta una vez; si persiste, se pregunta
-  a una persona. Nunca pasa, y no marca el cambio como malo.
+  a una persona. La persona puede arreglar el entorno y repetir la puerta, o abandonar el cambio;
+  nadie puede dar el error por bueno. Nunca pasa, y no marca el cambio como malo.
+- Una puerta solo se omite cuando la política la declara opcional. Omitir una puerta obligatoria
+  es un `ERROR`. Las puertas omitidas se listan en la evidencia y en el pull request.
 - Agregación por precedencia: algún `ERROR` sin resolver da `ERROR`; si no, algún `FAIL` da `FAIL`
   y los `ASK` de esa vuelta se descartan; si no, algún `ASK` da `ASK`; si no, `PASS`.
-- Un cambio se entrega con `PASS`, o con `ASK` cuando una persona ha respondido cada pregunta. Las
-  respuestas forman parte de la evidencia.
+- Un cambio se entrega con `PASS`, o con `ASK` cuando una persona ha respondido cada pregunta. Una
+  pregunta que plantea una puerta la responde una persona; una respuesta delegada no cuenta
+  ([ADR-0025](0025-the-interview-works-on-files-and-ends-by-coverage.es.md)). Las respuestas
+  forman parte de la evidencia.
 
 ## Base
 

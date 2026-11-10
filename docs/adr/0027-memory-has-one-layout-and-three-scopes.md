@@ -16,8 +16,10 @@ context of one story must not leak into another. No accepted standard for agent 
 - Three scopes: **project** (glossary, decisions, policy, pack), shared; **change** (the contract
   of a story, its examples and clarifications), in the directory and the branch of that change;
   **person** (the state of the run in progress, proposals not yet approved), local and never shared.
-- Everything is saved at once. Approval changes the state of an item, not whether it is saved.
-  A proposal lives in the local ledger until someone approves it; only then a file changes.
+- Everything is saved at once. Approval changes the state of an item, not whether it is saved. A
+  proposal lives in the local ledger until someone approves it; only then a file changes. The one
+  exception is held-out content: once the split is done the ledger keeps its digest, not its
+  content ([ADR-0014](0014-hidden-checks-are-held-out-approved-examples.md)).
 - The state of the work comes from the ledger, not from a summary.
 - The context file for agents is a small delimited block with what cannot be deduced from the code.
 

@@ -1,4 +1,4 @@
-<!-- translation-of: 0013-provenance-decides-what-a-check-can-do.md sha256:b2734340d2671074 -->
+<!-- translation-of: 0013-provenance-decides-what-a-check-can-do.md sha256:8ab85cc4e96a8225 -->
 # ADR-0013 · El origen de una comprobación decide qué puede hacer su fallo
 
 **Estado:** propuesta
@@ -24,6 +24,12 @@ Toda comprobación lleva su origen, y el origen fija el efecto de un fallo:
 
 Un modelo puede **proponer** ejemplos. Pasan a `human` cuando una persona los aprueba. La
 puntuación de mutación y la revisión por modelo son información en la evidencia, nunca una puerta.
+
+Una comprobación de origen `model` que pasa es solo información: nunca sostiene un `PASS`. Un
+requisito cuyas comprobaciones son todas de origen `model` aparece como no comprobado.
+
+La suite que ya tenía el proyecto cuenta como aprobada por una persona, porque entró por cambios
+que una persona aprobó. Eso incluye los tests que un agente escribió en un cambio anterior.
 
 ## Base
 

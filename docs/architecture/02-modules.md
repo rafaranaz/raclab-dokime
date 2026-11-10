@@ -100,7 +100,7 @@ block.
 | Model gateway | Given a registered template, its inputs and a schema, return valid JSON or an error | OpenAI-compatible API, vendor API, the installed agent |
 | Human channel | Present a typed question; return an answer with identity and delegation flag | ① terminal, ① files, none for CI, MCP forms |
 | Signer | Sign a digest with a declared purpose | ① system key agent, keyless signing, the CI runner's attestation |
-| Sealed store | Store and retrieve sealed material, encrypted for a list of recipients | An encrypted file in the repository |
+| Sealed store | Store and retrieve held-out content, encrypted for a list of recipients | An encrypted file in the repository |
 | Evidence store | Store and retrieve evidence by the digest of its subject | ① file, git notes, the forge's attestation store |
 | Forge | Create a branch, publish, open a pull request | GitHub; local without a forge |
 | Clock, random | Sources of time and randomness that can be injected | System; fixed for replay |

@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:e06e52a03455149b -->
+<!-- translation-of: 02-modules.md sha256:93d66156554a87b9 -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -102,7 +102,7 @@ primer bloque.
 | Pasarela de modelos | Dada una plantilla registrada, sus entradas y un esquema, devolver JSON válido o un error | API compatible con OpenAI, API de fabricante, el agente instalado |
 | Canal humano | Presentar una pregunta tipada; devolver una respuesta con identidad y marca de delegación | ① terminal, ① ficheros, ninguno para CI, formularios de MCP |
 | Firmante | Firmar una huella con un propósito declarado | ① agente de claves del sistema, firma sin clave, la atestación del ejecutor de CI |
-| Almacén de lo sellado | Guardar y recuperar material sellado, cifrado para una lista de destinatarios | Un fichero cifrado en el repositorio |
+| Almacén de lo sellado | Guardar y recuperar contenido reservado, cifrado para una lista de destinatarios | Un fichero cifrado en el repositorio |
 | Almacén de evidencia | Guardar y recuperar evidencia por la huella de su sujeto | ① fichero, notas de git, el almacén de atestaciones de la forja |
 | Forja | Crear una rama, publicar, abrir un pull request | GitHub; local sin forja |
 | Reloj, azar | Fuentes de tiempo y de aleatoriedad que se pueden inyectar | Sistema; fijos para la repetición |

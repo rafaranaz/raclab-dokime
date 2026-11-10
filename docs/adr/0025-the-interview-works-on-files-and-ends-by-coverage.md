@@ -19,10 +19,16 @@ interviewer guided by a structure of categories discovers far more.
 - **The harness decides when it ends, by coverage of categories.** There is no cap by default.
   When the person says enough, what is left becomes one list of assumptions to approve, with the
   answer a model suggests marked as delegated.
-- Doubts are classified with a bias towards asking. A person may delegate answers to a model; the
-  delegation is recorded and never covers the approval of the contract.
+- Doubts are classified with a bias towards asking. A person may delegate answers to interview
+  questions to a model; the delegation is recorded and never covers the approval of an example or
+  of the contract, nor a question raised by a gate.
 - A question is data, with the restrictions of MCP forms. Surfaces: files and the terminal; MCP
-  forms when the harness is entered from an editor; a mode without questions for CI.
+  forms when the harness is entered from an editor, for clarifying questions only; a mode without
+  questions for CI.
+- Examples and the contract are approved in a channel where the harness talks to the person
+  directly: files or the terminal. An answer that arrives through an MCP form is recorded as
+  coming through the client, unverified, because the client can read the form and answer in the
+  person's place.
 
 ## Basis
 
@@ -32,6 +38,11 @@ implicit requirements ([ReqElicitGym](https://arxiv.org/abs/2602.18306); its pub
 its paper differ); a guided interviewer reaches 0.69 on the same benchmark
 ([study](https://arxiv.org/abs/2605.05828)). Interviewing over the file, updating it after each
 answer, is what Spec Kit's `clarify` does, with a cap of five questions.
+
+A test of ours, with one agent run headless: the model saw neither an MCP form nor its answer, and
+nothing was left in the session files, but a hook of the client received the form and answered it.
+The [specification](https://modelcontextprotocol.io/specification/latest/client/elicitation) says
+that in form mode the data is exposed to the client.
 
 ## Alternatives considered
 

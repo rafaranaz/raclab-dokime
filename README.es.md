@@ -1,24 +1,26 @@
-<!-- translation-of: README.md sha256:ea658c19448689a3 -->
+<!-- translation-of: README.md sha256:156e5dc989aa06ce -->
 # raclab-dokime
 
 *Read in [English](README.md).*
 
-Pipeline de desarrollo guiado por especificación para agentes de código: de una petición en
-lenguaje natural a un cambio publicado, donde cada paso lo propone un agente y lo acepta o rechaza
-una verificación mecánica. Ningún resultado se da por bueno por la palabra del agente que lo
-produjo.
+Una capa de verificación y evidencia alrededor de los agentes de programación. No escribe código:
+ayuda a una persona a escribir un contrato de requisitos y ejemplos aprobados, entrega el trabajo a
+un agente que el usuario ya tiene, y acepta el resultado solo a través de puertas mecánicas. Lo que
+entrega es un cambio con evidencia firmada de qué se comprobó, qué no, y quién decidió qué. Ningún
+resultado se da por bueno por la palabra del agente que lo produjo.
 
 ## Estado
 
-En construcción. El repositorio está en la **Fase 0** (forma de trabajo y puertas de calidad);
-todavía no contiene código del harness. Las fases, su alcance y sus criterios de salida están en
-[docs/ROADMAP.es.md](docs/ROADMAP.es.md).
+En construcción. El repositorio está en la **fase 1** (arquitectura de referencia): el diseño está
+escrito y sus decisiones están aceptadas, y todavía no contiene código del harness. Las fases, los
+bloques de construcción y sus criterios de salida están en [docs/ROADMAP.es.md](docs/ROADMAP.es.md).
 
 ## Dónde está cada cosa
 
 | Qué | Dónde |
 |---|---|
 | Cómo se trabaja: ramas, commits, puertas, definición de terminado | [CONTRIBUTING.es.md](CONTRIBUTING.es.md) |
+| Qué es el producto, sus invariantes y sus módulos | [docs/architecture/](docs/architecture/README.es.md) |
 | Decisiones de diseño y de proceso | [docs/adr/](docs/adr/README.es.md) |
 | Requisitos EARS de cada ámbito | [docs/requirements/](docs/requirements/) |
 | Fases y criterios de salida | [docs/ROADMAP.es.md](docs/ROADMAP.es.md) |

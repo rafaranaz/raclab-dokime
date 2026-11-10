@@ -32,4 +32,7 @@ Reasoning. An earlier implementation shows that an idea can be written, not that
 
 - More code to write, and no shortcut for the first block.
 - Each decision can be traced to its basis instead of to a previous habit.
-- The accepted ADRs 0001 to 0007 keep their original context, as accepted ADRs are not edited.
+- The accepted ADRs 0001 to 0007 were edited once, with the maintainer's approval, so that they
+  state their reasons without citing an earlier implementation. Their decisions did not change.
+  This is an exception to the rule that accepted ADRs are not edited, made because the whole
+  design was reworked; it sets no precedent.

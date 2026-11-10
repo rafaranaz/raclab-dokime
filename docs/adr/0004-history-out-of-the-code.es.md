@@ -1,14 +1,13 @@
-<!-- translation-of: 0004-history-out-of-the-code.md sha256:10e60819fbda68cf -->
+<!-- translation-of: 0004-history-out-of-the-code.md sha256:f8cc95f5f110fd7a -->
 # ADR-0004 · La historia vive en git y en los ADR, no en el código
 
 **Estado:** aceptada
 
 ## Contexto
 
-En `dokime` el código de producción tenía unas 27.600 líneas de prosa frente a 31.200 de código, y
-1.296 referencias a identificadores de tarea. Los comentarios contaban cómo se llegó a cada línea y
-remitían a documentos que ya no existían en el repositorio. Auditar qué hacía una función exigía
-separar su explicación de su historia.
+Los comentarios que cuentan cómo se llegó a cada línea crecen hasta que un fichero tiene tanta
+prosa como código, citan identificadores de tarea y remiten a documentos que ya no existen en el
+repositorio. Auditar qué hace una función exige entonces separar su explicación de su historia.
 
 ## Decisión
 

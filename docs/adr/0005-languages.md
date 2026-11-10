@@ -6,8 +6,8 @@
 
 The team works in Spanish. The harness generates and parses EARS requirements with the canonical
 English keywords (`When`, `While`, `If ... then`, `Where`, `shall`), and agents working on code
-perform better and cost less with English identifiers, comments and prompts. In `dokime` both
-languages coexisted without a rule, which forced later translations of skills and validators.
+perform better and cost less with English identifiers, comments and prompts. Two languages
+coexisting without a rule force later translations of skills and validators.
 
 The people who use the harness should be able to work with it in Spanish or in English.
 
@@ -23,8 +23,8 @@ The people who use the harness should be able to work with it in Spanish or in E
 - **The product lets the user choose Spanish or English** for everything they read or write:
   interviews, the request, clarifying questions, approval gates and reports. Internal artifacts and
   model prompts stay in English. How the boundary is implemented (translating at the edge or
-  conversing directly in the chosen language) is decided in the architecture phase, in its own
-  ADR.
+  conversing directly in the chosen language) is decided in
+  [ADR-0032](0032-bilingual-interaction-signs-what-was-shown.md).
 
 ## Alternatives considered
 

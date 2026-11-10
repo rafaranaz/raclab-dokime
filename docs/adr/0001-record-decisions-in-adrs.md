@@ -4,9 +4,9 @@
 
 ## Context
 
-In `dokime` decisions were scattered across code comments, plan documents, technical-debt logs and
-commit messages. Working out why something was the way it was meant reading the whole history,
-and the code ended up explaining its own past instead of what it does.
+When decisions are scattered across code comments, plan documents, technical-debt logs and commit
+messages, working out why something is the way it is means reading the whole history, and the
+code ends up explaining its own past instead of what it does.
 
 ## Decision
 

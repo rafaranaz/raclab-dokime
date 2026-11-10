@@ -4,7 +4,7 @@
 
 ## Context
 
-`dokime` was published under the Business Source License 1.1, which protects commercial use for a
+A source-available license such as the Business Source License 1.1 protects commercial use for a
 period before converting to an open source license. The market for a harness like this is limited
 today, and the main value of publishing it is that someone who finds it useful can adopt it,
 adapt it or learn from it without friction.
@@ -15,7 +15,7 @@ adapt it or learn from it without friction.
 
 ## Alternatives considered
 
-- **Business Source License 1.1, as in `dokime`.** It protects a commercial opportunity that does
+- **Business Source License 1.1.** It protects a commercial opportunity that does
   not exist today at the cost of discouraging adoption and contributions.
 - **Apache License 2.0.** Equally permissive and with an explicit patent grant, but longer and with
   more obligations for whoever redistributes it; MIT is enough for the goal of maximum reuse.

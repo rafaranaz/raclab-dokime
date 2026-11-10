@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:66b5475039460e23 -->
+<!-- translation-of: CONTRIBUTING.md sha256:9d220c4b98e92b5a -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -73,6 +73,10 @@ Optional-Trailer: value
 - La aprobación humana es la puerta de decisión: CI dice si el cambio es correcto según las
   reglas; la revisión dice si es el cambio que queremos.
 - Nunca se mergea con CI en rojo ni con un hallazgo de revisión abierto.
+- Una descripción lleva una sola línea de atribución, la de la plantilla. Las herramientas que abren o
+  editan pull requests pueden añadir su propio pie o un enlace de sesión; un workflow
+  ([.github/workflows/pr-description.yml](.github/workflows/pr-description.yml)) los quita cada vez
+  que se abre o se edita una descripción, para que nadie tenga que hacerlo a mano.
 
 ## Puertas de calidad
 

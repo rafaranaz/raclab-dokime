@@ -1,0 +1,30 @@
+name: pr-description
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  clean:
+    name: keep one attribution line
+    runs-on: ubuntu-24.04
+    steps:
+      # pull_request_target checks out the base branch, so only trusted code runs with write access.
+      - uses: actions/checkout@v7
+      - name: Remove attribution appended by tooling
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/body.md"
+          result="$(python3 -m tools.clean_pr_body "$RUNNER_TEMP/body.md")"
+          echo "$result"
+          if [ "$result" = "changed=true" ]; then
+            gh api -X PATCH "repos/$REPO/pulls/$PR_NUMBER" -F body=@"$RUNNER_TEMP/body.md" --silent
+          fi

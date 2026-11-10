@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:9d220c4b98e92b5a -->
+<!-- translation-of: CONTRIBUTING.md sha256:da4e042707735716 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -19,7 +19,7 @@ una puerta en CI que la comprueba.
 
 ## Ciclo de un ámbito
 
-Un ámbito es un módulo del harness (`core`, `graph`, `spec`...) o una pieza de gobierno (`repo`,
+Un ámbito es un módulo del harness (`core`, `contract`, `verify`...) o una pieza de gobierno (`repo`,
 `arch`). La lista cerrada está en [tools/scopes.toml](tools/scopes.toml), con las rutas que
 pertenecen a cada uno.
 
@@ -30,18 +30,21 @@ pertenecen a cada uno.
 3. **Cerrar.** Se ejecutan todas las puertas en local, se redacta el informe de cierre y se abre o
    actualiza el PR. Ver la skill [close-scope](.claude/skills/close-scope/SKILL.md).
 
-**Solo hay un ámbito de módulo abierto a la vez.** El siguiente no se abre hasta que el anterior
-está mergeado.
+**Solo hay un ámbito de módulo abierto a la vez**, y pertenece al bloque de la
+[hoja de ruta](docs/ROADMAP.es.md) que está abierto. El siguiente no se abre hasta que el anterior
+está mergeado. Los ámbitos de gobierno (`repo`, `arch`) pueden estar abiertos a su lado.
 
 ## Ramas
 
 - `main` está protegida: sin push directo, solo merge por PR con CI en verde.
 - Formato: `tipo/ámbito-descripción`, en minúsculas y con guiones. Por ejemplo
-  `feat/graph-ambiguity-confidence` o `docs/arch-c4-context`.
+  `feat/contract-example-schema` o `docs/arch-c4-context`.
 - `tipo` es un tipo de Conventional Commits y `ámbito` uno de `tools/scopes.toml`. Los ámbitos no
   llevan guiones, porque el primer guion separa el ámbito de la descripción.
 - Las ramas viven poco: si una rama crece más de lo que se puede revisar de una sentada, se parte.
-- El merge es **por rebase**: el historial de `main` es lineal y se conserva cada commit.
+- El merge es **por rebase**: el historial de `main` es lineal y se conserva cada commit. Cuando
+  GitHub pida actualizar una rama, se elige **Update with rebase**: la opción por defecto añade
+  un commit de merge, que la comprobación de commits rechaza.
 
 ## Commits
 
@@ -94,6 +97,7 @@ en local con los mismos comandos.
 | Trazabilidad | `uv run python -m tools.check_traceability` | Todo requisito con test; todo test con marcador |
 | Enlaces en Markdown | `uv run python -m tools.check_links` | Sin enlaces rotos |
 | Traducciones al español | `uv run python -m tools.check_translations` | Todo documento traducido y al día |
+| Registros de decisión | `uv run python -m tools.check_adrs` | Todo ADR desde el 0008 dice en qué se apoya; todo ADR coincide con el índice |
 | Diagramas Mermaid | `npm ci` una vez, y luego `uv run python -m tools.check_mermaid` | Todo diagrama se renderiza; falla si falta el renderizador |
 | Ficheros versionados e ignorados | `git ls-files --cached --ignored --exclude-standard` | Salida vacía |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <rama>` | Sin hallazgos |

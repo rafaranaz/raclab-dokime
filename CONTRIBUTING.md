@@ -18,7 +18,7 @@ checks it.
 
 ## Lifecycle of a scope
 
-A scope is a harness module (`core`, `graph`, `spec`...) or a governance piece (`repo`, `arch`).
+A scope is a harness module (`core`, `contract`, `verify`...) or a governance piece (`repo`, `arch`).
 The closed list is in [tools/scopes.toml](tools/scopes.toml), with the paths that belong to each.
 
 1. **Open.** Declare the scope in `tools/scopes.toml`, create the branch and write the EARS
@@ -28,19 +28,22 @@ The closed list is in [tools/scopes.toml](tools/scopes.toml), with the paths tha
 3. **Close.** Run every gate locally, write the closing report and open or update the pull
    request. See the [close-scope](.claude/skills/close-scope/SKILL.md) skill.
 
-**Only one module scope is open at a time.** The next one does not open until the previous one is
-merged.
+**Only one module scope is open at a time**, and it belongs to the block of the
+[roadmap](docs/ROADMAP.md) that is open. The next one does not open until the previous one is
+merged. Governance scopes (`repo`, `arch`) may be open next to it.
 
 ## Branches
 
 - `main` is protected: no direct pushes, only merges through pull requests with CI green.
 - Format: `type/scope-description`, lower case with hyphens. For example
-  `feat/graph-ambiguity-confidence` or `docs/arch-c4-context`.
+  `feat/contract-example-schema` or `docs/arch-c4-context`.
 - `type` is a Conventional Commits type and `scope` is one from `tools/scopes.toml`. Scopes have no
   hyphens, because the first hyphen separates the scope from the description.
 - Branches are short-lived: if a branch grows beyond what can be reviewed in one sitting, it is
   split.
-- Merges are done **by rebase**: the history of `main` is linear and every commit is kept.
+- Merges are done **by rebase**: the history of `main` is linear and every commit is kept. When
+  GitHub asks to update a branch, choose **Update with rebase**: the default option adds a merge
+  commit, which the commit check rejects.
 
 ## Commits
 
@@ -93,6 +96,7 @@ with the same commands.
 | Traceability | `uv run python -m tools.check_traceability` | Every requirement with a test; every test with a marker |
 | Markdown links | `uv run python -m tools.check_links` | No broken links |
 | Spanish translations | `uv run python -m tools.check_translations` | Every document translated and up to date |
+| Decision records | `uv run python -m tools.check_adrs` | Every ADR from 0008 on states its basis; every ADR agrees with the index |
 | Mermaid diagrams | `npm ci` once, then `uv run python -m tools.check_mermaid` | Every diagram renders; fails if the renderer is missing |
 | Tracked files that are ignored | `git ls-files --cached --ignored --exclude-standard` | Empty output |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <branch>` | No findings |

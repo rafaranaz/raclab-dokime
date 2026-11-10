@@ -1,6 +1,6 @@
 # ADR-0002 · New repository, ported module by module from `dokime`
 
-**Status:** accepted
+**Status:** superseded by [ADR-0008](0008-built-new-nothing-is-ported.md)
 
 ## Context
 

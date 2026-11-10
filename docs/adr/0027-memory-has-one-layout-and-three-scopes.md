@@ -1,6 +1,6 @@
 # ADR-0027 · Memory has one layout, two storages and three scopes
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

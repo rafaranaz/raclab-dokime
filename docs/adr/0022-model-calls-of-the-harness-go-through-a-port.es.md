@@ -1,7 +1,7 @@
-<!-- translation-of: 0022-model-calls-of-the-harness-go-through-a-port.md sha256:f404815930073bcb -->
+<!-- translation-of: 0022-model-calls-of-the-harness-go-through-a-port.md sha256:be3a6d37cabb6326 -->
 # ADR-0022 · Las llamadas del arnés a un modelo pasan por un puerto con tres vías
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

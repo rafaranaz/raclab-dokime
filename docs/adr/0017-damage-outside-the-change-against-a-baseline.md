@@ -1,6 +1,6 @@
 # ADR-0017 · Damage outside the change is found by comparing against a baseline
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

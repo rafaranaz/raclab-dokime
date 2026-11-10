@@ -1,7 +1,7 @@
-<!-- translation-of: 0032-bilingual-interaction-signs-what-was-shown.md sha256:e85857cd9f1b3630 -->
+<!-- translation-of: 0032-bilingual-interaction-signs-what-was-shown.md sha256:572bddf0fee38770 -->
 # ADR-0032 · La persona trabaja en su idioma, y la aprobación firma lo que se le mostró
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

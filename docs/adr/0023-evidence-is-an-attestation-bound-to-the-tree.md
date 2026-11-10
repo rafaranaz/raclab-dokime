@@ -1,6 +1,6 @@
 # ADR-0023 · Evidence is an in-toto attestation bound to the resulting tree
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

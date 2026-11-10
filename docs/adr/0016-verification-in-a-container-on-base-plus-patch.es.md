@@ -1,7 +1,7 @@
-<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:ce7e8a1265a74e87 -->
+<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:6ecf2d8ccc1106ea -->
 # ADR-0016 · La verificación corre en un contenedor sin red, sobre el commit base más el parche
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -1,6 +1,6 @@
 # ADR-0026 · Formal consistency is checked per requirement, and its findings ask
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

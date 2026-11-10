@@ -1,6 +1,6 @@
 # ADR-0019 · The harness launches the installed agent and talks to it through files
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

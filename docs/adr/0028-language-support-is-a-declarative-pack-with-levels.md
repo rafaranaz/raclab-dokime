@@ -1,6 +1,6 @@
 # ADR-0028 · Language support is a declarative pack with support levels
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

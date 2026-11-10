@@ -1,7 +1,7 @@
-<!-- translation-of: 0024-approval-attestation-and-commit-are-signed-separately.md sha256:f887c83f656da847 -->
+<!-- translation-of: 0024-approval-attestation-and-commit-are-signed-separately.md sha256:8d025406c4bc88cc -->
 # ADR-0024 · La aprobación, la atestación y el commit se firman por separado
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -1,7 +1,7 @@
-<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:a09ff7583541ea76 -->
+<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:baf72d5e70777233 -->
 # ADR-0023 · La evidencia es una atestación in-toto atada al árbol resultante
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

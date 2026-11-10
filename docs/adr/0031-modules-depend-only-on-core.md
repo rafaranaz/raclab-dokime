@@ -1,6 +1,6 @@
 # ADR-0031 · Modules depend only on core; adapters are imported only by the composition root
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

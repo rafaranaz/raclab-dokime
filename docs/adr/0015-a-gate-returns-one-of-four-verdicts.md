@@ -1,6 +1,6 @@
 # ADR-0015 · A gate returns one of four verdicts
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

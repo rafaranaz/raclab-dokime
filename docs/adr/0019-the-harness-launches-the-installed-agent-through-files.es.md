@@ -1,7 +1,7 @@
-<!-- translation-of: 0019-the-harness-launches-the-installed-agent-through-files.md sha256:a2ebd04bc20dbbd1 -->
+<!-- translation-of: 0019-the-harness-launches-the-installed-agent-through-files.md sha256:60cc4b03c359a191 -->
 # ADR-0019 · El arnés lanza el agente instalado y se comunica con él por ficheros
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

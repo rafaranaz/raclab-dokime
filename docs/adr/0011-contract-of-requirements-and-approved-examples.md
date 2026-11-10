@@ -1,6 +1,6 @@
 # ADR-0011 · A contract is EARS requirements plus examples approved by a person
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

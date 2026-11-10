@@ -1,6 +1,6 @@
 # ADR-0024 · Approval, attestation and commit are signed separately
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

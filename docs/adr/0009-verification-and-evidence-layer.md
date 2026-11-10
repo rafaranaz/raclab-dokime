@@ -1,6 +1,6 @@
 # ADR-0009 · The product is a verification and evidence layer around existing coding agents
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

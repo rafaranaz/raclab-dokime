@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:8dfcb011283d7535 -->
+<!-- translation-of: ROADMAP.md sha256:c8bdc10f76f24a11 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -46,7 +46,7 @@ EARS de alto nivel cuando se abre su ámbito en la fase 2.
 Criterios de salida:
 
 - [ ] Los documentos anteriores están en `docs/architecture/` y sus diagramas pasan la validación.
-- [ ] Cada ADR desde el 0008 está aceptado o queda expresamente como hipótesis con su prueba.
+- [x] Cada ADR desde el 0008 está aceptado o queda expresamente como hipótesis con su prueba.
 - [ ] La comprobación de que cada ADR dice en qué se apoya y los contratos de importación están en
   CI.
 - [ ] La arquitectura está aprobada en revisión.

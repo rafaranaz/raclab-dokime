@@ -1,4 +1,4 @@
-<!-- translation-of: 0022-model-calls-of-the-harness-go-through-a-port.md sha256:e4efce307869c7ab -->
+<!-- translation-of: 0022-model-calls-of-the-harness-go-through-a-port.md sha256:f404815930073bcb -->
 # ADR-0022 · Las llamadas del arnés a un modelo pasan por un puerto con tres vías
 
 **Estado:** propuesta
@@ -15,7 +15,9 @@ función de MCP que permite a un servidor pedir texto al modelo del cliente est�
 - Un puerto con tres adaptadores: una API compatible con OpenAI (que incluye servidores locales),
   una API de fabricante y el agente instalado. Ninguno es el de por defecto; elige la
   configuración, por tarea si se quiere.
-- **El material sellado nunca pasa por la instalación del agente que implementa.**
+- **El contenido reservado nunca pasa por la instalación del agente que implementa**, y tampoco
+  los ejemplos de un contrato antes del reparto: el adaptador del agente instalado no se usa para
+  proponer ni manejar ejemplos de un contrato que ese agente va a implementar.
 - Cada prompt es una plantilla registrada con identificador y huella. Cada respuesta se valida
   contra un esquema, se reintenta una vez y, si no, es un error.
 - Todo lo que devuelve un modelo tiene origen `model`
@@ -40,5 +42,5 @@ estructuradas no llevan herramientas.
 ## Consecuencias
 
 - Tres adaptadores que mantener.
-- Un usuario sin clave puede ejecutarlo todo en local salvo la generación de material sellado, a
+- Un usuario sin clave puede ejecutarlo todo en local salvo la propuesta de ejemplos, a
   no ser que configure un modelo local.

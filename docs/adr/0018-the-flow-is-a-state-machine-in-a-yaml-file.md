@@ -13,7 +13,8 @@ to see the exact flow a change went through.
 - The flow is a YAML file with a strict schema: states, the gate that closes each one, and the
   transition for each verdict. Unknown fields are rejected.
 - It is validated when loaded: every non-final state has a gate; a final state is reachable from
-  every state; every loop has a budget in the policy.
+  every state; every loop has a budget in the policy; no transition leads from `ERROR` or `FAIL`
+  to a state that delivers.
 - **Exhausting a budget asks a person.** It neither rejects nor continues on its own.
 - The file carries no logic. Conditions live in the gates, which are code.
 - The digest of the flow is part of the evidence.

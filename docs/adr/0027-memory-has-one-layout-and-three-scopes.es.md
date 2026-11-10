@@ -1,4 +1,4 @@
-<!-- translation-of: 0027-memory-has-one-layout-and-three-scopes.md sha256:06174a15c3eb79dc -->
+<!-- translation-of: 0027-memory-has-one-layout-and-three-scopes.md sha256:5dfdd32a463ead91 -->
 # ADR-0027 · La memoria tiene una estructura, dos almacenamientos y tres alcances
 
 **Estado:** propuesta
@@ -21,7 +21,9 @@ aceptado de memoria para agentes.
   compartido.
 - Todo se guarda al momento. La aprobación cambia el estado de un elemento, no decide si se
   guarda. Una propuesta vive en el registro local hasta que alguien la aprueba; solo entonces
-  cambia un fichero.
+  cambia un fichero. La única excepción es el contenido reservado: hecho el reparto, el registro
+  guarda su huella, no su contenido
+  ([ADR-0014](0014-hidden-checks-are-held-out-approved-examples.es.md)).
 - El estado del trabajo sale del registro, no de un resumen.
 - El fichero de contexto para agentes es un bloque pequeño y delimitado con lo que no se puede
   deducir del código.

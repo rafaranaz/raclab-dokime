@@ -1,4 +1,4 @@
-<!-- translation-of: 0018-the-flow-is-a-state-machine-in-a-yaml-file.md sha256:d760b9ec454a36e2 -->
+<!-- translation-of: 0018-the-flow-is-a-state-machine-in-a-yaml-file.md sha256:b0bcaafdcd2a719c -->
 # ADR-0018 · El flujo es una máquina de estados declarada en un fichero YAML
 
 **Estado:** propuesta
@@ -14,7 +14,8 @@ auditor quiere ver el flujo exacto por el que pasó un cambio.
 - El flujo es un fichero YAML con un esquema estricto: estados, la puerta que cierra cada uno y la
   transición para cada veredicto. Los campos desconocidos se rechazan.
 - Se valida al cargarlo: todo estado no final tiene puerta; desde todo estado se alcanza uno
-  final; todo bucle tiene un presupuesto en la política.
+  final; todo bucle tiene un presupuesto en la política; ninguna transición lleva de `ERROR` o de
+  `FAIL` a un estado que entrega.
 - **Agotar un presupuesto pregunta a una persona.** Ni rechaza ni sigue por su cuenta.
 - El fichero no lleva lógica. Las condiciones viven en las puertas, que son código.
 - La huella del flujo forma parte de la evidencia.

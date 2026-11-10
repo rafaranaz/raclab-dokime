@@ -1,4 +1,4 @@
-<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:dad6a939fb12da13 -->
+<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:f7a2ee7010897256 -->
 # ADR-0023 · La evidencia es una atestación in-toto atada al árbol resultante
 
 **Estado:** propuesta
@@ -14,10 +14,11 @@ cambia al integrar.
 - La evidencia es una declaración in-toto en un sobre DSSE, con un tipo de predicado propio
   ("conformidad con un contrato").
 - Su sujeto es la **huella del árbol resultante** y la huella del parche, no el commit.
-- Registra, para cada puerta del flujo, que se ejecutó, que se omitió con un motivo o que no
-  aplicaba; el origen de cada comprobación; el contrato y quién lo aprobó; el entorno; el agente,
-  el modelo, la forma de pago y el peldaño de adopción; las decisiones humanas con quién las tomó
-  y si fueron delegadas.
+- Registra, para cada puerta del flujo, que se ejecutó, que se omitió porque la política la
+  declara opcional o que no aplicaba; el origen de cada comprobación; el contrato y quién lo
+  aprobó; el entorno; el agente, el modelo, la forma de pago y el peldaño de adopción; las
+  decisiones humanas con quién las tomó y si fueron delegadas. De las comprobaciones selladas
+  lleva huellas y clases de fallo, nunca valores ni entradas.
 - **Lo que no se comprobó es un campo obligatorio**, rellenado mecánicamente.
 - Lleva una etiqueta de independencia: autoatestado, verificado en CI, o verificado en CI con un
   segundo aprobador.

@@ -12,9 +12,11 @@ rebase, and GitHub rewrites the commits when it does, so a commit identifier cha
 - Evidence is an in-toto statement in a DSSE envelope, with a predicate type of our own
   ("conformance to a contract").
 - Its subject is the **digest of the resulting tree** and the digest of the patch, not the commit.
-- It records, for every gate of the flow, that it ran, was skipped with a reason or did not apply;
-  the origin of every check; the contract and who approved it; the environment; the agent, model,
-  payment mode and adoption step; the human decisions with who took them and whether delegated.
+- It records, for every gate of the flow, that it ran, was skipped because the policy declares it
+  optional, or did not apply; the origin of every check; the contract and who approved it; the
+  environment; the agent, model, payment mode and adoption step; the human decisions with who took
+  them and whether delegated. For sealed checks it carries digests and classes of failure, never
+  values or inputs.
 - **What was not checked is a mandatory field**, filled mechanically.
 - It carries a label of independence: self-attested, verified in CI, or verified in CI with a
   second approver.

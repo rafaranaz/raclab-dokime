@@ -11,11 +11,16 @@ environment counts as a failure of the change.
 
 - A gate returns `PASS`, `FAIL`, `ASK` or `ERROR`.
 - `ERROR` means the gate could not evaluate. It is retried once; if it persists, a person is
-  asked. It never passes, and it does not mark the change as bad.
+  asked. The person can repair the environment and run the gate again, or abandon the change;
+  nobody can accept the error. It never passes, and it does not mark the change as bad.
+- A gate is skipped only when the policy declares it optional. Skipping a mandatory gate is an
+  `ERROR`. The skipped gates are listed in the evidence and in the pull request.
 - Aggregation by precedence: any unresolved `ERROR` gives `ERROR`; else any `FAIL` gives `FAIL`
   and the `ASK` of that round are dropped; else any `ASK` gives `ASK`; else `PASS`.
-- A change is delivered with `PASS`, or with `ASK` when a person has answered every question.
-  The answers are part of the evidence.
+- A change is delivered with `PASS`, or with `ASK` when a person has answered every question. A
+  question raised by a gate is answered by a person; a delegated answer does not count
+  ([ADR-0025](0025-the-interview-works-on-files-and-ends-by-coverage.md)). The answers are part of
+  the evidence.
 
 ## Basis
 

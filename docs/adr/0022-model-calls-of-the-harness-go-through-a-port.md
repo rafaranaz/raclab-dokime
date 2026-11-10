@@ -13,7 +13,9 @@ The MCP feature that lets a server ask the client's model is deprecated.
 
 - A port with three adapters: an OpenAI-compatible API (which includes local servers), a vendor
   API, and the installed agent. None is the default; the configuration chooses, per task if wanted.
-- **Sealed material never goes through the installation of the agent that implements.**
+- **Held-out content never goes through the installation of the agent that implements**, and
+  neither do the examples of a contract before the split: the installed-agent adapter is not used
+  to propose or handle examples of a contract that agent will implement.
 - Every prompt is a registered template with an identifier and a digest. Every answer is validated
   against a schema, retried once, and otherwise is an error.
 - Everything a model returns has origin `model` ([ADR-0013](0013-provenance-decides-what-a-check-can-do.md)).
@@ -35,5 +37,5 @@ models stop calling tools when tools and a JSON schema are both active
 ## Consequences
 
 - Three adapters to maintain.
-- A user without a key can run everything except the generation of sealed material locally, unless
+- A user without a key can run everything except the proposal of examples locally, unless
   a local model is configured.

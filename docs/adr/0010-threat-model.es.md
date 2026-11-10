@@ -1,4 +1,4 @@
-<!-- translation-of: 0010-threat-model.md sha256:d7e896c89331b0c0 -->
+<!-- translation-of: 0010-threat-model.md sha256:90613edfbdb5f864 -->
 # ADR-0010 · El modelo de amenazas dice qué se defiende y qué no
 
 **Estado:** propuesta
@@ -22,7 +22,7 @@ propia interfaz de control local
 | T6 | Un usuario que falsea su propia evidencia en local | No | Repetición de la verificación en CI |
 | T7 | Un proveedor de modelo comprometido | No | Un modelo local lo evita |
 
-Activos, por orden: la máquina y las credenciales del usuario, el material reservado, la integridad
+Activos, por orden: la máquina y las credenciales del usuario, el contenido reservado, la integridad
 del veredicto, la integridad de la evidencia.
 
 ## Base

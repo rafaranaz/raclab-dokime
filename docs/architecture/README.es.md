@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:e74fec1eb2ad183e -->
+<!-- translation-of: README.md sha256:18b32f3b3a79204f -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -26,6 +26,7 @@ evidencia lo dice.
 |---|---|
 | [01-context.es.md](01-context.es.md) | Con quién habla el sistema, y las zonas de confianza |
 | [02-modules.es.md](02-modules.es.md) | Módulos, puertos y dependencias permitidas |
+| [glossary.es.md](glossary.es.md) | Los términos en que se apoyan los invariantes y las decisiones |
 | [Decisiones](../adr/README.es.md) | ADR 0008 a 0032, cada uno con su base y sus alternativas |
 
 Estados y flujos, y datos y evidencia, llegan en los siguientes pull requests de esta fase
@@ -39,13 +40,13 @@ CI cuando se rompe
 
 | Id | Invariante | Lo hace cumplir |
 |---|---|---|
-| INV-1 | No hay camino desde una salida de modelo hasta un `PASS` o un `FAIL` sin una aprobación humana o una derivación mecánica | El tipo del veredicto lleva el origen; un test de propiedad sobre el agregador |
+| INV-1 | No hay camino desde una salida de modelo hasta un `PASS` o un `FAIL` sin una aprobación humana o una derivación mecánica. Una comprobación de origen `model` que pasa no sostiene nada; la suite que ya tenía el proyecto cuenta como aprobada | El tipo del veredicto lleva el origen; un test de propiedad sobre el agregador |
 | INV-2 | El código escrito por el agente nunca corre en un proceso que contenga un valor esperado de un ejemplo sellado | A la zona de verificación solo entran entradas; un test busca en la zona una cadena centinela |
-| INV-3 | Ningún fichero legible desde donde trabaja el agente contiene material sellado | Cada lote sellado lleva una cadena centinela; un test la busca |
+| INV-3 | Desde el reparto, ningún fichero legible desde donde trabaja el agente contiene contenido reservado en claro. Para un desarrollador solo sin CI es mejor esfuerzo, y la evidencia lo dice | Cada lote sellado lleva una cadena centinela; un test la busca en claro antes de cada lanzamiento del agente y antes de cada ejecución sellada. No ve el contenido transformado a propósito, que es código hostil, fuera del modelo de amenazas |
 | INV-4 | El veredicto es función de base, parche, contrato, imagen, política, flujo y semilla, todos identificados por huella | Una orden de repetición recalcula el veredicto desde el registro |
 | INV-5 | Todo estado tiene puerta de salida; todo bucle tiene presupuesto; agotar un presupuesto pregunta a una persona | El validador del fichero de flujo |
-| INV-6 | No se entrega nada con un `ERROR` sin resolver | Un test de propiedad sobre el agregador |
-| INV-7 | Toda puerta del flujo aparece en la evidencia como ejecutada, omitida con un motivo, o no aplicable | Validación de esquema al construir la evidencia |
+| INV-6 | No se entrega nada con un `ERROR` sin resolver, y nadie puede dar uno por bueno | El validador rechaza un flujo con una transición de `ERROR` o de `FAIL` a un estado que entrega; un test de propiedad sobre el agregador |
+| INV-7 | Toda puerta del flujo aparece en la evidencia como ejecutada, omitida porque la política la declara opcional, o no aplicable | Validación de esquema al construir la evidencia |
 | INV-8 | Toda decisión humana es un evento con identidad, y toda respuesta delegada está marcada | El canal humano solo devuelve respuestas con quién respondió y la marca de delegación |
 | INV-9 | `core`, `contract`, `oracle`, `verify` y `evidence` no importan ningún adaptador de agente, de modelo ni de lenguaje | Contratos de importación |
 | INV-10 | La evidencia se valida con una orden que solo depende del módulo `evidence` y de herramientas estándar | Un test que instala solo ese módulo |

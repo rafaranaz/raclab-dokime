@@ -21,7 +21,7 @@ own local control interface
 | T6 | A user who forges their own evidence locally | No | Re-verification in CI |
 | T7 | A compromised model provider | No | A local model avoids it |
 
-Assets, in order: the user's machine and credentials, the sealed material, the integrity of the
+Assets, in order: the user's machine and credentials, the held-out content, the integrity of the
 verdict, the integrity of the evidence.
 
 ## Basis

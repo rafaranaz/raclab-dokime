@@ -1,4 +1,4 @@
-<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:c6b175a060c0a894 -->
+<!-- translation-of: 0025-the-interview-works-on-files-and-ends-by-coverage.md sha256:8c317fa1a9200933 -->
 # ADR-0025 · La entrevista trabaja sobre ficheros y termina por cobertura
 
 **Estado:** propuesta
@@ -20,11 +20,16 @@ Preguntar ayuda, y un entrevistador guiado por una estructura de categorías des
 - **El arnés decide cuándo termina, por cobertura de categorías.** No hay tope por defecto. Cuando
   la persona dice basta, lo pendiente pasa a una sola lista de supuestos que aprobar, con la
   respuesta que sugiere un modelo marcada como delegada.
-- Las dudas se clasifican con sesgo hacia preguntar. Una persona puede delegar respuestas en un
-  modelo; la delegación se registra y nunca alcanza a la aprobación del contrato.
+- Las dudas se clasifican con sesgo hacia preguntar. Una persona puede delegar en un modelo
+  respuestas a preguntas de la entrevista; la delegación se registra y nunca alcanza a la
+  aprobación de un ejemplo ni del contrato, ni a una pregunta que plantea una puerta.
 - Una pregunta es un dato, con las restricciones de los formularios de MCP. Superficies: ficheros
-  y terminal; formularios de MCP cuando se entra al arnés desde un editor; un modo sin preguntas
-  para CI.
+  y terminal; formularios de MCP cuando se entra al arnés desde un editor, solo para preguntas de
+  aclaración; un modo sin preguntas para CI.
+- Los ejemplos y el contrato se aprueban en un canal donde el arnés habla directamente con la
+  persona: ficheros o terminal. Una respuesta que llega por un formulario de MCP se registra como
+  llegada a través del cliente, sin verificar, porque el cliente puede leer el formulario y
+  responder en lugar de la persona.
 
 ## Base
 
@@ -34,6 +39,12 @@ tercio de los requisitos implícitos ([ReqElicitGym](https://arxiv.org/abs/2602.
 publicados y su artículo difieren); un entrevistador guiado llega a 0,69 en el mismo banco de
 pruebas ([estudio](https://arxiv.org/abs/2605.05828)). Entrevistar sobre el fichero y actualizarlo
 tras cada respuesta es lo que hace `clarify` de Spec Kit, con un tope de cinco preguntas.
+
+Una prueba nuestra, con un agente lanzado sin interfaz: el modelo no vio ni el formulario de MCP ni
+su respuesta, y no quedó nada en los ficheros de la sesión, pero un hook del cliente recibió el
+formulario y lo respondió. La
+[especificación](https://modelcontextprotocol.io/specification/latest/client/elicitation) dice
+que en modo formulario los datos quedan expuestos al cliente.
 
 ## Alternativas consideradas
 

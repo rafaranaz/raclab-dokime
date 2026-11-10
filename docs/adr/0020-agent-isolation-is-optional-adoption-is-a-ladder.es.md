@@ -1,4 +1,4 @@
-<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:8ab0dd69adfdda94 -->
+<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:7070f08872ca81c3 -->
 # ADR-0020 · Aislar al agente es opcional; la adopción es una escalera
 
 **Estado:** propuesta
@@ -22,11 +22,16 @@ garantías del producto no salen de dónde corrió el agente.
   también es opcional: el agente puede trabajar en el repositorio del usuario, en una rama, desde
   un árbol limpio.
 - **La clave de los ejemplos sellados vive solo en CI.** La máquina de un desarrollador no puede
-  descifrarlos, así que su secreto no depende del aislamiento local. Un desarrollador solo sin CI
-  guarda la clave en local, y la evidencia lo declara como mejor esfuerzo.
-- Cuando el envoltorio está activo, deniega la red local hacia el arnés, y se prueba antes de cada
-  lanzamiento.
-- La evidencia registra el peldaño y si hubo envoltorio.
+  descifrarlos. Su secreto empieza en el reparto: antes, los ejemplos están en claro donde se
+  especifica el contrato, así que la evidencia registra la barrera entre ese sitio y el agente:
+  otra máquina, el envoltorio, otro usuario del sistema, o ninguna.
+- Un desarrollador solo sin CI guarda la clave en local. El contenido reservado se descifra
+  entonces solo en memoria, nunca se escribe en disco, y la evidencia lo declara como mejor
+  esfuerzo.
+- Cuando el envoltorio está activo, deniega la red local hacia el arnés y la lectura del
+  directorio de estado del arnés (registro, clave y almacén de lo sellado), y se prueba antes de
+  cada lanzamiento.
+- La evidencia registra el peldaño, si hubo envoltorio y la barrera usada al especificar.
 
 ## Base
 

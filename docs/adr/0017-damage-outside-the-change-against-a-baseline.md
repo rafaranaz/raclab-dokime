@@ -9,8 +9,9 @@ open model broke at least one test that passed before.
 
 ## Decision
 
-- Before the change, the existing suite and every example run on the base commit, more than once.
-  Tests whose result varies are marked unstable, excluded and listed.
+- Before the change, the existing suite and every example run on the base commit as many times as
+  the policy says, twice to start with. Tests whose result varies are marked unstable, excluded
+  and listed; the list is recorded in the ledger and is an input of the verdict.
 - After the change, every test that passed in the baseline must still pass and none may disappear.
 - The proportion of changed **production** lines executed by the suite and the examples must reach
   the threshold of the policy. Lines of test code do not count.

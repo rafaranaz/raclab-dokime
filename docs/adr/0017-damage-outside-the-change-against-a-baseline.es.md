@@ -1,4 +1,4 @@
-<!-- translation-of: 0017-damage-outside-the-change-against-a-baseline.md sha256:0bd3da0d6e2c280f -->
+<!-- translation-of: 0017-damage-outside-the-change-against-a-baseline.md sha256:75df6377b7c0f23f -->
 # ADR-0017 · El daño fuera del cambio se encuentra comparando con una línea base
 
 **Estado:** propuesta
@@ -10,8 +10,10 @@ un modelo abierto rompía al menos un test que antes pasaba.
 
 ## Decisión
 
-- Antes del cambio, la suite existente y todos los ejemplos corren sobre el commit base, más de
-  una vez. Los tests cuyo resultado varía se marcan como inestables, se excluyen y se listan.
+- Antes del cambio, la suite existente y todos los ejemplos corren sobre el commit base tantas
+  veces como diga la política, dos para empezar. Los tests cuyo resultado varía se marcan como
+  inestables, se excluyen y se listan; la lista se guarda en el registro y es una entrada del
+  veredicto.
 - Después del cambio, todo test que pasaba en la línea base debe seguir pasando y ninguno puede
   desaparecer.
 - La proporción de líneas de **producción** cambiadas que ejecutan la suite y los ejemplos debe

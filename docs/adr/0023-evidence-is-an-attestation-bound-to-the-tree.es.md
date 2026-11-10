@@ -1,4 +1,4 @@
-<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:f7a2ee7010897256 -->
+<!-- translation-of: 0023-evidence-is-an-attestation-bound-to-the-tree.md sha256:b5e84315e68ee82c -->
 # ADR-0023 · La evidencia es una atestación in-toto atada al árbol resultante
 
 **Estado:** propuesta
@@ -15,16 +15,23 @@ cambia al integrar.
   ("conformidad con un contrato").
 - Su sujeto es la **huella del árbol resultante** y la huella del parche, no el commit.
 - Registra, para cada puerta del flujo, que se ejecutó, que se omitió porque la política la
-  declara opcional o que no aplicaba; el origen de cada comprobación; el contrato y quién lo
-  aprobó; el entorno; el agente, el modelo, la forma de pago y el peldaño de adopción; las
-  decisiones humanas con quién las tomó y si fueron delegadas. De las comprobaciones selladas
+  declara opcional, que no aplicaba o que no se alcanzó, las dos últimas con un motivo derivado
+  mecánicamente del contrato, del nivel del pack o de la puerta que detuvo el flujo.
+- Registra el origen de cada comprobación; el contrato y quién lo aprobó; las huellas de la imagen
+  con su plataforma, del pack, de la política y del flujo; las semillas; la versión del arnés; el
+  agente, el modelo, la forma de pago y el peldaño de adopción; y las decisiones humanas con quién
+  las tomó, cómo se estableció esa identidad y si fueron delegadas. De las comprobaciones selladas
   lleva huellas y clases de fallo, nunca valores ni entradas.
 - **Lo que no se comprobó es un campo obligatorio**, rellenado mecánicamente.
 - Lleva una etiqueta de independencia: autoatestado, verificado en CI, o verificado en CI con un
   segundo aprobador.
-- El registro de una ejecución solo crece y cada evento guarda la huella del anterior. Las puertas
-  se pueden volver a ejecutar desde los artefactos guardados.
-- Una orden que solo depende del módulo de evidencia verifica un fichero de evidencia.
+- El registro de una ejecución solo crece y cada evento guarda la huella del anterior. Conserva
+  las respuestas de las personas, las salidas de los modelos y la lista de tests inestables, de
+  modo que una orden de repetición puede volver a ejecutar las puertas desde los artefactos
+  guardados sin preguntar a nadie. Las puertas selladas solo se pueden repetir donde está la
+  clave.
+- Una orden propia, que solo depende de los módulos `evidence` y `core`, verifica un fichero de
+  evidencia.
 
 ## Base
 

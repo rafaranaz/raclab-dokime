@@ -13,16 +13,22 @@ rebase, and GitHub rewrites the commits when it does, so a commit identifier cha
   ("conformance to a contract").
 - Its subject is the **digest of the resulting tree** and the digest of the patch, not the commit.
 - It records, for every gate of the flow, that it ran, was skipped because the policy declares it
-  optional, or did not apply; the origin of every check; the contract and who approved it; the
-  environment; the agent, model, payment mode and adoption step; the human decisions with who took
-  them and whether delegated. For sealed checks it carries digests and classes of failure, never
-  values or inputs.
+  optional, did not apply or was not reached, the last two with a reason derived mechanically from
+  the contract, the level of the pack or the gate that stopped the flow.
+- It records the origin of every check; the contract and who approved it; the digests of the image
+  with its platform, the pack, the policy and the flow; the seeds; the version of the harness; the
+  agent, model, payment mode and adoption step; and the human decisions with who took them, how
+  that identity was established and whether delegated. For sealed checks it carries digests and
+  classes of failure, never values or inputs.
 - **What was not checked is a mandatory field**, filled mechanically.
 - It carries a label of independence: self-attested, verified in CI, or verified in CI with a
   second approver.
-- The ledger of a run is append-only and each event stores the hash of the previous one. The gates
-  can be run again from the stored artifacts.
-- A command that depends only on the evidence module verifies an evidence file.
+- The ledger of a run is append-only and each event stores the hash of the previous one. It keeps
+  the answers of people, the outputs of models and the list of unstable tests, so a replay command
+  can run the gates again from the stored artifacts without asking anyone. Sealed gates can be
+  replayed only where the key is.
+- A command of its own, which depends only on the `evidence` and `core` modules, verifies an
+  evidence file.
 
 ## Basis
 

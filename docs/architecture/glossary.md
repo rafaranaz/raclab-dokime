@@ -37,6 +37,11 @@ a decision needs another meaning, it needs another term.
 | Origin | Who stands behind the expected result of a check: `human`, `derived`, `model` or `existing` |
 | Gate | A step of the flow that returns a verdict |
 | Optional gate | A gate the policy allows to skip. Every other gate is mandatory |
-| Verdict | `PASS`, `FAIL`, `ASK` or `ERROR` |
+| Verdict | `PASS`, `FAIL`, `ASK` or `ERROR`. A gate returns one; the verdict of a change is their aggregation |
+| Not applicable | A gate that has nothing to act on in this change, by a condition read from the contract or from the level of the pack |
+| Not reached | A gate the flow did not get to, because an earlier gate stopped it |
+| Final state | A state of the flow with no gate and no transition. It either delivers or it does not |
+| Identity | Who took a human decision, together with how that was established: signed, declared, or through a client and unverified |
+| Replay | Recomputing the verdict of a run from its ledger and stored artifacts, without asking anyone |
 | Delivery | Producing the commit and the evidence of a change. Only a state of the flow that delivers can do it |
 | Delegated answer | An answer to an interview question that a person left to a model. It is marked, and it never approves an example or a contract nor answers a gate |

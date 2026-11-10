@@ -1,4 +1,4 @@
-<!-- translation-of: 01-context.md sha256:62d4b0b8ceb3e5e8 -->
+<!-- translation-of: 01-context.md sha256:d91ce48eff068148 -->
 # Contexto y zonas de confianza
 
 *Read in [English](01-context.md).*
@@ -57,7 +57,7 @@ flowchart TB
         human["canal humano"]
     end
     subgraph ci["CI: de confianza, no controlado por el autor durante la ejecución"]
-        key["clave de los ejemplos sellados"]
+        key["clave de los lotes sellados"]
     end
     subgraph prepare["zona de preparación: red solo hacia registros"]
         build["construcción de la imagen"]
@@ -83,7 +83,7 @@ flowchart TB
     key -.->|nunca en la máquina de un desarrollador| work
 ```
 
-| Zona | Qué corre | Red | Ve secretos | Ve ejemplos sellados |
+| Zona | Qué corre | Red | Ve secretos | Ve ejemplos reservados |
 |---|---|---|---|---|
 | Anfitrión | El arnés | La del usuario | A través del agente de claves | Solo donde está la clave: CI, o la máquina de un desarrollador solo |
 | Preparación | La construcción de la imagen | Registros permitidos, por un intermediario | No | No |

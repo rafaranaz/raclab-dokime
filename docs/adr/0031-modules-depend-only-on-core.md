@@ -15,8 +15,9 @@ Cyclic dependencies precede other architecture problems in 60 % to 80 % of the c
   import each other. `engine` imports the services.
 - Adapters (`sandbox`, `agents`, `gateway`) import only `core` and implement its ports. Only
   `interfaces`, the composition root, imports adapters.
-- `evidence` imports nothing but `core`, so that verifying evidence can be installed on its own.
-- Every port has two adapters foreseen from the start, and takes the shape of an existing
+- `evidence` imports nothing but `core`, so that verifying evidence can be installed with those
+  two modules alone.
+- Every port has at least two adapters foreseen from the start, and takes the shape of an existing
   standard where one exists.
 - These rules are import contracts checked in CI.
 

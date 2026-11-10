@@ -1,4 +1,4 @@
-<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:dfd2ab99ba9b7894 -->
+<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:ce7e8a1265a74e87 -->
 # ADR-0016 · La verificación corre en un contenedor sin red, sobre el commit base más el parche
 
 **Estado:** propuesta
@@ -25,6 +25,9 @@ hacer que las comprobaciones pasen.
 - Los servicios que los tests necesitan corren junto al código dentro de la red aislada y se
   reinician antes de cada verificación. Los tests que necesitan red externa se excluyen y se
   declaran.
+- Toda ejecución parte de la imagen: nada de lo que una ejecución escribe la sobrevive, salvo las
+  observaciones y los ficheros de resultados que devuelve. El entorno registra qué montó y qué
+  pasó a la zona de verificación.
 
 ## Base
 

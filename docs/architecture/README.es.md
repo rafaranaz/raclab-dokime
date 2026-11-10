@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:18b32f3b3a79204f -->
+<!-- translation-of: README.md sha256:35b3e2e1ffe82585 -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -41,15 +41,15 @@ CI cuando se rompe
 | Id | Invariante | Lo hace cumplir |
 |---|---|---|
 | INV-1 | No hay camino desde una salida de modelo hasta un `PASS` o un `FAIL` sin una aprobación humana o una derivación mecánica. Una comprobación de origen `model` que pasa no sostiene nada; la suite que ya tenía el proyecto cuenta como aprobada | El tipo del veredicto lleva el origen; un test de propiedad sobre el agregador |
-| INV-2 | El código escrito por el agente nunca corre en un proceso que contenga un valor esperado de un ejemplo sellado | A la zona de verificación solo entran entradas; un test busca en la zona una cadena centinela |
+| INV-2 | El código escrito por el agente nunca corre en un proceso que contenga el valor esperado de un ejemplo reservado. Las entradas de los ejemplos reservados sí entran en la zona de verificación, porque el código tiene que recibirlas | El entorno de verificación pasa a la zona solo entradas y registra qué montó y qué pasó; antes de cada ejecución sellada un test busca en los ficheros, los argumentos y el entorno de la zona una cadena centinela puesta como valor esperado. No ve el contenido transformado a propósito, que es código hostil, fuera del modelo de amenazas |
 | INV-3 | Desde el reparto, ningún fichero legible desde donde trabaja el agente contiene contenido reservado en claro. Para un desarrollador solo sin CI es mejor esfuerzo, y la evidencia lo dice | Cada lote sellado lleva una cadena centinela; un test la busca en claro antes de cada lanzamiento del agente y antes de cada ejecución sellada. No ve el contenido transformado a propósito, que es código hostil, fuera del modelo de amenazas |
-| INV-4 | El veredicto es función de base, parche, contrato, imagen, política, flujo y semilla, todos identificados por huella | Una orden de repetición recalcula el veredicto desde el registro |
-| INV-5 | Todo estado tiene puerta de salida; todo bucle tiene presupuesto; agotar un presupuesto pregunta a una persona | El validador del fichero de flujo |
+| INV-4 | El veredicto agregado de un cambio se puede recalcular a partir de base, parche, contrato, imagen y su plataforma, pack, política, flujo, semillas y versión del arnés, todos identificados por huella, junto con lo que el registro guardó de la ejecución: las respuestas de las personas, las salidas de los modelos y la lista de tests inestables. Cuando dos ejecuciones difieren, el resultado es `ASK` | Una orden de repetición recalcula el veredicto desde el registro y los artefactos guardados. Las puertas selladas solo se pueden repetir donde está la clave |
+| INV-5 | Todo estado no final tiene puerta de salida; todo bucle tiene presupuesto; agotar un presupuesto lleva a un estado que pregunta a una persona | El validador del fichero de flujo, que comprueba las tres cosas |
 | INV-6 | No se entrega nada con un `ERROR` sin resolver, y nadie puede dar uno por bueno | El validador rechaza un flujo con una transición de `ERROR` o de `FAIL` a un estado que entrega; un test de propiedad sobre el agregador |
-| INV-7 | Toda puerta del flujo aparece en la evidencia como ejecutada, omitida porque la política la declara opcional, o no aplicable | Validación de esquema al construir la evidencia |
-| INV-8 | Toda decisión humana es un evento con identidad, y toda respuesta delegada está marcada | El canal humano solo devuelve respuestas con quién respondió y la marca de delegación |
-| INV-9 | `core`, `contract`, `oracle`, `verify` y `evidence` no importan ningún adaptador de agente, de modelo ni de lenguaje | Contratos de importación |
-| INV-10 | La evidencia se valida con una orden que solo depende del módulo `evidence` y de herramientas estándar | Un test que instala solo ese módulo |
+| INV-7 | Toda puerta del flujo aparece en la evidencia como ejecutada, omitida porque la política la declara opcional, no aplicable, o no alcanzada. Las dos últimas llevan su motivo, derivado mecánicamente | Al construir la evidencia, sus puertas se cotejan con la lista de puertas del fichero de flujo, no solo con el esquema |
+| INV-8 | Toda decisión humana es un evento con una identidad y con cómo se estableció esa identidad: firmada, declarada, o a través de un cliente y sin verificar. Toda respuesta delegada está marcada | Una decisión llega al arnés por el canal humano, por una firma o por la forja. Cada una de las tres vías registra la identidad y cómo se estableció; el canal humano añade la marca de delegación |
+| INV-9 | Solo `interfaces` importa un adaptador. Ningún otro módulo lo hace | Contratos de importación |
+| INV-10 | La evidencia se valida con una orden que solo depende de los módulos `evidence` y `core`, de git y del verificador público del esquema de firma que la evidencia nombra | Un test que instala solo esos dos módulos y ejecuta la orden |
 
 ## Cómo pasa un cambio
 

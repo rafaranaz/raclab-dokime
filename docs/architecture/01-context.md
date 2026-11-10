@@ -55,7 +55,7 @@ flowchart TB
         human["human channel"]
     end
     subgraph ci["CI: trusted, not controlled by the author during the run"]
-        key["key of the sealed examples"]
+        key["key of the sealed batches"]
     end
     subgraph prepare["prepare zone: network to registries only"]
         build["image build"]
@@ -81,7 +81,7 @@ flowchart TB
     key -.->|never on a developer machine| work
 ```
 
-| Zone | What runs | Network | Sees secrets | Sees sealed examples |
+| Zone | What runs | Network | Sees secrets | Sees held-out examples |
 |---|---|---|---|---|
 | Host | The harness | The user's | Through the key agent | Only where the key is: CI, or a single developer's machine |
 | Prepare | The image build | Allowed registries, through a proxy | No | No |

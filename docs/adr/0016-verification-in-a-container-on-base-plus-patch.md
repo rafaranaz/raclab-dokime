@@ -21,6 +21,9 @@ there (an installed package, a cached file, a modified test runner) can make the
   them is dropped from the patch unless the contract authorises it, and the attempt goes on.
 - Services the tests need run next to the code inside the isolated network and are reset before
   each verification. Tests that need an external network are excluded and declared.
+- Every run starts from the image: nothing a run writes survives it, except the observations and
+  result files it returns. The runtime records what it mounted and passed into the verification
+  zone.
 
 ## Basis
 

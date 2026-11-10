@@ -13,7 +13,7 @@ Cyclic dependencies precede other architecture problems in 60 % to 80 % of the c
 - Domain modules (`contract`, `oracle`, `evidence`, `packs`) import only `core`; `oracle` also
   imports `contract`. Domain services (`spec`, `verify`, `delivery`) import those and do not
   import each other. `engine` imports the services.
-- Adapters (`sandbox`, `agents`, `gateway`) import only `core` and implement its ports. Only
+- Adapters (`sandbox`, `agents`, `gateway`, `platform`) import only `core` and implement its ports. Only
   `interfaces`, the composition root, imports adapters.
 - `evidence` imports nothing but `core`, so that verifying evidence can be installed with those
   two modules alone.

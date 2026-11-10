@@ -14,11 +14,11 @@ it:
 
 | Block | What is built | Modules, in order |
 |---|---|---|
-| A · Audit | Verify a finished patch against a hand-written contract | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` |
-| B · Hold out | Held-out and derived examples | `oracle`, `verify`, `bench` |
+| A · Audit | Verify a finished patch against a hand-written contract | `core`, `contract`, `packs`, `sandbox` (verification runtime), `platform` (stores and clock), `verify`, `evidence`, `interfaces` |
+| B · Hold out | Held-out and derived examples | `oracle`, `platform` (sealed store), `verify`, `bench` |
 | C · Launch | The harness drives an agent, with the loop and disputes | `sandbox` (work), `agents`, `engine` |
 | D · Protect | Changed-line coverage, impact map, behaviour differences | `verify` |
-| E · Attest | Signatures, independent verification, re-verification in CI | `evidence`, `delivery` |
+| E · Attest | Signatures, independent verification, re-verification in CI | `platform` (signing and forge), `evidence`, `delivery` |
 | F · Specify | Interview, proposals of examples, detectors, solver | `gateway`, `spec` |
 | G · Generalise | A second language, more agents, team use | `packs`, `agents`, `delivery` |
 

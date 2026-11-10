@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:d16301b6bcc9771f -->
+<!-- translation-of: ROADMAP.md sha256:8dfcb011283d7535 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -62,11 +62,11 @@ se publica. Un resultado malo también se publica.
 
 | Bloque | Qué puede hacer un usuario al cerrarlo | Módulos, en orden | Criterio de salida | Versión |
 |---|---|---|---|---|
-| A · Auditar | Verificar un cambio terminado, hecho por cualquier agente, contra un contrato escrito a mano, en local y en CI | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `verify`, `evidence`, `interfaces` | Ningún falso aprobado en parches que fallan ejemplos visibles, modifican tests o rompen tests existentes | 0.1 |
-| B · Reservar | Lo mismo, con ejemplos que el agente no ha visto | `oracle`, `verify`, `bench` | Ningún falso aprobado en las cuatro técnicas de trampa; valor de la reserva medido | 0.2 |
+| A · Auditar | Verificar un cambio terminado, hecho por cualquier agente, contra un contrato escrito a mano, en local y en CI | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `platform` (almacenes y reloj), `verify`, `evidence`, `interfaces` | Ningún falso aprobado en parches que fallan ejemplos visibles, modifican tests o rompen tests existentes | 0.1 |
+| B · Reservar | Lo mismo, con ejemplos que el agente no ha visto | `oracle`, `platform` (almacén de lo sellado), `verify`, `bench` | Ningún falso aprobado en las cuatro técnicas de trampa; valor de la reserva medido | 0.2 |
 | C · Lanzar | Dar la tarea al arnés y que dirija al agente hasta que el cambio pasa o pregunta | `sandbox` (trabajo), `agents`, `engine` | El mismo cambio completa el circuito con dos perfiles de agente, uno con un modelo de pesos abiertos | 0.3 |
 | D · Proteger | Saber qué daña el cambio fuera de lo pedido | `verify` | Las regresiones inyectadas en código cubierto se detectan; tasa de preguntas medida | 0.4 |
-| E · Atestar | Entregar evidencia firmada que un tercero verifica sin el arnés | `evidence`, `delivery` | Alguien sin el arnés instalado verifica un fichero de evidencia | 0.5 |
+| E · Atestar | Entregar evidencia firmada que un tercero verifica sin el arnés | `platform` (firma y forja), `evidence`, `delivery` | Alguien sin el arnés instalado verifica un fichero de evidencia | 0.5 |
 | F · Especificar | Escribir el contrato con ayuda, en español o en inglés | `gateway`, `spec` | Minutos de persona por contrato medidos; prueba de atención hecha | 0.6 |
 | G · Generalizar | Usarlo con un segundo lenguaje, con más agentes y en equipo | `packs`, `agents`, `delivery` | El conjunto de casos incluye un repositorio Java; tres agentes distintos completan el circuito | 1.0 |
 
@@ -96,7 +96,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 | A0 Pruebas a mano | Tres cambios reales con un contrato escrito a mano y aprobado por una persona, cronometrado; tres repositorios elegidos para el conjunto de casos | Ninguno | Se conocen la proporción de requisitos que caben como ejemplos y los minutos por contrato, y el formato se confirma o se revisa |
 | A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract` | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
 | A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox` | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
-| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia | `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
+| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia | `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
 | A4 Auditoría en CI | Un flujo que audita un pull request y adjunta la evidencia, activado en este repositorio; versión 0.1 | `interfaces` | Un pull request real de este repositorio lleva su evidencia |
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo

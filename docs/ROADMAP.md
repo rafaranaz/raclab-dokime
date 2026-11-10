@@ -60,11 +60,11 @@ and published. A bad result is published as well.
 
 | Block | What a user can do when it closes | Modules, in order | Exit criterion | Version |
 |---|---|---|---|---|
-| A · Audit | Verify a finished change, made by any agent, against a hand-written contract, locally and in CI | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` | No false accept on patches that fail visible examples, edit tests or break existing tests | 0.1 |
-| B · Hold out | The same, with examples the agent never saw | `oracle`, `verify`, `bench` | No false accept on the four cheating techniques; value of the hold-out measured | 0.2 |
+| A · Audit | Verify a finished change, made by any agent, against a hand-written contract, locally and in CI | `core`, `contract`, `packs`, `sandbox` (verification runtime), `platform` (stores and clock), `verify`, `evidence`, `interfaces` | No false accept on patches that fail visible examples, edit tests or break existing tests | 0.1 |
+| B · Hold out | The same, with examples the agent never saw | `oracle`, `platform` (sealed store), `verify`, `bench` | No false accept on the four cheating techniques; value of the hold-out measured | 0.2 |
 | C · Launch | Hand the task to the harness and let it drive the agent until the change passes or it asks | `sandbox` (work), `agents`, `engine` | The same change completes the circuit with two agent profiles, one with an open-weight model | 0.3 |
 | D · Protect | Know what the change damages outside what was asked | `verify` | Injected regressions in covered code are detected; rate of questions measured | 0.4 |
-| E · Attest | Deliver signed evidence that a third party verifies without the harness | `evidence`, `delivery` | Someone without the harness installed verifies an evidence file | 0.5 |
+| E · Attest | Deliver signed evidence that a third party verifies without the harness | `platform` (signing and forge), `evidence`, `delivery` | Someone without the harness installed verifies an evidence file | 0.5 |
 | F · Specify | Write the contract with help, in Spanish or English | `gateway`, `spec` | Minutes of a person per contract measured; the attention test done | 0.6 |
 | G · Generalise | Use it with a second language, more agents and in a team | `packs`, `agents`, `delivery` | The corpus includes a Java repository; three different agents complete the circuit | 1.0 |
 
@@ -94,7 +94,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 | A0 Tests by hand | Three real changes with a hand-written contract approved by a person, timed; three repositories chosen for the corpus | None | The share of requirements that fit as examples and the minutes per contract are known, and the format is confirmed or revised |
 | A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract` | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
 | A2 Reproducible environment | A command that builds the image of a project from its pack and checks the pack against the history of the project | `packs`, `sandbox` | The packs of the three repositories build and pass their self-check |
-| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file | `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
+| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file | `platform`, `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
 | A4 Audit in CI | A workflow that audits a pull request and attaches the evidence, enabled on this repository; version 0.1 | `interfaces` | A real pull request of this repository carries its evidence |
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes

@@ -25,48 +25,50 @@ Exit criteria:
 
 ## Phase 1 · Reference architecture
 
-A critical review of the `dokime` design (its documents 01 to 08, the recorded incidents and the
-measurements of its code) to settle the architecture of this repository. It is delivered in
-several pull requests of the `arch` scope, reviewable separately:
+The architecture of the product, decided with evidence. Every decision is an ADR that states what
+it rests on (literature, reasoning or a test) and the alternatives considered
+([ADR-0008](adr/0008-built-new-nothing-is-ported.md)). It is delivered in several pull requests of
+the `arch` scope, reviewable separately:
 
-1. **Context and modules.** Context diagram (C4 level 1) and module diagram with the allowed
-   dependencies.
-2. **States and flows.** Global state machine, composition per mode and TDD sub-machine with
-   failure routing.
-3. **Data and trust.** Code graph model, ledger and traceability, end-to-end sequence of a story,
-   and trust boundaries (sandbox, untrusted repository, secrets).
+1. **Map and decisions.** What the product is and states, the invariants, the context, the trust
+   zones, the modules with their allowed dependencies, and the ADRs 0008 to 0032.
+2. **States and flows.** The state machine, its composition per mode, the verification pipeline
+   with its failure routes and the budgets.
+3. **Data and evidence.** The contract and example formats, the evidence predicate, the ledger and
+   the end-to-end sequence of a change.
 
-Decisions to review with evidence, each in its own ADR:
-
-- Code graph built on tree-sitter or on SCIP.
-- Own state engine or an existing one.
-- Levels of formal verification.
-- MVP scope: modes, languages, dashboard and daemon.
-- Delivery interface independent of GitHub.
-- Bilingual interaction: how the user works in Spanish or English while internal artifacts and
-  prompts stay in English ([ADR-0005](adr/0005-languages.md)).
+Each module gets its high-level EARS requirements when its scope is opened in phase 2.
 
 Gates added in this phase, because they depend on the architecture:
 
 - Import contracts between modules (import-linter), derived from the module diagram.
-- Validation of the Mermaid diagrams, in place before the first diagram is written.
+- A check that every ADR states its basis.
 
 Exit criteria:
 
-- Every module has a public interface, high-level EARS requirements and a closing gate defined.
-- The eight diagrams are in `docs/architecture/` and pass validation.
+- The documents above are in `docs/architecture/` and their diagrams pass validation.
+- Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
 - The import contracts are in CI.
 - The architecture is approved in review.
 
-## Phase 2 · Module-by-module port
+## Phase 2 · Construction in blocks
 
-One module open at a time, each with its scope, its branch and its pull request, in this
-provisional order (to be confirmed when phase 1 closes):
+Six blocks, each delivering a command someone can use
+([ADR-0029](adr/0029-build-order-starts-with-auditing.md)). Inside a block, one module scope is
+open at a time, in the order listed. A block closes when its exit criterion, a number measured on
+the corpus ([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md)), is
+met and published.
 
-`core` → `graph` → `sandbox` → `gateway` → `verify` → `engine` (delta mode only) → `spec` →
-`delivery` → `interfaces`
+| Block | Modules, in order | Exit criterion |
+|---|---|---|
+| A · Audit | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` | No false accept on patches that fail visible examples, edit tests or break existing tests |
+| B · Hold out | `oracle`, `verify`, `bench` | No false accept on the four cheating techniques; value of the hold-out measured |
+| C · Launch | `sandbox` (work), `agents`, `engine` | The same change completes the circuit with two agent profiles, one with an open-weight model |
+| D · Protect | `verify` | Injected regressions in covered code are detected; rate of questions measured |
+| E · Attest | `evidence`, `delivery` | Someone without the harness installed verifies an evidence file |
+| F · Specify | `gateway`, `spec` | Minutes of a person per contract measured; the attention test done |
 
-Initial language scope: Python and Java. Go and TypeScript come in once the core is closed.
+Initial language: Python. Java is the second.
 
 Exit criteria for each module: the definition of done in
 [CONTRIBUTING.md](../CONTRIBUTING.md#definition-of-done-for-a-scope).

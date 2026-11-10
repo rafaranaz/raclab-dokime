@@ -27,48 +27,80 @@ Exit criteria:
 
 The architecture of the product, decided with evidence. Every decision is an ADR that states what
 it rests on (literature, reasoning or a test) and the alternatives considered
-([ADR-0008](adr/0008-built-new-nothing-is-ported.md)). It is delivered in several pull requests of
-the `arch` scope, reviewable separately:
+([ADR-0008](adr/0008-built-new-nothing-is-ported.md)). It is delivered in milestones, each one a
+pull request reviewable on its own:
 
-1. **Map and decisions.** What the product is and states, the invariants, the context, the trust
-   zones, the modules with their allowed dependencies, and the ADRs 0008 to 0032.
-2. **States and flows.** The state machine, its composition per mode, the verification pipeline
-   with its failure routes and the budgets.
-3. **Data and evidence.** The contract and example formats, the evidence predicate, the ledger and
-   the end-to-end sequence of a change.
+| Milestone | What it delivers | Scope |
+|---|---|---|
+| 1.1 Map and decisions | What the product is and states, the invariants, the context, the trust zones, the modules with their allowed dependencies, and the ADRs 0008 to 0032 | `arch` |
+| 1.2 Governance aligned | A check that every ADR from 0008 on states its basis; the working agreement aligned with the blocks of phase 2 | `repo` |
+| 1.3 Data and evidence | The contract and example formats, the evidence predicate, the ledger and the end-to-end sequence of a change | `arch` |
+| 1.4 States and flows | The schema of the flow file, the states, the gates, the budgets, the composition per mode and the rules of the validator | `arch` |
+| 1.5 Import contracts | The dependency rules of the module map, checked in CI (import-linter) | `repo` |
+| 1.6 Phase closed | Exit criteria marked and the hypotheses listed with their test and their block | `arch` |
 
-Each module gets its high-level EARS requirements when its scope is opened in phase 2.
-
-Gates added in this phase, because they depend on the architecture:
-
-- Import contracts between modules (import-linter), derived from the module diagram.
-- A check that every ADR states its basis.
+Data and evidence comes before states and flows because block A depends on the formats, while the
+flow file is not used until block C. Each module gets its high-level EARS requirements when its
+scope is opened in phase 2.
 
 Exit criteria:
 
-- The documents above are in `docs/architecture/` and their diagrams pass validation.
-- Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
-- The import contracts are in CI.
-- The architecture is approved in review.
+- [ ] The documents above are in `docs/architecture/` and their diagrams pass validation.
+- [ ] Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
+- [ ] The check that every ADR states its basis and the import contracts are in CI.
+- [ ] The architecture is approved in review.
 
 ## Phase 2 · Construction in blocks
 
-Six blocks, each delivering a command someone can use
+Seven blocks, each delivering something a person can use and a published version
 ([ADR-0029](adr/0029-build-order-starts-with-auditing.md)). Inside a block, one module scope is
-open at a time, in the order listed. A block closes when its exit criterion, a number measured on
-the corpus ([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md)), is
-met and published.
+open at a time, in the order listed. A block closes when its exit criterion, measured on the
+corpus ([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md)), is met
+and published. A bad result is published as well.
 
-| Block | Modules, in order | Exit criterion |
+| Block | What a user can do when it closes | Modules, in order | Exit criterion | Version |
+|---|---|---|---|---|
+| A · Audit | Verify a finished change, made by any agent, against a hand-written contract, locally and in CI | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` | No false accept on patches that fail visible examples, edit tests or break existing tests | 0.1 |
+| B · Hold out | The same, with examples the agent never saw | `oracle`, `verify`, `bench` | No false accept on the four cheating techniques; value of the hold-out measured | 0.2 |
+| C · Launch | Hand the task to the harness and let it drive the agent until the change passes or it asks | `sandbox` (work), `agents`, `engine` | The same change completes the circuit with two agent profiles, one with an open-weight model | 0.3 |
+| D · Protect | Know what the change damages outside what was asked | `verify` | Injected regressions in covered code are detected; rate of questions measured | 0.4 |
+| E · Attest | Deliver signed evidence that a third party verifies without the harness | `evidence`, `delivery` | Someone without the harness installed verifies an evidence file | 0.5 |
+| F · Specify | Write the contract with help, in Spanish or English | `gateway`, `spec` | Minutes of a person per contract measured; the attention test done | 0.6 |
+| G · Generalise | Use it with a second language, more agents and in a team | `packs`, `agents`, `delivery` | The corpus includes a Java repository; three different agents complete the circuit | 1.0 |
+
+The milestones of a block are written here when the block opens, and its measured numbers when it
+closes. The order of blocks B and C is confirmed when block A closes.
+
+### Hypotheses
+
+Some decisions rest on reasoning. Each has a test that runs before the block that depends on it,
+and nothing is built on a failed hypothesis without a new decision. The full list is in the
+[architecture index](architecture/README.md#hypotheses-still-to-be-tested).
+
+| Hypothesis | Test | If it fails |
 |---|---|---|
-| A · Audit | `core`, `contract`, `packs`, `sandbox` (verification runtime), `verify`, `evidence`, `interfaces` | No false accept on patches that fail visible examples, edit tests or break existing tests |
-| B · Hold out | `oracle`, `verify`, `bench` | No false accept on the four cheating techniques; value of the hold-out measured |
-| C · Launch | `sandbox` (work), `agents`, `engine` | The same change completes the circuit with two agent profiles, one with an open-weight model |
-| D · Protect | `verify` | Injected regressions in covered code are detected; rate of questions measured |
-| E · Attest | `evidence`, `delivery` | Someone without the harness installed verifies an evidence file |
-| F · Specify | `gateway`, `spec` | Minutes of a person per contract measured; the attention test done |
+| Most real requirements can be expressed as examples at a boundary | By hand, before any code of block A | The contract format is revised before building |
+| Approving two or more examples per case costs an acceptable time | By hand, with the previous one | The hold-out rule is revised |
+| A pack can be proposed from the CI configuration of a project | Milestone A2, with containers and access to registries | Packs are written by hand per project, declared as a cost of adoption |
+| Holding out by case catches overfitted solutions | The metric "value of the hold-out" when block B closes | The hold-out becomes optional and the weight moves to relations and to block D |
+| An agent starts with its credential and a per-run configuration directory | Two agents on Linux and macOS, before block C | The harness uses the normal configuration of the agent and the evidence says so |
+| An open-weight model completes the circuit | When block C closes | The models it works with are published; the version is not blocked |
+| A person catches a wrong example planted among the proposed ones | When block F closes | The way examples are presented changes before block F is closed |
 
-Initial language: Python. Java is the second.
+### Block A · Milestones
+
+| Milestone | What can be shown | Modules | Closes when |
+|---|---|---|---|
+| A0 Tests by hand | Three real changes with a hand-written contract approved by a person, timed; three repositories chosen for the corpus | None | The share of requirements that fit as examples and the minutes per contract are known, and the format is confirmed or revised |
+| A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract` | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
+| A2 Reproducible environment | A command that builds the image of a project from its pack and checks the pack against the history of the project | `packs`, `sandbox` | The packs of the three repositories build and pass their self-check |
+| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file | `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
+| A4 Audit in CI | A workflow that audits a pull request and attaches the evidence, enabled on this repository; version 0.1 | `interfaces` | A real pull request of this repository carries its evidence |
+
+In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
+the metrics in block B.
+
+Initial language: Python. Java arrives in block G.
 
 Exit criteria for each module: the definition of done in
 [CONTRIBUTING.md](../CONTRIBUTING.md#definition-of-done-for-a-scope).

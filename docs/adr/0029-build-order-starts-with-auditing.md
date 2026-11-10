@@ -9,7 +9,8 @@ the least our own: it depends on each agent, on vendor policies and on isolation
 
 ## Decision
 
-Six blocks, each delivering a command someone can use, one module scope open at a time inside it:
+Seven blocks, each delivering a command someone can use, one module scope open at a time inside
+it:
 
 | Block | What is built | Modules, in order |
 |---|---|---|
@@ -19,10 +20,16 @@ Six blocks, each delivering a command someone can use, one module scope open at 
 | D · Protect | Changed-line coverage, impact map, behaviour differences | `verify` |
 | E · Attest | Signatures, independent verification, re-verification in CI | `evidence`, `delivery` |
 | F · Specify | Interview, proposals of examples, detectors, solver | `gateway`, `spec` |
+| G · Generalise | A second language, more agents, team use | `packs`, `agents`, `delivery` |
 
 - Block C does not close until the same change completes the circuit with two agent profiles, one
   of them with an open-weight model near the frontier. From C on, every block ends with that run.
-- First language: Python. A graphical interface, several repositories per project and a code
+- Block A includes running the audit in CI, which is the first step of the adoption ladder
+  ([ADR-0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.md)). Its exit criterion is
+  measured on corpus cases run as ordinary tests; `bench` automates them in block B.
+- Block G exists because "any agent, any language" is a stated goal, and a goal without a block
+  of its own is never checked.
+- First language: Python; Java arrives in block G. A graphical interface, several repositories per project and a code
   index with compiler precision are out of the first version.
 
 ## Basis

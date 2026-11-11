@@ -44,3 +44,4 @@ decision changes, a new one supersedes the previous one. The
 | [0033](0033-a-specification-from-another-tool-enters-as-proposals.md) | A specification from another tool enters as proposals | Accepted |
 | [0034](0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md) | A state closes with the aggregated verdict of its gates | Accepted |
 | [0035](0035-the-flow-is-loaded-and-validated-in-core.md) | The flow is loaded and validated in core | Accepted |
+| [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.md) | A milestone may open an increment of a later module | Accepted |

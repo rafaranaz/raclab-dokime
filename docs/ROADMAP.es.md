@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:9fe92a5f7dbcd4d2 -->
+<!-- translation-of: ROADMAP.md sha256:e707f1f379907b14 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -134,7 +134,8 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 
 `interfaces` se abre dos veces en el bloque A: en A1 para la orden `contract check`, que solo lee el
 fichero, llama a `contract` y muestra sus hallazgos, y en A3 para `audit`. Los ámbitos de un módulo
-se abren por incrementos, como `core`.
+se abren por incrementos, como `core`
+([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.es.md)).
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
 automatiza y calcula las métricas en el bloque B.

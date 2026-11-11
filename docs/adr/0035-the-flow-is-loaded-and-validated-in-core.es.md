@@ -1,7 +1,7 @@
-<!-- translation-of: 0035-the-flow-is-loaded-and-validated-in-core.md sha256:91bd4281c0821b1d -->
+<!-- translation-of: 0035-the-flow-is-loaded-and-validated-in-core.md sha256:f4872217ad961af7 -->
 # ADR-0035 · El flujo se carga y se valida en core
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

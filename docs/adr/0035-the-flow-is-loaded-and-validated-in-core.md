@@ -1,6 +1,6 @@
 # ADR-0035 · The flow is loaded and validated in core
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

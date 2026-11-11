@@ -1,0 +1,184 @@
+# Hand-written contract for milestone A0, on a change a public project already made:
+# humanize, commit 823ad60, "Fix naturalsize() rounding rollover at unit boundaries".
+format: 1
+story: naturalsize-carries-to-next-unit
+may_modify_tests: []
+
+requirements:
+  - id: carry-to-next-unit
+    kind: change
+    text: When rounding a size to its display precision reaches the base of its unit, naturalsize shall express the size in the next larger unit.
+    source: written
+  - id: carry-negative-sizes-too
+    kind: change
+    text: When a negative size rounds to the base of its unit, naturalsize shall express its magnitude in the next larger unit and keep the minus sign.
+    source: written
+  - id: keep-sizes-below-the-base
+    kind: preserve
+    text: While the rounded size stays below the base of its unit, naturalsize shall return the same text as before the change.
+    source: written
+
+examples:
+  # carry-to-next-unit: one less than a unit used to read "1000.0" of the unit below.
+  - id: E-ccf5
+    requirement: carry-to-next-unit
+    case: decimal-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999999]}
+        expect: {returns: "1.0 MB"}
+  - id: E-4e05
+    requirement: carry-to-next-unit
+    case: decimal-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999999999]}
+        expect: {returns: "1.0 GB"}
+  - id: E-5501
+    requirement: carry-to-next-unit
+    case: decimal-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999999999999]}
+        expect: {returns: "1.0 TB"}
+  - id: E-dbb6
+    requirement: carry-to-next-unit
+    case: binary-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [1048575], kwargs: {binary: true}}
+        expect: {returns: "1.0 MiB"}
+  - id: E-4461
+    requirement: carry-to-next-unit
+    case: binary-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [1073741823], kwargs: {binary: true}}
+        expect: {returns: "1.0 GiB"}
+  - id: E-d8ab
+    requirement: carry-to-next-unit
+    case: gnu-style
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [1048575], kwargs: {gnu: true}}
+        expect: {returns: "1.0M"}
+  - id: E-d70c
+    requirement: carry-to-next-unit
+    case: first-value-that-rounds-up
+    description: 999950 bytes is the smallest size that one decimal rounds up to 1000.0 kB.
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999950]}
+        expect: {returns: "1.0 MB"}
+
+  # carry-negative-sizes-too: the library accepts negative sizes, used for differences.
+  - id: E-7589
+    requirement: carry-negative-sizes-too
+    case: decimal-units
+    description: The sign is kept and the magnitude follows the same rule as a positive size.
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [-999999]}
+        expect: {returns: "-1.0 MB"}
+  - id: E-2d3b
+    requirement: carry-negative-sizes-too
+    case: binary-units
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [-1048575], kwargs: {binary: true}}
+        expect: {returns: "-1.0 MiB"}
+
+  # keep-sizes-below-the-base: everything that did not round up to the base reads as it did.
+  - id: E-82e8
+    requirement: keep-sizes-below-the-base
+    case: last-value-that-rounds-down
+    description: 999949 bytes still rounds down to 999.9 kB, so nothing carries.
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999949]}
+        expect: {returns: "999.9 kB"}
+  - id: E-f719
+    requirement: keep-sizes-below-the-base
+    case: plain-bytes
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [300]}
+        expect: {returns: "300 Bytes"}
+  - id: E-e26b
+    requirement: keep-sizes-below-the-base
+    case: plain-bytes
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [999]}
+        expect: {returns: "999 Bytes"}
+  - id: E-e53f
+    requirement: keep-sizes-below-the-base
+    case: middle-of-a-unit
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [31000]}
+        expect: {returns: "31.0 kB"}
+  - id: E-42a9
+    requirement: keep-sizes-below-the-base
+    case: middle-of-a-unit
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [32000000]}
+        expect: {returns: "32.0 MB"}
+  - id: E-2832
+    requirement: keep-sizes-below-the-base
+    case: middle-of-a-unit
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [31744], kwargs: {binary: true}}
+        expect: {returns: "31.0 KiB"}
+  - id: E-dd17
+    requirement: keep-sizes-below-the-base
+    case: exact-unit
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [1000]}
+        expect: {returns: "1.0 kB"}
+  - id: E-3ece
+    requirement: keep-sizes-below-the-base
+    case: exact-unit
+    boundary: function
+    target: humanize:naturalsize
+    origin: human
+    steps:
+      - input: {args: [1000000]}
+        expect: {returns: "1.0 MB"}
+
+relations: []

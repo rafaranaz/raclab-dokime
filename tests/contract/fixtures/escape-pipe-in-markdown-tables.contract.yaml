@@ -1,0 +1,144 @@
+# Hand-written contract for milestone A0, on a change a public project already made:
+# python-tabulate, commit e6a24aa, "escape pipe character in github and pipe formats".
+format: 1
+story: escape-pipe-in-markdown-tables
+may_modify_tests: [test/test_regression.py]
+
+requirements:
+  - id: escape-pipe-in-cells
+    kind: change
+    text: When a cell or a header contains a pipe character and the table format is github or pipe, tabulate shall write that pipe character preceded by a backslash.
+    source: written
+  - id: keep-tables-without-pipes
+    kind: preserve
+    text: While no cell and no header contains a pipe character, tabulate shall return the same table as before the change.
+    source: written
+  - id: keep-other-formats
+    kind: preserve
+    text: While the table format is neither github nor pipe, tabulate shall write a pipe character in a cell without a backslash.
+    source: written
+
+examples:
+  # escape-pipe-in-cells: a pipe inside a cell would otherwise split the column in Markdown.
+  - id: E-0205
+    requirement: escape-pipe-in-cells
+    case: github-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["foo|bar"]]]
+          kwargs: {headers: ["spam|eggs"], tablefmt: github}
+        expect:
+          returns:
+            $text: |
+              | spam\|eggs   |
+              |:------------|
+              | foo\|bar     |
+            final_newline: false
+  - id: E-f40d
+    requirement: escape-pipe-in-cells
+    case: github-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["a|b", 1], ["c", 22]]]
+          kwargs: {headers: [k, "n"], tablefmt: github}
+        expect:
+          returns:
+            $text: |
+              | k   |   n |
+              |:----|----:|
+              | a\|b |   1 |
+              | c   |  22 |
+            final_newline: false
+  - id: E-4c6e
+    requirement: escape-pipe-in-cells
+    case: pipe-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["foo|bar"]]]
+          kwargs: {headers: ["spam|eggs"], tablefmt: pipe}
+        expect:
+          returns:
+            $text: |
+              | spam\|eggs   |
+              |:------------|
+              | foo\|bar     |
+            final_newline: false
+  - id: E-9506
+    requirement: escape-pipe-in-cells
+    case: two-pipes-in-a-cell
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["a||b"]]]
+          kwargs: {tablefmt: github}
+        expect:
+          returns:
+            $text: |
+              |:-----|
+              | a\|\|b |
+            final_newline: false
+
+  # keep-tables-without-pipes: a table with no pipe in its cells reads as it did.
+  - id: E-9d18
+    requirement: keep-tables-without-pipes
+    case: github-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[[spam, 42], [eggs, 451]]]
+          kwargs: {headers: [item, qty], tablefmt: github}
+        expect:
+          returns:
+            $text: |
+              | item   |   qty |
+              |:-------|------:|
+              | spam   |    42 |
+              | eggs   |   451 |
+            final_newline: false
+
+  # keep-other-formats: outside Markdown tables a pipe is an ordinary character.
+  - id: E-15a9
+    requirement: keep-other-formats
+    case: simple-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["foo|bar"]]]
+          kwargs: {headers: ["spam|eggs"], tablefmt: simple}
+        expect:
+          returns:
+            $text: |
+              spam|eggs
+              -----------
+              foo|bar
+            final_newline: false
+  # The layout of a grid table is not what this requirement states; only the pipe left as it is.
+  - id: E-255c
+    requirement: keep-other-formats
+    case: grid-format
+    boundary: function
+    target: tabulate:tabulate
+    origin: human
+    steps:
+      - input:
+          args: [[["foo|bar"]]]
+          kwargs: {headers: ["spam|eggs"], tablefmt: grid}
+        expect:
+          returns: {$contains: "| foo|bar "}
+
+relations: []

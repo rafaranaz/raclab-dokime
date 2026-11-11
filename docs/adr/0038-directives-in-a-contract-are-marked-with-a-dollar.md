@@ -38,10 +38,19 @@ convention exists in a widely used system, with the same escape and with a known
 with the prototype of the reader: a key such as `$approx` or `$text` is read as a plain key in
 block style and in flow style.
 
-From memory, not checked today: JSON Schema marks its own keywords the same way (`$ref`, `$id`).
-Reasoning: a mark in the key is visible to the person who approves, and data with such keys is
-rare. No test: the A0 contracts used no matcher. The first contract of the corpus that uses one is
-that test.
+Read in the JSON Schema specification: its core keywords (`$schema`, `$id`, `$ref`, `$defs`,
+`$anchor`, `$comment` and others) carry the `$` "to emphasize their required nature"; the prefix
+"is not formally reserved", and other keywords are advised not to start with it. It defines no
+escape, because it does not need one: the names chosen by the user sit under a keyword
+(`properties`), so position tells them apart. So JSON Schema supports the mark as a convention for
+what belongs to the format, and not the escape, which comes from MongoDB.
+
+Tested on the rewritten A0 contracts: `$text` is used 34 times in two contracts and one example
+uses the matcher `$contains`, where the requirement speaks of a pipe in a cell and not of the
+layout of the table; every example passes against the real code, and a wrong `$contains`, a
+flipped `final_newline` and a matcher inside an input were each caught. The contracts with `$text`
+are 25% and 6% longer. Reasoning, without a test: that a mark in the key is seen by the person who
+approves. One matcher in one contract is a thin test; the corpus is the real one.
 
 ## Alternatives considered
 

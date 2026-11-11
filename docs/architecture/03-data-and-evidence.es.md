@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:596bd3d1c5451443 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:5daf4433a78c9bb2 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -136,6 +136,7 @@ relations:
   colección sin orden (`$unordered`), contiene (`$contains`), patrón (`$pattern`), referencia a un
   paso anterior (`$ref`). El catálogo de relaciones incluye `idempotent` (aplicar la operación dos
   veces da lo mismo que aplicarla una).
+- **La entrada de un paso en la frontera `function`** es `args` y `kwargs`, y nada más.
 - **El texto del requisito es canónico en inglés.** A la persona se le puede mostrar en otro
   idioma; la aprobación registra la huella de lo que se le mostró
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.es.md)).

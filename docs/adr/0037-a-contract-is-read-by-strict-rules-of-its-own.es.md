@@ -1,4 +1,4 @@
-<!-- translation-of: 0037-a-contract-is-read-by-strict-rules-of-its-own.md sha256:b1a76dfcb5b3640d -->
+<!-- translation-of: 0037-a-contract-is-read-by-strict-rules-of-its-own.md sha256:eaedb10c91a7842f -->
 # ADR-0037 · Un contrato se lee con reglas estrictas propias, y se informa de todos los problemas
 
 **Estado:** aceptada
@@ -60,13 +60,23 @@ prototipo del lector:
   nadie había reparado: una cabecera de tabla `n`.
 - `strictyaml` rechaza claves repetidas, alias y tipos implícitos, y también el estilo de flujo
   (`{a: 1}`, `[1, 2]`) que usan todos los contratos.
-- La especificación YAML 1.2.2 dice que las claves de un mapa son únicas, y que el que dos claves
-  sean iguales depende del esquema.
+- Los tres contratos de A0, reescritos con estas reglas, no dan ningún hallazgo, y todos sus
+  ejemplos siguen pasando contra el código real (7, 17 y 15). Cuatro defectos sembrados en uno de
+  ellos se detectaron todos.
 - PyYAML y `ruamel.yaml` han tenido una versión en los últimos catorce meses.
 
-De memoria, sin comprobar hoy: que la lista de tipos de YAML 1.1 cuenta `y` y `n` como booleanos,
-y que las reglas para los valores sin comillas se parecen al esquema JSON de la especificación
-YAML 1.2. No se han mirado enlaces a otros analizadores. Razonamiento: con reglas propias el
+Leído en las fuentes:
+
+- La especificación YAML 1.2.2 dice que las claves de un mapa son únicas, y que el que dos claves
+  sean iguales depende del esquema.
+- Las reglas para los valores sin comillas son las del esquema JSON de esa especificación (`null`,
+  `true`, `false` y los números como los escribe JSON), con dos diferencias: lo que no encaja es
+  un texto en vez de un error, y un número con el punto suelto o con decimales acabados en cero se
+  rechaza. El esquema núcleo de la especificación no tiene fechas, así que `ruamel.yaml`, al leer
+  `2026-11-10` como una fecha, va más allá de ella.
+- La lista de tipos de YAML 1.1 cuenta `y`, `n`, `yes`, `no`, `on` y `off` como booleanos.
+
+No se han mirado enlaces a otros analizadores. Razonamiento: con reglas propias el
 significado de un contrato no cambia si cambia la biblioteca; la regla de los decimales acabados
 en cero; informar de todo a la vez, que le ahorra a la persona una vuelta por problema. La prueba
 que confirma el conjunto es el criterio de A1, un conjunto de contratos con defectos sembrados
@@ -90,5 +100,6 @@ donde hay que informar de todos.
 - El lector vive en `core`, porque lo usan `contract` y el cargador de flujos
   ([ADR-0035](0035-the-flow-is-loaded-and-validated-in-core.es.md)). Recibe texto; no abre
   ficheros.
-- Los tres contratos de A0 se reescriben con estas reglas antes de entrar en el corpus.
+- Los tres contratos de A0, reescritos con estas reglas, pasan a ser los contratos de prueba
+  válidos del validador.
 - Quien quiera el texto `no` o `1.10` lo escribe entre comillas, y el validador se lo dice.

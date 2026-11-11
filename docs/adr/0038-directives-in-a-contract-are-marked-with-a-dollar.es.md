@@ -1,4 +1,4 @@
-<!-- translation-of: 0038-directives-in-a-contract-are-marked-with-a-dollar.md sha256:622bc9a80a77a4da -->
+<!-- translation-of: 0038-directives-in-a-contract-are-marked-with-a-dollar.md sha256:2e82797f7fd28b5a -->
 # ADR-0038 · Las directivas de un contrato se marcan con un signo de dólar
 
 **Estado:** aceptada
@@ -40,10 +40,21 @@ admiten. Así que la convención existe en un sistema muy usado, con el mismo es
 conocido. Comprobado con el prototipo del lector: una clave como `$approx` o `$text` se lee como
 una clave normal en estilo de bloque y en estilo de flujo.
 
-De memoria, sin comprobar hoy: JSON Schema marca igual sus propias palabras clave (`$ref`, `$id`).
-Razonamiento: una marca en la clave la ve quien aprueba, y los datos con claves así son raros. Sin
-prueba: los contratos de A0 no usaron comparadores. El primer contrato del corpus que use uno es
-esa prueba.
+Leído en la especificación de JSON Schema: sus palabras clave del núcleo (`$schema`, `$id`,
+`$ref`, `$defs`, `$anchor`, `$comment` y otras) llevan el `$` "to emphasize their required
+nature"; el prefijo "is not formally reserved", y se aconseja que las demás palabras clave no
+empiecen por él. No define ningún escape, porque no lo necesita: los nombres que elige el usuario
+van debajo de una palabra clave (`properties`), así que la posición los distingue. JSON Schema
+respalda entonces la marca como convención para lo que pertenece al formato, y no el escape, que
+viene de MongoDB.
+
+Probado sobre los contratos de A0 reescritos: `$text` se usa 34 veces en dos contratos y un
+ejemplo usa el comparador `$contains`, donde el requisito habla de una barra vertical en una celda
+y no de la disposición de la tabla; todos los ejemplos pasan contra el código real, y un
+`$contains` erróneo, un `final_newline` invertido y un comparador dentro de una entrada se
+detectaron. Los contratos con `$text` son un 25% y un 6% más largos. Razonamiento, sin prueba: que
+una marca en la clave la ve quien aprueba. Un comparador en un contrato es una prueba delgada; el
+corpus es la de verdad.
 
 ## Alternativas consideradas
 

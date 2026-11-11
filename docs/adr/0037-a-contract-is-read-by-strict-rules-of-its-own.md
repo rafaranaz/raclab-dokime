@@ -55,13 +55,22 @@ of the reader:
   `n`.
 - `strictyaml` rejects repeated keys, aliases and implicit types, and also the flow style
   (`{a: 1}`, `[1, 2]`) that every contract uses.
-- The YAML 1.2.2 specification says that the keys of a mapping are unique, and that whether two
-  keys are equal depends on the schema.
+- The three A0 contracts, rewritten to these rules, give no finding, and all their examples still
+  pass against the real code (7, 17 and 15). Four defects seeded in one of them were all caught.
 - PyYAML and `ruamel.yaml` both had a release in the last fourteen months.
 
-From memory, not checked today: that the YAML 1.1 type list counts `y` and `n` as booleans, and
-that the rules for values without quotes are close to the JSON schema of the YAML 1.2
-specification. Not looked at: bindings of other parsers. Reasoning: with rules of its own the
+Read in the sources:
+
+- The YAML 1.2.2 specification says that the keys of a mapping are unique, and that whether two
+  keys are equal depends on the schema.
+- The rules for values without quotes are those of the JSON schema of that specification (`null`,
+  `true`, `false` and numbers as JSON writes them), with two differences: what does not match is
+  a text instead of an error, and a number with a bare dot or with decimals ending in zero is
+  rejected. The core schema of the specification has no dates, so `ruamel.yaml` reading
+  `2026-11-10` as a date goes beyond it.
+- The YAML 1.1 type list counts `y`, `n`, `yes`, `no`, `on` and `off` as booleans.
+
+Not looked at: bindings of other parsers. Reasoning: with rules of its own the
 meaning of a contract does not change if the library changes; the rule about decimals ending in
 zero; reporting everything at once, which saves the person a round trip per problem. The test that
 confirms the whole is the criterion of A1, a set of contracts with seeded defects where every
@@ -84,5 +93,6 @@ defect has to be reported.
 - The reader lives in `core`, because `contract` and the flow loader
   ([ADR-0035](0035-the-flow-is-loaded-and-validated-in-core.md)) both use it. It receives text;
   it does not open files.
-- The three contracts of A0 are rewritten to these rules before they enter the corpus.
+- The three contracts of A0, rewritten to these rules, become the valid test contracts of the
+  validator.
 - A person who wants the text `no` or `1.10` writes it in quotes, and the validator says so.

@@ -42,3 +42,7 @@ paths = ["docs/architecture/**"]
 [scopes.core]
 description = "Domain types shared by every module: verdicts and their aggregation, findings."
 paths = ["src/dokime/core/**", "tests/core/**", "docs/requirements/core.md"]
+
+[scopes.contract]
+description = "Read, validate and compare contracts: schema, EARS syntax, directives, coverage, contradictions."
+paths = ["src/dokime/contract/**", "tests/contract/**", "docs/requirements/contract.md"]

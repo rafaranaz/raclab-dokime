@@ -64,7 +64,8 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
 
 ```bash
 uv sync --locked
-uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest --cov
+uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports
+uv run pytest --cov
 uv run python -m tools.check_history && uv run python -m tools.check_ears
 uv run python -m tools.check_traceability && uv run python -m tools.check_links
 uv run python -m tools.check_translations && uv run python -m tools.check_adrs

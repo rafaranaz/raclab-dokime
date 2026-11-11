@@ -73,3 +73,22 @@ or an alias. Every finding of the reader has the verdict `FAIL`.
 | `text-on-several-lines` | A folded block, or a scalar that continues on another line |
 | `block-ending` | A literal block that does not end in exactly one newline |
 | `trailing-whitespace` | A line of a literal block that ends in a space or a tab |
+
+## The shape of what was read
+
+`check_fields` compares a mapping that was read with a table of fields and notes what does not
+fit: `unknown-field`, `missing-field`, `wrong-type` and `unknown-value`. `Notes` collects the
+findings of a check and turns the path of a part into its line. The checks of a contract and of a
+pack are built on them.
+
+```python
+from dokime.core.reading import read
+from dokime.core.shape import Field, Notes, check_fields, one_of
+
+table = {"name": Field("a text", lambda value: isinstance(value, str)), "level": one_of("P1", "P2")}
+reading = read("name: cachetools\nlevel: P9\n")
+notes = Notes(reading)
+check_fields(notes, reading.value, (), table)
+[(finding.code, finding.lines) for finding in notes.findings]  # [("unknown-value", (2,))]
+```
+

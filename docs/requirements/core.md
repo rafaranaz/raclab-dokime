@@ -74,3 +74,14 @@ readers, so the reader rejects it and asks for quotes.
 | A number with a leading `+` or a bare dot | `+1`, `.5`, `1.` |
 | Infinities and not-a-number | `.inf`, `-.inf`, `.nan` |
 | Dates and times | `2026-11-10`, `2026-11-10T10:00:00Z`, `12:30` |
+
+## The shape of what was read
+
+A check of a file that was read (a contract, a pack, a flow) compares each of its mappings with a
+table of fields: which fields the mapping may have, which are mandatory and what each holds.
+
+- **CORE-050** If a mapping has a field that its table does not list, then the shape check shall report a finding with the code `unknown-field` that names the field, with its line.
+- **CORE-051** If a mapping lacks a field that its table marks as mandatory, then the shape check shall report a finding with the code `missing-field` that names the field, with the line of the mapping.
+- **CORE-052** If the value of a field is not what its table states, then the shape check shall report a finding with the code `wrong-type` that names the field, with its line.
+- **CORE-053** If a field with a closed list of values has a value that is not in the list with the same type, then the shape check shall report a finding with the code `unknown-value` that lists the values allowed, with its line.
+- **CORE-054** When a finding is about a part that has no line of its own, the shape check shall give the line of the nearest part that contains it.

@@ -1,7 +1,7 @@
-<!-- translation-of: 0033-a-specification-from-another-tool-enters-as-proposals.md sha256:bb9dbc7d2459e276 -->
+<!-- translation-of: 0033-a-specification-from-another-tool-enters-as-proposals.md sha256:4de8f8a38a3c98e2 -->
 # ADR-0033 · Una especificación de otra herramienta entra como propuestas
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

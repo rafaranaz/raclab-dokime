@@ -41,4 +41,4 @@ decision changes, a new one supersedes the previous one. The
 | [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md) | The harness is measured on a corpus with known verdicts | Accepted |
 | [0031](0031-modules-depend-only-on-core.md) | Modules depend only on core; adapters are imported only by the composition root | Accepted |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.md) | The person works in their language, and the approval signs what was shown | Accepted |
-| [0033](0033-a-specification-from-another-tool-enters-as-proposals.md) | A specification from another tool enters as proposals | Proposed |
+| [0033](0033-a-specification-from-another-tool-enters-as-proposals.md) | A specification from another tool enters as proposals | Accepted |

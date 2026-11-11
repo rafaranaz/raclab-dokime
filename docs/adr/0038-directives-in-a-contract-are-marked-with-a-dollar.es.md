@@ -1,7 +1,7 @@
-<!-- translation-of: 0038-directives-in-a-contract-are-marked-with-a-dollar.md sha256:2e82797f7fd28b5a -->
+<!-- translation-of: 0038-directives-in-a-contract-are-marked-with-a-dollar.md sha256:fd1d36e69f24a244 -->
 # ADR-0038 · Las directivas de un contrato se marcan con un signo de dólar
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0039](0039-what-a-contract-of-the-first-version-may-say.es.md)
 
 ## Contexto
 

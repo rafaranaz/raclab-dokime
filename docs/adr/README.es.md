@@ -1,12 +1,13 @@
-<!-- translation-of: README.md sha256:0abc5c3bde3ed4e8 -->
-<!-- translation-of: README.md sha256:3a2f8645e9dfd036 -->
+<!-- translation-of: README.md sha256:8f44ced1ad213692 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
 
 Cada decisión con consecuencias se registra en un ADR: un fichero corto con el contexto, la
 decisión, las alternativas descartadas y sus consecuencias. Los ADR aceptados no se editan: si la
-decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
+decisión cambia, se escribe uno nuevo que sustituye al anterior, o que enmienda una parte, y el
+anterior lo dice en su estado. Una decisión aceptada puede cambiar. Cambia cuando hay evidencia y
+una razón clara: la nueva mejora lo que existe o resuelve un problema que se encontró. La skill
 [adr](../../.claude/skills/adr/SKILL.md) describe el formato.
 
 | Nº | Decisión | Estado |
@@ -48,5 +49,5 @@ decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
 | [0035](0035-the-flow-is-loaded-and-validated-in-core.es.md) | El flujo se carga y se valida en core | Aceptada |
 | [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.es.md) | Un hito puede abrir un incremento de un módulo posterior | Aceptada |
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.es.md) | Un contrato se lee con reglas estrictas propias, y se informa de todos los problemas | Aceptada |
-| [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada |
+| [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |

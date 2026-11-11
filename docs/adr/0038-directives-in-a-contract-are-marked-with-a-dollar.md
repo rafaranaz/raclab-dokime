@@ -1,6 +1,6 @@
 # ADR-0038 · Directives in a contract are marked with a dollar sign
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0039](0039-what-a-contract-of-the-first-version-may-say.md)
 
 ## Context
 

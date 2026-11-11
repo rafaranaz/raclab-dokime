@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:c112f45866b87ff6 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:6183240dce619de7 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -134,9 +134,10 @@ relations:
 
 - **Lo que un paso puede esperar** es un valor exacto o uno de los comparadores del catálogo
   cerrado: cualquier identificador o marca de tiempo (`$any`), número aproximado (`$approx`),
-  colección sin orden (`$unordered`), contiene (`$contains`), patrón (`$pattern`), referencia a un
-  paso anterior (`$ref`). El catálogo de relaciones incluye `idempotent` (aplicar la operación dos
-  veces da lo mismo que aplicarla una).
+  colección sin orden (`$unordered`), contiene (`$contains`), una expresión regular que casa el
+  texto entero (`$fullmatch`), referencia a un paso anterior (`$ref`). El catálogo de relaciones
+  tiene `idempotent` (aplicar la operación dos veces da lo mismo que aplicarla una) y
+  `order-insensitive`.
 - **Los campos de un ejemplo son cerrados**
   ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.es.md)). En la frontera
   `function` la entrada es `args` y `kwargs`, y la expectativa es `returns` o `raises`. En `cli` la

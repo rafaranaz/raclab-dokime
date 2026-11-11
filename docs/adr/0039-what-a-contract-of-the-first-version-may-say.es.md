@@ -1,4 +1,4 @@
-<!-- translation-of: 0039-what-a-contract-of-the-first-version-may-say.md sha256:24e37acd727cf84a -->
+<!-- translation-of: 0039-what-a-contract-of-the-first-version-may-say.md sha256:d739b3e2a5596e51 -->
 # ADR-0039 · Qué puede decir un contrato de la primera versión, y qué decide su comprobación
 
 **Estado:** aceptada
@@ -27,6 +27,9 @@ puede rechazar lo que el formato no define.
   Con varios pasos, se comparan los pasos con las mismas entradas desde el principio.
 - **Duplicado.** Dos ejemplos con la misma frontera, el mismo objetivo y los mismos pasos, sean
   cuales sean su id, su caso y su descripción.
+- **Un nombre cambia.** El comparador que el
+  [ADR-0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) lista como `$pattern`
+  se llama `$fullmatch`, como la función de Python que hace lo mismo.
 - **Veredictos.** Un esquema roto, un texto de requisito que no es EARS, una contradicción y un
   duplicado dan `FAIL`. Un requisito sin ejemplo, o con ejemplos solo de origen `model`, da `ASK`
   ([ADR-0013](0013-provenance-decides-what-a-check-can-do.es.md)).
@@ -44,7 +47,7 @@ Los comparadores de la primera versión:
 | Comparador | Valor esperado | Se cumple cuando |
 |---|---|---|
 | `$contains` | Un texto | El texto observado lo contiene |
-| `$pattern` | Una expresión regular de Python | Casa con el texto observado entero |
+| `$fullmatch` | Una expresión regular de Python | Casa con el texto observado entero |
 | `$approx`, con `tolerance` | Un número | El número observado difiere como mucho en `tolerance`, que es absoluta y obligatoria |
 | `$unordered` | Una lista | La lista observada tiene los mismos elementos, en cualquier orden |
 | `$any` | `uuid` o `timestamp` | El texto observado es un UUID, o una fecha y hora en ISO 8601 |
@@ -57,10 +60,16 @@ De los tres contratos escritos a mano del hito A0: usan `args`, `kwargs`, `retur
 
 Leído en las fuentes:
 
-- La especificación de JSON Schema dice que sus expresiones regulares no están ancladas: un
-  patrón casa en cualquier parte del texto. `$pattern` hace lo contrario a propósito. Un patrón
-  demasiado estricto falla donde una persona lo ve; uno demasiado laxo pasa en silencio.
-  `$contains` ya cubre "en cualquier parte".
+- Las herramientas se dividen en dos familias sobre qué tiene que casar un patrón. En cualquier
+  parte del texto: `pattern` en JSON Schema, `raises(match=…)` en pytest y `assertRegex` en
+  unittest, que buscan. El texto entero: el atributo `pattern` de HTML y, por una fuente
+  secundaria, la faceta `pattern` de XML Schema. Quien escribe contratos para un proyecto Python
+  viene de la primera familia.
+- Así que un comparador llamado `$pattern` que casara el texto entero usaría la palabra de JSON
+  Schema con el significado contrario. El texto entero sigue siendo el significado correcto aquí:
+  un patrón demasiado estricto falla donde una persona lo ve, uno demasiado laxo pasa en silencio,
+  y el bloque se mide por sus falsos aprobados. El nombre `$fullmatch` conserva el significado y
+  quita el falso amigo. `$contains` ya cubre "en cualquier parte".
 - `pytest.approx` (versión 9.2.0) compara por defecto con una tolerancia relativa de una
   millonésima. `$approx` no tiene valor por defecto: quien aprueba ve la tolerancia.
 - `ERROR` para lo que la versión no puede comprobar se sigue del
@@ -83,6 +92,10 @@ herramientas una contradicción entre ejemplos.
 - **`origin` con `human` por defecto.** Una línea menos por ejemplo.
 - **Comprobar solo la forma de las relaciones hasta el bloque B.** Un nombre de relación
   inventado pasaría la comprobación de la primera versión.
+- **`$pattern` casando en cualquier parte, como JSON Schema y pytest.** Sin sorpresa para quien
+  viene de ellos, y un patrón laxo aprueba en silencio.
+- **`$pattern` casando el texto entero.** La primera decisión, tomada antes de mirar cómo lo hacen
+  otras herramientas. Segura, con un nombre prestado que en otros sitios significa lo contrario.
 - **Comparar dos comparadores.** Decidir si dos patrones pueden cumplirse a la vez no es posible
   en general; una respuesta parcial parecería completa.
 

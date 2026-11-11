@@ -54,6 +54,9 @@ addressed by its path from the root, so that a later check can say where a probl
 reading.lines[("id",)]  # 2, the occurrence whose value is kept
 ```
 
+`reading.blocks` holds the paths of the values written as literal blocks (`|`), which a quoted
+text with the same content is not.
+
 The value is `None` when the text is not YAML, does not hold exactly one document or has an anchor
 or an alias. Every finding of the reader has the verdict `FAIL`.
 

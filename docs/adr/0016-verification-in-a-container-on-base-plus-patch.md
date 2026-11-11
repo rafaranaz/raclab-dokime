@@ -1,6 +1,6 @@
 # ADR-0016 · Verification runs in a container without network, on the base commit plus the patch
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md)
 
 ## Context
 

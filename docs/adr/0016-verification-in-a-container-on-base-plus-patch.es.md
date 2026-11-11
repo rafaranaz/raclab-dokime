@@ -1,7 +1,7 @@
-<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:6ecf2d8ccc1106ea -->
+<!-- translation-of: 0016-verification-in-a-container-on-base-plus-patch.md sha256:530c3b4a563cd47c -->
 # ADR-0016 · La verificación corre en un contenedor sin red, sobre el commit base más el parche
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md)
 
 ## Contexto
 

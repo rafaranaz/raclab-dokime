@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:5adf91cb858f3074 -->
+<!-- translation-of: README.md sha256:7be6cd26542abc2c -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -27,7 +27,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0013](0013-provenance-decides-what-a-check-can-do.es.md) | El origen de una comprobación decide qué puede hacer su fallo | Aceptada |
 | [0014](0014-hidden-checks-are-held-out-approved-examples.es.md) | Las comprobaciones ocultas son ejemplos aprobados y reservados por caso, más relaciones aprobadas | Aceptada |
 | [0015](0015-a-gate-returns-one-of-four-verdicts.es.md) | Una puerta devuelve uno de cuatro veredictos | Aceptada |
-| [0016](0016-verification-in-a-container-on-base-plus-patch.es.md) | La verificación corre en un contenedor sin red, sobre el commit base más el parche | Aceptada |
+| [0016](0016-verification-in-a-container-on-base-plus-patch.es.md) | La verificación corre en un contenedor sin red, sobre el commit base más el parche | Aceptada, enmendada por el 0041 |
 | [0017](0017-damage-outside-the-change-against-a-baseline.es.md) | El daño fuera del cambio se encuentra comparando con una línea base | Aceptada |
 | [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.es.md) | El flujo es una máquina de estados declarada en un fichero YAML | Aceptada |
 | [0019](0019-the-harness-launches-the-installed-agent-through-files.es.md) | El arnés lanza el agente instalado y se comunica con él por ficheros | Aceptada |
@@ -52,3 +52,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada |

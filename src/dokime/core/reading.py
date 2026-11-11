@@ -46,13 +46,15 @@ type Path = tuple[str | int, ...]
 class Reading:
     """What a text holds, every problem found while reading it, and where each part is.
 
-    `lines` gives the line where each key of a mapping and each item of a sequence starts. A part
-    is addressed by its path from the root: the keys and the positions that lead to it.
+    `lines` gives the line where each key of a mapping and each item of a sequence starts, and
+    `blocks` the values written as literal blocks. A part is addressed by its path from the root:
+    the keys and the positions that lead to it.
     """
 
     value: Value
     findings: tuple[Finding, ...]
     lines: Mapping[Path, int] = field(default_factory=dict, compare=False)
+    blocks: frozenset[Path] = field(default=frozenset(), compare=False)
 
 
 def read(text: str) -> Reading:
@@ -77,7 +79,12 @@ def read(text: str) -> Reading:
     root = cast(yaml.Node, yaml.compose(text, Loader=yaml.SafeLoader))
     walk.lines[()] = _line(root.start_mark)
     value = walk.value(root, ())
-    return Reading(value=value, findings=_in_order(walk.findings), lines=walk.lines)
+    return Reading(
+        value=value,
+        findings=_in_order(walk.findings),
+        lines=walk.lines,
+        blocks=frozenset(walk.blocks),
+    )
 
 
 def _fail(code: str, message: str, *lines: int) -> Finding:
@@ -131,13 +138,17 @@ class _Walk:
 
     findings: list[Finding] = field(default_factory=list)
     lines: dict[Path, int] = field(default_factory=dict)
+    blocks: set[Path] = field(default_factory=set)
 
     def value(self, node: yaml.Node, path: Path) -> Value:
         if isinstance(node, yaml.MappingNode):
             return self._mapping(node, path)
         if isinstance(node, yaml.SequenceNode):
             return [self._part(item, (*path, index)) for index, item in enumerate(node.value)]
-        return self._scalar(cast(yaml.ScalarNode, node))
+        scalar = cast(yaml.ScalarNode, node)
+        if scalar.style == "|":
+            self.blocks.add(path)
+        return self._scalar(scalar)
 
     def _part(self, node: yaml.Node, path: Path, start: yaml.Node | None = None) -> Value:
         """Read a part of a mapping or of a sequence and note the line where it starts."""

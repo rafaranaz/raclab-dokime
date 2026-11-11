@@ -57,6 +57,8 @@ the codes named here.
 - **CORE-040** When a text is read, the reader shall give the line where every key of a mapping and every item of a sequence starts, addressed by its path from the root.
 - **CORE-041** If a key appears more than once in a mapping, then the reader shall give for its path the line of the occurrence whose value it keeps.
 
+- **CORE-042** When a text is read, the reader shall give the paths of the values that are written as literal blocks.
+
 ### Table of ambiguous values
 
 A value without quotes in one of these forms is read with different types by different YAML

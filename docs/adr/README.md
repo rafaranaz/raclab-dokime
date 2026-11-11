@@ -42,3 +42,5 @@ decision changes, a new one supersedes the previous one. The
 | [0031](0031-modules-depend-only-on-core.md) | Modules depend only on core; adapters are imported only by the composition root | Accepted |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.md) | The person works in their language, and the approval signs what was shown | Accepted |
 | [0033](0033-a-specification-from-another-tool-enters-as-proposals.md) | A specification from another tool enters as proposals | Accepted |
+| [0034](0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md) | A state closes with the aggregated verdict of its gates | Proposed |
+| [0035](0035-the-flow-is-loaded-and-validated-in-core.md) | The flow is loaded and validated in core | Proposed |

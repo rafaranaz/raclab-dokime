@@ -63,7 +63,7 @@ flowchart TB
 
 | Module | Responsibility | Does not |
 |---|---|---|
-| `core` | Types, the algebra of verdicts, the ledger with chained hashes, the definition of the ports | Do input or output, except writing the ledger through a port |
+| `core` | Types, the algebra of verdicts, the ledger with chained hashes, the schema and the validator of the flow, the definition of the ports | Do input or output, except writing the ledger through a port |
 | `contract` | Read, validate and digest a contract: EARS syntax, example schema, coverage of requirements by examples, contradictions | Run anything |
 | `oracle` | Split examples into visible and sealed; apply relations; compare observations with what is expected; word the feedback | Run the code under test. It receives observations |
 | `packs` | Pack model, detection of the kind of project, self-check | Know languages in code. Everything is declarative |
@@ -71,7 +71,7 @@ flowchart TB
 | `verify` | The gates, the baseline, the impact map from coverage, the aggregation | Talk to the agent or to the person |
 | `spec` | Interview, ambiguity detectors, the solver where it applies | Approve. It only proposes |
 | `delivery` | Commit, attach the evidence, open the pull request | Verify |
-| `engine` | Load and validate the flow, run it, keep the budgets, package the task for the agent | Hold gate logic |
+| `engine` | Run a validated flow, keep the budgets, ask the questions, package the task for the agent | Hold gate logic |
 | `sandbox` | Adapters for the verification runtime and for isolating the agent | Decide policy. It receives it |
 | `agents` | Adapters that launch agents | Interpret the result. The harness computes the patch |
 | `gateway` | Model adapters, registered prompts, validation of answers against a schema | Decide |

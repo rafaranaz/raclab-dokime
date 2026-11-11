@@ -46,3 +46,7 @@ paths = ["src/dokime/core/**", "tests/core/**", "docs/requirements/core.md"]
 [scopes.contract]
 description = "Read, validate and compare contracts: schema, EARS syntax, directives, coverage, contradictions."
 paths = ["src/dokime/contract/**", "tests/contract/**", "docs/requirements/contract.md"]
+
+[scopes.interfaces]
+description = "The commands a person or a pipeline runs, and the composition root."
+paths = ["src/dokime/interfaces/**", "tests/interfaces/**", "docs/requirements/interfaces.md"]

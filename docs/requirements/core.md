@@ -54,6 +54,9 @@ the codes named here.
 - **CORE-038** If the value of a literal block does not end in exactly one newline, then the reader shall report a finding with the code `block-ending` and the line where the block starts.
 - **CORE-039** If a line of a literal block ends in a space or a tab, then the reader shall report a finding with the code `trailing-whitespace` and that line.
 
+- **CORE-040** When a text is read, the reader shall give the line where every key of a mapping and every item of a sequence starts, addressed by its path from the root.
+- **CORE-041** If a key appears more than once in a mapping, then the reader shall give for its path the line of the occurrence whose value it keeps.
+
 ### Table of ambiguous values
 
 A value without quotes in one of these forms is read with different types by different YAML

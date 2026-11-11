@@ -5,6 +5,7 @@ no anchors, aliases, tags or merge keys, and no value whose type depends on the 
 """
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import cast
 
@@ -38,12 +39,20 @@ _AMBIGUOUS = re.compile(
 )
 
 
+type Path = tuple[str | int, ...]
+
+
 @dataclass(frozen=True)
 class Reading:
-    """What a text holds and every problem found while reading it."""
+    """What a text holds, every problem found while reading it, and where each part is.
+
+    `lines` gives the line where each key of a mapping and each item of a sequence starts. A part
+    is addressed by its path from the root: the keys and the positions that lead to it.
+    """
 
     value: Value
     findings: tuple[Finding, ...]
+    lines: Mapping[Path, int] = field(default_factory=dict, compare=False)
 
 
 def read(text: str) -> Reading:
@@ -65,8 +74,10 @@ def read(text: str) -> Reading:
         return _stopped(shared)
     walk = _Walk()
     walk.findings.extend(finding for event in events if (finding := _tag(event)))
-    value = walk.value(cast(yaml.Node, yaml.compose(text, Loader=yaml.SafeLoader)))
-    return Reading(value=value, findings=_in_order(walk.findings))
+    root = cast(yaml.Node, yaml.compose(text, Loader=yaml.SafeLoader))
+    walk.lines[()] = _line(root.start_mark)
+    value = walk.value(root, ())
+    return Reading(value=value, findings=_in_order(walk.findings), lines=walk.lines)
 
 
 def _fail(code: str, message: str, *lines: int) -> Finding:
@@ -116,32 +127,40 @@ def _tag(event: yaml.Event) -> Finding | None:
 
 @dataclass
 class _Walk:
-    """Builds the value of a tree of nodes and collects the findings of its nodes."""
+    """Builds the value of a tree of nodes and collects its findings and the line of each part."""
 
     findings: list[Finding] = field(default_factory=list)
+    lines: dict[Path, int] = field(default_factory=dict)
 
-    def value(self, node: yaml.Node) -> Value:
+    def value(self, node: yaml.Node, path: Path) -> Value:
         if isinstance(node, yaml.MappingNode):
-            return self._mapping(node)
+            return self._mapping(node, path)
         if isinstance(node, yaml.SequenceNode):
-            return [self.value(item) for item in node.value]
+            return [self._part(item, (*path, index)) for index, item in enumerate(node.value)]
         return self._scalar(cast(yaml.ScalarNode, node))
 
-    def _mapping(self, node: yaml.MappingNode) -> dict[str, Value]:
+    def _part(self, node: yaml.Node, path: Path, start: yaml.Node | None = None) -> Value:
+        """Read a part of a mapping or of a sequence and note the line where it starts."""
+        self.lines[path] = _line((start or node).start_mark)
+        return self.value(node, path)
+
+    def _mapping(self, node: yaml.MappingNode, path: Path) -> dict[str, Value]:
         result: dict[str, Value] = {}
         seen: dict[str, list[int]] = {}
         for key, item in node.value:
             line = _line(key.start_mark)
             if not isinstance(key, yaml.ScalarNode):
                 self.findings.append(_fail("key-not-text", "a key must be a text", line))
-                self.value(item)
+                left_out = _Walk()
+                left_out.value(item, ())
+                self.findings.extend(left_out.findings)
                 continue
             self._layout(key)
             if key.value == "<<" and not key.style:
                 message = "the merge key << is not allowed; write the keys where they are used"
                 self.findings.append(_fail("merge-key", message, line))
             seen.setdefault(key.value, []).append(line)
-            result[key.value] = self.value(item)
+            result[key.value] = self._part(item, (*path, key.value), start=key)
         for name, lines in seen.items():
             if len(lines) > 1:
                 message = f"the key {name!r} appears {len(lines)} times in the same mapping"

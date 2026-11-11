@@ -47,6 +47,13 @@ reading.value  # {"id": "b", "flag": "no"}
 # [("duplicate-key", (1, 2)), ("ambiguous-value", (3,))]
 ```
 
+`reading.lines` gives the line where each key of a mapping and each item of a sequence starts,
+addressed by its path from the root, so that a later check can say where a problem is:
+
+```python
+reading.lines[("id",)]  # 2, the occurrence whose value is kept
+```
+
 The value is `None` when the text is not YAML, does not hold exactly one document or has an anchor
 or an alias. Every finding of the reader has the verdict `FAIL`.
 

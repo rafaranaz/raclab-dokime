@@ -84,8 +84,15 @@ checked by running its examples against the code before and after the change. Al
 requirements fit as examples at a boundary. The person approved them. Reading took about 4 to 5
 minutes for the pull-request cleaner, about 2 for `naturalsize` and about 3 for `tabulate`, whose
 formats the person did not know; these are the person's own estimates, not measurements. What it changed in
-the format is in [the contract](architecture/03-data-and-evidence.md#the-contract). Still open:
-the three repositories of the corpus.
+the format is in [the contract](architecture/03-data-and-evidence.md#the-contract). The
+three repositories of the corpus are other ones, so that what is known of the A0 projects does not
+leak into the tests: [cachetools](https://github.com/tkem/cachetools) (MIT),
+[python-semver](https://github.com/python-semver/python-semver) (BSD-3-Clause) and
+[mdformat](https://github.com/executablebooks/mdformat) (MIT). All three are pure Python, install on
+Python 3.13 and their suites pass in under 15 seconds (416, 512 and 4286 tests); two of them have a
+command-line boundary (`pysemver`, `mdformat`) and all have a function boundary. They have 72, 25 and
+38 commits with "fix" in the message that touch tests, which is a count of candidates, not of usable
+cases.
 
 ### Hypotheses
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:183f605106c44543 -->
+<!-- translation-of: ROADMAP.md sha256:f3c0521a08219540 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -87,8 +87,15 @@ antes y después del cambio. Los nueve requisitos caben como ejemplos en una fro
 los aprobó. La lectura llevó unos 4 o 5 minutos en el limpiador de descripciones, unos 2 en
 `naturalsize` y unos 3 en `tabulate`, cuyos formatos la persona no conocía; son estimaciones de la
 propia persona, no mediciones. Lo que cambió en el formato está en
-[el contrato](architecture/03-data-and-evidence.es.md#el-contrato). Sigue abierto: los tres
-repositorios del corpus.
+[el contrato](architecture/03-data-and-evidence.es.md#el-contrato). Los tres
+repositorios del corpus son otros, para que lo que se sabe de los proyectos de A0 no se filtre en
+las pruebas: [cachetools](https://github.com/tkem/cachetools) (MIT),
+[python-semver](https://github.com/python-semver/python-semver) (BSD-3-Clause) y
+[mdformat](https://github.com/executablebooks/mdformat) (MIT). Los tres son Python puro, se
+instalan en Python 3.13 y sus suites pasan en menos de 15 segundos (416, 512 y 4286 tests); dos
+tienen frontera de línea de órdenes (`pysemver`, `mdformat`) y todos tienen frontera de función.
+Tienen 72, 25 y 38 commits con "fix" en el mensaje que tocan tests, que es una cuenta de
+candidatos, no de casos utilizables.
 
 ### Hipótesis
 

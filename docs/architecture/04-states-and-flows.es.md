@@ -1,4 +1,4 @@
-<!-- translation-of: 04-states-and-flows.md sha256:d4f9c821067de4e0 -->
+<!-- translation-of: 04-states-and-flows.md sha256:ebd67c87725b911a -->
 # Estados y flujos
 
 *Read in [English](04-states-and-flows.md).*
@@ -23,6 +23,10 @@ la lógica está en las puertas.
 Una transición es el nombre de un estado. Una transición que puede repetirse lleva un
 **presupuesto** y el estado de pregunta al que va la ejecución cuando el presupuesto se agota. Las
 cantidades están en la política, no en el flujo.
+
+Un presupuesto nunca termina una ejecución ni la deja seguir por su cuenta. Marca el punto en que
+se pregunta a una persona, con lo que han mostrado los intentos hasta entonces; la persona lo
+amplía o para.
 
 Una respuesta lleva a un estado con nombre, o a uno de tres sitios que dependen de desde dónde se
 hizo la pregunta:

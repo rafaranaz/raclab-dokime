@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:4ddb394dd0f4b865 -->
+<!-- translation-of: README.md sha256:0e5bf49127125e09 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -43,5 +43,5 @@ decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
 | [0031](0031-modules-depend-only-on-core.es.md) | Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición | Aceptada |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.es.md) | La persona trabaja en su idioma, y la aprobación firma lo que se le mostró | Aceptada |
 | [0033](0033-a-specification-from-another-tool-enters-as-proposals.es.md) | Una especificación de otra herramienta entra como propuestas | Aceptada |
-| [0034](0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.es.md) | Un estado se cierra con el veredicto agregado de sus puertas | Propuesta |
+| [0034](0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.es.md) | Un estado se cierra con el veredicto agregado de sus puertas | Aceptada |
 | [0035](0035-the-flow-is-loaded-and-validated-in-core.es.md) | El flujo se carga y se valida en core | Propuesta |

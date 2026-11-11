@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:6372c977ccfd1e2d -->
+<!-- translation-of: glossary.md sha256:42263c02bb64e12f -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -40,7 +40,7 @@ término.
 | Puerta | Un paso del flujo que devuelve un veredicto |
 | Estado de trabajo | Un estado del flujo que ejecuta una o más puertas y se cierra con su veredicto agregado |
 | Estado de pregunta | Un estado del flujo en el que una persona elige una respuesta de una lista cerrada |
-| Presupuesto | Cuántas veces puede repetirse una transición del flujo antes de preguntar a una persona. La cantidad está en la política |
+| Presupuesto | Cuántas veces puede repetirse una transición del flujo antes de preguntar a una persona. No termina nada por sí solo. La cantidad está en la política |
 | Puerta opcional | Una puerta que la política permite omitir. Todas las demás son obligatorias |
 | Veredicto | `PASS`, `FAIL`, `ASK` o `ERROR`. Una puerta devuelve uno; el veredicto de un cambio es su agregación |
 | No aplicable | Una puerta que no tiene sobre qué actuar en este cambio, por una condición leída del contrato o del nivel del pack |

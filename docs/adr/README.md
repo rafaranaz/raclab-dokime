@@ -26,7 +26,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0013](0013-provenance-decides-what-a-check-can-do.md) | The origin of a check decides what its failure can do | Accepted |
 | [0014](0014-hidden-checks-are-held-out-approved-examples.md) | Hidden checks are approved examples held out by case, plus approved relations | Accepted |
 | [0015](0015-a-gate-returns-one-of-four-verdicts.md) | A gate returns one of four verdicts | Accepted |
-| [0016](0016-verification-in-a-container-on-base-plus-patch.md) | Verification runs in a container without network, on the base commit plus the patch | Accepted |
+| [0016](0016-verification-in-a-container-on-base-plus-patch.md) | Verification runs in a container without network, on the base commit plus the patch | Accepted, amended by 0041 |
 | [0017](0017-damage-outside-the-change-against-a-baseline.md) | Damage outside the change is found by comparing against a baseline | Accepted |
 | [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.md) | The flow is a state machine declared in a YAML file | Accepted |
 | [0019](0019-the-harness-launches-the-installed-agent-through-files.md) | The harness launches the installed agent and talks to it through files | Accepted |
@@ -51,3 +51,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted |

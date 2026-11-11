@@ -47,3 +47,4 @@ decision changes, a new one supersedes the previous one. The
 | [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.md) | A milestone may open an increment of a later module | Accepted |
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.md) | A contract is read by strict rules of its own, and every problem is reported | Accepted |
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted |
+| [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |

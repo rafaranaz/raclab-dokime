@@ -134,6 +134,7 @@ relations:
   (`$unordered`), contains (`$contains`), pattern (`$pattern`), reference to an earlier step
   (`$ref`). The catalogue of relations includes `idempotent` (applying the
   operation twice gives what applying it once gives).
+- **The input of a step at the `function` boundary** is `args` and `kwargs`, and nothing else.
 - **The requirement text is canonical in English.** The person may be shown another language; the
   approval records the digest of what was shown
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.md)).

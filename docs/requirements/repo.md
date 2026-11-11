@@ -57,6 +57,13 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-091** When a decision record has no row in the index of decision records, the decision-record check shall report the record.
 - **REPO-092** When the status of a decision record differs from the status in its index row, the decision-record check shall report both statuses.
 
+## Import contracts (`pyproject.toml`, section `tool.importlinter`)
+
+- **REPO-100** When a module of the package imports a module that the dependency rules of the architecture forbid, the import check shall reject the package.
+- **REPO-101** While a module of the architecture does not exist in the package, the import check shall accept the package.
+- **REPO-102** The import check shall accept every dependency drawn in the module diagram of the architecture.
+- **REPO-103** The import contracts shall name the same modules as the module diagram of the architecture.
+
 ## Pull request descriptions (`tools/clean_pr_body.py`)
 
 - **REPO-080** When a pull request description contains an attribution line added by tooling, the description cleaner shall remove that line together with the separator line directly above it.

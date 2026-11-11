@@ -1,7 +1,7 @@
 [project]
 name = "raclab-dokime"
 version = "0.0.0"
-description = "Spec-driven pipeline for coding agents with mechanical verification of every step."
+description = "Verification and evidence layer around coding agents."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13,<3.14"
@@ -9,6 +9,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "import-linter>=2.16",
     "mypy>=1.18",
     "pip-audit>=2.9",
     "pytest>=8.4",
@@ -57,3 +58,52 @@ branch = true
 fail_under = 90
 show_missing = true
 skip_covered = true
+
+[tool.importlinter]
+root_package = "dokime"
+
+[[tool.importlinter.contracts]]
+name = "Modules depend downwards only, and siblings do not import each other"
+type = "layers"
+containers = ["dokime"]
+layers = [
+    "(bench)",
+    "(interfaces)",
+    "(sandbox) | (agents) | (gateway) | (platform)",
+    "(engine)",
+    "(spec) | (verify) | (delivery)",
+    "(oracle)",
+    "(contract) | (evidence) | (packs)",
+    "(core)",
+]
+
+[[tool.importlinter.contracts]]
+name = "Adapters import only core"
+type = "layers"
+containers = ["dokime"]
+layers = [
+    "(engine) : (spec) : (verify) : (delivery) : (oracle) : (contract) : (evidence) : (packs)",
+    "(sandbox) | (agents) | (gateway) | (platform)",
+    "(core)",
+]
+
+[[tool.importlinter.contracts]]
+name = "Only interfaces imports adapters"
+type = "layers"
+containers = ["dokime"]
+layers = [
+    "(sandbox) | (agents) | (gateway) | (platform)",
+    "(bench)",
+]
+# The path through the composition root is the allowed one, so its imports do not count here.
+ignore_imports = ["dokime.interfaces -> dokime.**", "dokime.interfaces.** -> dokime.**"]
+unmatched_ignore_imports_alerting = "none"
+
+[[tool.importlinter.contracts]]
+name = "The oracle imports only the contract and core"
+type = "layers"
+containers = ["dokime"]
+layers = [
+    "(evidence) | (packs)",
+    "(oracle)",
+]

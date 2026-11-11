@@ -6,6 +6,7 @@ no anchors, aliases, tags or merge keys, and no value whose type depends on the 
 
 import re
 from dataclasses import dataclass, field
+from typing import cast
 
 import yaml
 
@@ -14,8 +15,27 @@ from dokime.core.verdicts import Verdict
 
 type Value = bool | int | float | str | list[Value] | dict[str, Value] | None
 
-_JSON_NUMBER = re.compile(r"-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]+)?")
+_JSON_NUMBER = re.compile(r"-?(0|[1-9][0-9]*)(\.(?P<decimals>[0-9]+))?([eE][-+]?[0-9]+)?")
 _CONSTANTS: dict[str, Value] = {"true": True, "false": False, "null": None}
+_EXPONENT = r"([eE][-+]?[0-9]+)?"
+_AMBIGUOUS = re.compile(
+    "|".join(
+        [
+            r"(?i:y|n|yes|no|on|off|true|false|null)|~",  # booleans or null for some readers
+            r"",  # an empty value
+            rf"[-+]?0[0-9]+(\.[0-9]*)?{_EXPONENT}",  # leading zeros
+            r"[-+]?0[xX][0-9a-fA-F_]+|[-+]?0[oO][0-7_]+|[-+]?0[bB][01_]+",  # other bases
+            r"[-+]?[0-9][0-9_]*_[0-9_]*(\.[0-9_]*)?",  # digits with underscores
+            rf"\+[0-9]+(\.[0-9]*)?{_EXPONENT}",  # a leading plus sign
+            rf"[-+]?\.[0-9]+{_EXPONENT}|[-+]?[0-9]+\.{_EXPONENT}",  # a bare dot
+            r"[-+]?\.(?i:inf)|\.(?i:nan)",  # infinities and not-a-number
+            r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}"  # dates, alone or followed by a time
+            r"(([Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?"
+            r"([ \t]*(Z|[-+][0-9]{1,2}(:[0-9]{2})?))?)?",
+            r"[-+]?[0-9][0-9_]*(:[0-5]?[0-9])+(\.[0-9_]*)?",  # times in base sixty
+        ]
+    )
+)
 
 
 @dataclass(frozen=True)
@@ -45,7 +65,7 @@ def read(text: str) -> Reading:
         return _stopped(shared)
     walk = _Walk()
     walk.findings.extend(finding for event in events if (finding := _tag(event)))
-    value = walk.value(yaml.compose(text, Loader=yaml.SafeLoader))
+    value = walk.value(cast(yaml.Node, yaml.compose(text, Loader=yaml.SafeLoader)))
     return Reading(value=value, findings=_in_order(walk.findings))
 
 
@@ -100,14 +120,12 @@ class _Walk:
 
     findings: list[Finding] = field(default_factory=list)
 
-    def value(self, node: yaml.Node | None) -> Value:
+    def value(self, node: yaml.Node) -> Value:
         if isinstance(node, yaml.MappingNode):
             return self._mapping(node)
         if isinstance(node, yaml.SequenceNode):
             return [self.value(item) for item in node.value]
-        if isinstance(node, yaml.ScalarNode):
-            return self._scalar(node)
-        return None
+        return self._scalar(cast(yaml.ScalarNode, node))
 
     def _mapping(self, node: yaml.MappingNode) -> dict[str, Value]:
         result: dict[str, Value] = {}
@@ -135,6 +153,21 @@ class _Walk:
             return text
         if text in _CONSTANTS:
             return _CONSTANTS[text]
-        if _JSON_NUMBER.fullmatch(text):
+        number = _JSON_NUMBER.fullmatch(text)
+        if number is None:
+            if _AMBIGUOUS.fullmatch(text):
+                self._ambiguous(node, "YAML readers disagree on its type")
+            return text
+        decimals = number["decimals"]
+        if decimals is None:
             return int(text) if text.lstrip("-").isdigit() else float(text)
-        return text
+        if len(decimals) > 1 and decimals.endswith("0"):
+            self._ambiguous(node, "read as a number it loses its last zero")
+            return text
+        return float(text)
+
+    def _ambiguous(self, node: yaml.ScalarNode, reason: str) -> None:
+        message = (
+            f"the value {node.value!r} is ambiguous: {reason}; put it in quotes if it is a text"
+        )
+        self.findings.append(_fail("ambiguous-value", message, _line(node.start_mark)))

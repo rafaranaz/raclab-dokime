@@ -36,6 +36,9 @@ a decision needs another meaning, it needs another term.
 | Check | One comparison between what was observed and what was expected |
 | Origin | Who stands behind the expected result of a check: `human`, `derived`, `model` or `existing` |
 | Gate | A step of the flow that returns a verdict |
+| Work state | A state of the flow that runs one or more gates and closes with their aggregated verdict |
+| Question state | A state of the flow in which a person chooses one of a closed list of answers |
+| Budget | How many times a transition of the flow may repeat before a person is asked. The amount is in the policy |
 | Optional gate | A gate the policy allows to skip. Every other gate is mandatory |
 | Verdict | `PASS`, `FAIL`, `ASK` or `ERROR`. A gate returns one; the verdict of a change is their aggregation |
 | Not applicable | A gate that has nothing to act on in this change, by a condition read from the contract or from the level of the pack |

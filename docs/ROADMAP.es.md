@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:f3c0521a08219540 -->
+<!-- translation-of: ROADMAP.md sha256:e6f9b840f456aaf8 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -96,6 +96,15 @@ instalan en Python 3.13 y sus suites pasan en menos de 15 segundos (416, 512 y 4
 tienen frontera de línea de órdenes (`pysemver`, `mdformat`) y todos tienen frontera de función.
 Tienen 72, 25 y 38 commits con "fix" en el mensaje que tocan tests, que es una cuenta de
 candidatos, no de casos utilizables.
+
+Cómo usa el corpus esos repositorios:
+
+- **Referenciar, no copiar.** Un caso apunta a `repositorio@commit`; no se copia código de esos
+  proyectos a este repositorio. Si alguna vez se copia algo, el aviso de copyright y el texto de la
+  licencia viajan con ello.
+- **No tocar nunca los originales.** Las ejecuciones se hacen sobre copias locales. No se abre
+  ninguna pull request, issue ni comentario en esos proyectos.
+- **Nombrarlos en cada informe**, con la versión, para que los números se puedan reproducir.
 
 ### Hipótesis
 

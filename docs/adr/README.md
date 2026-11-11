@@ -50,3 +50,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.md) | A contract is read by strict rules of its own, and every problem is reported | Accepted |
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
+| [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |

@@ -78,7 +78,7 @@ closes. The order of blocks B and C is confirmed when block A closes.
 **Block A is open.** Its first milestone, A0, has no code: it tests by hand the formats that the
 rest of the block depends on.
 
-**A0 so far.** Three hand-written contracts were made on changes that public projects already
+**A0 is done.** Three hand-written contracts were made on changes that public projects already
 made (a pull-request description cleaner, `humanize.naturalsize`, `tabulate` pipe escaping), each
 checked by running its examples against the code before and after the change. All nine
 requirements fit as examples at a boundary. The person approved them. Reading took about 4 to 5
@@ -93,6 +93,18 @@ Python 3.13 and their suites pass in under 15 seconds (416, 512 and 4286 tests);
 command-line boundary (`pysemver`, `mdformat`) and all have a function boundary. They have 72, 25 and
 38 commits with "fix" in the message that touch tests, which is a count of candidates, not of usable
 cases.
+
+**A1 is done.** `dokime contract check` validates a contract file and says what it lacks, with one
+line for each finding and an exit code for each verdict
+([ADR-0040](adr/0040-commands-exit-with-a-code-for-each-verdict.md)). It was built in three modules:
+`core` (verdicts, findings and the strict reader of
+[ADR-0037](adr/0037-a-contract-is-read-by-strict-rules-of-its-own.md)), `contract` (the check) and
+`interfaces` (the command). The three contracts of A0, rewritten to the rules that A1 fixed, pass
+without a finding. Its exit criterion is met: with a text that is not EARS, a requirement without
+an example, a duplicate and a contradiction seeded in one of them, the command reports the four in
+one run. The defects of reading (a repeated key, a value whose type depends on the reader, a text
+on several lines) are reported the same way. What A1 does not do: it runs nothing, so a contract
+that passes says nothing yet about the code.
 
 How the corpus uses those repositories:
 

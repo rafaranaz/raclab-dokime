@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:295d56e12db37b10 -->
+<!-- translation-of: README.md sha256:a0c2c62040c8acbf -->
 # raclab-dokime
 
 *Read in [English](README.md).*
@@ -12,7 +12,8 @@ resultado se da por bueno por la palabra del agente que lo produjo.
 ## Estado
 
 En construcción. La arquitectura de referencia está escrita y sus decisiones están aceptadas. El
-repositorio está en la **fase 2, bloque A** (auditar), y todavía no contiene código del harness. Las fases, los
+repositorio está en la **fase 2, bloque A** (auditar). Su primera orden, `dokime contract check`,
+valida un fichero de contrato y dice qué le falta; todavía nada verifica un cambio. Las fases, los
 bloques de construcción y sus criterios de salida están en [docs/ROADMAP.es.md](docs/ROADMAP.es.md).
 
 ## Dónde está cada cosa

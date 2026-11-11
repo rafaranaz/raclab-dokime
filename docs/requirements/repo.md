@@ -64,6 +64,10 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-102** The import check shall accept every dependency drawn in the module diagram of the architecture.
 - **REPO-103** The import contracts shall name the same modules as the module diagram of the architecture.
 
+## The installed command (`pyproject.toml`, section `project.scripts`)
+
+- **REPO-110** The package shall install a command named `dokime` that runs the command line of the `interfaces` module.
+
 ## Pull request descriptions (`tools/clean_pr_body.py`)
 
 - **REPO-080** When a pull request description contains an attribution line added by tooling, the description cleaner shall remove that line together with the separator line directly above it.

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:c8bdc10f76f24a11 -->
+<!-- translation-of: ROADMAP.md sha256:e8bf5b0005825a19 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -23,7 +23,7 @@ Criterios de salida:
 - [x] CI en verde sobre el PR de la fase en GitHub.
 - [x] Protección de `main` aplicada en GitHub (ver abajo).
 
-## Fase 1 · Arquitectura de referencia
+## Fase 1 · Arquitectura de referencia — completada
 
 La arquitectura del producto, decidida con evidencia. Cada decisión es un ADR que dice en qué se
 apoya (literatura, razonamiento o una prueba) y las alternativas consideradas
@@ -43,13 +43,17 @@ Datos y evidencia va antes que estados y flujos porque el bloque A depende de lo
 mientras que el fichero de flujo no se usa hasta el bloque C. Cada módulo recibe sus requisitos
 EARS de alto nivel cuando se abre su ámbito en la fase 2.
 
+Antes de aceptarse, las decisiones se comprobaron contra los diez invariantes por tres vías
+independientes. Las correcciones, un glosario y los ADR 0033 a 0035 salieron de esa comprobación y
+de poner por escrito los formatos.
+
 Criterios de salida:
 
-- [ ] Los documentos anteriores están en `docs/architecture/` y sus diagramas pasan la validación.
+- [x] Los documentos anteriores están en `docs/architecture/` y sus diagramas pasan la validación.
 - [x] Cada ADR desde el 0008 está aceptado o queda expresamente como hipótesis con su prueba.
-- [ ] La comprobación de que cada ADR dice en qué se apoya y los contratos de importación están en
+- [x] La comprobación de que cada ADR dice en qué se apoya y los contratos de importación están en
   CI.
-- [ ] La arquitectura está aprobada en revisión.
+- [x] La arquitectura está aprobada en revisión.
 
 ## Fase 2 · Construcción por bloques
 
@@ -72,6 +76,9 @@ se publica. Un resultado malo también se publica.
 
 Los hitos de un bloque se escriben aquí cuando el bloque se abre, y sus números medidos cuando se
 cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
+
+**El bloque A está abierto.** Su primer hito, A0, no tiene código: prueba a mano los formatos de los
+que depende el resto del bloque.
 
 ### Hipótesis
 

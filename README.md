@@ -10,8 +10,8 @@ as good on the word of the agent that produced it.
 
 ## Status
 
-Under construction. The repository is in **phase 1** (reference architecture): the design is
-written and its decisions are accepted, and it does not contain any harness code yet. The phases,
+Under construction. The reference architecture is written and its decisions are accepted. The
+repository is in **phase 2, block A** (audit), and it does not contain any harness code yet. The phases,
 the blocks of construction and their exit criteria are in [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Where things are

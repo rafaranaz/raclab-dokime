@@ -94,6 +94,15 @@ command-line boundary (`pysemver`, `mdformat`) and all have a function boundary.
 38 commits with "fix" in the message that touch tests, which is a count of candidates, not of usable
 cases.
 
+How the corpus uses those repositories:
+
+- **Reference, do not vendor.** A case points to `repository@commit`; no code of those projects is
+  copied into this repository. If something is ever copied, the copyright notice and the licence
+  text travel with it.
+- **Never touch the originals.** Runs happen on local copies. No pull request, issue or comment is
+  opened on those projects.
+- **Name them in every report**, with the version, so that the numbers can be reproduced.
+
 ### Hypotheses
 
 Some decisions rest on reasoning. Each has a test that runs before the block that depends on it,

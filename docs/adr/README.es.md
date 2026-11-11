@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:51fd89d9e4e3a953 -->
+<!-- translation-of: README.md sha256:e00012b7e6b0cbb0 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -42,3 +42,4 @@ decisión cambia, se escribe uno nuevo que sustituye al anterior. La skill
 | [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Aceptada |
 | [0031](0031-modules-depend-only-on-core.es.md) | Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición | Aceptada |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.es.md) | La persona trabaja en su idioma, y la aprobación firma lo que se le mostró | Aceptada |
+| [0033](0033-a-specification-from-another-tool-enters-as-proposals.es.md) | Una especificación de otra herramienta entra como propuestas | Propuesta |

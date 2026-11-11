@@ -78,6 +78,15 @@ closes. The order of blocks B and C is confirmed when block A closes.
 **Block A is open.** Its first milestone, A0, has no code: it tests by hand the formats that the
 rest of the block depends on.
 
+**A0 so far.** Three hand-written contracts were made on changes that public projects already
+made (a pull-request description cleaner, `humanize.naturalsize`, `tabulate` pipe escaping), each
+checked by running its examples against the code before and after the change. All nine
+requirements fit as examples at a boundary. The person approved them; reading took about two
+minutes for the first contract that was timed and longer for the one in formats the person did not
+know; the minutes of the other two were not recorded and are not claimed here. What it changed in
+the format is in [the contract](architecture/03-data-and-evidence.md#the-contract). Still open:
+the three repositories of the corpus.
+
 ### Hypotheses
 
 Some decisions rest on reasoning. Each has a test that runs before the block that depends on it,

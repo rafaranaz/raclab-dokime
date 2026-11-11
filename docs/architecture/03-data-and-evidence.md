@@ -90,23 +90,29 @@ A YAML file with requirements, examples and relations
 [ADR-0012](../adr/0012-examples-are-observations-at-a-boundary.md)).
 
 ```yaml
-contract: 1
-story: invoice-rounding
-supersedes: []
-changes_tests: []
+format: 1                       # version of the file format
+story: invoice-rounding         # identifies the contract
+may_modify_tests: []            # test files the change is allowed to edit
 
 requirements:
-  - id: R1
-    kind: new            # new | change | preserve
+  - id: round-total-once        # descriptive, chosen by the person
+    kind: new                   # new | change | preserve
     text: When an invoice has lines in several currencies, the system shall round the total once.
-    source: written      # written | imported, with the tool and the file it came from
+    source: written             # written | imported, with the tool and the file it came from
+  - id: round-each-line-first
+    kind: change
+    replaces: round-per-line    # only on a change: the behaviour it replaces
+    text: …
+    source: written
 
 examples:
-  - id: E1
-    requirement: R1
+  - id: E-4f1a                  # opaque, random, assigned once by the harness
+    requirement: round-total-once
     case: normal
-    boundary: cli        # function | cli | http
-    origin: human        # a proposal has origin model until a person accepts it
+    boundary: cli               # function | cli | http
+    target: invoice             # what is called: a command, a function or a route
+    description: Two lines in euros whose sum needs rounding.   # optional, one line
+    origin: human               # a proposal has origin model until a person accepts it
     steps:
       - input:
           args: [total, invoice.json]
@@ -114,33 +120,54 @@ examples:
         expect:
           exit: 0
           stdout: {json: {total: {approx: 10.03, tolerance: 0.005}}}
+          files: {}             # files that must exist afterwards, when the boundary is cli
 
 relations:
   - id: L1
-    requirement: R1
+    requirement: round-total-once
     relation: order-insensitive   # from the closed catalogue
     over: lines
 ```
 
 - **What a step may expect** is an exact value or one of the matchers of the closed catalogue: any
   identifier, any timestamp, approximate number, unordered collection, contains, pattern,
-  reference to an earlier step.
+  reference to an earlier step. The catalogue of relations includes `idempotent` (applying the
+  operation twice gives what applying it once gives).
 - **The requirement text is canonical in English.** The person may be shown another language; the
   approval records the digest of what was shown
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.md)).
 - **A requirement says where it came from.** One imported from a specification made with another
   tool is a proposal like any other
   ([ADR-0033](../adr/0033-a-specification-from-another-tool-enters-as-proposals.md)).
+- **Identifiers.** A requirement id is descriptive, because the person reads it and chooses it.
+  An example id is opaque and random, because an id derived from the content could be guessed and
+  would say something about an example that is held out.
+- **A multi-line text states its final newline.** Wherever an expectation is a text of several
+  lines, it is written as `text:` with a `|` block and a mandatory `final_newline: true|false`.
+  A `|-` block is rejected by the validator: whether a text ends in a newline decides whether an
+  example passes, and it must not hang on a hyphen that nobody sees.
+- **An example does not widen its requirement.** If an example fixes a behaviour that the text of
+  its requirement does not state (a negative number, an empty list), the requirement is changed
+  first, with the person's approval, or the example is not written. The interview applies this
+  rule, and it asks the person about an edge case instead of deciding it inside an example.
+- **Comments in a contract** are written in English and say something. They are outside the digest
+  and the signature, so a comment never states anything that needs approval: that goes in the
+  text, the `description` or an example. Unknown fields are rejected by the validator.
+- **What the person is shown to approve** marks what the file does not show: trailing spaces and
+  the final newline are drawn visibly.
 
 ### The digest of a contract
 
 The digest has to stay verifiable after the split, when the content of the held-out examples is
 no longer in the file. So it is computed over the digests of its parts, not over the file:
 
-1. Each requirement, example and relation has the digest of its canonical form.
+1. Each requirement, example and relation has the digest of its canonical form. The digest of an
+   example is computed with a random salt that is kept with the example. Without it, a held-out
+   example with a short, guessable content could be found by trying candidates against its digest.
 2. The digest of the contract is the digest of the header and the ordered list of those digests.
 3. After the split, the file keeps the visible examples whole and, for each held-out example, only
-   its identifier, requirement, case and digest.
+   its identifier, requirement, case and digest. The salt of a held-out example stays under the
+   key, not in the file.
 
 Anyone can recompute the digest of the contract from the file. Only who holds the key can check
 that a held-out digest matches its content.

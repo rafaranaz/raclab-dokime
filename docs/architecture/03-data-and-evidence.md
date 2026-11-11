@@ -125,8 +125,9 @@ examples:
 relations:
   - id: L1
     requirement: round-total-once
-    relation: order-insensitive   # from the closed catalogue
-    over: lines
+    relation: order-insensitive   # from the closed catalogue: idempotent | order-insensitive
+    target: invoice
+    over: lines                   # the input whose order does not matter
 ```
 
 - **What a step may expect** is an exact value or one of the matchers of the closed catalogue: any
@@ -134,7 +135,16 @@ relations:
   (`$unordered`), contains (`$contains`), pattern (`$pattern`), reference to an earlier step
   (`$ref`). The catalogue of relations includes `idempotent` (applying the
   operation twice gives what applying it once gives).
-- **The input of a step at the `function` boundary** is `args` and `kwargs`, and nothing else.
+- **The fields of an example are closed**
+  ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.md)). At the `function`
+  boundary the input is `args` and `kwargs`, and the expectation is `returns` or `raises`. At
+  `cli` the input is `args`, `stdin`, `files` and `env`, and the expectation is `exit`, `stdout`,
+  `stderr` and `files`. What `expect` does not declare is not compared. The first version does not
+  check examples at `http` nor the matcher `$ref`, and says so with the verdict `ERROR`.
+- **Every example says its origin**, `human` or `model`. There is no default.
+- **A contradiction and a duplicate are defects.** Two examples with the same boundary, target and
+  inputs contradict when their expectations cannot both hold; they are duplicates when their steps
+  are the same.
 - **The requirement text is canonical in English.** The person may be shown another language; the
   approval records the digest of what was shown
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.md)).

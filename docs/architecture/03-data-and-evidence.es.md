@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:5daf4433a78c9bb2 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:c112f45866b87ff6 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -127,8 +127,9 @@ examples:
 relations:
   - id: L1
     requirement: round-total-once
-    relation: order-insensitive   # del catálogo cerrado
-    over: lines
+    relation: order-insensitive   # del catálogo cerrado: idempotent | order-insensitive
+    target: invoice
+    over: lines                   # la entrada cuyo orden no importa
 ```
 
 - **Lo que un paso puede esperar** es un valor exacto o uno de los comparadores del catálogo
@@ -136,7 +137,16 @@ relations:
   colección sin orden (`$unordered`), contiene (`$contains`), patrón (`$pattern`), referencia a un
   paso anterior (`$ref`). El catálogo de relaciones incluye `idempotent` (aplicar la operación dos
   veces da lo mismo que aplicarla una).
-- **La entrada de un paso en la frontera `function`** es `args` y `kwargs`, y nada más.
+- **Los campos de un ejemplo son cerrados**
+  ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.es.md)). En la frontera
+  `function` la entrada es `args` y `kwargs`, y la expectativa es `returns` o `raises`. En `cli` la
+  entrada es `args`, `stdin`, `files` y `env`, y la expectativa es `exit`, `stdout`, `stderr` y
+  `files`. Lo que `expect` no declara no se compara. La primera versión no comprueba ejemplos en
+  `http` ni el comparador `$ref`, y lo dice con el veredicto `ERROR`.
+- **Cada ejemplo dice su origen**, `human` o `model`. No hay valor por defecto.
+- **Una contradicción y un duplicado son defectos.** Dos ejemplos con la misma frontera, el mismo
+  objetivo y las mismas entradas se contradicen cuando sus expectativas no pueden cumplirse a la
+  vez; son duplicados cuando sus pasos son los mismos.
 - **El texto del requisito es canónico en inglés.** A la persona se le puede mostrar en otro
   idioma; la aprobación registra la huella de lo que se le mostró
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.es.md)).

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:e8bf5b0005825a19 -->
+<!-- translation-of: ROADMAP.md sha256:c2e691887b63f3f6 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -79,6 +79,16 @@ cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
 
 **El bloque A está abierto.** Su primer hito, A0, no tiene código: prueba a mano los formatos de los
 que depende el resto del bloque.
+
+**A0 hasta ahora.** Se hicieron tres contratos a mano sobre cambios que proyectos públicos ya habían
+hecho (un limpiador de descripciones de pull request, `humanize.naturalsize` y el escapado de
+barras verticales en `tabulate`), y cada uno se comprobó ejecutando sus ejemplos contra el código
+antes y después del cambio. Los nueve requisitos caben como ejemplos en una frontera. La persona
+los aprobó; la lectura llevó unos dos minutos en el primer contrato que se cronometró y más en el
+que usa formatos que la persona no conocía; los minutos de los otros dos no se anotaron y aquí no
+se afirman. Lo que cambió en el formato está en
+[el contrato](architecture/03-data-and-evidence.es.md#el-contrato). Sigue abierto: los tres
+repositorios del corpus.
 
 ### Hipótesis
 

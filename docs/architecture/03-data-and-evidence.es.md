@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:a2215a1c51f4fd47 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:43d42b7dcfb16d70 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -92,23 +92,29 @@ Un fichero YAML con requisitos, ejemplos y relaciones
 [ADR-0012](../adr/0012-examples-are-observations-at-a-boundary.es.md)).
 
 ```yaml
-contract: 1
-story: invoice-rounding
-supersedes: []
-changes_tests: []
+format: 1                       # versión del formato del fichero
+story: invoice-rounding         # identifica el contrato
+may_modify_tests: []            # ficheros de test que el cambio puede editar
 
 requirements:
-  - id: R1
-    kind: new            # new | change | preserve
+  - id: round-total-once        # descriptivo, lo elige la persona
+    kind: new                   # new | change | preserve
     text: When an invoice has lines in several currencies, the system shall round the total once.
-    source: written      # written | imported, con la herramienta y el fichero de origen
+    source: written             # written | imported, con la herramienta y el fichero de origen
+  - id: round-each-line-first
+    kind: change
+    replaces: round-per-line    # solo en un cambio: el comportamiento que sustituye
+    text: …
+    source: written
 
 examples:
-  - id: E1
-    requirement: R1
+  - id: E-4f1a                  # opaco, aleatorio, lo asigna el arnés una sola vez
+    requirement: round-total-once
     case: normal
-    boundary: cli        # function | cli | http
-    origin: human        # una propuesta tiene origen model hasta que una persona la acepta
+    boundary: cli               # function | cli | http
+    target: invoice             # lo que se invoca: una orden, una función o una ruta
+    description: Two lines in euros whose sum needs rounding.   # opcional, una línea
+    origin: human               # una propuesta tiene origen model hasta que una persona la acepta
     steps:
       - input:
           args: [total, invoice.json]
@@ -116,23 +122,41 @@ examples:
         expect:
           exit: 0
           stdout: {json: {total: {approx: 10.03, tolerance: 0.005}}}
+          files: {}             # ficheros que deben existir después, cuando la frontera es cli
 
 relations:
   - id: L1
-    requirement: R1
+    requirement: round-total-once
     relation: order-insensitive   # del catálogo cerrado
     over: lines
 ```
 
 - **Lo que un paso puede esperar** es un valor exacto o uno de los comparadores del catálogo
   cerrado: cualquier identificador, cualquier marca de tiempo, número aproximado, colección sin
-  orden, contiene, patrón, referencia a un paso anterior.
+  orden, contiene, patrón, referencia a un paso anterior. El catálogo de relaciones incluye
+  `idempotent` (aplicar la operación dos veces da lo mismo que aplicarla una).
 - **El texto del requisito es canónico en inglés.** A la persona se le puede mostrar en otro
   idioma; la aprobación registra la huella de lo que se le mostró
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.es.md)).
 - **Un requisito dice de dónde vino.** Uno importado de una especificación hecha con otra
   herramienta es una propuesta como cualquier otra
   ([ADR-0033](../adr/0033-a-specification-from-another-tool-enters-as-proposals.es.md)).
+- **Identificadores.** El id de un requisito es descriptivo, porque la persona lo lee y lo elige.
+  El id de un ejemplo es opaco y aleatorio, porque un id derivado del contenido se podría adivinar
+  y diría algo de un ejemplo reservado.
+- **Un texto de varias líneas declara su salto de línea final.** Siempre que una expectativa es un
+  texto de varias líneas, se escribe como `text:` con un bloque `|` y un `final_newline: true|false`
+  obligatorio. El validador rechaza un bloque `|-`: que un texto acabe o no en salto de línea decide
+  si un ejemplo pasa, y no puede depender de un guion que nadie ve.
+- **Un ejemplo no ensancha su requisito.** Si un ejemplo fija un comportamiento que el texto de su
+  requisito no dice (un número negativo, una lista vacía), primero se cambia el requisito, con la
+  aprobación de la persona, o el ejemplo no se escribe. La entrevista aplica esta regla y pregunta
+  a la persona por un caso límite en vez de decidirlo dentro de un ejemplo.
+- **Los comentarios de un contrato** se escriben en inglés y dicen algo. Quedan fuera de la huella
+  y de la firma, así que un comentario nunca afirma nada que necesite aprobación: eso va en el
+  texto, en la `description` o en un ejemplo. El validador rechaza los campos desconocidos.
+- **Lo que se le muestra a la persona para aprobar** marca lo que el fichero no deja ver: los
+  espacios finales y el salto de línea final se dibujan de forma visible.
 
 ### La huella de un contrato
 
@@ -140,10 +164,14 @@ La huella tiene que seguir siendo verificable después del reparto, cuando el co
 ejemplos reservados ya no está en el fichero. Por eso se calcula sobre las huellas de sus partes,
 no sobre el fichero:
 
-1. Cada requisito, ejemplo y relación tiene la huella de su forma canónica.
+1. Cada requisito, ejemplo y relación tiene la huella de su forma canónica. La huella de un
+   ejemplo se calcula con una sal aleatoria que se guarda con el ejemplo. Sin ella, un ejemplo
+   reservado de contenido corto y adivinable podría encontrarse probando candidatos contra su
+   huella.
 2. La huella del contrato es la huella de la cabecera y de la lista ordenada de esas huellas.
 3. Tras el reparto, el fichero conserva enteros los ejemplos visibles y, de cada ejemplo
-   reservado, solo su identificador, su requisito, su caso y su huella.
+   reservado, solo su identificador, su requisito, su caso y su huella. La sal de un ejemplo
+   reservado queda bajo la clave, no en el fichero.
 
 Cualquiera puede recalcular la huella del contrato desde el fichero. Solo quien tiene la clave
 puede comprobar que una huella reservada corresponde a su contenido.

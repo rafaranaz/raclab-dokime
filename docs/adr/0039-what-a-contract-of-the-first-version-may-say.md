@@ -26,6 +26,9 @@ what the format does not define.
   same inputs from the start are the ones compared.
 - **Duplicate.** Two examples with the same boundary, target and steps, whatever their id, case
   and description.
+- **A name changes.** The matcher that
+  [ADR-0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) lists as `$pattern` is
+  named `$fullmatch`, after the function of Python that does the same.
 - **Verdicts.** A broken schema, a requirement text that is not EARS, a contradiction and a
   duplicate give `FAIL`. A requirement with no example, or with examples of origin `model` only,
   gives `ASK` ([ADR-0013](0013-provenance-decides-what-a-check-can-do.md)).
@@ -43,7 +46,7 @@ The matchers of the first version:
 | Matcher | Expected value | Holds when |
 |---|---|---|
 | `$contains` | A text | The observed text contains it |
-| `$pattern` | A regular expression of Python | It matches the whole observed text |
+| `$fullmatch` | A regular expression of Python | It matches the whole observed text |
 | `$approx`, with `tolerance` | A number | The observed number differs by no more than `tolerance`, which is absolute and mandatory |
 | `$unordered` | A list | The observed list has the same items, in any order |
 | `$any` | `uuid` or `timestamp` | The observed text is a UUID, or a date and time in ISO 8601 |
@@ -56,10 +59,15 @@ fields, `order-insensitive` and the other matchers have not been used in a real 
 
 Read in the sources:
 
-- The JSON Schema specification says that its regular expressions are not anchored: a pattern
-  matches anywhere in the text. `$pattern` does the opposite on purpose. A pattern that is too
-  strict fails where a person sees it; one that is too loose passes in silence. `$contains`
-  already covers "anywhere".
+- Tools split in two families on what a pattern has to match. Anywhere in the text: `pattern` in
+  JSON Schema, `raises(match=…)` in pytest and `assertRegex` in unittest, which both search. The
+  whole text: the `pattern` attribute of HTML and, by a secondary source, the `pattern` facet of
+  XML Schema. People who write contracts for a Python project come from the first family.
+- So a matcher called `$pattern` that matches the whole text would use the word of JSON Schema
+  with the opposite meaning. The whole text is still the right meaning here: a pattern that is too
+  strict fails where a person sees it, one that is too loose passes in silence, and the block is
+  measured by its false accepts. The name `$fullmatch` keeps the meaning and removes the false
+  friend. `$contains` already covers "anywhere".
 - `pytest.approx` (version 9.2.0) compares with a relative tolerance of one in a million by
   default. `$approx` has no default: the person who approves sees the tolerance.
 - `ERROR` for what the version cannot check follows
@@ -81,6 +89,10 @@ between examples.
 - **`origin` with `human` by default.** One line less per example.
 - **Check only the shape of relations until block B.** An invented relation name would pass the
   check of the first version.
+- **`$pattern` matching anywhere, as JSON Schema and pytest do.** No surprise for who comes from
+  them, and a loose pattern accepts in silence.
+- **`$pattern` matching the whole text.** The first decision, taken before looking at how other
+  tools do it. Safe, with a borrowed name that means the opposite elsewhere.
 - **Compare two matchers.** Deciding whether two patterns can both hold is not possible in
   general; a partial answer would look like a complete one.
 

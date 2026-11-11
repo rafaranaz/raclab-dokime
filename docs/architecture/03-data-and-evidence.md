@@ -132,9 +132,10 @@ relations:
 
 - **What a step may expect** is an exact value or one of the matchers of the closed catalogue: any
   identifier or timestamp (`$any`), approximate number (`$approx`), unordered collection
-  (`$unordered`), contains (`$contains`), pattern (`$pattern`), reference to an earlier step
-  (`$ref`). The catalogue of relations includes `idempotent` (applying the
-  operation twice gives what applying it once gives).
+  (`$unordered`), contains (`$contains`), a regular expression that matches the whole text
+  (`$fullmatch`), reference to an earlier step (`$ref`). The catalogue of relations has
+  `idempotent` (applying the operation twice gives what applying it once gives) and
+  `order-insensitive`.
 - **The fields of an example are closed**
   ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.md)). At the `function`
   boundary the input is `args` and `kwargs`, and the expectation is `returns` or `raises`. At

@@ -4,8 +4,10 @@
 
 Every decision with consequences is recorded in an ADR: a short file with the context, the
 decision, the alternatives considered and the consequences. Accepted ADRs are not edited: if the
-decision changes, a new one supersedes the previous one. The
-[adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
+decision changes, a new one supersedes the previous one, or amends a part of it, and the previous
+one says so in its status. A decision that was accepted can change. It changes when there is
+evidence and a clear reason: the new one improves what exists or solves a problem that was found.
+The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 
 | No. | Decision | Status |
 |---|---|---|
@@ -46,5 +48,5 @@ decision changes, a new one supersedes the previous one. The
 | [0035](0035-the-flow-is-loaded-and-validated-in-core.md) | The flow is loaded and validated in core | Accepted |
 | [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.md) | A milestone may open an increment of a later module | Accepted |
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.md) | A contract is read by strict rules of its own, and every problem is reported | Accepted |
-| [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted |
+| [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |

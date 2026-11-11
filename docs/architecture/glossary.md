@@ -5,6 +5,20 @@
 The terms the invariants and the decisions rely on. A term has one meaning in every document; if
 a decision needs another meaning, it needs another term.
 
+## The harness and what it verifies
+
+| Term | Meaning |
+|---|---|
+| Harness | This program. It runs on the machine of whoever uses it or in a job of a pipeline, outside every container, and it starts the containers it needs |
+| Verified project | The repository whose change is checked. Its code and its tests run inside a container. The harness is not part of it |
+| Pack | The data that tells the harness how to build the environment of a verified project and how to run its tests. It says nothing about how the harness itself is built |
+| Environment | The container image where the code of a verified project runs, built as its pack says |
+| Prepare | The phase that builds the environment of a verified project. It may download its dependencies |
+| Verify | The phase that runs the code of a verified project in its environment, without network |
+| Self-check of a pack | The proof that a pack really runs the tests: on a past commit of the project that fixed a defect and added a test, that test fails before the fix and passes after it |
+| Pipeline of the project | The continuous integration of a verified project. It is a source for writing its pack. It is not the pipeline where the harness is tested |
+| Corpus | The verified projects and their changes, each with a known verdict, that are used to measure the harness |
+
 ## Contract and examples
 
 | Term | Meaning |

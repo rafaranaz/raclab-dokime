@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:8f44ced1ad213692 -->
+<!-- translation-of: README.md sha256:5adf91cb858f3074 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -51,3 +51,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.es.md) | Un contrato se lee con reglas estrictas propias, y se informa de todos los problemas | Aceptada |
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
+| [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |

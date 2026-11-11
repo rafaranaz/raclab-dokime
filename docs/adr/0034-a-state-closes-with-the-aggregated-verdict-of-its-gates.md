@@ -1,6 +1,6 @@
 # ADR-0034 · A state closes with the aggregated verdict of its gates
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,7 +1,7 @@
-<!-- translation-of: 0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md sha256:4f1d679d3cdbf193 -->
+<!-- translation-of: 0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md sha256:978d6211ab14c943 -->
 # ADR-0034 · Un estado se cierra con el veredicto agregado de sus puertas
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

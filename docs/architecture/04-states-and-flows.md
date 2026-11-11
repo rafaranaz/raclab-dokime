@@ -23,6 +23,9 @@ A transition is the name of a state. A transition that can repeat carries a **bu
 question state the run goes to when the budget is exhausted. The amounts are in the policy, not
 in the flow.
 
+A budget never ends a run and never lets it continue on its own. It marks the point at which a
+person is asked, with what the attempts so far have shown; the person extends it or stops.
+
 An answer leads to a named state, or to one of three places that depend on where the question was
 asked from:
 

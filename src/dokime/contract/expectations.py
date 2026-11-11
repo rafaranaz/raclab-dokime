@@ -95,6 +95,21 @@ def is_exact(expected: Expected) -> bool:
     return not isinstance(expected, Contains | FullMatch | Approx | Unordered | AnyValue | Json)
 
 
+def identical(one: Expected, other: Expected) -> bool:
+    """Say whether two expectations, or two inputs, are written the same, types included."""
+    if type(one) is not type(other):
+        return False
+    if isinstance(one, dict) and isinstance(other, dict):
+        return one.keys() == other.keys() and all(identical(one[key], other[key]) for key in one)
+    if isinstance(one, list) and isinstance(other, list):
+        return len(one) == len(other) and all(map(identical, one, other))
+    if isinstance(one, Unordered) and isinstance(other, Unordered):
+        return identical(list(one.items), list(other.items))
+    if isinstance(one, Json) and isinstance(other, Json):
+        return identical(one.value, other.value)
+    return one == other
+
+
 def _is_number(observed: object) -> TypeIs[int | float]:
     return isinstance(observed, int | float) and not isinstance(observed, bool)
 

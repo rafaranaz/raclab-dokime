@@ -5,7 +5,9 @@ description = "Verification and evidence layer around coding agents."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = [
@@ -15,6 +17,7 @@ dev = [
     "pytest>=8.4",
     "pytest-cov>=7.0",
     "ruff>=0.14",
+    "types-pyyaml>=6.0.12",
 ]
 
 [build-system]

@@ -41,6 +41,8 @@ a decision needs another meaning, it needs another term.
 | Budget | How many times a transition of the flow may repeat before a person is asked. It ends nothing by itself. The amount is in the policy |
 | Optional gate | A gate the policy allows to skip. Every other gate is mandatory |
 | Verdict | `PASS`, `FAIL`, `ASK` or `ERROR`. A gate returns one; the verdict of a change is their aggregation |
+| Finding | One problem found by a check: a code from a closed list, a message, the lines where it is, and the verdict it gives (`FAIL`, `ASK` or `ERROR`) |
+| Directive | A mapping in a contract with a key that starts with `$`. It is an instruction to the harness, not data |
 | Not applicable | A gate that has nothing to act on in this change, by a condition read from the contract or from the level of the pack |
 | Not reached | A gate the flow did not get to, because an earlier gate stopped it |
 | Final state | A state of the flow with no gate and no transition. It either delivers or it does not |

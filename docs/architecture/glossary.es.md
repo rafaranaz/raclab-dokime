@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:42263c02bb64e12f -->
+<!-- translation-of: glossary.md sha256:d407623f5e7b1bff -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -43,6 +43,8 @@ término.
 | Presupuesto | Cuántas veces puede repetirse una transición del flujo antes de preguntar a una persona. No termina nada por sí solo. La cantidad está en la política |
 | Puerta opcional | Una puerta que la política permite omitir. Todas las demás son obligatorias |
 | Veredicto | `PASS`, `FAIL`, `ASK` o `ERROR`. Una puerta devuelve uno; el veredicto de un cambio es su agregación |
+| Hallazgo | Un problema encontrado por una comprobación: un código de una lista cerrada, un mensaje, las líneas donde está y el veredicto que da (`FAIL`, `ASK` o `ERROR`) |
+| Directiva | Un mapa de un contrato con una clave que empieza por `$`. Es una instrucción para el arnés, no un dato |
 | No aplicable | Una puerta que no tiene sobre qué actuar en este cambio, por una condición leída del contrato o del nivel del pack |
 | No alcanzada | Una puerta a la que el flujo no llegó, porque una anterior lo detuvo |
 | Estado final | Un estado del flujo sin puerta ni transición. O entrega o no entrega |

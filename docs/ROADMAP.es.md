@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:e6f9b840f456aaf8 -->
+<!-- translation-of: ROADMAP.md sha256:9fe92a5f7dbcd4d2 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -127,10 +127,14 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 | Hito | Qué se puede enseñar | Módulos | Se cierra cuando |
 |---|---|---|---|
 | A0 Pruebas a mano | Tres cambios reales con un contrato escrito a mano y aprobado por una persona, cronometrado; tres repositorios elegidos para el conjunto de casos | Ninguno | Se conocen la proporción de requisitos que caben como ejemplos y los minutos por contrato, y el formato se confirma o se revisa |
-| A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract` | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
+| A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract`, `interfaces` (solo la orden) | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
 | A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox` | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
 | A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia | `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
 | A4 Auditoría en CI | Un flujo que audita un pull request y adjunta la evidencia, activado en este repositorio; versión 0.1 | `interfaces` | Un pull request real de este repositorio lleva su evidencia |
+
+`interfaces` se abre dos veces en el bloque A: en A1 para la orden `contract check`, que solo lee el
+fichero, llama a `contract` y muestra sus hallazgos, y en A3 para `audit`. Los ámbitos de un módulo
+se abren por incrementos, como `core`.
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
 automatiza y calcula las métricas en el bloque B.

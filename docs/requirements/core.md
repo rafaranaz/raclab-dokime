@@ -47,7 +47,7 @@ the codes named here.
 - **CORE-031** When a value without quotes is `null`, the reader shall read it as null.
 - **CORE-032** When a value without quotes is a number in the form JSON writes it, the reader shall read it as a number.
 - **CORE-033** If a value without quotes has one of the forms of the table of ambiguous values, then the reader shall report a finding with the code `ambiguous-value` and the line of the value.
-- **CORE-034** If a number without quotes has decimals that end in zero, then the reader shall report a finding with the code `ambiguous-value` and the line of the value.
+- **CORE-034** If a number without quotes has two or more decimals and the last one is zero, then the reader shall report a finding with the code `ambiguous-value` and the line of the value.
 - **CORE-035** When a value without quotes has none of the forms above, the reader shall read it as a text.
 - **CORE-036** When a value is in quotes, the reader shall read it as a text.
 - **CORE-037** If a scalar is a folded block or continues on another line without being a literal block, then the reader shall report a finding with the code `text-on-several-lines` and the line where the scalar starts.

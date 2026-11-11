@@ -50,3 +50,7 @@ paths = ["src/dokime/contract/**", "tests/contract/**", "docs/requirements/contr
 [scopes.interfaces]
 description = "The commands a person or a pipeline runs, and the composition root."
 paths = ["src/dokime/interfaces/**", "tests/interfaces/**", "docs/requirements/interfaces.md"]
+
+[scopes.packs]
+description = "The pack of a verified project: its format, its check and the rules of its self-check."
+paths = ["src/dokime/packs/**", "tests/packs/**", "docs/requirements/packs.md"]

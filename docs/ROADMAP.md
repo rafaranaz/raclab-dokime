@@ -131,7 +131,8 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 
 `interfaces` is opened twice in block A: in A1 for the command `contract check`, which only reads the
 file, calls `contract` and shows its findings, and in A3 for `audit`. The scopes of a module are
-opened by increments, as `core` is.
+opened by increments, as `core` is
+([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.md)).
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
 the metrics in block B.

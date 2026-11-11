@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:e707f1f379907b14 -->
+<!-- translation-of: ROADMAP.md sha256:56b4bfff183dcf5f -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -80,7 +80,7 @@ cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
 **El bloque A está abierto.** Su primer hito, A0, no tiene código: prueba a mano los formatos de los
 que depende el resto del bloque.
 
-**A0 hasta ahora.** Se hicieron tres contratos a mano sobre cambios que proyectos públicos ya habían
+**A0 está hecho.** Se hicieron tres contratos a mano sobre cambios que proyectos públicos ya habían
 hecho (un limpiador de descripciones de pull request, `humanize.naturalsize` y el escapado de
 barras verticales en `tabulate`), y cada uno se comprobó ejecutando sus ejemplos contra el código
 antes y después del cambio. Los nueve requisitos caben como ejemplos en una frontera. La persona
@@ -96,6 +96,18 @@ instalan en Python 3.13 y sus suites pasan en menos de 15 segundos (416, 512 y 4
 tienen frontera de línea de órdenes (`pysemver`, `mdformat`) y todos tienen frontera de función.
 Tienen 72, 25 y 38 commits con "fix" en el mensaje que tocan tests, que es una cuenta de
 candidatos, no de casos utilizables.
+
+**A1 está hecho.** `dokime contract check` valida un fichero de contrato y dice qué le falta, con una
+línea por hallazgo y un código de salida por veredicto
+([ADR-0040](adr/0040-commands-exit-with-a-code-for-each-verdict.es.md)). Se construyó en tres
+módulos: `core` (veredictos, hallazgos y el lector estricto del
+[ADR-0037](adr/0037-a-contract-is-read-by-strict-rules-of-its-own.es.md)), `contract` (la
+comprobación) e `interfaces` (la orden). Los tres contratos de A0, reescritos con las reglas que
+fijó A1, pasan sin ningún hallazgo. Su criterio de salida se cumple: con un texto que no es EARS,
+un requisito sin ejemplo, un duplicado y una contradicción sembrados en uno de ellos, la orden
+informa de los cuatro en una ejecución. Los defectos de lectura (una clave repetida, un valor cuyo
+tipo depende del lector, un texto en varias líneas) se informan igual. Lo que A1 no hace: no
+ejecuta nada, así que un contrato que pasa todavía no dice nada del código.
 
 Cómo usa el corpus esos repositorios:
 

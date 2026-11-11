@@ -136,6 +136,7 @@ class _Walk:
                 self.findings.append(_fail("key-not-text", "a key must be a text", line))
                 self.value(item)
                 continue
+            self._layout(key)
             if key.value == "<<" and not key.style:
                 message = "the merge key << is not allowed; write the keys where they are used"
                 self.findings.append(_fail("merge-key", message, line))
@@ -149,6 +150,7 @@ class _Walk:
 
     def _scalar(self, node: yaml.ScalarNode) -> Value:
         text: str = node.value
+        self._layout(node)
         if node.style:
             return text
         if text in _CONSTANTS:
@@ -171,3 +173,23 @@ class _Walk:
             f"the value {node.value!r} is ambiguous: {reason}; put it in quotes if it is a text"
         )
         self.findings.append(_fail("ambiguous-value", message, _line(node.start_mark)))
+
+    def _layout(self, node: yaml.ScalarNode) -> None:
+        """Check the layout of a scalar: only a literal block may take several lines."""
+        line = _line(node.start_mark)
+        if node.style == "|":
+            self._block(node.value, line)
+        elif node.style == ">" or _line(node.end_mark) > line:
+            message = (
+                "a text on several lines is joined with spaces; write it as a literal block (|)"
+            )
+            self.findings.append(_fail("text-on-several-lines", message, line))
+
+    def _block(self, text: str, line: int) -> None:
+        if not text.endswith("\n") or text.endswith("\n\n"):
+            message = "a literal block must end in exactly one newline; write it with | alone"
+            self.findings.append(_fail("block-ending", message, line))
+        for index, written in enumerate(text.split("\n"), start=1):
+            if written != written.rstrip(" \t"):
+                message = "a line of a literal block ends in a space or a tab"
+                self.findings.append(_fail("trailing-whitespace", message, line + index))

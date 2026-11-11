@@ -116,10 +116,10 @@ examples:
     steps:
       - input:
           args: [total, invoice.json]
-          files: {invoice.json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}
+          files: {invoice.json: {$json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}}
         expect:
           exit: 0
-          stdout: {json: {total: {approx: 10.03, tolerance: 0.005}}}
+          stdout: {$json: {total: {$approx: 10.03, tolerance: 0.005}}}
           files: {}             # files that must exist afterwards, when the boundary is cli
 
 relations:
@@ -130,8 +130,9 @@ relations:
 ```
 
 - **What a step may expect** is an exact value or one of the matchers of the closed catalogue: any
-  identifier, any timestamp, approximate number, unordered collection, contains, pattern,
-  reference to an earlier step. The catalogue of relations includes `idempotent` (applying the
+  identifier or timestamp (`$any`), approximate number (`$approx`), unordered collection
+  (`$unordered`), contains (`$contains`), pattern (`$pattern`), reference to an earlier step
+  (`$ref`). The catalogue of relations includes `idempotent` (applying the
   operation twice gives what applying it once gives).
 - **The requirement text is canonical in English.** The person may be shown another language; the
   approval records the digest of what was shown
@@ -142,10 +143,32 @@ relations:
 - **Identifiers.** A requirement id is descriptive, because the person reads it and chooses it.
   An example id is opaque and random, because an id derived from the content could be guessed and
   would say something about an example that is held out.
-- **A multi-line text states its final newline.** Wherever an expectation is a text of several
-  lines, it is written as `text:` with a `|` block and a mandatory `final_newline: true|false`.
-  A `|-` block is rejected by the validator: whether a text ends in a newline decides whether an
+- **A multi-line text states its final newline.** A text of several lines, in an input or in an
+  expectation, is written with the directive `$text`, as a literal block, with a mandatory
+  `final_newline`:
+
+  ```yaml
+  stdout:
+    $text: |
+      total: 10.03
+      lines: 2
+    final_newline: true
+  ```
+
+  The block always gives a value that ends in one newline; `final_newline: false` removes it to
+  get the real text, and `true` keeps it. Whether a text ends in a newline decides whether an
   example passes, and it must not hang on a hyphen that nobody sees.
+- **Directives are marked with `$`**
+  ([ADR-0038](../adr/0038-directives-in-a-contract-are-marked-with-a-dollar.md)). A mapping with a
+  key that starts with `$` is an instruction to the harness: `$text`, `$json`, `$literal` and the
+  matchers. Every other mapping is data as written, so a function that returns a mapping with a
+  key `approx` is not mistaken for a matcher.
+- **A contract is read by strict rules of its own**
+  ([ADR-0037](../adr/0037-a-contract-is-read-by-strict-rules-of-its-own.md)). One document, no
+  anchors, aliases, tags or merge keys. A repeated key or id is a defect. A value without quotes
+  that YAML readers type differently (`no`, `010`, `1.10`, a date, an empty value) is rejected,
+  asking for quotes. A text on several lines that is not a literal block is rejected. The
+  validator reports every finding in one run, each with its lines.
 - **An example does not widen its requirement.** If an example fixes a behaviour that the text of
   its requirement does not state (a negative number, an empty list), the requirement is changed
   first, with the person's approval, or the example is not written. The interview applies this

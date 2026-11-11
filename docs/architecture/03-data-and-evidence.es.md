@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:43d42b7dcfb16d70 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:596bd3d1c5451443 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -118,10 +118,10 @@ examples:
     steps:
       - input:
           args: [total, invoice.json]
-          files: {invoice.json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}
+          files: {invoice.json: {$json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}}
         expect:
           exit: 0
-          stdout: {json: {total: {approx: 10.03, tolerance: 0.005}}}
+          stdout: {$json: {total: {$approx: 10.03, tolerance: 0.005}}}
           files: {}             # ficheros que deben existir después, cuando la frontera es cli
 
 relations:
@@ -132,9 +132,10 @@ relations:
 ```
 
 - **Lo que un paso puede esperar** es un valor exacto o uno de los comparadores del catálogo
-  cerrado: cualquier identificador, cualquier marca de tiempo, número aproximado, colección sin
-  orden, contiene, patrón, referencia a un paso anterior. El catálogo de relaciones incluye
-  `idempotent` (aplicar la operación dos veces da lo mismo que aplicarla una).
+  cerrado: cualquier identificador o marca de tiempo (`$any`), número aproximado (`$approx`),
+  colección sin orden (`$unordered`), contiene (`$contains`), patrón (`$pattern`), referencia a un
+  paso anterior (`$ref`). El catálogo de relaciones incluye `idempotent` (aplicar la operación dos
+  veces da lo mismo que aplicarla una).
 - **El texto del requisito es canónico en inglés.** A la persona se le puede mostrar en otro
   idioma; la aprobación registra la huella de lo que se le mostró
   ([ADR-0032](../adr/0032-bilingual-interaction-signs-what-was-shown.es.md)).
@@ -144,10 +145,33 @@ relations:
 - **Identificadores.** El id de un requisito es descriptivo, porque la persona lo lee y lo elige.
   El id de un ejemplo es opaco y aleatorio, porque un id derivado del contenido se podría adivinar
   y diría algo de un ejemplo reservado.
-- **Un texto de varias líneas declara su salto de línea final.** Siempre que una expectativa es un
-  texto de varias líneas, se escribe como `text:` con un bloque `|` y un `final_newline: true|false`
-  obligatorio. El validador rechaza un bloque `|-`: que un texto acabe o no en salto de línea decide
-  si un ejemplo pasa, y no puede depender de un guion que nadie ve.
+- **Un texto de varias líneas declara su salto de línea final.** Un texto de varias líneas, en una
+  entrada o en una expectativa, se escribe con la directiva `$text`, como bloque literal, con un
+  `final_newline` obligatorio:
+
+  ```yaml
+  stdout:
+    $text: |
+      total: 10.03
+      lines: 2
+    final_newline: true
+  ```
+
+  El bloque siempre da un valor que acaba en un salto de línea; `final_newline: false` lo quita
+  para obtener el texto real, y `true` lo conserva. Que un texto acabe o no en salto de línea
+  decide si un ejemplo pasa, y no puede depender de un guion que nadie ve.
+- **Las directivas se marcan con `$`**
+  ([ADR-0038](../adr/0038-directives-in-a-contract-are-marked-with-a-dollar.es.md)). Un mapa con
+  una clave que empieza por `$` es una instrucción para el arnés: `$text`, `$json`, `$literal` y
+  los comparadores. Cualquier otro mapa es un dato tal como está escrito, así que una función que
+  devuelve un mapa con una clave `approx` no se confunde con un comparador.
+- **Un contrato se lee con reglas estrictas propias**
+  ([ADR-0037](../adr/0037-a-contract-is-read-by-strict-rules-of-its-own.es.md)). Un solo
+  documento, sin anclas, alias, etiquetas ni claves de fusión. Una clave o un id repetidos son un
+  defecto. Un valor sin comillas que los lectores de YAML tipan de forma distinta (`no`, `010`,
+  `1.10`, una fecha, un valor vacío) se rechaza pidiendo comillas. Un texto de varias líneas que
+  no es un bloque literal se rechaza. El validador informa de todos los hallazgos en una sola
+  ejecución, cada uno con sus líneas.
 - **Un ejemplo no ensancha su requisito.** Si un ejemplo fija un comportamiento que el texto de su
   requisito no dice (un número negativo, una lista vacía), primero se cambia el requisito, con la
   aprobación de la persona, o el ejemplo no se escribe. La entrevista aplica esta regla y pregunta

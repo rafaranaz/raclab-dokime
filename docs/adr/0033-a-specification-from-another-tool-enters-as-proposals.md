@@ -1,6 +1,6 @@
 # ADR-0033 · A specification from another tool enters as proposals
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

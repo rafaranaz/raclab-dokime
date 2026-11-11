@@ -124,10 +124,14 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 | Milestone | What can be shown | Modules | Closes when |
 |---|---|---|---|
 | A0 Tests by hand | Three real changes with a hand-written contract approved by a person, timed; three repositories chosen for the corpus | None | The share of requirements that fit as examples and the minutes per contract are known, and the format is confirmed or revised |
-| A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract` | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
+| A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract`, `interfaces` (the command only) | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
 | A2 Reproducible environment | A command that builds the image of a project from its pack and checks the pack against the history of the project | `packs`, `sandbox` | The packs of the three repositories build and pass their self-check |
 | A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file | `platform`, `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
 | A4 Audit in CI | A workflow that audits a pull request and attaches the evidence, enabled on this repository; version 0.1 | `interfaces` | A real pull request of this repository carries its evidence |
+
+`interfaces` is opened twice in block A: in A1 for the command `contract check`, which only reads the
+file, calls `contract` and shows its findings, and in A3 for `audit`. The scopes of a module are
+opened by increments, as `core` is.
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
 the metrics in block B.

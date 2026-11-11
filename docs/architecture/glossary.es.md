@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:d407623f5e7b1bff -->
+<!-- translation-of: glossary.md sha256:1ff6c6aa582f9044 -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -6,6 +6,20 @@
 Los términos en que se apoyan los invariantes y las decisiones. Un término tiene un solo
 significado en todos los documentos; si una decisión necesita otro significado, necesita otro
 término.
+
+## El arnés y lo que verifica
+
+| Término | Significado |
+|---|---|
+| Arnés | Este programa. Corre en la máquina de quien lo usa o en un job de un pipeline, fuera de todo contenedor, y arranca los contenedores que necesita |
+| Proyecto verificado | El repositorio cuyo cambio se comprueba. Su código y sus tests corren dentro de un contenedor. El arnés no forma parte de él |
+| Pack | Los datos que le dicen al arnés cómo construir el entorno de un proyecto verificado y cómo ejecutar sus tests. No dice nada de cómo se construye el propio arnés |
+| Entorno | La imagen de contenedor donde corre el código de un proyecto verificado, construida como dice su pack |
+| Preparación | La fase que construye el entorno de un proyecto verificado. Puede descargar sus dependencias |
+| Verificación | La fase que ejecuta el código de un proyecto verificado en su entorno, sin red |
+| Autocomprobación de un pack | La prueba de que un pack ejecuta de verdad los tests: en un commit pasado del proyecto que arregló un defecto y añadió un test, ese test falla antes del arreglo y pasa después |
+| Pipeline del proyecto | La integración continua de un proyecto verificado. Es una fuente para escribir su pack. No es el pipeline donde se prueba el arnés |
+| Corpus | Los proyectos verificados y sus cambios, cada uno con un veredicto conocido, que se usan para medir el arnés |
 
 ## Contrato y ejemplos
 

@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:d148b5be0d8b14c9 -->
+<!-- translation-of: 02-modules.md sha256:c22144578c690231 -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -64,7 +64,7 @@ flowchart TB
 
 | Módulo | Responsabilidad | No hace |
 |---|---|---|
-| `core` | Tipos, el álgebra de veredictos, el registro con huellas encadenadas, la definición de los puertos | Entrada ni salida, salvo escribir el registro por un puerto |
+| `core` | Tipos, el álgebra de veredictos, el registro con huellas encadenadas, el esquema y el validador del flujo, la definición de los puertos | Entrada ni salida, salvo escribir el registro por un puerto |
 | `contract` | Leer, validar y dar huella a un contrato: sintaxis EARS, esquema de ejemplos, cobertura de requisitos por ejemplos, contradicciones | Ejecutar nada |
 | `oracle` | Repartir los ejemplos en visibles y sellados; aplicar relaciones; comparar observaciones con lo esperado; redactar la realimentación | Ejecutar el código examinado. Recibe observaciones |
 | `packs` | Modelo de pack, detección del tipo de proyecto, autocomprobación | Saber de lenguajes en código. Todo es declarativo |
@@ -72,7 +72,7 @@ flowchart TB
 | `verify` | Las puertas, la línea base, el mapa de impacto por cobertura, la agregación | Hablar con el agente ni con la persona |
 | `spec` | Entrevista, detectores de ambigüedad, el solucionador donde aplique | Aprobar. Solo propone |
 | `delivery` | Commit, adjuntar la evidencia, abrir el pull request | Verificar |
-| `engine` | Cargar y validar el flujo, ejecutarlo, llevar los presupuestos, empaquetar la tarea para el agente | Contener lógica de puertas |
+| `engine` | Ejecutar un flujo validado, llevar los presupuestos, hacer las preguntas, empaquetar la tarea para el agente | Contener lógica de puertas |
 | `sandbox` | Adaptadores del entorno de verificación y del aislamiento del agente | Decidir la política. La recibe |
 | `agents` | Adaptadores que lanzan agentes | Interpretar el resultado. El parche lo calcula el arnés |
 | `gateway` | Adaptadores de modelo, prompts registrados, validación de respuestas contra un esquema | Decidir |

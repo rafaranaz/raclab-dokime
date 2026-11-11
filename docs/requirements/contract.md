@@ -5,8 +5,11 @@ its requirements, its examples and its relations, and says what the contract lac
 nothing. Each requirement follows an EARS template and has at least one test that declares it in
 its `SDD-EARS:` marker.
 
-The decisions behind these requirements are in ADR-0037 (strict reading), ADR-0038 (directives) and
-ADR-0039 (what a contract of the first version may say).
+The decisions behind these requirements are in
+[ADR-0037](../adr/0037-a-contract-is-read-by-strict-rules-of-its-own.md) (strict reading),
+[ADR-0038](../adr/0038-directives-in-a-contract-are-marked-with-a-dollar.md) (directives) and
+[ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.md) (what a contract of the
+first version may say).
 
 ## The result of a check
 

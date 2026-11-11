@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:da4e042707735716 -->
+<!-- translation-of: CONTRIBUTING.md sha256:947d56cf24fd6df2 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -91,6 +91,7 @@ en local con los mismos comandos.
 | Lint, incluidas seguridad (`S`) y complejidad ciclomática | `uv run ruff check .` | Sin hallazgos; complejidad ≤ 10 por función |
 | Formato | `uv run ruff format --check .` | Sin diferencias |
 | Tipos | `uv run mypy` | Modo estricto, sin errores |
+| Contratos de importación | `uv run lint-imports` | Ningún módulo importa lo que prohíben las reglas de dependencia de la arquitectura |
 | Tests y cobertura | `uv run pytest --cov` | Todos en verde; cobertura de ramas ≥ 90 % |
 | Historia en el código | `uv run python -m tools.check_history` | Sin hallazgos |
 | Sintaxis EARS | `uv run python -m tools.check_ears` | Sin hallazgos |
@@ -104,8 +105,10 @@ en local con los mismos comandos.
 | Ámbito de la rama | `uv run python -m tools.check_scope --base origin/main --branch <rama>` | Sin hallazgos |
 | Dependencias | `pip-audit` sobre las dependencias del lockfile | Sin vulnerabilidades conocidas |
 
-Los contratos de importación entre módulos se añaden en la Fase 1, cuando exista la arquitectura que
-los define.
+Los contratos de importación están en `pyproject.toml` y siguen las reglas de dependencia de
+[docs/architecture/02-modules.es.md](docs/architecture/02-modules.es.md). En ellos todo módulo es
+opcional, de modo que un módulo queda comprobado desde el día en que se crea. Un cambio en el
+diagrama de módulos y un cambio en los contratos van juntos: un test compara los dos.
 
 ## Requisitos y trazabilidad
 

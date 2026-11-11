@@ -90,6 +90,7 @@ with the same commands.
 | Lint, including security (`S`) and cyclomatic complexity | `uv run ruff check .` | No findings; complexity ≤ 10 per function |
 | Formatting | `uv run ruff format --check .` | No differences |
 | Types | `uv run mypy` | Strict mode, no errors |
+| Import contracts | `uv run lint-imports` | No module imports what the dependency rules of the architecture forbid |
 | Tests and coverage | `uv run pytest --cov` | All green; branch coverage ≥ 90 % |
 | History in code | `uv run python -m tools.check_history` | No findings |
 | EARS syntax | `uv run python -m tools.check_ears` | No findings |
@@ -103,8 +104,10 @@ with the same commands.
 | Branch scope | `uv run python -m tools.check_scope --base origin/main --branch <branch>` | No findings |
 | Dependencies | `pip-audit` over the locked dependencies | No known vulnerabilities |
 
-Import contracts between modules are added in phase 1, when the architecture that defines them
-exists.
+The import contracts are in `pyproject.toml` and follow the dependency rules of
+[docs/architecture/02-modules.md](docs/architecture/02-modules.md). Every module is optional in
+them, so a module is checked from the day it is created. A change to the module diagram and a
+change to the contracts go together: a test compares the two.
 
 ## Requirements and traceability
 

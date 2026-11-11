@@ -27,7 +27,7 @@ A finding is one problem found by a check. Its verdict is `FAIL`, `ASK` or `ERRO
 - **CORE-015** If a finding code is not made of lowercase words joined by hyphens, then the finding shall be rejected with an error naming the code.
 - **CORE-016** If a finding has a line smaller than 1, then the finding shall be rejected with an error naming the line.
 
-## Strict reading (ADR-0037)
+## Strict reading ([ADR-0037](../adr/0037-a-contract-is-read-by-strict-rules-of-its-own.md))
 
 The reader receives the text of a contract or of a flow file. It does not open files. The library
 only parses; the rules below decide what the text means. Every finding of the reader has one of

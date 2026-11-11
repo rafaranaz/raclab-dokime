@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:25aeecb5489766f5 -->
+<!-- translation-of: README.md sha256:77f9684923f30476 -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -27,11 +27,11 @@ evidencia lo dice.
 | [01-context.es.md](01-context.es.md) | Con quién habla el sistema, y las zonas de confianza |
 | [02-modules.es.md](02-modules.es.md) | Módulos, puertos y dependencias permitidas |
 | [03-data-and-evidence.es.md](03-data-and-evidence.es.md) | El contrato, el registro, la evidencia y un cambio de extremo a extremo |
+| [04-states-and-flows.es.md](04-states-and-flows.es.md) | Qué puede decir un fichero de flujo, qué rechaza el validador, las puertas y los dos flujos iniciales |
 | [glossary.es.md](glossary.es.md) | Los términos en que se apoyan los invariantes y las decisiones |
 | [Decisiones](../adr/README.es.md) | ADR 0008 a 0032, cada uno con su base y sus alternativas |
 
-Estados y flujos llegan en el siguiente pull request de esta fase
-([hoja de ruta](../ROADMAP.es.md)).
+Las fases y los bloques de construcción están en la [hoja de ruta](../ROADMAP.es.md).
 
 ## Invariantes
 

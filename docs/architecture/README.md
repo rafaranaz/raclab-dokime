@@ -26,11 +26,11 @@ the same, the evidence says so.
 | [01-context.md](01-context.md) | Who the system talks to, and the trust zones |
 | [02-modules.md](02-modules.md) | Modules, ports and allowed dependencies |
 | [03-data-and-evidence.md](03-data-and-evidence.md) | The contract, the ledger, the evidence and a change from end to end |
+| [04-states-and-flows.md](04-states-and-flows.md) | What a flow file can say, what the validator rejects, the gates and the two starting flows |
 | [glossary.md](glossary.md) | The terms the invariants and the decisions rely on |
 | [Decisions](../adr/README.md) | ADRs 0008 to 0032, each with its basis and alternatives |
 
-States and flows come in the next pull request of this phase
-([roadmap](../ROADMAP.md)).
+The phases and the blocks of construction are in the [roadmap](../ROADMAP.md).
 
 ## Invariants
 

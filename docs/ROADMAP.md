@@ -81,9 +81,9 @@ rest of the block depends on.
 **A0 so far.** Three hand-written contracts were made on changes that public projects already
 made (a pull-request description cleaner, `humanize.naturalsize`, `tabulate` pipe escaping), each
 checked by running its examples against the code before and after the change. All nine
-requirements fit as examples at a boundary. The person approved them; reading took about two
-minutes for the first contract that was timed and longer for the one in formats the person did not
-know; the minutes of the other two were not recorded and are not claimed here. What it changed in
+requirements fit as examples at a boundary. The person approved them. Reading took about 4 to 5
+minutes for the pull-request cleaner, about 2 for `naturalsize` and about 3 for `tabulate`, whose
+formats the person did not know; these are the person's own estimates, not measurements. What it changed in
 the format is in [the contract](architecture/03-data-and-evidence.md#the-contract). Still open:
 the three repositories of the corpus.
 

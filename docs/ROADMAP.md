@@ -23,7 +23,7 @@ Exit criteria:
 - [x] CI green on the phase pull request in GitHub.
 - [x] Protection of `main` enforced in GitHub (see below).
 
-## Phase 1 · Reference architecture
+## Phase 1 · Reference architecture — done
 
 The architecture of the product, decided with evidence. Every decision is an ADR that states what
 it rests on (literature, reasoning or a test) and the alternatives considered
@@ -43,12 +43,16 @@ Data and evidence comes before states and flows because block A depends on the f
 flow file is not used until block C. Each module gets its high-level EARS requirements when its
 scope is opened in phase 2.
 
+Before they were accepted, the decisions were checked against the ten invariants by three
+independent attempts. The corrections, a glossary and the ADRs 0033 to 0035 came from that check
+and from writing the formats down.
+
 Exit criteria:
 
-- [ ] The documents above are in `docs/architecture/` and their diagrams pass validation.
+- [x] The documents above are in `docs/architecture/` and their diagrams pass validation.
 - [x] Every ADR from 0008 on is accepted or explicitly left as a hypothesis with its test.
-- [ ] The check that every ADR states its basis and the import contracts are in CI.
-- [ ] The architecture is approved in review.
+- [x] The check that every ADR states its basis and the import contracts are in CI.
+- [x] The architecture is approved in review.
 
 ## Phase 2 · Construction in blocks
 
@@ -70,6 +74,9 @@ and published. A bad result is published as well.
 
 The milestones of a block are written here when the block opens, and its measured numbers when it
 closes. The order of blocks B and C is confirmed when block A closes.
+
+**Block A is open.** Its first milestone, A0, has no code: it tests by hand the formats that the
+rest of the block depends on.
 
 ### Hypotheses
 

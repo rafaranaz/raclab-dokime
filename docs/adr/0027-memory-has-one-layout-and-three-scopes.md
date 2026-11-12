@@ -1,6 +1,6 @@
 # ADR-0027 · Memory has one layout, two storages and three scopes
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0042](0042-memory-persists-on-local-disk-or-in-its-own-git-repository.md)
 
 ## Context
 

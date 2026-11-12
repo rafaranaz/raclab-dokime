@@ -66,22 +66,29 @@ erDiagram
 
 ## Where it lives
 
-One layout, whether it is kept in the repository or, for a single developer, in a local directory
-without git ([ADR-0027](../adr/0027-memory-has-one-layout-and-three-scopes.md)).
+Memory is a store of its own, never inside the repository of the verified project, which holds
+nothing of the harness. It persists in one of two modes, with the same layout
+([ADR-0027](../adr/0027-memory-has-one-layout-and-three-scopes.md),
+[ADR-0042](../adr/0042-memory-persists-on-local-disk-or-in-its-own-git-repository.md)):
 
-| Scope | What | Where |
+| Mode | Where memory is | Who uses it |
 |---|---|---|
-| Project | Policy, pack, flow, list of allowed signers, memory files | `.dokime/` |
-| Change | Contract, clarifications, approval, sealed batch | `.dokime/changes/<story>/`, on the branch of the change |
-| Person | Ledger of each run, stored artifacts, proposals not yet approved, the key when it is local | The state directory of the harness, outside the working tree |
+| Local disk | A directory on the machine, without git | One person who uses the harness alone and chooses to keep memory local |
+| Git repository | A git repository of its own, apart from the repository of the verified project | One person, or a team, who choose git in order to share the memory of the project |
+
+| Scope | What | Where in memory |
+|---|---|---|
+| Project | Policy, pack, flow, list of allowed signers, glossary, decisions | `project/` |
+| Change | Contract, clarifications, approval, sealed batch | `changes/<story>/` |
+| Person | Ledger of each run, stored artifacts, proposals not yet approved, the key when it is local | The state directory of the harness on the machine. It is never pushed |
 
 Two rules follow from decisions already taken:
 
 - **Evidence never lives inside the tree it describes.** Its subject is the digest of the tree, and
   a file added to the tree would change that digest. It is kept by the evidence store: a file next
   to the pull request, git notes or the attestation store of the forge.
-- **The list of allowed signers, the policy, the pack and the flow are protected paths.** A change
-  to them made by the agent is dropped from the patch.
+- **The list of allowed signers, the policy, the pack and the flow are out of reach of a patch.**
+  They are in memory, outside the tree that the patch changes.
 
 ## The contract
 

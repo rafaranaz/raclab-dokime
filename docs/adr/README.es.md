@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:7be6cd26542abc2c -->
+<!-- translation-of: README.md sha256:138483d60c499c9a -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -38,7 +38,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0024](0024-approval-attestation-and-commit-are-signed-separately.es.md) | La aprobación, la atestación y el commit se firman por separado | Aceptada |
 | [0025](0025-the-interview-works-on-files-and-ends-by-coverage.es.md) | La entrevista trabaja sobre ficheros y termina por cobertura | Aceptada |
 | [0026](0026-formal-consistency-is-checked-per-requirement.es.md) | La consistencia formal se comprueba por requisito, y sus hallazgos preguntan | Aceptada |
-| [0027](0027-memory-has-one-layout-and-three-scopes.es.md) | La memoria tiene una estructura, dos almacenamientos y tres alcances | Aceptada |
+| [0027](0027-memory-has-one-layout-and-three-scopes.es.md) | La memoria tiene una estructura, dos almacenamientos y tres alcances | Aceptada, enmendada por el 0042 |
 | [0028](0028-language-support-is-a-declarative-pack-with-levels.es.md) | El soporte de un lenguaje es un pack declarativo con niveles | Aceptada |
 | [0029](0029-build-order-starts-with-auditing.es.md) | El orden de construcción empieza por auditar un cambio que ya existe | Aceptada |
 | [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Aceptada |
@@ -52,4 +52,5 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
-| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0042 |
+| [0042](0042-memory-persists-on-local-disk-or-in-its-own-git-repository.es.md) | La memoria persiste en disco local o en su propio repositorio git | Aceptada |

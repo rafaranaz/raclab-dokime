@@ -1,6 +1,6 @@
 # ADR-0041 · The environment of a verified project is a Dockerfile, and its pack proves itself
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0042](0042-memory-persists-on-local-disk-or-in-its-own-git-repository.md)
 
 ## Context
 

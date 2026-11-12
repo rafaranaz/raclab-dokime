@@ -1,4 +1,4 @@
-<!-- translation-of: glossary.md sha256:1ff6c6aa582f9044 -->
+<!-- translation-of: glossary.md sha256:db286278c747427f -->
 # Glosario
 
 *Read in [English](glossary.md).*
@@ -19,6 +19,7 @@ término.
 | Verificación | La fase que ejecuta el código de un proyecto verificado en su entorno, sin red |
 | Autocomprobación de un pack | La prueba de que un pack ejecuta de verdad los tests: en un commit pasado del proyecto que arregló un defecto y añadió un test, ese test falla antes del arreglo y pasa después |
 | Pipeline del proyecto | La integración continua de un proyecto verificado. Es una fuente para escribir su pack. No es el pipeline donde se prueba el arnés |
+| Memoria | Lo que el arnés guarda sobre un proyecto verificado entre ejecuciones: su pack y su política, el contrato de cada cambio, el estado del trabajo. Un almacén propio, en disco local o en su propio repositorio git, nunca dentro del repositorio del proyecto verificado |
 | Corpus | Los proyectos verificados y sus cambios, cada uno con un veredicto conocido, que se usan para medir el arnés |
 
 ## Contrato y ejemplos

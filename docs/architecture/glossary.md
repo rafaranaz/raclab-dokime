@@ -17,6 +17,7 @@ a decision needs another meaning, it needs another term.
 | Verify | The phase that runs the code of a verified project in its environment, without network |
 | Self-check of a pack | The proof that a pack really runs the tests: on a past commit of the project that fixed a defect and added a test, that test fails before the fix and passes after it |
 | Pipeline of the project | The continuous integration of a verified project. It is a source for writing its pack. It is not the pipeline where the harness is tested |
+| Memory | What the harness keeps about a verified project between runs: its pack and policy, the contract of each change, the state of the work. A store of its own, on local disk or in its own git repository, never inside the repository of the verified project |
 | Corpus | The verified projects and their changes, each with a known verdict, that are used to measure the harness |
 
 ## Contract and examples

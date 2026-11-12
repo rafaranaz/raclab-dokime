@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:6183240dce619de7 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:66963007a24b71f0 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -68,22 +68,29 @@ erDiagram
 
 ## Dónde vive
 
-Una sola estructura, se guarde en el repositorio o, para un desarrollador solo, en un directorio
-local sin git ([ADR-0027](../adr/0027-memory-has-one-layout-and-three-scopes.es.md)).
+La memoria es un almacén propio, nunca dentro del repositorio del proyecto verificado, que no
+contiene nada del arnés. Persiste en uno de dos modos, con la misma estructura
+([ADR-0027](../adr/0027-memory-has-one-layout-and-three-scopes.es.md),
+[ADR-0042](../adr/0042-memory-persists-on-local-disk-or-in-its-own-git-repository.es.md)):
 
-| Alcance | Qué | Dónde |
+| Modo | Dónde está la memoria | Quién lo usa |
 |---|---|---|
-| Proyecto | Política, pack, flujo, lista de firmantes permitidos, ficheros de memoria | `.dokime/` |
-| Cambio | Contrato, aclaraciones, aprobación, lote sellado | `.dokime/changes/<historia>/`, en la rama del cambio |
-| Persona | Registro de cada ejecución, artefactos guardados, propuestas sin aprobar, la clave cuando es local | El directorio de estado del arnés, fuera del árbol de trabajo |
+| Disco local | Un directorio en la máquina, sin git | Una persona que usa el arnés sola y elige guardar la memoria en local |
+| Repositorio git | Un repositorio git propio, aparte del repositorio del proyecto verificado | Una persona, o un equipo, que eligen git para poder compartir la memoria del proyecto |
+
+| Alcance | Qué | Dónde en la memoria |
+|---|---|---|
+| Proyecto | Política, pack, flujo, lista de firmantes permitidos, glosario, decisiones | `project/` |
+| Cambio | Contrato, aclaraciones, aprobación, lote sellado | `changes/<historia>/` |
+| Persona | Registro de cada ejecución, artefactos guardados, propuestas sin aprobar, la clave cuando es local | El directorio de estado del arnés en la máquina. Nunca se sube |
 
 De decisiones ya tomadas se siguen dos reglas:
 
 - **La evidencia nunca vive dentro del árbol que describe.** Su sujeto es la huella del árbol, y
   un fichero añadido al árbol cambiaría esa huella. La guarda el almacén de evidencia: un fichero
   junto al pull request, notas de git o el almacén de atestaciones de la forja.
-- **La lista de firmantes permitidos, la política, el pack y el flujo son rutas protegidas.** Un
-  cambio en ellos hecho por el agente se descarta del parche.
+- **La lista de firmantes permitidos, la política, el pack y el flujo quedan fuera del alcance de
+  un parche.** Están en la memoria, fuera del árbol que el parche cambia.
 
 ## El contrato
 

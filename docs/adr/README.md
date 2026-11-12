@@ -37,7 +37,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0024](0024-approval-attestation-and-commit-are-signed-separately.md) | Approval, attestation and commit are signed separately | Accepted |
 | [0025](0025-the-interview-works-on-files-and-ends-by-coverage.md) | The interview works on files and ends by coverage | Accepted |
 | [0026](0026-formal-consistency-is-checked-per-requirement.md) | Formal consistency is checked per requirement, and its findings ask | Accepted |
-| [0027](0027-memory-has-one-layout-and-three-scopes.md) | Memory has one layout, two storages and three scopes | Accepted |
+| [0027](0027-memory-has-one-layout-and-three-scopes.md) | Memory has one layout, two storages and three scopes | Accepted, amended by 0042 |
 | [0028](0028-language-support-is-a-declarative-pack-with-levels.md) | Language support is a declarative pack with support levels | Accepted |
 | [0029](0029-build-order-starts-with-auditing.md) | The build order starts with auditing a change that already exists | Accepted |
 | [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md) | The harness is measured on a corpus with known verdicts | Accepted |
@@ -51,4 +51,5 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |
-| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted, amended by 0042 |
+| [0042](0042-memory-persists-on-local-disk-or-in-its-own-git-repository.md) | Memory persists on local disk or in its own git repository | Accepted |

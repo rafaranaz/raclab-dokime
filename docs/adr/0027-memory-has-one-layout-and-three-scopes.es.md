@@ -1,7 +1,7 @@
-<!-- translation-of: 0027-memory-has-one-layout-and-three-scopes.md sha256:3e35157311ea0d45 -->
+<!-- translation-of: 0027-memory-has-one-layout-and-three-scopes.md sha256:3ad501f2a7bd465b -->
 # ADR-0027 · La memoria tiene una estructura, dos almacenamientos y tres alcances
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0042](0042-memory-persists-on-local-disk-or-in-its-own-git-repository.es.md)
 
 ## Contexto
 

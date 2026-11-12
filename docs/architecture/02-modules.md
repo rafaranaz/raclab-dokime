@@ -31,7 +31,7 @@ flowchart TB
         sandbox["sandbox<br/>verification runtime, work isolation"]
         agents["agents<br/>headless and ACP drivers"]
         gateway["gateway<br/>model clients"]
-        platform["platform<br/>signing, stores, forge, clock"]
+        platform["platform<br/>repository, signing, stores, forge, clock"]
     end
 
     interfaces --> engine
@@ -75,7 +75,7 @@ flowchart TB
 | `sandbox` | Adapters for the verification runtime and for isolating the agent | Decide policy. It receives it |
 | `agents` | Adapters that launch agents | Interpret the result. The harness computes the patch |
 | `gateway` | Model adapters, registered prompts, validation of answers against a schema | Decide |
-| `platform` | Adapters of the signer, the sealed store, the evidence store and the forge, and the system clock and randomness | Decide, or hold domain logic |
+| `platform` | Adapters of the project repository, the signer, the sealed store, the evidence store and the forge, and the system clock and randomness | Decide, or hold domain logic |
 | `interfaces` | The command, the human channel, the composition root | Hold domain logic |
 | `bench` | Run the measurement corpus and compute the metrics | Ship with the installed product |
 
@@ -98,7 +98,8 @@ block.
 
 | Port | Contract in short | Adapters |
 |---|---|---|
-| Verification runtime | Build an image from a pack and a commit; run a command in it without network, with read-only mounts and limits | ① Docker, Podman |
+| Verification runtime | Build an image from a Dockerfile and a directory; run a command in it without network, with read-only mounts and limits; record the digest of the tree it was given | ① Docker, Podman |
+| Project repository | List commits; give the parent and the changed paths of a commit; compose a tree from a commit with paths of another commit or with a patch, named by its git tree digest; extract a tree to a directory, byte for byte | ① the `git` command; a git library |
 | Work isolation | Open a work session with writable paths, denied read paths and allowed network destinations; report its level | None, operating-system wrapper, micro virtual machine |
 | Agent driver | Run a task in a work session; return the identity of the agent and its exit state | Headless mode per agent profile, ACP |
 | Model gateway | Given a registered template, its inputs and a schema, return valid JSON or an error | OpenAI-compatible API, vendor API, the installed agent |
@@ -111,8 +112,8 @@ block.
 
 Where the adapters live: the verification runtime and the work isolation in `sandbox`; the agent
 launcher in `agents`; the model gateway in `gateway`; the human channel in `interfaces`; the
-signer, the sealed store, the evidence store, the forge, the clock and the randomness in
-`platform`. No domain module talks to the outside.
+project repository, the signer, the sealed store, the evidence store, the forge, the clock and the
+randomness in `platform`. No domain module talks to the outside.
 
 ## Build order
 

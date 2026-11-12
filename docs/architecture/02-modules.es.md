@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:c22144578c690231 -->
+<!-- translation-of: 02-modules.md sha256:336053123c9795d0 -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -32,7 +32,7 @@ flowchart TB
         sandbox["sandbox<br/>entorno de verificación, aislamiento del trabajo"]
         agents["agents<br/>lanzadores sin interfaz y ACP"]
         gateway["gateway<br/>clientes de modelo"]
-        platform["platform<br/>firma, almacenes, forja, reloj"]
+        platform["platform<br/>repositorio, firma, almacenes, forja, reloj"]
     end
 
     interfaces --> engine
@@ -76,7 +76,7 @@ flowchart TB
 | `sandbox` | Adaptadores del entorno de verificación y del aislamiento del agente | Decidir la política. La recibe |
 | `agents` | Adaptadores que lanzan agentes | Interpretar el resultado. El parche lo calcula el arnés |
 | `gateway` | Adaptadores de modelo, prompts registrados, validación de respuestas contra un esquema | Decidir |
-| `platform` | Adaptadores del firmante, del almacén de lo sellado, del almacén de evidencia y de la forja, y el reloj y el azar del sistema | Decidir, ni contener lógica de dominio |
+| `platform` | Adaptadores del repositorio del proyecto, del firmante, del almacén de lo sellado, del almacén de evidencia y de la forja, y el reloj y el azar del sistema | Decidir, ni contener lógica de dominio |
 | `interfaces` | La orden, el canal humano, la raíz de composición | Contener lógica de dominio |
 | `bench` | Ejecutar el conjunto de medición y calcular las métricas | Formar parte del producto instalado |
 
@@ -100,7 +100,8 @@ primer bloque.
 
 | Puerto | Contrato resumido | Adaptadores |
 |---|---|---|
-| Entorno de verificación | Construir una imagen desde un pack y un commit; ejecutar una orden en ella sin red, con montajes de solo lectura y límites | ① Docker, Podman |
+| Entorno de verificación | Construir una imagen desde un Dockerfile y un directorio; ejecutar una orden en ella sin red, con montajes de solo lectura y límites; registrar la huella del árbol que recibió | ① Docker, Podman |
+| Repositorio del proyecto | Listar commits; dar el padre y las rutas cambiadas de un commit; componer un árbol a partir de un commit con rutas de otro commit o con un parche, nombrado por su huella de árbol de git; extraer un árbol a un directorio, byte a byte | ① la orden `git`; una biblioteca de git |
 | Aislamiento del trabajo | Abrir una sesión de trabajo con rutas de escritura, rutas de lectura denegadas y destinos de red permitidos; declarar su nivel | Ninguno, envoltorio del sistema operativo, microVM |
 | Lanzador de agentes | Ejecutar una tarea en una sesión de trabajo; devolver la identidad del agente y su estado de salida | Modo sin interfaz por perfil de agente, ACP |
 | Pasarela de modelos | Dada una plantilla registrada, sus entradas y un esquema, devolver JSON válido o un error | API compatible con OpenAI, API de fabricante, el agente instalado |
@@ -113,8 +114,8 @@ primer bloque.
 
 Dónde viven los adaptadores: el entorno de verificación y el aislamiento del trabajo en `sandbox`;
 el lanzador de agentes en `agents`; la pasarela de modelos en `gateway`; el canal humano en
-`interfaces`; el firmante, el almacén de lo sellado, el almacén de evidencia, la forja, el reloj y
-el azar en `platform`. Ningún módulo de dominio habla con el exterior.
+`interfaces`; el repositorio del proyecto, el firmante, el almacén de lo sellado, el almacén de
+evidencia, la forja, el reloj y el azar en `platform`. Ningún módulo de dominio habla con el exterior.
 
 ## Orden de construcción
 

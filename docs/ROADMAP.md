@@ -106,6 +106,25 @@ one run. The defects of reading (a repeated key, a value whose type depends on t
 on several lines) are reported the same way. What A1 does not do: it runs nothing, so a contract
 that passes says nothing yet about the code.
 
+**A2 so far.** What needs no container engine is built: the format of a pack and its check, which
+files of a project are tests, and the rules of the self-check as decisions over results
+([ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md), module `packs`).
+No engine has been run yet, so three choices of the format are hypotheses to run first, before
+anything is built on them: the code of the project enters the image when it is built, the test
+command is a list of arguments, and the report is written to an output directory that the harness
+mounts. What is left, in order:
+
+1. Run those three hypotheses by hand with `docker`, `podman` and `buildah` on one repository of
+   the corpus, and record what each engine guarantees.
+2. Add a parser that is safe against hostile XML (a dependency, `repo` scope) and read the report
+   in JUnit XML (`packs`).
+3. Define the ports of the engine and of the history of the project in `core`, from what step 1
+   showed, and build the adapters (`sandbox`).
+4. Write the packs of the three repositories of the corpus from their pipelines, recording which
+   lines served and what it cost, which is the test by hand of the hypothesis about packs.
+5. Build `dokime env check` (`interfaces`) and close A2 when the three packs build and pass their
+   self-check.
+
 How the corpus uses those repositories:
 
 - **Reference, do not vendor.** A case points to `repository@commit`; no code of those projects is

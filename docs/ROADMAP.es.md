@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:56b4bfff183dcf5f -->
+<!-- translation-of: ROADMAP.md sha256:88365e335964c13e -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -108,6 +108,26 @@ un requisito sin ejemplo, un duplicado y una contradicción sembrados en uno de 
 informa de los cuatro en una ejecución. Los defectos de lectura (una clave repetida, un valor cuyo
 tipo depende del lector, un texto en varias líneas) se informan igual. Lo que A1 no hace: no
 ejecuta nada, así que un contrato que pasa todavía no dice nada del código.
+
+**A2 hasta ahora.** Está construido lo que no necesita un motor de contenedores: el formato de un
+pack y su comprobación, qué ficheros de un proyecto son tests, y las reglas de la autocomprobación
+como decisiones sobre resultados
+([ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md), módulo `packs`).
+Todavía no se ha ejecutado ningún motor, así que tres elecciones del formato son hipótesis que hay
+que ejecutar primero, antes de construir nada encima: el código del proyecto entra en la imagen al
+construirla, la orden de tests es una lista de argumentos, y el informe se escribe en una carpeta
+de salida que monta el arnés. Lo que queda, en orden:
+
+1. Ejecutar a mano esas tres hipótesis con `docker`, `podman` y `buildah` sobre un repositorio del
+   corpus, y anotar qué garantiza cada motor.
+2. Añadir un analizador seguro frente a XML hostil (una dependencia, ámbito `repo`) y leer el
+   informe en JUnit XML (`packs`).
+3. Definir en `core` los puertos del motor y de la historia del proyecto, a partir de lo que
+   mostró el paso 1, y construir los adaptadores (`sandbox`).
+4. Escribir los packs de los tres repositorios del corpus a partir de sus pipelines, anotando qué
+   líneas sirvieron y cuánto costó, que es la prueba a mano de la hipótesis sobre los packs.
+5. Construir `dokime env check` (`interfaces`) y cerrar A2 cuando los tres packs construyan y
+   pasen su autocomprobación.
 
 Cómo usa el corpus esos repositorios:
 

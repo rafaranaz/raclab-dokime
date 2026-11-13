@@ -92,3 +92,22 @@ check_fields(notes, reading.value, (), table)
 [(finding.code, finding.lines) for finding in notes.findings]  # [("unknown-value", (2,))]
 ```
 
+
+## The port of the project repository
+
+`ProjectRepository` is the port of
+[ADR-0042](../../../docs/adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md):
+give the history from a commit, give the change of a commit, compose a tree from a commit with
+paths of another commit or with a patch, and extract a tree. `core` defines it and the values it
+exchanges and runs no `git`. Commit and tree names are 40 lowercase hexadecimal characters and
+never equal each other; a path of the repository is relative and is decoded from its bytes as
+UTF-8. An adapter that cannot do an operation raises `RefusalError`, which carries a finding with
+the verdict `ERROR` for the module that called the port to add to its result.
+
+```python
+from dokime.core.repository import CommitName, RefusalError, RepoPath
+
+CommitName("0123456789abcdef0123456789abcdef01234567")
+RepoPath.from_bytes(b"src/a.py")  # RepoPath(text="src/a.py")
+RefusalError("shallow-clone", "the repository is a shallow clone").finding.verdict  # Verdict.ERROR
+```

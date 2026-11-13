@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:2e289f2524d85fe4 -->
+<!-- translation-of: README.md sha256:c5e31d9c1a1916f7 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -54,3 +54,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada |
+| [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Propuesta |

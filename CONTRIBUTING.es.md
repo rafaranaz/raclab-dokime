@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:947d56cf24fd6df2 -->
+<!-- translation-of: CONTRIBUTING.md sha256:078804aca328ba75 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -45,6 +45,11 @@ está mergeado. Los ámbitos de gobierno (`repo`, `arch`) pueden estar abiertos 
 - El merge es **por rebase**: el historial de `main` es lineal y se conserva cada commit. Cuando
   GitHub pida actualizar una rama, se elige **Update with rebase**: la opción por defecto añade
   un commit de merge, que la comprobación de commits rechaza.
+- **Primero se mira el remoto.** Antes de empezar una rama, antes de reescribir una que ya está en
+  el remoto y antes de un commit que cambia el estado de una ADR, se listan las ramas y las pull
+  requests abiertas del remoto (`git fetch --prune`, `git branch -r`, `gh pr list`). Puede haber
+  más de una sesión, de una persona o de un agente, trabajando a la vez en el repositorio: es fácil
+  hacer dos veces el mismo cambio, y una reescritura puede descartar commits que otro subió.
 
 ## Commits
 

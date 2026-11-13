@@ -54,3 +54,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted, amended by 0043 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md) | A port of the project repository composes the trees that are built | Accepted |
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md) | Tests run only on an engine that enforces the limits | Accepted |
+| [0044](0044-how-the-self-check-of-a-pack-runs-and-reads-its-reports.md) | How the self-check of a pack runs and reads its reports | Proposed |

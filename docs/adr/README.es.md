@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:c4c338f0772b3ebf -->
+<!-- translation-of: README.md sha256:a3601f0f89c2fe2d -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -55,3 +55,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0043 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada |
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Aceptada |
+| [0044](0044-how-the-self-check-of-a-pack-runs-and-reads-its-reports.es.md) | Cómo se ejecuta la autocomprobación de un pack y cómo lee sus informes | Propuesta |

@@ -98,8 +98,8 @@ block.
 
 | Port | Contract in short | Adapters |
 |---|---|---|
-| Verification runtime | Build an image from a Dockerfile and a directory; run a command in it without network, with read-only mounts and limits | ① Docker, Podman |
-| Project repository | List commits; give the parent and the changed paths of a commit; compose a tree from a commit with paths of another commit or with a patch, named by its git tree digest; extract a tree to a directory, byte for byte; refuse a tree with a submodule | ① the `git` command; a git library |
+| Verification runtime | Build an image from a Dockerfile and a directory; run a command in it without network, with read-only mounts and limits; read the report it wrote and give the outcome of each test | ① Docker, Podman |
+| Project repository | Give the history from a commit, each commit with its date and its parents; give the parent and the changed paths of a commit; compose a tree from a commit with paths of another commit or with a patch, named by its git tree digest; extract a tree to a directory, byte for byte; refuse a tree with a submodule | ① the `git` command; a git library |
 | Work isolation | Open a work session with writable paths, denied read paths and allowed network destinations; report its level | None, operating-system wrapper, micro virtual machine |
 | Agent driver | Run a task in a work session; return the identity of the agent and its exit state | Headless mode per agent profile, ACP |
 | Model gateway | Given a registered template, its inputs and a schema, return valid JSON or an error | OpenAI-compatible API, vendor API, the installed agent |

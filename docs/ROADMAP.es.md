@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:56b4bfff183dcf5f -->
+<!-- translation-of: ROADMAP.md sha256:28c832ef6808e9a2 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -66,7 +66,7 @@ se publica. Un resultado malo también se publica.
 
 | Bloque | Qué puede hacer un usuario al cerrarlo | Módulos, en orden | Criterio de salida | Versión |
 |---|---|---|---|---|
-| A · Auditar | Verificar un cambio terminado, hecho por cualquier agente, contra un contrato escrito a mano, en local y en CI | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `platform` (almacenes y reloj), `verify`, `evidence`, `interfaces` | Ningún falso aprobado en parches que fallan ejemplos visibles, modifican tests o rompen tests existentes | 0.1 |
+| A · Auditar | Verificar un cambio terminado, hecho por cualquier agente, contra un contrato escrito a mano, en local y en CI | `core`, `contract`, `packs`, `sandbox` (entorno de verificación), `platform` (repositorio del proyecto, almacenes y reloj), `verify`, `evidence`, `interfaces` | Ningún falso aprobado en parches que fallan ejemplos visibles, modifican tests o rompen tests existentes | 0.1 |
 | B · Reservar | Lo mismo, con ejemplos que el agente no ha visto | `oracle`, `platform` (almacén de lo sellado), `verify`, `bench` | Ningún falso aprobado en las cuatro técnicas de trampa; valor de la reserva medido | 0.2 |
 | C · Lanzar | Dar la tarea al arnés y que dirija al agente hasta que el cambio pasa o pregunta | `sandbox` (trabajo), `agents`, `engine` | El mismo cambio completa el circuito con dos perfiles de agente, uno con un modelo de pesos abiertos | 0.3 |
 | D · Proteger | Saber qué daña el cambio fuera de lo pedido | `verify` | Las regresiones inyectadas en código cubierto se detectan; tasa de preguntas medida | 0.4 |
@@ -140,12 +140,16 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 |---|---|---|---|
 | A0 Pruebas a mano | Tres cambios reales con un contrato escrito a mano y aprobado por una persona, cronometrado; tres repositorios elegidos para el conjunto de casos | Ninguno | Se conocen la proporción de requisitos que caben como ejemplos y los minutos por contrato, y el formato se confirma o se revisa |
 | A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract`, `interfaces` (solo la orden) | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
-| A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox` | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
+| A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox`, `platform` (solo el repositorio del proyecto), `interfaces` (solo la orden) | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
 | A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia | `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
 | A4 Auditoría en CI | Un flujo que audita un pull request y adjunta la evidencia, activado en este repositorio; versión 0.1 | `interfaces` | Un pull request real de este repositorio lleva su evidencia |
 
-`interfaces` se abre dos veces en el bloque A: en A1 para la orden `contract check`, que solo lee el
-fichero, llama a `contract` y muestra sus hallazgos, y en A3 para `audit`. Los ámbitos de un módulo
+`interfaces` se abre tres veces en el bloque A: en A1 para la orden `contract check`, que solo lee
+el fichero, llama a `contract` y muestra sus hallazgos; en A2 para la orden que construye una imagen
+y comprueba un pack, que lee el pack y llama a `packs`; y en A3 para `audit`. `platform` se abre dos
+veces: en A2 para el adaptador del repositorio del proyecto
+([ADR-0042](adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md)), y
+en A3 para los almacenes y el reloj. Los ámbitos de un módulo
 se abren por incrementos, como `core`
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.es.md)).
 

@@ -1,6 +1,6 @@
 # ADR-0042 · A port of the project repository composes the trees that are built
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

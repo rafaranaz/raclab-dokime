@@ -85,3 +85,37 @@ table of fields: which fields the mapping may have, which are mandatory and what
 - **CORE-052** If the value of a field is not what its table states, then the shape check shall report a finding with the code `wrong-type` that names the field, with its line.
 - **CORE-053** If a field with a closed list of values has a value that is not in the list with the same type, then the shape check shall report a finding with the code `unknown-value` that lists the values allowed, with its line.
 - **CORE-054** When a finding is about a part that has no line of its own, the shape check shall give the line of the nearest part that contains it.
+
+## The port of the project repository ([ADR-0042](../adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md))
+
+`core` defines the port and the values it exchanges; it runs no `git`. What an adapter does with a
+real repository (how it composes and extracts a tree, when it refuses and with which code) is
+required in the scope of the adapters, for every adapter of the project repository, where it can
+be tested. The order in which the self-check takes the commits of a history belongs to `packs`.
+
+### Names and paths
+
+- **CORE-060** The name of a commit and the name of a tree shall accept a text of 40 lowercase hexadecimal characters.
+- **CORE-061** If the name of a commit or of a tree is not 40 lowercase hexadecimal characters, then the name shall be rejected with an error that quotes the text.
+- **CORE-062** The name of a commit shall not be equal to the name of a tree with the same text.
+- **CORE-063** The path of the repository shall accept a relative path whose parts are separated by `/`.
+- **CORE-064** If a path of the repository is empty, starts or ends with `/`, has an empty part, has a part `.` or `..`, or has a NUL character, then the path shall be rejected with an error that quotes the path.
+- **CORE-065** When a path of the repository is made from the bytes that a repository stores, the path shall decode them as UTF-8.
+- **CORE-066** If the bytes of a path are not valid UTF-8, then the path shall be rejected with an error that quotes the bytes.
+
+### What the port gives and takes
+
+- **CORE-067** The port shall offer five operations: give the history from a commit, give the change of a commit, compose a tree from a commit with paths of another commit, compose a tree from a commit with a patch, and extract a tree to a directory.
+- **CORE-068** The history from a commit shall carry every commit reachable from it, each with its commit date in whole seconds and its parents in the order the commit names them.
+- **CORE-069** The change of a commit shall carry the name of the commit, the name of its one parent and the paths it changed.
+- **CORE-070** The composition with paths of another commit shall receive the paths to take as a rule that says, for each path of the repository, whether it is taken.
+- **CORE-071** The port shall return the name of the composed tree from each composition.
+
+### Refusals
+
+A refusal is how an adapter says that it cannot do an operation. It is not an error of the
+harness: the module that called the port adds its finding to its result, and the round ends in
+`ERROR`.
+
+- **CORE-072** When an adapter refuses an operation, the port shall raise a refusal that carries a finding with the verdict `ERROR`.
+- **CORE-073** If a refusal is given a code or a message that a finding does not accept, then the refusal shall be rejected with the error of the finding.

@@ -1,4 +1,4 @@
-<!-- translation-of: 0043-tests-run-only-on-an-engine-that-enforces-the-limits.md sha256:58c73f3ed1c88a7a -->
+<!-- translation-of: 0043-tests-run-only-on-an-engine-that-enforces-the-limits.md sha256:69942a25985a7857 -->
 # ADR-0043 · Los tests solo se ejecutan en un motor que impone los límites
 
 **Estado:** propuesta
@@ -58,12 +58,12 @@ Comprobado el 2026-11-12 con docker 29.9.3 (demonio, usuario en el grupo `docker
 El programa que carga el contenedor, ejecutado como `python /load.py mem|pids|cpu` con cada límite:
 
 ```python
-if what == "mem":     # 50 MB blocks, every page touched, up to 600 MB
+if what == "mem":  # 50 MB blocks, every page touched, up to 600 MB
     blocks = [bytearray(50 * 1024 * 1024) for _ in range(12)]
 elif what == "pids":  # up to 200 threads that sleep
     for n in range(1, 201):
         threading.Thread(target=time.sleep, args=(5,), daemon=True).start()
-elif what == "cpu":   # 4 busy processes for 4 seconds; children CPU time over wall time
+elif what == "cpu":  # 4 busy processes for 4 seconds; children CPU time over wall time
     ...
 ```
 

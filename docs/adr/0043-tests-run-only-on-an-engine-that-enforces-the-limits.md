@@ -57,12 +57,12 @@ Verified on 2026-11-12 with docker 29.9.3 (daemon, user in the group `docker`), 
 The program that loads the container, run as `python /load.py mem|pids|cpu` with each limit:
 
 ```python
-if what == "mem":     # 50 MB blocks, every page touched, up to 600 MB
+if what == "mem":  # 50 MB blocks, every page touched, up to 600 MB
     blocks = [bytearray(50 * 1024 * 1024) for _ in range(12)]
 elif what == "pids":  # up to 200 threads that sleep
     for n in range(1, 201):
         threading.Thread(target=time.sleep, args=(5,), daemon=True).start()
-elif what == "cpu":   # 4 busy processes for 4 seconds; children CPU time over wall time
+elif what == "cpu":  # 4 busy processes for 4 seconds; children CPU time over wall time
     ...
 ```
 

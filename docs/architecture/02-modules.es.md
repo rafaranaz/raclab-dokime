@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:017edf11e2af8501 -->
+<!-- translation-of: 02-modules.md sha256:5fad92900e3c08c2 -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -100,7 +100,7 @@ primer bloque.
 
 | Puerto | Contrato resumido | Adaptadores |
 |---|---|---|
-| Entorno de verificación | Construir una imagen desde un Dockerfile y un directorio; ejecutar una orden en ella sin red, con montajes de solo lectura y límites | ① Docker, Podman |
+| Entorno de verificación | Construir una imagen desde un Dockerfile y un directorio; ejecutar una orden en ella sin red, con montajes de solo lectura y límites; leer el informe que escribió y dar el resultado de cada test | ① Docker, Podman |
 | Repositorio del proyecto | Dar la historia desde un commit, cada commit con su fecha y sus padres; dar el padre y las rutas cambiadas de un commit; componer un árbol a partir de un commit con rutas de otro commit o con un parche, nombrado por su huella de árbol de git; extraer un árbol a un directorio, byte a byte; rechazar un árbol con un submódulo | ① la orden `git`; una biblioteca de git |
 | Aislamiento del trabajo | Abrir una sesión de trabajo con rutas de escritura, rutas de lectura denegadas y destinos de red permitidos; declarar su nivel | Ninguno, envoltorio del sistema operativo, microVM |
 | Lanzador de agentes | Ejecutar una tarea en una sesión de trabajo; devolver la identidad del agente y su estado de salida | Modo sin interfaz por perfil de agente, ACP |

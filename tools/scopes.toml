@@ -40,7 +40,7 @@ description = "Reference architecture: documents and diagrams under docs/archite
 paths = ["docs/architecture/**"]
 
 [scopes.core]
-description = "Domain types shared by every module: verdicts and their aggregation, findings."
+description = "Domain types shared by every module: verdicts and their aggregation, findings, strict reading, and the definitions of the ports."
 paths = ["src/dokime/core/**", "tests/core/**", "docs/requirements/core.md"]
 
 [scopes.contract]

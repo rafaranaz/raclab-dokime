@@ -1,6 +1,6 @@
 # ADR-0041 · The environment of a verified project is a Dockerfile, and its pack proves itself
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md)
 
 ## Context
 

@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:c5e31d9c1a1916f7 -->
+<!-- translation-of: README.md sha256:c4c338f0772b3ebf -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -52,6 +52,6 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
-| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0043 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada |
-| [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Propuesta |
+| [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Aceptada |

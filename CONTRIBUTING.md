@@ -44,6 +44,11 @@ merged. Governance scopes (`repo`, `arch`) may be open next to it.
 - Merges are done **by rebase**: the history of `main` is linear and every commit is kept. When
   GitHub asks to update a branch, choose **Update with rebase**: the default option adds a merge
   commit, which the commit check rejects.
+- **Look at the remote first.** Before starting a branch, before rewriting one that is already on
+  the remote, and before a commit that changes the status of an ADR, list the open branches and
+  pull requests of the remote (`git fetch --prune`, `git branch -r`, `gh pr list`). More than one
+  session, of a person or of an agent, may work on the repository at once: the same change is easy
+  to make twice, and a rewrite can discard commits that someone else pushed.
 
 ## Commits
 

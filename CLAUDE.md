@@ -48,6 +48,9 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
 - **When you change an English document, update its Spanish version** and its header in the same
   commit.
 - **Do not disable or relax a gate** without an approved ADR.
+- **Look at the remote first.** Before starting a branch, rewriting one already pushed, or
+  changing the status of an ADR, list the open branches and pull requests of the remote. Another
+  session may be doing the same work.
 
 ## Skills
 

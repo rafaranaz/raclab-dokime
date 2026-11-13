@@ -1,7 +1,7 @@
-<!-- translation-of: 0043-tests-run-only-on-an-engine-that-enforces-the-limits.md sha256:69942a25985a7857 -->
+<!-- translation-of: 0043-tests-run-only-on-an-engine-that-enforces-the-limits.md sha256:0be7287c1d59bedc -->
 # ADR-0043 · Los tests solo se ejecutan en un motor que impone los límites
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -51,6 +51,6 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |
-| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted, amended by 0043 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md) | A port of the project repository composes the trees that are built | Accepted |
-| [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md) | Tests run only on an engine that enforces the limits | Proposed |
+| [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md) | Tests run only on an engine that enforces the limits | Accepted |

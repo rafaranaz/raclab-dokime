@@ -1,6 +1,6 @@
 # ADR-0043 · Tests run only on an engine that enforces the limits
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

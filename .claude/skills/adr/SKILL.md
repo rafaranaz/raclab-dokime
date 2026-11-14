@@ -10,11 +10,21 @@ from now, it is not clear why the alternative was **not** chosen, the ADR has fa
 
 ## When to write one
 
-- A choice is made between real alternatives and it conditions future work.
-- A process rule or a CI gate changes.
-- A known limitation is accepted.
+Only a decision that does one of these is an ADR:
 
-It is not needed for changes whose reason fits in the commit message.
+- It changes an invariant.
+- It changes the boundary of a module.
+- It changes the contract of a port.
+- It adds, removes or replaces a dependency.
+- It changes a process rule or a CI gate.
+- It is expensive to undo.
+
+Everything else is an EARS requirement of its scope, with its test: the value of a limit, an error
+code, a detail of implementation, how a file is opened. The reason for a value goes in the commit
+that sets it. A known limitation goes in the consequences of the ADR that causes it, or in a
+requirement.
+
+If in doubt, do not write it: ask the maintainer, with a recommendation.
 
 ## Format
 

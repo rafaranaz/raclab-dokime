@@ -1,4 +1,4 @@
-<!-- translation-of: 0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md sha256:719a716620c2edaf -->
+<!-- translation-of: 0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md sha256:8595188b8fc1490d -->
 # ADR-0045 · Un informe de tests lo lee un lector acotado que rechaza cualquier DTD
 
 **Estado:** propuesta
@@ -50,6 +50,13 @@ resultado.
   `ERROR`. No es un aislamiento.** El proceso corre con los permisos de la persona. Si un defecto
   de Expat permitiera ejecutar código, ese código podría hacer lo que puede hacer la persona.
 - **Se registra la versión de Expat.** El valor de `pyexpat.EXPAT_VERSION` va en la evidencia.
+- **El mínimo de Expat vive en el adaptador, no en `core`.** Es una constante del adaptador que lee
+  los informes, junto a la comprobación que se hace al arrancar el adaptador. No es política: dice
+  qué versiones del analizador que usa este adaptador se sabe que no son seguras, así que quien
+  llama no tiene motivo para pedir otra, y un adaptador con otro analizador tendría otro mínimo.
+  Subirlo es un cambio solo de `sandbox`, cuyo commit cita la entrada del fichero `Changes` de
+  Expat que lo justifica. Como la evidencia registra la versión encontrada, una ejecución se puede
+  juzgar después contra un mínimo más reciente.
 
 ## Base
 
@@ -114,7 +121,7 @@ No comprobado: macOS y Windows; si macOS hace cumplir `RLIMIT_AS`; informes de h
 sean pytest. Razonamiento, sin prueba: que un pack no necesita un informe mayor en la primera
 versión (32 MiB caben unos 300 000 tests al tamaño medido); los límites de 512 MiB y 10 s del
 lector; que el lugar correcto para dar los límites es quien llama, y no el adaptador ni la raíz de
-composición.
+composición, y que el lugar correcto para el mínimo de Expat es el adaptador.
 
 ## Alternativas consideradas
 
@@ -134,6 +141,11 @@ composición.
   política, la recibe.
 - **Los límites los da `interfaces` al construir el adaptador.** La raíz de composición tendría un
   valor de política, y `verify` no podría pedir límites distintos de los de la autocomprobación.
+- **El mínimo de Expat en `core`, con los límites.** `core` nombraría una biblioteca que solo usa un
+  adaptador, y quien llama podría bajar un suelo de seguridad.
+- **El mínimo de Expat como restricción del proyecto**, en `pyproject.toml`. Expat viene con la
+  compilación de Python, a menudo enlazado con la biblioteca del sistema, no con un paquete, así
+  que ninguna restricción de dependencias puede exigirlo.
 - **Un campo del pack para subir el límite del informe.** El código que se comprueba elegiría su
   propio límite, y ningún pack del corpus se acerca a él.
 
@@ -145,7 +157,7 @@ composición.
 - En Windows no hay `dir_fd`, así que la apertura segura del informe no funciona allí: límite
   conocido.
 - Un arnés sobre un Python cuyo Expat sea anterior a la 2.8.5 rechaza leer informes. El mínimo se
-  revisa aparte cuando Expat publique arreglos.
+  revisa aparte, en `sandbox`, cuando Expat publique arreglos.
 - El proceso que lee el informe acota los recursos. No contiene un defecto de Expat que permita
   ejecutar código.
 - `Outcome` y `Report` se mueven en dos ramas, una por alcance: `core` los añade, y después `packs`

@@ -111,3 +111,18 @@ CommitName("0123456789abcdef0123456789abcdef01234567")
 RepoPath.from_bytes(b"src/a.py")  # RepoPath(text="src/a.py")
 RefusalError("shallow-clone", "the repository is a shallow clone").finding.verdict  # Verdict.ERROR
 ```
+
+## The outcome of a test run
+
+`Outcome` is what happened to one test in one run: passed, failed, error or skipped. A `Report`
+gives the outcome of each test by its name. `ReportLimits` holds how much the reader of a report
+may take, as [ADR-0045](../../../docs/adr/0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md)
+says: 32 MiB for the report, 512 MiB of memory and 10 seconds of processor time unless the caller
+passes others.
+
+```python
+from dokime.core.outcomes import Outcome, ReportLimits
+
+report = {"tests/test_a.py::test_one": Outcome.PASSED}
+ReportLimits().report_bytes  # 33554432
+```

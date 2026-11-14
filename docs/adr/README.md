@@ -58,3 +58,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0045](0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md) | A test report is read by a bounded reader that refuses any DTD | Accepted |
 | [0046](0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md) | Look at the remote before starting or rewriting a branch | Accepted |
 | [0047](0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.md) | Only what changes a boundary or is expensive to undo is an ADR | Accepted |
+| [0048](0048-requirements-go-up-with-their-first-tests.md) | Requirements go up with their first tests | Proposed |

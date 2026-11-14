@@ -22,8 +22,10 @@ description: Open the work on a new scope (a harness module or a governance piec
    `tests/<scope>/**` and `docs/requirements/<scope>.md`. This is the first commit of the branch.
 3. **Write the requirements** in `docs/requirements/<scope>.md` with the `ears-requirements` skill,
    and run them through `uv run python -m tools.check_ears`.
-4. **Open the pull request as a draft** with the requirements, before writing code. Reviewing
-   requirements is far cheaper than reviewing code built on the wrong requirements.
+4. **Open the pull request with the requirements and their first tests**, in separate commits:
+   the requirements first, then the tests and the code that turn them green. Never a draft pull
+   request with traceability red. The requirements still come before the code in the history, so
+   a reviewer can read them first.
 5. **Build one requirement at a time** with the `tdd` skill.
 
 ## While working

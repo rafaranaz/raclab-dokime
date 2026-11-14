@@ -75,6 +75,9 @@ Optional-Trailer: value
 
 ## Pull requests
 
+- **A pull request starts by saying what it advances**: the exit criterion of the open milestone,
+  or the requirements, that it moves forward. If it advances none, the maintainer is asked before
+  it is written ([ADR-0049](docs/adr/0049-every-pull-request-says-what-it-advances.md)).
 - Small enough to review in one sitting. The template asks for the scope and the affected
   requirements, and lists only the points a review has to judge. It has no checkbox for anything
   CI already enforces: a manual tick next to a mechanical gate adds nothing but a chance to be

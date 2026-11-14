@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:107cdcfc88a9360b -->
+<!-- translation-of: README.md sha256:02a7fd038ad20ee3 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -60,3 +60,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0046](0046-look-at-the-remote-before-starting-or-rewriting-a-branch.es.md) | Mirar el remoto antes de empezar o reescribir una rama | Aceptada |
 | [0047](0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.es.md) | Solo es una ADR lo que cambia una frontera o cuesta caro deshacer | Aceptada |
 | [0048](0048-requirements-go-up-with-their-first-tests.es.md) | Los requisitos se suben con sus primeros tests | Aceptada |
+| [0049](0049-every-pull-request-says-what-it-advances.es.md) | Toda pull request dice qué hace avanzar | Propuesta |

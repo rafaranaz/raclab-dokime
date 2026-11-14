@@ -130,3 +130,37 @@ module that called it. They live in `core` because an adapter imports only `core
 - **CORE-076** The limits of reading a report shall carry the largest size of the report in bytes, the memory of the reader in bytes and the processor time of the reader in seconds.
 - **CORE-077** The limits of reading a report shall default to 32 MiB for the report, 512 MiB for the memory of the reader and 10 seconds of processor time.
 - **CORE-078** If a limit of reading a report is not a whole number greater than zero, then the limits shall be rejected with an error that names the limit.
+
+## The port of the verification runtime ([ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md), [ADR-0043](../adr/0043-tests-run-only-on-an-engine-that-enforces-the-limits.md), [ADR-0045](../adr/0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md))
+
+`core` defines the port and the values it exchanges; it runs no engine. What an adapter guarantees
+while it runs (no network, the limits, a read-only root, how it tells a kill apart) and how it
+finds the base image of a Dockerfile are requirements of the adapters. The port gives how a run
+ended and does not decide a verdict: the module that called it does. Known limit: a project that
+needs more than the default limits of a build or of a run cannot ask for them in this version.
+
+### Digests
+
+- **CORE-079** The digest of an image or of a manifest shall accept the text `sha256:` followed by 64 lowercase hexadecimal characters.
+- **CORE-080** If the digest of an image or of a manifest is not `sha256:` followed by 64 lowercase hexadecimal characters, then the digest shall be rejected with an error that quotes the text.
+
+### What the port gives and takes
+
+- **CORE-081** The port shall offer three operations: build an image from a Dockerfile and a directory, run a command in an image, and read the report that a run wrote.
+- **CORE-082** The build shall receive the Dockerfile, the directory it builds from and the limits of the build.
+- **CORE-083** The build shall return the digest of the image it built and the base image of the final stage of the Dockerfile, or no base image when that stage has none.
+- **CORE-084** The base image shall carry the reference written in the Dockerfile, the digest of the manifest of the platform that was built, and the digest of the index that the reference resolved to, or no index digest when it resolved to no index.
+- **CORE-085** The run shall receive the digest of the image, the command as a list of arguments, the directory of the project, the output directory and the limits of the run.
+- **CORE-086** The result of a run shall say how it ended: it exited by itself, it was killed when it reached the time limit, it was killed when it reached the memory limit, or it was killed for another reason.
+- **CORE-087** The result of a run shall carry the exit code of the command when the run exited by itself, and no exit code otherwise.
+- **CORE-088** The reading of a report shall receive the output directory, the path of the report inside it and the limits of reading, and give the report of the run.
+- **CORE-089** When an adapter of the verification runtime refuses an operation, the port shall raise the refusal of CORE-072.
+
+### The limits of a build and of a run
+
+- **CORE-090** The limits of a build shall carry the time on the clock in seconds.
+- **CORE-091** The limits of a build shall default to 1800 seconds.
+- **CORE-092** If the time of a build is not a whole number greater than zero, then the limits of the build shall be rejected with an error that names the limit.
+- **CORE-093** The limits of a run shall carry the memory in bytes, the number of processors, the number of processes and the time on the clock in seconds.
+- **CORE-094** The limits of a run shall default to 2 GiB of memory, 2 processors, 512 processes and 900 seconds.
+- **CORE-095** If the memory, the processes or the time of a run is not a whole number greater than zero, or the processors are not a finite number greater than zero, then the limits of the run shall be rejected with an error that names the limit.

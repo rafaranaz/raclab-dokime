@@ -49,6 +49,13 @@ result.
   allowed code to run, that code could do what the person can do.
 - **The version of Expat is recorded.** The value of `pyexpat.EXPAT_VERSION` goes into the
   evidence.
+- **The minimum of Expat lives in the adapter, not in `core`.** It is one constant of the adapter
+  that reads reports, next to the check made when the adapter starts. It is not policy: it says
+  which versions of the parser this adapter uses are known to be unsafe, so a caller has no reason
+  to ask for another, and an adapter with another parser would have another minimum. Raising it is
+  a change of `sandbox` alone, whose commit quotes the entry of the `Changes` file of Expat that
+  justifies it. Since the evidence records the version found, a run can be judged later against a
+  newer minimum.
 
 ## Basis
 
@@ -110,7 +117,7 @@ Not checked: macOS and Windows; whether `RLIMIT_AS` is enforced on macOS; report
 than pytest. Reasoning, without a test: that a pack never needs a larger report in the first
 version (32 MiB holds about 300,000 tests at the size measured); the limits of 512 MiB and 10 s
 for the reader; that the caller, and not the adapter or the composition root, is the right place
-to give the limits.
+to give the limits, and that the adapter is the right place for the minimum of Expat.
 
 ## Alternatives considered
 
@@ -130,6 +137,11 @@ to give the limits.
   policy, it receives it.
 - **The limits given by `interfaces` when it builds the adapter.** The composition root would hold
   a value of policy, and `verify` could not ask for other limits than the self-check.
+- **The minimum of Expat in `core`, with the limits.** `core` would name a library that only one
+  adapter uses, and a caller could lower a floor of safety.
+- **The minimum of Expat as a constraint of the project**, in `pyproject.toml`. Expat comes with
+  the build of Python, often linked to the library of the system, not with a package, so no
+  constraint on dependencies can require it.
 - **A field of the pack to raise the limit of the report.** The code under check would choose its
   own limit, and no pack of the corpus comes near it.
 
@@ -142,7 +154,7 @@ to give the limits.
 - On Windows there is no `dir_fd`, so the safe opening of the report does not work there: known
   limit.
 - A harness on a Python whose Expat is older than 2.8.5 refuses to read reports. The minimum is
-  reviewed on its own when Expat publishes fixes.
+  reviewed on its own, in `sandbox`, when Expat publishes fixes.
 - The process that reads the report bounds resources. It does not contain a defect of Expat that
   allows code to run.
 - `Outcome` and `Report` move in two branches, one per scope: `core` adds them, and then `packs`

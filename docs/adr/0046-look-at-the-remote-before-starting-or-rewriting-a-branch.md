@@ -1,6 +1,6 @@
 # ADR-0046 · Look at the remote before starting or rewriting a branch
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

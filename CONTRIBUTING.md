@@ -48,7 +48,9 @@ merged. Governance scopes (`repo`, `arch`) may be open next to it.
   the remote, and before a commit that changes the status of an ADR, list the open branches and
   pull requests of the remote (`git fetch --prune`, `git branch -r`, `gh pr list`). More than one
   session, of a person or of an agent, may work on the repository at once: the same change is easy
-  to make twice, and a rewrite can discard commits that someone else pushed.
+  to make twice, and a rewrite can discard commits that someone else pushed. The listing is read
+  before deciding, in a command of its own: chained with the push in one command, nobody reads it
+  before the push.
 
 ## Commits
 

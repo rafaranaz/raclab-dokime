@@ -1,4 +1,4 @@
-<!-- translation-of: 0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md sha256:1f6b065e1262b330 -->
+<!-- translation-of: 0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md sha256:cb143f00ba6d6c36 -->
 # ADR-0046 · Mirar el remoto antes de empezar o reescribir una rama
 
 **Estado:** propuesta
@@ -22,7 +22,8 @@ lo que otra no ha subido. El 2026-11-13 y el 2026-11-14 eso costó cuatro veces:
 Antes de empezar una rama, antes de reescribir una que ya está en el remoto y antes de un commit que
 cambia el estado de una ADR, se listan las ramas y las pull requests abiertas del remoto
 (`git fetch --prune`, `git branch -r`, `gh pr list`). Si alguna ya hace el mismo trabajo, no se
-empieza la nueva, o se empieza a partir de ella. La regla está escrita en la sección de ramas de
+empieza la nueva, o se empieza a partir de ella. La lista se lee antes de decidir, en una orden
+aparte, y nunca se encadena con el push. La regla está escrita en la sección de ramas de
 [CONTRIBUTING.es.md](../../CONTRIBUTING.es.md) y en las reglas de trabajo de
 [CLAUDE.md](../../CLAUDE.md), que carga cada sesión.
 
@@ -34,10 +35,12 @@ una de las sesiones:
 - En el primero, #32 llevaba seis minutos abierta cuando se empezó la segunda rama.
 - En el segundo, #35 estaba abierta cuando empezó la otra sesión.
 - En el tercero no consta qué push llegó antes.
-- En el cuarto, la sesión de #41 había listado el remoto justo antes de abrirla, y #42 llegó
-  dieciséis segundos después.
+- En el cuarto, la sesión de #42 sí listó el remoto, y la rama de #41 estaba en la lista. La lista
+  y el push iban en una sola orden, así que el push siguió adelante antes de que nadie leyera la
+  lista.
 
-Un listado habría mostrado los dos primeros. No puede mostrar trabajo que aún no se ha subido.
+Un listado habría mostrado los dos primeros, y mostró el cuarto: lo que falló allí fue leerlo
+después del push en lugar de antes. Un listado no puede mostrar trabajo que aún no se ha subido.
 
 Razonamiento, sin prueba: que el listado quita la mayoría de los duplicados al coste de dos órdenes.
 La prueba que lo confirmaría es contar las ramas y pull requests duplicadas durante el resto del
@@ -53,7 +56,7 @@ bloque A, con la regla en vigor.
   ya hecho. Se puede añadir más adelante si siguen los duplicados.
 - **Reservar el trabajo antes**, con una issue o una pull request en borrador vacía, antes de
   escribir nada. Añade un paso a cada rama, y dos reservas hechas con segundos de diferencia chocan
-  igual que #41 y #42.
+  igual.
 - **Confiar en `--force-with-lease`.** Rechaza un push que descartaría commits que otro subió, y
   solo eso: no hace nada contra dos ramas que hacen el mismo trabajo.
 
@@ -61,7 +64,8 @@ bloque A, con la regla en vigor.
 
 - Cada rama, cada reescritura de una rama subida y cada cambio de estado empieza con dos órdenes.
   Sin `gh`, las pull requests se miran en la web.
-- Dos sesiones que empiezan el mismo trabajo con segundos de diferencia siguen chocando, como #41 y
-  #42. La regla lo hace raro; no lo impide.
+- Dos sesiones que suben el mismo trabajo entre la lista y el push de la otra siguen chocando. La
+  regla lo hace raro; no lo impide.
+- Una lista en la misma orden que el push no cuenta como mirar: nadie la lee a tiempo.
 - Una reescritura sigue usando `--force-with-lease`, que cubre lo que un listado no puede: los
   commits subidos entre el listado y el push.

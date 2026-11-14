@@ -86,7 +86,7 @@ table of fields: which fields the mapping may have, which are mandatory and what
 - **CORE-053** If a field with a closed list of values has a value that is not in the list with the same type, then the shape check shall report a finding with the code `unknown-value` that lists the values allowed, with its line.
 - **CORE-054** When a finding is about a part that has no line of its own, the shape check shall give the line of the nearest part that contains it.
 
-## The port of the project repository ([ADR-0042](../adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md))
+## The port of the project repository ([ADR-0042](../adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md), [ADR-0044](../adr/0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md))
 
 `core` defines the port and the values it exchanges; it runs no `git`. What an adapter does with a
 real repository (how it composes and extracts a tree, when it refuses and with which code) is

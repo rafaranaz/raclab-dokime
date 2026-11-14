@@ -24,7 +24,7 @@ A finding is one problem found by a check. Its verdict is `FAIL`, `ASK` or `ERRO
 - **CORE-012** If a finding has an empty code or an empty message, then the finding shall be rejected with an error naming the empty field.
 - **CORE-013** When a list of findings is summarised, the summary shall be the aggregation of their verdicts.
 - **CORE-014** When a list of findings is empty, the summary shall be `PASS`.
-- **CORE-015** If a finding code is not made of lowercase words joined by hyphens, then the finding shall be rejected with an error naming the code.
+- **CORE-015** If a finding code is not made of words of lowercase letters and digits joined by hyphens, starting with a letter, then the finding shall be rejected with an error naming the code.
 - **CORE-016** If a finding has a line smaller than 1, then the finding shall be rejected with an error naming the line.
 
 ## Strict reading ([ADR-0037](../adr/0037-a-contract-is-read-by-strict-rules-of-its-own.md))

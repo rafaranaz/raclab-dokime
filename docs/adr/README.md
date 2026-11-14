@@ -61,3 +61,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0048](0048-requirements-go-up-with-their-first-tests.md) | Requirements go up with their first tests | Accepted |
 | [0049](0049-every-pull-request-says-what-it-advances.md) | Every pull request says what it advances | Accepted |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.md) | An experiment enters the repository as a test | Accepted |
+| [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.md) | The adapters that run a program are exempt from S603 | Proposed |

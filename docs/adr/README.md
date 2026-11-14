@@ -60,3 +60,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0047](0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.md) | Only what changes a boundary or is expensive to undo is an ADR | Accepted |
 | [0048](0048-requirements-go-up-with-their-first-tests.md) | Requirements go up with their first tests | Accepted |
 | [0049](0049-every-pull-request-says-what-it-advances.md) | Every pull request says what it advances | Proposed |
+| [0050](0050-an-experiment-enters-the-repository-as-a-test.md) | An experiment enters the repository as a test | Proposed |

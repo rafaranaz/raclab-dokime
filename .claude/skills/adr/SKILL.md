@@ -46,7 +46,9 @@ What is chosen, in the present tense and active voice ("We use X").
 ## Basis
 What the decision rests on: published evidence, a measurement of ours, or reasoning. Reasoning
 alone is a valid basis; say that it is, and name the test that would confirm it and the block of
-the roadmap where it runs.
+the roadmap where it runs. A measurement of ours gives its result here, not its program: the
+program enters the repository as a test or a fixture of its scope, with its requirement, and the
+basis names it, or says that it is still to come and in which scope.
 
 ## Alternatives considered
 At least one, each with the concrete reason it was discarded.

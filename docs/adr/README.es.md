@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:4ba2b07f1efc1e72 -->
+<!-- translation-of: README.md sha256:107cdcfc88a9360b -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -59,4 +59,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0045](0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.es.md) | Un informe de tests lo lee un lector acotado que rechaza cualquier DTD | Aceptada |
 | [0046](0046-look-at-the-remote-before-starting-or-rewriting-a-branch.es.md) | Mirar el remoto antes de empezar o reescribir una rama | Aceptada |
 | [0047](0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.es.md) | Solo es una ADR lo que cambia una frontera o cuesta caro deshacer | Aceptada |
-| [0048](0048-requirements-go-up-with-their-first-tests.es.md) | Los requisitos se suben con sus primeros tests | Propuesta |
+| [0048](0048-requirements-go-up-with-their-first-tests.es.md) | Los requisitos se suben con sus primeros tests | Aceptada |

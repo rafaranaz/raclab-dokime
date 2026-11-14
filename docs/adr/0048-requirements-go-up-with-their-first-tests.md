@@ -1,6 +1,6 @@
 # ADR-0048 · Requirements go up with their first tests
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

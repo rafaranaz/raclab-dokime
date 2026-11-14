@@ -1,7 +1,7 @@
-<!-- translation-of: 0048-requirements-go-up-with-their-first-tests.md sha256:b8966397763469aa -->
+<!-- translation-of: 0048-requirements-go-up-with-their-first-tests.md sha256:db2577e84f40077f -->
 # ADR-0048 · Los requisitos se suben con sus primeros tests
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

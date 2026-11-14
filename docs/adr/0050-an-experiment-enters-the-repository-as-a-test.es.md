@@ -1,7 +1,7 @@
-<!-- translation-of: 0050-an-experiment-enters-the-repository-as-a-test.md sha256:00c0e5f3d2973c27 -->
+<!-- translation-of: 0050-an-experiment-enters-the-repository-as-a-test.md sha256:b7686e58e5ef36d5 -->
 # ADR-0050 · Un experimento entra en el repositorio como un test
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

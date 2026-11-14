@@ -1,6 +1,6 @@
 # ADR-0050 · An experiment enters the repository as a test
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

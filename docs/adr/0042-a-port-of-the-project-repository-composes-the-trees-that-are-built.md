@@ -1,6 +1,6 @@
 # ADR-0042 · A port of the project repository composes the trees that are built
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md)
 
 ## Context
 

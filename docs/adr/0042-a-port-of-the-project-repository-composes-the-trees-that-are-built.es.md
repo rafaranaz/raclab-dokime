@@ -1,7 +1,7 @@
-<!-- translation-of: 0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md sha256:7cb1b6d43131f5e1 -->
+<!-- translation-of: 0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md sha256:cce7ece4acd75ab3 -->
 # ADR-0042 · Un puerto del repositorio del proyecto compone los árboles que se construyen
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.es.md)
 
 ## Contexto
 

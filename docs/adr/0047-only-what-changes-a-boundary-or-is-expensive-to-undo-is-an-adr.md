@@ -1,6 +1,6 @@
 # ADR-0047 · Only what changes a boundary or is expensive to undo is an ADR
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

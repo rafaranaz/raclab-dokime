@@ -150,6 +150,24 @@ in A3 for the stores and the clock. The scopes of a module are
 opened by increments, as `core` is
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.md)).
 
+A2 is built first as the thinnest path that works, `dokime env check` on cachetools behind the
+ports, and then hardened one piece at a time, each with its requirement and its test. The skeleton
+goes in this order:
+
+1. `core`: the outcome of a run, its report and the limits of its reader; the port of the
+   verification runtime.
+2. `platform`: the git adapter with the history, the change of a commit, the composition with the
+   paths of another commit and the extraction, with the refusals of ADR-0042. The composition with
+   a patch is refused with `patch-not-supported` until A3.
+3. `sandbox`: the podman adapter, which builds, runs with the four guarantees of ADR-0043 and reads
+   the report with its size limit and refusing a `DOCTYPE`. The tests of the guarantees run in CI.
+4. `packs`: the rule of order of ADR-0044 and the loop of the self-check over the ports.
+5. `interfaces`: the command `dokime env check`.
+6. Run it on cachetools. Two witnesses among the first ten candidates mean the skeleton walks.
+
+Then the hardening: the reader of the report in a process of its own and the opening of its path
+without links (ADR-0045), the docker adapter, python-semver and mdformat, and the closing of A2.
+
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 
 - **Before A3:** how the cases of the corpus are labelled before they are run, which the exit

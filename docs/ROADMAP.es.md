@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:0dcdf60572b278ce -->
+<!-- translation-of: ROADMAP.md sha256:51c397718679924d -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -152,6 +152,26 @@ veces: en A2 para el adaptador del repositorio del proyecto
 en A3 para los almacenes y el reloj. Los ámbitos de un módulo
 se abren por incrementos, como `core`
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.es.md)).
+
+A2 se construye primero como el camino más delgado que funciona, `dokime env check` sobre cachetools
+detrás de los puertos, y después se endurece una pieza cada vez, cada una con su requisito y su
+test. El esqueleto va en este orden:
+
+1. `core`: el resultado de una ejecución, su informe y los límites de su lector; el puerto del
+   entorno de verificación.
+2. `platform`: el adaptador de git con la historia, el cambio de un commit, la composición con las
+   rutas de otro commit y la extracción, con los rechazos de la ADR-0042. La composición con un
+   parche se rechaza con `patch-not-supported` hasta A3.
+3. `sandbox`: el adaptador de podman, que construye, ejecuta con las cuatro garantías de la ADR-0043
+   y lee el informe con su límite de tamaño y rechazando un `DOCTYPE`. Los tests de las garantías se
+   ejecutan en CI.
+4. `packs`: la regla de orden de la ADR-0044 y el bucle de la autocomprobación sobre los puertos.
+5. `interfaces`: la orden `dokime env check`.
+6. Ejecutarla sobre cachetools. Dos testigos entre los diez primeros candidatos significan que el
+   esqueleto camina.
+
+Después, el endurecimiento: el lector del informe en un proceso propio y la apertura de su ruta sin
+enlaces (ADR-0045), el adaptador de docker, python-semver y mdformat, y el cierre de A2.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 

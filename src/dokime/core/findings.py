@@ -6,16 +6,17 @@ from dataclasses import dataclass
 
 from dokime.core.verdicts import Verdict, aggregate
 
-_CODE = re.compile(r"[a-z]+(-[a-z]+)*")
+_CODE = re.compile(r"[a-z][a-z0-9]*(-[a-z0-9]+)*")
 
 
 @dataclass(frozen=True)
 class Finding:
     """One problem found by a check.
 
-    The code comes from a closed list and is made of lowercase words joined by hyphens. The lines
-    are those of the file where the problem is, counted from 1; there may be none. The verdict is
-    `FAIL`, `ASK` or `ERROR`: a finding is a reason against passing.
+    The code comes from a closed list and is made of words of lowercase letters and digits joined
+    by hyphens, starting with a letter. The lines are those of the file where the problem is,
+    counted from 1; there may be none. The verdict is `FAIL`, `ASK` or `ERROR`: a finding is a
+    reason against passing.
     """
 
     code: str
@@ -30,7 +31,8 @@ class Finding:
             raise ValueError("a finding needs a message: it is empty")
         if not _CODE.fullmatch(self.code):
             raise ValueError(
-                f"the code {self.code!r} is not made of lowercase words joined by hyphens"
+                f"the code {self.code!r} is not made of lowercase words of letters and digits"
+                " joined by hyphens, starting with a letter"
             )
         if self.verdict is Verdict.PASS:
             raise ValueError(f"a finding cannot carry the verdict {self.verdict.value}")

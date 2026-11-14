@@ -17,8 +17,8 @@ aggregate([Verdict.PASS, Verdict.ASK, Verdict.FAIL])  # Verdict.FAIL
 
 ## Findings
 
-A finding is one problem found by a check: a code made of lowercase words joined by hyphens, a
-message, the lines of the file where it is and the verdict it gives, which is never `PASS`. A list
+A finding is one problem found by a check: a code made of words of lowercase letters and digits
+joined by hyphens, starting with a letter, a message, the lines of the file where it is and the verdict it gives, which is never `PASS`. A list
 of findings summarises to the aggregation of their verdicts, and to `PASS` when it is empty.
 
 ```python

@@ -46,15 +46,42 @@ def test_a_finding_with_an_empty_message_is_rejected_naming_the_field() -> None:
 
 
 @pytest.mark.parametrize(
-    "code", ["Duplicate-Key", "duplicate_key", "duplicate key", "-key", "key-", "a--b", "clé"]
+    "code",
+    [
+        "Duplicate-Key",
+        "duplicate_key",
+        "duplicate key",
+        "-key",
+        "key-",
+        "a--b",
+        "clé",
+        "256-repository",
+        "8bit",
+        "sha_256",
+        "path-not-UTF8",
+    ],
 )
-def test_a_code_that_is_not_lowercase_words_joined_by_hyphens_is_rejected(code: str) -> None:
+def test_a_code_that_is_not_words_of_letters_and_digits_from_a_letter_is_rejected(
+    code: str,
+) -> None:
     with pytest.raises(ValueError, match=code):
         finding(code=code)
 
 
-@pytest.mark.parametrize("code", ["tag", "duplicate-key", "text-on-several-lines", "not-yaml"])
-def test_a_code_of_lowercase_words_joined_by_hyphens_is_accepted(code: str) -> None:
+@pytest.mark.parametrize(
+    "code",
+    [
+        "tag",
+        "duplicate-key",
+        "text-on-several-lines",
+        "not-yaml",
+        "sha256-repository",
+        "path-not-utf8",
+        "http2",
+        "rule-2",
+    ],
+)
+def test_a_code_of_words_of_letters_and_digits_from_a_letter_is_accepted(code: str) -> None:
     assert finding(code=code).code == code
 
 

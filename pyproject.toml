@@ -44,6 +44,9 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S603", "S607"]
 "tools/**" = ["S603", "S607"]
+# The adapters that run a program: ADR-0051.
+"src/dokime/platform/**" = ["S603"]
+"src/dokime/sandbox/**" = ["S603"]
 
 [tool.mypy]
 python_version = "3.13"

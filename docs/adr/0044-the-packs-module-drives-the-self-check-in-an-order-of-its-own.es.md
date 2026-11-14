@@ -1,7 +1,7 @@
-<!-- translation-of: 0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md sha256:3f328565c3d7b3cf -->
+<!-- translation-of: 0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md sha256:645876053d7b737f -->
 # ADR-0044 · El módulo packs dirige la autocomprobación en un orden propio
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

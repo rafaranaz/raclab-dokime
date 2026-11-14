@@ -1,6 +1,6 @@
 # ADR-0044 · The packs module drives the self-check in an order of its own
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

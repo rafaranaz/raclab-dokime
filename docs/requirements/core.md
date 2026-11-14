@@ -119,3 +119,14 @@ harness: the module that called the port adds its finding to its result, and the
 
 - **CORE-072** When an adapter refuses an operation, the port shall raise a refusal that carries a finding with the verdict `ERROR`.
 - **CORE-073** If a refusal is given a code or a message that a finding does not accept, then the refusal shall be rejected with the error of the finding.
+
+## The outcome of a test run ([ADR-0045](../adr/0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md))
+
+The adapter of the verification runtime reads the report of a run and gives these values to the
+module that called it. They live in `core` because an adapter imports only `core`.
+
+- **CORE-074** The outcome of a test shall be one of passed, failed, error and skipped.
+- **CORE-075** The report of a run shall give, for the name of each test, its outcome.
+- **CORE-076** The limits of reading a report shall carry the largest size of the report in bytes, the memory of the reader in bytes and the processor time of the reader in seconds.
+- **CORE-077** The limits of reading a report shall default to 32 MiB for the report, 512 MiB for the memory of the reader and 10 seconds of processor time.
+- **CORE-078** If a limit of reading a report is not a whole number greater than zero, then the limits shall be rejected with an error that names the limit.

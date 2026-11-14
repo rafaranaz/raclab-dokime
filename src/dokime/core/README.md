@@ -126,3 +126,19 @@ from dokime.core.outcomes import Outcome, ReportLimits
 report = {"tests/test_a.py::test_one": Outcome.PASSED}
 ReportLimits().report_bytes  # 33554432
 ```
+
+## The port of the verification runtime
+
+`VerificationRuntime` builds an image from a Dockerfile, runs a command in it and reads the report
+the run wrote. A build gives the digest of the image and the base image of its final stage: the
+reference as written, the digest of the platform manifest and, if the reference named an index,
+its digest. A run gives how it ended (`exited` with its exit code, `time-limit`, `memory-limit` or
+`killed`) and decides no verdict. `BuildLimits` (30 minutes) and `RunLimits` (2 GiB, 2 processors,
+512 processes, 15 minutes) are passed by the caller; a pack cannot change them.
+
+```python
+from dokime.core.runtime import Ending, RunLimits, RunResult
+
+RunLimits(processors=0.5).memory_bytes  # 2147483648
+RunResult(ending=Ending.TIME_LIMIT, exit_code=None)
+```

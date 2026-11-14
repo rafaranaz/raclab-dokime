@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:537a5aa40dce8c8d -->
+<!-- translation-of: README.md sha256:994953a822a28fe9 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -56,4 +56,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada, enmendada por el 0044 |
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Aceptada |
 | [0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.es.md) | El módulo packs dirige la autocomprobación en un orden propio | Aceptada |
-| [0045](0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.es.md) | Un informe de tests lo lee un lector acotado que rechaza cualquier DTD | Propuesta |
+| [0045](0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.es.md) | Un informe de tests lo lee un lector acotado que rechaza cualquier DTD | Aceptada |

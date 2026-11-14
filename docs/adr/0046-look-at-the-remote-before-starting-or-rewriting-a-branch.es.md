@@ -1,7 +1,7 @@
-<!-- translation-of: 0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md sha256:cb143f00ba6d6c36 -->
+<!-- translation-of: 0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md sha256:9c4f8fa97881cfe8 -->
 # ADR-0046 · Mirar el remoto antes de empezar o reescribir una rama
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:77f9684923f30476 -->
+<!-- translation-of: README.md sha256:aba0f8532aec7f9f -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -87,7 +87,7 @@ de contar:
 | Aprobar dos o más ejemplos por caso cuesta un tiempo aceptable | Minutos de persona por contrato | A, a mano |
 | La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | Proporción de requisitos marcados sin ejemplo | A |
 | Un agente puede arrancar con su credencial y un directorio de configuración hecho para la ejecución | Probarlo con dos agentes en Linux y macOS | C |
-| Un pack se puede proponer a partir de la configuración de CI de un proyecto | Repetir nuestra prueba parcial con contenedores y acceso a los registros | A |
+| ~~Un pack se puede proponer a partir de la configuración de CI de un proyecto~~ | **Descartada** por la [ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md): el pack lo escribe una persona | — |
 
 ## Fuera de la primera versión
 

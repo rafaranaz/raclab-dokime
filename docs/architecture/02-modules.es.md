@@ -1,4 +1,4 @@
-<!-- translation-of: 02-modules.md sha256:5fad92900e3c08c2 -->
+<!-- translation-of: 02-modules.md sha256:91b5b3108bedb657 -->
 # Módulos
 
 *Read in [English](02-modules.md).*
@@ -23,7 +23,7 @@ flowchart TB
         contract["contract<br/>formato, comprobaciones, huella"]
         oracle["oracle<br/>reserva, relaciones, comparación"]
         evidence["evidence<br/>declaración, firma, verificación"]
-        packs["packs<br/>modelo de pack, detección, autocomprobación"]
+        packs["packs<br/>modelo de pack, comprobación, autocomprobación"]
     end
     subgraph L0["núcleo"]
         core["core<br/>tipos, veredictos, eventos, registro, puertos"]
@@ -67,7 +67,7 @@ flowchart TB
 | `core` | Tipos, el álgebra de veredictos, el registro con huellas encadenadas, el esquema y el validador del flujo, la definición de los puertos | Entrada ni salida, salvo escribir el registro por un puerto |
 | `contract` | Leer, validar y dar huella a un contrato: sintaxis EARS, esquema de ejemplos, cobertura de requisitos por ejemplos, contradicciones | Ejecutar nada |
 | `oracle` | Repartir los ejemplos en visibles y sellados; aplicar relaciones; comparar observaciones con lo esperado; redactar la realimentación | Ejecutar el código examinado. Recibe observaciones |
-| `packs` | Modelo de pack, detección del tipo de proyecto, autocomprobación | Saber de lenguajes en código. Todo es declarativo |
+| `packs` | Modelo de pack, la comprobación de un pack, autocomprobación | Saber de lenguajes en código. Todo es declarativo |
 | `evidence` | Construir la atestación, pedir firmas, **verificar** un fichero de evidencia sin el resto | Decidir veredictos |
 | `verify` | Las puertas, la línea base, el mapa de impacto por cobertura, la agregación | Hablar con el agente ni con la persona |
 | `spec` | Entrevista, detectores de ambigüedad, el solucionador donde aplique | Aprobar. Solo propone |

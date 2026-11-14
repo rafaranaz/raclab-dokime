@@ -22,7 +22,7 @@ flowchart TB
         contract["contract<br/>format, lint, digest"]
         oracle["oracle<br/>hold-out, relations, comparison"]
         evidence["evidence<br/>statement, sign, verify"]
-        packs["packs<br/>pack model, detection, self-check"]
+        packs["packs<br/>pack model, check, self-check"]
     end
     subgraph L0["kernel"]
         core["core<br/>types, verdicts, events, ledger, ports"]
@@ -66,7 +66,7 @@ flowchart TB
 | `core` | Types, the algebra of verdicts, the ledger with chained hashes, the schema and the validator of the flow, the definition of the ports | Do input or output, except writing the ledger through a port |
 | `contract` | Read, validate and digest a contract: EARS syntax, example schema, coverage of requirements by examples, contradictions | Run anything |
 | `oracle` | Split examples into visible and sealed; apply relations; compare observations with what is expected; word the feedback | Run the code under test. It receives observations |
-| `packs` | Pack model, detection of the kind of project, self-check | Know languages in code. Everything is declarative |
+| `packs` | Pack model, the check of a pack, self-check | Know languages in code. Everything is declarative |
 | `evidence` | Build the attestation, ask for signatures, **verify** an evidence file without the rest | Decide verdicts |
 | `verify` | The gates, the baseline, the impact map from coverage, the aggregation | Talk to the agent or to the person |
 | `spec` | Interview, ambiguity detectors, the solver where it applies | Approve. It only proposes |

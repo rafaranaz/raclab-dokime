@@ -20,7 +20,8 @@ none sees what another has not pushed. On 2026-11-13 and 2026-11-14 that cost fo
 Before starting a branch, before rewriting one that is already on the remote, and before a commit
 that changes the status of an ADR, the open branches and pull requests of the remote are listed
 (`git fetch --prune`, `git branch -r`, `gh pr list`). If one already does the same work, the new
-one is not started, or is started from it. The rule is written in the section on branches of
+one is not started, or is started from it. The listing is read before deciding, in a command of
+its own, and is never chained with the push. The rule is written in the section on branches of
 [CONTRIBUTING.md](../../CONTRIBUTING.md) and in the working rules of
 [CLAUDE.md](../../CLAUDE.md), which every session loads.
 
@@ -32,10 +33,12 @@ one of the sessions:
 - In the first, #32 had been open for six minutes when the second branch was started.
 - In the second, #35 was open when the other session started.
 - In the third, which push came first is not recorded.
-- In the fourth, the session of #41 had listed the remote just before opening it, and #42 came
-  sixteen seconds later.
+- In the fourth, the session of #42 did list the remote, and the branch of #41 was in the list.
+  The listing and the push ran in one command, so the push went ahead before anyone read the
+  list.
 
-A listing would have shown the first two. It cannot show work that is not pushed yet.
+A listing would have shown the first two, and it did show the fourth: what failed there was
+reading it after the push instead of before. A listing cannot show work that is not pushed yet.
 
 Reasoning, without a test: that the listing removes most duplicates at the cost of two commands.
 The test that would confirm it is counting the duplicate branches and pull requests over the rest
@@ -50,7 +53,7 @@ of block A, with the rule in force.
   request changes.** It acts only once both are open, after the work is done. It may be added
   later if duplicates go on.
 - **Claim the work first**, with an issue or an empty draft pull request, before writing anything.
-  It adds a step to every branch, and two claims made seconds apart race just like #41 and #42.
+  It adds a step to every branch, and two claims made seconds apart race the same way.
 - **Rely on `--force-with-lease`.** It refuses a push that would discard commits someone else
   pushed, and only that: it does nothing for two branches doing the same work.
 
@@ -58,7 +61,8 @@ of block A, with the rule in force.
 
 - Every branch, every rewrite of a pushed branch and every change of status starts with two
   commands. Without `gh`, the pull requests are looked at on the web.
-- Two sessions that start the same work within seconds still collide, as #41 and #42 did. The rule
-  makes that rare; it does not prevent it.
+- Two sessions that push the same work between the listing and the push of the other still
+  collide. The rule makes that rare; it does not prevent it.
+- A listing in the same command as the push does not count as looking: nothing reads it in time.
 - A rewrite still uses `--force-with-lease`, which covers what a listing cannot: commits pushed
   between the listing and the push.

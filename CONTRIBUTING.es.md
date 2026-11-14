@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:078804aca328ba75 -->
+<!-- translation-of: CONTRIBUTING.md sha256:053c89beae9eee4b -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -49,7 +49,9 @@ está mergeado. Los ámbitos de gobierno (`repo`, `arch`) pueden estar abiertos 
   el remoto y antes de un commit que cambia el estado de una ADR, se listan las ramas y las pull
   requests abiertas del remoto (`git fetch --prune`, `git branch -r`, `gh pr list`). Puede haber
   más de una sesión, de una persona o de un agente, trabajando a la vez en el repositorio: es fácil
-  hacer dos veces el mismo cambio, y una reescritura puede descartar commits que otro subió.
+  hacer dos veces el mismo cambio, y una reescritura puede descartar commits que otro subió. La
+  lista se lee antes de decidir, en una orden aparte: encadenada con el push en una sola orden,
+  nadie la lee antes del push.
 
 ## Commits
 

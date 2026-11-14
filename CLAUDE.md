@@ -49,8 +49,9 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
   commit.
 - **Do not disable or relax a gate** without an approved ADR.
 - **Look at the remote first.** Before starting a branch, rewriting one already pushed, or
-  changing the status of an ADR, list the open branches and pull requests of the remote. Another
-  session may be doing the same work.
+  changing the status of an ADR, list the open branches and pull requests of the remote, and read
+  the list before deciding: never chain the listing and the push in one command. Another session
+  may be doing the same work.
 
 ## Skills
 

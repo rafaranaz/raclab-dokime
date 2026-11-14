@@ -1,7 +1,7 @@
-<!-- translation-of: 0049-every-pull-request-says-what-it-advances.md sha256:5a56fe9464e23ded -->
+<!-- translation-of: 0049-every-pull-request-says-what-it-advances.md sha256:cf655ac3aac31f19 -->
 # ADR-0049 · Toda pull request dice qué hace avanzar
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

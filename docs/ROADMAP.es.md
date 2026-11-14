@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:a4c53497440bb829 -->
+<!-- translation-of: ROADMAP.md sha256:0dcdf60572b278ce -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -152,6 +152,13 @@ veces: en A2 para el adaptador del repositorio del proyecto
 en A3 para los almacenes y el reloj. Los ámbitos de un módulo
 se abren por incrementos, como `core`
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.es.md)).
+
+Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
+
+- **Antes de A3:** cómo se etiquetan los casos del corpus antes de ejecutarlos, que el criterio de
+  salida de A3 exige; y el formato de la política, cuya huella va en la evidencia y que es una ruta
+  protegida.
+- **Antes de A4:** cómo se versiona y se publica el arnés.
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
 automatiza y calcula las métricas en el bloque B.

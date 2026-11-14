@@ -150,6 +150,13 @@ in A3 for the stores and the clock. The scopes of a module are
 opened by increments, as `core` is
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.md)).
 
+Still to decide before a milestone opens. They are written down here and not decided in A2:
+
+- **Before A3:** how the cases of the corpus are labelled before they are run, which the exit
+  criterion of A3 requires; and the format of the policy, whose digest goes into the evidence and
+  which is a protected path.
+- **Before A4:** how the harness is versioned and published.
+
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
 the metrics in block B.
 

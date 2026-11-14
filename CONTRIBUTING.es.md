@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:053c89beae9eee4b -->
+<!-- translation-of: CONTRIBUTING.md sha256:44b9669b39270e89 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -76,6 +76,9 @@ Optional-Trailer: value
 
 ## Pull requests
 
+- **Una pull request empieza diciendo qué hace avanzar**: el criterio de salida del hito abierto, o
+  los requisitos, que mueve hacia delante. Si no hace avanzar ninguno, se pregunta al mantenedor
+  antes de escribirla ([ADR-0049](docs/adr/0049-every-pull-request-says-what-it-advances.es.md)).
 - Pequeños y revisables de una sentada. La plantilla pide el ámbito y los requisitos afectados, y
   solo enumera los puntos que tiene que juzgar la revisión. No tiene ninguna casilla para lo que CI
   ya comprueba: una marca manual junto a una puerta mecánica no añade nada salvo la posibilidad de

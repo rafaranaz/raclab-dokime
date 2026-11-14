@@ -1,5 +1,7 @@
 ## What changes and why
 
+**Advances:** <!-- the exit criterion of the open milestone, or the requirements, that this moves forward. If none, ask the maintainer before writing it. -->
+
 <!-- One or two sentences. The detail of each step is in the commits. -->
 
 ## Scope

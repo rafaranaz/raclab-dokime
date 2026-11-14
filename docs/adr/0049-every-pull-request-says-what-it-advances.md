@@ -1,6 +1,6 @@
 # ADR-0049 · Every pull request says what it advances
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

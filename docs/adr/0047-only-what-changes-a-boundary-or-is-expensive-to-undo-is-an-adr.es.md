@@ -1,7 +1,7 @@
-<!-- translation-of: 0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.md sha256:8431dd89f9819850 -->
+<!-- translation-of: 0047-only-what-changes-a-boundary-or-is-expensive-to-undo-is-an-adr.md sha256:2d2fafaebd549e7f -->
 # ADR-0047 · Solo es una ADR lo que cambia una frontera o cuesta caro deshacer
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

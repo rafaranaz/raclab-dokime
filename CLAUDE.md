@@ -75,3 +75,6 @@ uv run python -m tools.check_traceability && uv run python -m tools.check_links
 uv run python -m tools.check_translations && uv run python -m tools.check_adrs
 npm ci && uv run python -m tools.check_mermaid
 ```
+
+`ruff format --check` also checks the Python blocks inside Markdown files, ADRs included: a
+program quoted in a document has to be formatted like code.

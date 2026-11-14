@@ -125,7 +125,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 |---|---|---|
 | Most real requirements can be expressed as examples at a boundary | By hand, before any code of block A | The contract format is revised before building |
 | Approving two or more examples per case costs an acceptable time | By hand, with the previous one | The hold-out rule is revised |
-| A pack can be proposed from the CI configuration of a project | Milestone A2, with containers and access to registries | Packs are written by hand per project, declared as a cost of adoption |
+| ~~A pack can be proposed from the CI configuration of a project~~ | **Discarded** by [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md): the harness does not derive a pack, a person writes it | Applied: packs are written by hand per project, a cost of adoption |
 | Holding out by case catches overfitted solutions | The metric "value of the hold-out" when block B closes | The hold-out becomes optional and the weight moves to relations and to block D |
 | An agent starts with its credential and a per-run configuration directory | Two agents on Linux and macOS, before block C | The harness uses the normal configuration of the agent and the evidence says so |
 | An open-weight model completes the circuit | When block C closes | The models it works with are published; the version is not blocked |

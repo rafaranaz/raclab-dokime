@@ -83,7 +83,7 @@ Each decision says what it rests on. These rest on reasoning and need a test bef
 | Approving two or more examples per case costs an acceptable time | Minutes of a person per contract | A, by hand |
 | Most real requirements can be expressed as examples at a boundary | Share of requirements marked as having no example | A |
 | An agent can start with its credential and a configuration directory made for the run | Try it with two agents on Linux and macOS | C |
-| A pack can be proposed from the CI configuration of a project | Repeat our partial test with containers and registry access | A |
+| ~~A pack can be proposed from the CI configuration of a project~~ | **Discarded** by [ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md): a person writes the pack | — |
 
 ## Out of the first version
 

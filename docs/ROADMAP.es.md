@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:28c832ef6808e9a2 -->
+<!-- translation-of: ROADMAP.md sha256:a4c53497440bb829 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -128,7 +128,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 |---|---|---|
 | La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | A mano, antes de cualquier código del bloque A | Se revisa el formato del contrato antes de construir |
 | Aprobar dos o más ejemplos por caso cuesta un tiempo aceptable | A mano, junto con la anterior | Se revisa la regla de reserva |
-| Un pack se puede proponer a partir de la configuración de CI de un proyecto | Hito A2, con contenedores y acceso a los registros | Los packs se escriben a mano por proyecto, declarado como coste de adopción |
+| ~~Un pack se puede proponer a partir de la configuración de CI de un proyecto~~ | **Descartada** por la [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md): el arnés no deduce un pack, lo escribe una persona | Aplicado: los packs se escriben a mano por proyecto, un coste de adopción |
 | La reserva por caso detecta soluciones sobreajustadas | La métrica "valor de la reserva" al cerrar el bloque B | La reserva pasa a ser opcional y el peso va a las relaciones y al bloque D |
 | Un agente arranca con su credencial y un directorio de configuración hecho para la ejecución | Dos agentes en Linux y macOS, antes del bloque C | El arnés usa la configuración normal del agente y la evidencia lo dice |
 | Un modelo de pesos abiertos completa el circuito | Al cerrar el bloque C | Se publica con qué modelos funciona; la versión no se bloquea |

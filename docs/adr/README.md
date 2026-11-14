@@ -56,3 +56,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md) | Tests run only on an engine that enforces the limits | Accepted |
 | [0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md) | The packs module drives the self-check in an order of its own | Accepted |
 | [0045](0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md) | A test report is read by a bounded reader that refuses any DTD | Accepted |
+| [0046](0046-look-at-the-remote-before-starting-or-rewriting-a-branch.md) | Look at the remote before starting or rewriting a branch | Proposed |

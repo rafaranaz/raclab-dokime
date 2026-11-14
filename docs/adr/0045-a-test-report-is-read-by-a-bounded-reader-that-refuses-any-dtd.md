@@ -1,6 +1,6 @@
 # ADR-0045 · A test report is read by a bounded reader that refuses any DTD
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

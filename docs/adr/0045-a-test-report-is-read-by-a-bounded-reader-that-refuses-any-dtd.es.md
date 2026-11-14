@@ -1,7 +1,7 @@
-<!-- translation-of: 0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md sha256:8595188b8fc1490d -->
+<!-- translation-of: 0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md sha256:9db17c213ebb36cd -->
 # ADR-0045 · Un informe de tests lo lee un lector acotado que rechaza cualquier DTD
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

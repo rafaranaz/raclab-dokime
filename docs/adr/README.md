@@ -52,6 +52,6 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted, amended by 0043 |
-| [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md) | A port of the project repository composes the trees that are built | Accepted |
+| [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md) | A port of the project repository composes the trees that are built | Accepted, amended by 0044 |
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.md) | Tests run only on an engine that enforces the limits | Accepted |
-| [0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md) | The packs module drives the self-check in an order of its own | Proposed |
+| [0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md) | The packs module drives the self-check in an order of its own | Accepted |

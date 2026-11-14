@@ -71,4 +71,8 @@ the decision.
 - **A decision that states or changes an invariant is checked against it** before it is accepted:
   does the invariant have one reading, does it follow from the decisions in every mode, and does
   its mechanism enforce what it says. The invariants are in `docs/architecture/README.md`.
-- **An ADR is born as `proposed`** and becomes `accepted` when its pull request is approved.
+- **An ADR is born as `proposed`** and becomes `accepted` when its pull request is approved. Its pull
+  request is not merged while it says `proposed`: on approval, the acceptance goes as its own commit
+  on the same branch, and it also marks as amended or superseded any ADR that this one changes.
+  Then the pull request is merged. An ADR merged as `proposed` by mistake is accepted in a branch of
+  its own.

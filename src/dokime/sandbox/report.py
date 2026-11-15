@@ -80,6 +80,8 @@ def read_report(output: Path, report: PurePosixPath, limits: ReportLimits) -> Re
                 str(READER_PROGRAM),
                 str(descriptor),
                 str(limits.report_bytes),
+                str(limits.reader_memory_bytes),
+                str(limits.reader_cpu_seconds),
             ],
             stdin=subprocess.DEVNULL,
             capture_output=True,

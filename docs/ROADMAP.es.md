@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:dc138f08af26382b -->
+<!-- translation-of: ROADMAP.md sha256:662a1d262b22ef91 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -220,22 +220,32 @@ Apuntado como deuda, que no bloquea ningún hito:
 - Opcional: `pip install --require-hashes` en los Dockerfile del conjunto de casos.
 - Los testigos guardados para que la siguiente ejecución de una autocomprobación use los mismos,
   como dice la ADR-0041: no se construyó en A2.
+- De adopción: una imagen cuyo `USER` no es root. SANDBOX-038 la rechaza hoy, así que no es una
+  protección contra código hostil sino la compatibilidad con imágenes que fijan un usuario, y
+  ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2: solo
+  `--userns=keep-id:uid=U,gid=G`, con los números del usuario, deja que ese usuario lea sus propios
+  ficheros y escriba en la salida con los ficheros a nombre de la persona; ahí no se acepta un
+  nombre. La opción recomendada para cuando un usuario lo necesite lee esos números del
+  `/etc/passwd` y el `/etc/group` de la imagen con `podman create` y `podman cp`, sin ejecutar
+  nada; el código del proyecto puede reescribir esos ficheros durante la construcción, así que es
+  una superficie nueva en A3 y necesita su decisión entonces.
+- Un test de `no-new-privileges` con un programa setuid real, que depende del anterior: la imagen
+  del corpus trae `su`, `passwd` y otros, y `passwd -S tester`, ejecutado por un usuario que no es
+  root, muestra las fechas de `/etc/shadow` sin la opción y no las muestra con ella.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
 - **Antes de A3:** la configuración del proyecto: el adaptador de git lee los hechos del proyecto
-  con `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés;
-  en A3 hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
-  comprueba pasa a ser hostil en A3, así que estas protecciones del endurecimiento de A2 van antes:
-  el lector del informe en un proceso propio y la apertura de su ruta sin enlaces (ADR-0045); una
-  ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`; y una imagen cuyo `USER` no
-  es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese usuario, lo que falta probar
-  cuando `USER` es un nombre. El formato de la política, cómo se etiquetan los casos del corpus y la
-  configuración de los tests en el pack los deciden la ADR-0054, la ADR-0055 y la ADR-0056. La
-  ADR-0056 deja dos puntos para cuando se abra A3, antes de construir el gate `protected-paths`:
-  los ficheros que guardan la configuración de los tests junto con la del proyecto, como hace
-  mdformat en `pyproject.toml`; y cómo cuenta la autocomprobación un commit que cambia solo
-  configuración y código.
+  con `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en
+  A3 hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
+  comprueba pasa a ser hostil en A3, así que el endurecimiento de A2 va antes; ya están construidos
+  el lector del informe en un proceso propio, con su ruta abierta sin enlaces (ADR-0045), y una
+  ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`. El formato de la política,
+  cómo se etiquetan los casos del corpus y la configuración de los tests en el pack los deciden la
+  ADR-0054, la ADR-0055 y la ADR-0056. La ADR-0056 deja dos puntos para cuando se abra A3, antes de
+  construir el gate `protected-paths`: los ficheros que guardan la configuración de los tests junto
+  con la del proyecto, como hace mdformat en `pyproject.toml`; y cómo cuenta la autocomprobación un
+  commit que cambia solo configuración y código.
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia

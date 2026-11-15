@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:90c6dc50b91fd773 -->
+<!-- translation-of: ROADMAP.md sha256:daf4223982ddaae9 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -184,15 +184,28 @@ midieron. Un SIGTERM a mitad de una ejecución de cachetools, enviado a `python 
 a la orden `dokime` instalada y a `uv run dokime`, no dejó ningún contenedor ni ningún directorio
 temporal; `uv run` reenvía la señal y termina con 143.
 
-A2 se cierra con su criterio de salida, no con todo el endurecimiento. Lo que falta para cerrarlo:
+**A2 se cerró el 2026-11-15**, con su criterio de salida y no con todo el endurecimiento. Además del
+esqueleto llevó dos piezas más:
 
-1. Los packs de los tres repositorios en este repositorio, ejecutados como sus tests contra cada
-   proyecto en su commit, que no se copia, en un job `corpus` de CI que falla salvo que cada
-   proyecto se haya autocomprobado y haya pasado (ADR-0052).
-2. Una línea por candidato según `env check` lo mira: mdformat estuvo 254 s sin escribir nada entre
-   los programas y el resultado.
+1. Los packs de los tres repositorios en `tests/corpus/`, fijados por digest y versiones exactas,
+   ejecutados contra cada proyecto en su commit, que no se copia, en un job `corpus` de CI que
+   falla salvo que cada proyecto se haya autocomprobado y haya pasado (ADR-0052).
+2. Una línea por candidato según `env check` lo mira: mdformat había estado 254 s sin escribir
+   nada entre los programas y el resultado.
 
-Después, el cierre de A2.
+Medido en el cierre, con los packs fijados:
+
+| Proyecto | Testigos entre los candidatos | En la máquina de desarrollo, imágenes en el almacén | En el job `corpus`, un runner nuevo |
+|---|---|---|---|
+| cachetools | 2 de 3 | 16 s | 10 s |
+| python-semver | 2 de 3 | 32 s | 12 s |
+| mdformat | 2 de 6 | 248 s | 89 s |
+
+El job `corpus` tardó 2 minutos en total. A2 resolvió la única hipótesis de la tabla de arriba cuya
+prueba le tocaba, que un pack se puede proponer desde la configuración de CI de un proyecto: la
+ADR-0041 la descartó por decisión, no por una prueba. La autocomprobación para en el segundo
+testigo, así que ya no se mide cuántos testigos hay entre los diez primeros; la ADR-0044 daba 7, 8 y
+4.
 
 Apuntado como deuda, que no bloquea ningún hito:
 
@@ -205,6 +218,8 @@ Apuntado como deuda, que no bloquea ningún hito:
   mismo; y un solo sitio para el tratamiento de SIGTERM, hoy copiado en `sandbox`, `packs` e
   `interfaces`.
 - Opcional: `pip install --require-hashes` en los Dockerfile del conjunto de casos.
+- Los testigos guardados para que la siguiente ejecución de una autocomprobación use los mismos,
+  como dice la ADR-0041: no se construyó en A2.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 

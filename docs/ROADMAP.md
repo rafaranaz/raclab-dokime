@@ -179,15 +179,27 @@ measured. A SIGTERM in the middle of a run of cachetools, sent to `python -m dok
 the installed `dokime` and to `uv run dokime`, left no container and no temporary directory;
 `uv run` passes the signal on and ends with 143.
 
-A2 closes with its exit criterion, not with the whole hardening. What is left to close it:
+**A2 closed on 2026-11-15**, with its exit criterion and not with the whole hardening. Besides the
+skeleton it took two more pieces:
 
-1. The packs of the three repositories in this repository, run as its tests against each project
-   at its commit, which is not copied, in a job `corpus` of CI that fails unless every project was
-   self-checked and passed (ADR-0052).
-2. A line for each candidate as `env check` looks at it: mdformat ran for 254 s with nothing
+1. The packs of the three repositories in `tests/corpus/`, pinned by digest and exact versions,
+   run against each project at its commit, which is not copied, in a job `corpus` of CI that
+   fails unless every project was self-checked and passed (ADR-0052).
+2. A line for each candidate as `env check` looks at it: mdformat had run for 254 s with nothing
    written between the programs and the result.
 
-Then the closing of A2.
+Measured at the closing, with the pinned packs:
+
+| Project | Witnesses among the candidates | On the machine of development, images in the store | In the job `corpus`, a fresh runner |
+|---|---|---|---|
+| cachetools | 2 of 3 | 16 s | 10 s |
+| python-semver | 2 of 3 | 32 s | 12 s |
+| mdformat | 2 of 6 | 248 s | 89 s |
+
+The job `corpus` took 2 minutes in all. A2 resolved the one hypothesis of the table above whose test
+it held, that a pack can be proposed from the CI configuration of a project: ADR-0041 discarded it
+by a decision, not by a test. The self-check stops at the second witness, so the number of witnesses
+among the first ten is no longer measured; ADR-0044 had 7, 8 and 4.
 
 Noted as debt, which blocks no milestone:
 
@@ -200,6 +212,8 @@ Noted as debt, which blocks no milestone:
   itself; and one place for the handling of SIGTERM, copied today in `sandbox`, `packs` and
   `interfaces`.
 - Optional: `pip install --require-hashes` in the Dockerfiles of the corpus.
+- The witnesses recorded so that the next run of a self-check uses the same ones, as ADR-0041
+  says: not built in A2.
 
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 

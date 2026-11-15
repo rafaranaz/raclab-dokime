@@ -1,11 +1,13 @@
 # SDD-EARS: SANDBOX-030 SANDBOX-031 SANDBOX-032 SANDBOX-034 SANDBOX-035 SANDBOX-036 SANDBOX-037
+import stat
 import threading
 import time
 from pathlib import Path
 
 import pytest
 
-from dokime.core.runtime import Ending, RunLimits, RunResult, VerificationRuntime
+from dokime.core.runtime import Digest, Ending, RunLimits, RunResult, VerificationRuntime
+from dokime.sandbox.podman import PodmanRuntime
 from tests.sandbox.engines import BUSYBOX, Engine
 
 MIB = 1024 * 1024
@@ -148,3 +150,26 @@ def test_a_run_killed_by_the_memory_limit_leaves_the_working_directory_unchanged
     result = shell(engine, runtime, directories, "head -c 300m /dev/zero | tail", limits)
     assert result.ending is Ending.MEMORY_LIMIT
     assert list(harness.iterdir()) == []
+
+
+@pytest.mark.parametrize("state", ["exited", "stopped"])
+def test_a_container_that_has_exited_but_is_not_yet_cleaned_up_gives_its_exit_code(
+    tmp_path: Path, state: str
+) -> None:
+    """Podman gives "stopped" for a container that has exited and is not yet cleaned up. Two runs
+    at once can find it so after `podman run` returns."""
+    program = tmp_path / "podman"
+    program.write_text(
+        "#!/bin/sh\n"
+        'case "$1" in\n'
+        '  --version) echo "podman version 5.4.2" ;;\n'
+        f'  container) echo "{state} 3 false" ;;\n'
+        "esac\n"
+    )
+    program.chmod(program.stat().st_mode | stat.S_IXUSR)
+    project, out = tmp_path / "project", tmp_path / "out"
+    project.mkdir()
+    out.mkdir()
+    runtime = PodmanRuntime(podman=str(program))
+    result = runtime.run(Digest(f"sha256:{'a' * 64}"), ("true",), project, out, RunLimits())
+    assert result == RunResult(ending=Ending.EXITED, exit_code=3)

@@ -47,6 +47,8 @@ _STOP_SECONDS = 10
 _OOM_EXIT = 137
 _NOT_STARTED = (126, 127)
 """What podman returns when the command cannot be invoked or is not found."""
+_ENDED = ("exited", "stopped")
+"""The states of a container whose command has ended: cleaned up or not yet."""
 _CONMON_OOM = "oom"
 """The file that conmon leaves in its working directory when the memory limit kills the container.
 
@@ -285,7 +287,7 @@ class PodmanRuntime:
         state = done.stdout.split()
         if returned in _NOT_STARTED and state[:1] == ["created"]:
             return RunResult(ending=Ending.EXITED, exit_code=returned)
-        if done.returncode != 0 or len(state) != 3 or state[0] != "exited":
+        if done.returncode != 0 or len(state) != 3 or state[0] not in _ENDED:
             seen = " ".join(state) or done.stderr.strip() or "no state"
             raise RefusalError(
                 "podman-failed",

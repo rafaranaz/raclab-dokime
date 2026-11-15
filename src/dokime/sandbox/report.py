@@ -7,52 +7,23 @@ hardening of ADR-0045.
 """
 
 import errno
+import json
 import os
 import stat
+import subprocess
+import sys
 from pathlib import Path, PurePosixPath
-from typing import NoReturn
-from xml.parsers import expat
 
 from dokime.core.outcomes import Outcome, Report, ReportLimits
 from dokime.core.repository import RefusalError
 
-_CHILDREN = {"failure": Outcome.FAILED, "error": Outcome.ERROR, "skipped": Outcome.SKIPPED}
-_PRECEDENCE = (Outcome.ERROR, Outcome.FAILED, Outcome.SKIPPED)
+READER_PROGRAM = Path(__file__).with_name("reader_process.py")
+"""The program that parses the report, in a process of its own."""
 
+_LAST_ERROR = 2000
+"""How much of what the program that reads wrote on its error output a refusal quotes."""
 
-class _DoctypeError(Exception):
-    pass
-
-
-def _refuse_doctype(*_: object) -> NoReturn:
-    raise _DoctypeError
-
-
-class _Cases:
-    """Collects the outcome of each test case as the parser goes through the report."""
-
-    def __init__(self) -> None:
-        self.report: dict[str, Outcome] = {}
-        self._case: str | None = None
-        self._seen: set[Outcome] = set()
-
-    def start(self, tag: str, attributes: dict[str, str]) -> None:
-        if tag == "testcase" and self._case is None:
-            self._case = f"{attributes.get('classname', '')}::{attributes.get('name', '')}"
-            self._seen = set()
-        elif self._case is not None and tag in _CHILDREN:
-            self._seen.add(_CHILDREN[tag])
-
-    def end(self, tag: str) -> None:
-        if tag != "testcase" or self._case is None:
-            return
-        if self._case in self.report:
-            raise RefusalError(
-                "report-duplicate-test", f"the report names the test {self._case!r} twice"
-            )
-        outcome = next((o for o in _PRECEDENCE if o in self._seen), Outcome.PASSED)
-        self.report[self._case] = outcome
-        self._case = None
+_OUTCOMES = {outcome.value: outcome for outcome in Outcome}
 
 
 def _not_a_file(report: PurePosixPath, why: str) -> RefusalError:
@@ -100,34 +71,56 @@ def read_report(output: Path, report: PurePosixPath, limits: ReportLimits) -> Re
         raise RefusalError(
             "path-outside-output", f"the path of the report {str(report)!r} leaves the output"
         )
-    descriptor = _open(output, report)
+    os.close(_open(output, report))
+    done = subprocess.run(
+        [
+            sys.executable,
+            "-I",
+            str(READER_PROGRAM),
+            str(output.joinpath(*report.parts)),
+            str(limits.report_bytes),
+        ],
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        check=False,
+    )
+    return _result(report, limits, done)
+
+
+def _result(
+    report: PurePosixPath, limits: ReportLimits, done: "subprocess.CompletedProcess[bytes]"
+) -> Report:
+    """Turn what the program that reads gave into the report, or into its refusal."""
     try:
-        with os.fdopen(descriptor, "rb", closefd=False) as handle:
-            data = handle.read(limits.report_bytes + 1)
-    except OSError as error:
-        raise RefusalError(
-            "report-unreadable", f"the report {report} cannot be read: {error}"
-        ) from None
-    finally:
-        os.close(descriptor)
-    if len(data) > limits.report_bytes:
-        raise RefusalError(
-            "report-too-large",
-            f"the report {report} is larger than its limit of {limits.report_bytes} bytes",
-        )
-    cases = _Cases()
-    parser = expat.ParserCreate()
-    parser.StartDoctypeDeclHandler = _refuse_doctype
-    parser.EntityDeclHandler = _refuse_doctype
-    parser.ExternalEntityRefHandler = _refuse_doctype
-    parser.StartElementHandler = cases.start
-    parser.EndElementHandler = cases.end
-    try:
-        parser.Parse(data, True)
-    except _DoctypeError:
-        raise RefusalError("report-has-doctype", f"the report {report} has a DOCTYPE") from None
-    except expat.ExpatError as error:
-        raise RefusalError(
-            "report-unreadable", f"the report {report} is not well-formed XML: {error}"
-        ) from None
-    return cases.report
+        given = json.loads(done.stdout) if done.returncode == 0 else None
+    except ValueError:
+        given = None
+    if isinstance(given, dict) and isinstance(given.get("refusal"), str):
+        refused = _refusal(report, limits, given["refusal"], str(given.get("detail", "")))
+        if refused is not None:
+            raise refused
+    cases = given.get("cases") if isinstance(given, dict) else None
+    if isinstance(cases, dict) and all(
+        isinstance(name, str) and outcome in _OUTCOMES for name, outcome in cases.items()
+    ):
+        return {name: _OUTCOMES[outcome] for name, outcome in cases.items()}
+    ending = f"the signal {-done.returncode}" if done.returncode < 0 else f"{done.returncode}"
+    raise RefusalError(
+        "report-reader-failed",
+        f"the process that reads the report {report} ended with {ending} and gave no report: "
+        f"{done.stderr.decode(errors='replace').strip()[-_LAST_ERROR:] or 'no output'}",
+    )
+
+
+def _refusal(
+    report: PurePosixPath, limits: ReportLimits, code: str, detail: str
+) -> RefusalError | None:
+    messages = {
+        "report-too-large": (
+            f"the report {report} is larger than its limit of {limits.report_bytes} bytes"
+        ),
+        "report-has-doctype": f"the report {report} has a DOCTYPE",
+        "report-unreadable": f"the report {report} is not well-formed XML: {detail}",
+        "report-duplicate-test": f"the report names the test {detail!r} twice",
+    }
+    return RefusalError(code, messages[code]) if code in messages else None

@@ -9,6 +9,8 @@ hardening of ADR-0045.
 import errno
 import json
 import os
+import pyexpat
+import re
 import stat
 import subprocess
 import sys
@@ -20,10 +22,32 @@ from dokime.core.repository import RefusalError
 READER_PROGRAM = Path(__file__).with_name("reader_process.py")
 """The program that parses the report, in a process of its own."""
 
+MINIMUM_EXPAT = (2, 8, 5)
+"""Expat 2.8.5 fixed CVE-2026-93990, malformed UTF-16, which a report only has to declare.
+
+The entries of the `Changes` file of Expat behind this value are in the basis of ADR-0045.
+"""
+
+_EXPAT_VERSION = re.compile(r"expat_(\d+)\.(\d+)\.(\d+)")
 _LAST_ERROR = 2000
 """How much of what the program that reads wrote on its error output a refusal quotes."""
 
 _OUTCOMES = {outcome.value: outcome for outcome in Outcome}
+
+
+def expat_version() -> str:
+    """Give the version of the Expat that parses the reports, refusing one older than the minimum.
+
+    The program that reads runs on the same Python as the harness, so it has the same Expat.
+    """
+    found = _EXPAT_VERSION.fullmatch(pyexpat.EXPAT_VERSION)
+    if found is None or tuple(int(part) for part in found.groups()) < MINIMUM_EXPAT:
+        raise RefusalError(
+            "expat-too-old",
+            "the reader of reports needs Expat 2.8.5 or later, and the Python of the harness has"
+            f" {pyexpat.EXPAT_VERSION.removeprefix('expat_')!r}",
+        )
+    return pyexpat.EXPAT_VERSION.removeprefix("expat_")
 
 
 def _not_a_file(report: PurePosixPath, why: str) -> RefusalError:

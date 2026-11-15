@@ -32,7 +32,7 @@ from dokime.core.runtime import (
     RunLimits,
     RunResult,
 )
-from dokime.sandbox.report import read_report
+from dokime.sandbox.report import expat_version, read_report
 
 MINIMUM_VERSION = (4, 9)
 """The podman of ubuntu-24.04, where CI runs: reasoning, not a measurement of older versions."""
@@ -111,6 +111,7 @@ class PodmanRuntime:
             )
         self.podman_path = Path(found).resolve()
         self.podman_version = self._check_version()
+        self.expat_version = expat_version()
 
     def _check_version(self) -> str:
         try:

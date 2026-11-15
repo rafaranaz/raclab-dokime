@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:de97a022a182822f -->
+<!-- translation-of: README.md sha256:206dba089a12fe7f -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -63,3 +63,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0049](0049-every-pull-request-says-what-it-advances.es.md) | Toda pull request dice qué hace avanzar | Aceptada |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.es.md) | Un experimento entra en el repositorio como un test | Aceptada |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Aceptada |
+| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) | El conjunto de casos se ejecuta en CI en un job propio, con red | Propuesta |

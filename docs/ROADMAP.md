@@ -215,14 +215,14 @@ Noted as debt, which blocks no milestone:
 - The witnesses recorded so that the next run of a self-check uses the same ones, as ADR-0041
   says: not built in A2.
 - Of adoption: an image whose `USER` is not root. SANDBOX-038 refuses it today, so it is not a
-  protection against hostile code but the support of images that set a user, and none of the
-  three packs needs it. Five variants were measured with podman 5.4.2: only
-  `--userns=keep-id:uid=U,gid=G`, with the numbers of the user, lets that user read its own files
-  and write in the output with the files owned by the person; a name is not accepted there. The
-  option recommended for when a user needs it reads those numbers from `/etc/passwd` and
-  `/etc/group` of the image with `podman create` and `podman cp`, running nothing; those files can
-  be rewritten by the code of the project during the build, so it is a new surface in A3 and needs
-  its decision then.
+  protection against hostile code but the support of images that set a user, and none of the three
+  packs needs it. Five variants were measured with podman 5.4.2
+  ([#81](https://github.com/rafaranaz/raclab-dokime/pull/81)): only `--userns=keep-id:uid=U,gid=G`,
+  with the numbers of the user, lets that user read its own files and write in the output with the
+  files owned by the person; a name is not accepted there. The option recommended for when a user
+  needs it reads those numbers from `/etc/passwd` and `/etc/group` of the image with `podman create`
+  and `podman cp`, running nothing; those files can be rewritten by the code of the project during
+  the build, so it is a new surface in A3 and needs its decision then.
 - A test of `no-new-privileges` with a real setuid program, which depends on the previous one: the
   image of the corpus has `su`, `passwd` and others, and `passwd -S tester`, run by a user that is
   not root, shows the dates of `/etc/shadow` without the option and does not with it.

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:662a1d262b22ef91 -->
+<!-- translation-of: ROADMAP.md sha256:8d1f944ef8a52cc6 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -222,13 +222,14 @@ Apuntado como deuda, que no bloquea ningún hito:
   como dice la ADR-0041: no se construyó en A2.
 - De adopción: una imagen cuyo `USER` no es root. SANDBOX-038 la rechaza hoy, así que no es una
   protección contra código hostil sino la compatibilidad con imágenes que fijan un usuario, y
-  ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2: solo
-  `--userns=keep-id:uid=U,gid=G`, con los números del usuario, deja que ese usuario lea sus propios
-  ficheros y escriba en la salida con los ficheros a nombre de la persona; ahí no se acepta un
-  nombre. La opción recomendada para cuando un usuario lo necesite lee esos números del
-  `/etc/passwd` y el `/etc/group` de la imagen con `podman create` y `podman cp`, sin ejecutar
-  nada; el código del proyecto puede reescribir esos ficheros durante la construcción, así que es
-  una superficie nueva en A3 y necesita su decisión entonces.
+  ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2
+  ([#81](https://github.com/rafaranaz/raclab-dokime/pull/81)): solo `--userns=keep-id:uid=U,gid=G`,
+  con los números del usuario, deja que ese usuario lea sus propios ficheros y escriba en la salida
+  con los ficheros a nombre de la persona; ahí no se acepta un nombre. La opción recomendada para
+  cuando un usuario lo necesite lee esos números del `/etc/passwd` y el `/etc/group` de la imagen
+  con `podman create` y `podman cp`, sin ejecutar nada; el código del proyecto puede reescribir esos
+  ficheros durante la construcción, así que es una superficie nueva en A3 y necesita su decisión
+  entonces.
 - Un test de `no-new-privileges` con un programa setuid real, que depende del anterior: la imagen
   del corpus trae `su`, `passwd` y otros, y `passwd -S tester`, ejecutado por un usuario que no es
   root, muestra las fechas de `/etc/shadow` sin la opción y no las muestra con ella.

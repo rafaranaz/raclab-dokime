@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:daf4223982ddaae9 -->
+<!-- translation-of: ROADMAP.md sha256:dc138f08af26382b -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -223,16 +223,19 @@ Apuntado como deuda, que no bloquea ningún hito:
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
-- **Antes de A3:** cómo se etiquetan los casos del corpus antes de ejecutarlos, que el criterio de
-  salida de A3 exige; el formato de la política, cuya huella va en la evidencia y que es una ruta
-  protegida; y la configuración del proyecto: el adaptador de git lee los hechos del proyecto con
-  `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en A3
-  hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
+- **Antes de A3:** la configuración del proyecto: el adaptador de git lee los hechos del proyecto
+  con `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés;
+  en A3 hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
   comprueba pasa a ser hostil en A3, así que estas protecciones del endurecimiento de A2 van antes:
   el lector del informe en un proceso propio y la apertura de su ruta sin enlaces (ADR-0045); una
   ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`; y una imagen cuyo `USER` no
   es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese usuario, lo que falta probar
-  cuando `USER` es un nombre.
+  cuando `USER` es un nombre. El formato de la política, cómo se etiquetan los casos del corpus y la
+  configuración de los tests en el pack los deciden la ADR-0054, la ADR-0055 y la ADR-0056. La
+  ADR-0056 deja dos puntos para cuando se abra A3, antes de construir el gate `protected-paths`:
+  los ficheros que guardan la configuración de los tests junto con la del proyecto, como hace
+  mdformat en `pyproject.toml`; y cómo cuenta la autocomprobación un commit que cambia solo
+  configuración y código.
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia

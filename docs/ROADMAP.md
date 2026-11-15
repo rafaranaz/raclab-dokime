@@ -217,17 +217,20 @@ Noted as debt, which blocks no milestone:
 
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 
-- **Before A3:** how the cases of the corpus are labelled before they are run, which the exit
-  criterion of A3 requires; the format of the policy, whose digest goes into the evidence and
-  which is a protected path; and the configuration of the project: the git adapter reads the facts
-  of the project with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs
-  to the person who runs the harness; in A3 it has to be checked that the change of an agent
-  cannot touch `.git/config`. The code under check becomes hostile in A3, so these protections of
+- **Before A3:** the configuration of the project: the git adapter reads the facts of the project
+  with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs to the person
+  who runs the harness; in A3 it has to be checked that the change of an agent cannot touch
+  `.git/config`. The code under check becomes hostile in A3, so these protections of
   the hardening of A2 come before it: the reader of the report in a process of its own and the
   opening of its path without links (ADR-0045); a run with `--cap-drop=ALL` and
   `--security-opt no-new-privileges`; and an image whose `USER` is not root, run with
   `--userns=keep-id` and the uid and gid of that user, which still has to be tried when `USER` is
-  a name.
+  a name. The format of the policy, how the cases of the corpus are labelled and the configuration
+  of the tests in the pack are decided by ADR-0054, ADR-0055 and ADR-0056. ADR-0056 leaves two
+  points for when A3 opens, before the gate `protected-paths` is built: the files that hold the
+  configuration of the tests together with that of the project, as mdformat does in
+  `pyproject.toml`; and how the self-check counts a commit that changes only configuration and
+  code.
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.

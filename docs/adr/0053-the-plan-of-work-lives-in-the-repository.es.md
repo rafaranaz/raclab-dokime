@@ -1,7 +1,7 @@
-<!-- translation-of: 0053-the-plan-of-work-lives-in-the-repository.md sha256:aeef12908e1b1f76 -->
+<!-- translation-of: 0053-the-plan-of-work-lives-in-the-repository.md sha256:02ee6d59736283af -->
 # ADR-0053 · El plan de trabajo vive en el repositorio
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

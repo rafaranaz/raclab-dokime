@@ -56,6 +56,11 @@ isolation: it runs with the permissions of the person who runs the harness.
 - **SANDBOX-027** While a command runs, the verification runtime adapter shall give it a writable `/tmp` that is not kept after the run.
 - **SANDBOX-028** When a run ends, the verification runtime adapter shall leave the files that the command wrote in the output directory owned by the user who runs the harness.
 
+### The privileges of a run
+
+- **SANDBOX-070** While a command runs, the verification runtime adapter shall give its processes no capabilities.
+- **SANDBOX-071** While a command runs, the verification runtime adapter shall keep its processes from gaining privileges by running a program, as the flag `no_new_privs` of Linux does.
+
 ### How a run ended
 
 - **SANDBOX-030** When the command ends with an exit code and the engine does not report that the memory limit killed it, the verification runtime adapter shall give the ending "exited" with that exit code, 137 included.

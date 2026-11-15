@@ -47,7 +47,7 @@ class Digest:
 
 @dataclass(frozen=True)
 class BaseImage:
-    """The image a stage starts from: the reference as written in the Dockerfile, the digest of
+    """The image a stage starts from: the reference as the build resolved it, the digest of
     the manifest of the platform built, and the digest of the index it resolved to, if any."""
 
     reference: str

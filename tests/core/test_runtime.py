@@ -39,10 +39,13 @@ def test_the_build_returns_the_image_and_the_base_image_of_the_final_stage_or_no
     assert get_type_hints(Build)["base"] == BaseImage | None
 
 
+RESOLVED = "docker.io/library/python:3.13-slim"
+
+
 def test_the_base_image_carries_the_reference_the_platform_digest_and_the_index_digest() -> None:
-    base = BaseImage(reference="python:3.13-slim", platform=IMAGE, index=OTHER)
-    assert (base.reference, base.platform, base.index) == ("python:3.13-slim", IMAGE, OTHER)
-    assert BaseImage(reference="python:3.13-slim", platform=IMAGE, index=None).index is None
+    base = BaseImage(reference=RESOLVED, platform=IMAGE, index=OTHER)
+    assert (base.reference, base.platform, base.index) == (RESOLVED, IMAGE, OTHER)
+    assert BaseImage(reference=RESOLVED, platform=IMAGE, index=None).index is None
     assert get_type_hints(BaseImage)["index"] == Digest | None
 
 

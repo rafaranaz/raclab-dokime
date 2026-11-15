@@ -1,7 +1,7 @@
-<!-- translation-of: 0056-the-pack-names-the-configuration-of-its-tests.md sha256:7218bd8982336511 -->
+<!-- translation-of: 0056-the-pack-names-the-configuration-of-its-tests.md sha256:779ef5a7acef254f -->
 # ADR-0056 · El pack nombra la configuración de sus tests, que queda protegida
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

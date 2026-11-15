@@ -66,4 +66,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0053](0053-the-plan-of-work-lives-in-the-repository.md) | The plan of work lives in the repository | Accepted |
 | [0054](0054-the-policy-is-an-optional-file-of-values.md) | The policy is an optional file of values, and the first version holds two | Accepted |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md) | A case of the corpus is labelled by how it is built, and confirmed before it runs | Accepted |
-| [0056](0056-the-pack-names-the-configuration-of-its-tests.md) | The pack names the configuration of its tests, which is protected | Proposed |
+| [0056](0056-the-pack-names-the-configuration-of-its-tests.md) | The pack names the configuration of its tests, which is protected | Accepted |

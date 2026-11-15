@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:0d2f8564af2bec31 -->
+<!-- translation-of: README.md sha256:291cb7c25c052b6a -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -65,4 +65,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Aceptada |
 | [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) | El conjunto de casos se ejecuta en CI en un job propio, con red | Aceptada |
 | [0053](0053-the-plan-of-work-lives-in-the-repository.es.md) | El plan de trabajo vive en el repositorio | Aceptada |
-| [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Propuesta |
+| [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |

@@ -64,4 +64,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.md) | The adapters that run a program are exempt from S603 | Accepted |
 | [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) | The corpus runs in CI in a job of its own, with the network | Accepted |
 | [0053](0053-the-plan-of-work-lives-in-the-repository.md) | The plan of work lives in the repository | Accepted |
-| [0054](0054-the-policy-is-an-optional-file-of-values.md) | The policy is an optional file of values, and the first version holds two | Proposed |
+| [0054](0054-the-policy-is-an-optional-file-of-values.md) | The policy is an optional file of values, and the first version holds two | Accepted |

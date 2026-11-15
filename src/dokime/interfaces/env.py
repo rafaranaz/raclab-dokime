@@ -2,7 +2,8 @@
 
 `interfaces` is the composition root: it opens the adapters, names the programs they run and
 hands them to `packs`, which drives the self-check. The lines of the programs are written before
-the self-check starts, so that a run shows at once with what it runs.
+the self-check starts, and the line of each candidate as soon as it has been looked at, so that a
+run shows at once with what it runs and then how it goes.
 """
 
 import argparse
@@ -105,8 +106,7 @@ def env_check(arguments: argparse.Namespace) -> int:
     if as_json:
         sys.stdout.write(_as_json(pack_path, result))
     else:
-        lines = [_candidate_line(candidate) for candidate in result.candidates]
-        lines += [finding_line(str(pack_path), finding) for finding in result.findings]
+        lines = [finding_line(str(pack_path), finding) for finding in result.findings]
         lines.append(summary(result.verdict, result.findings))
         sys.stdout.write("\n".join(lines) + "\n")
     return EXIT_CODES[result.verdict]
@@ -143,9 +143,15 @@ def _self_check(pack_path: Path, project: Path, start: str, as_json: bool) -> Se
                 ports.repository,
                 ports.runtime,
                 ports.programs,
+                on_candidate=(lambda _: None) if as_json else _write_candidate,
             )
     except RefusalError as refusal:
         return ended(refusal.finding)
+
+
+def _write_candidate(candidate: Candidate) -> None:
+    sys.stdout.write(_candidate_line(candidate) + "\n")
+    sys.stdout.flush()
 
 
 def _candidate_line(candidate: Candidate) -> str:

@@ -20,6 +20,17 @@ def is_candidate(pack: Pack, changed: Iterable[str]) -> bool:
     return are_tests == {True, False}
 
 
+def turned_green(parent: Report, commit: Report) -> tuple[str, ...]:
+    """Give the tests that pass on the commit and failed, gave an error or were missing on the
+    parent, in the order of the report of the commit."""
+    broken = (Outcome.FAILED, Outcome.ERROR)
+    return tuple(
+        test
+        for test, outcome in commit.items()
+        if outcome is Outcome.PASSED and parent.get(test) in (*broken, None)
+    )
+
+
 def is_witness(parent: Report, commit: Report) -> bool:
     """Say whether the reports of a candidate prove that the pack runs its tests.
 
@@ -29,10 +40,7 @@ def is_witness(parent: Report, commit: Report) -> bool:
     broken = (Outcome.FAILED, Outcome.ERROR)
     if not any(outcome in broken for outcome in parent.values()):
         return False
-    return any(
-        outcome is Outcome.PASSED and parent.get(test) in (*broken, None)
-        for test, outcome in commit.items()
-    )
+    return bool(turned_green(parent, commit))
 
 
 def self_check(candidates: Sequence[bool]) -> tuple[Finding, ...]:

@@ -13,14 +13,15 @@ from dokime.contract.check import check
 from dokime.contract.model import Checked
 from dokime.core.findings import Finding
 from dokime.core.verdicts import Verdict
-
-EXIT_CODES = {Verdict.PASS: 0, Verdict.FAIL: 1, Verdict.ERROR: 2, Verdict.ASK: 3}
-_COUNTED = (Verdict.FAIL, Verdict.ASK, Verdict.ERROR)
+from dokime.interfaces.env import env_check
+from dokime.interfaces.text import EXIT_CODES, finding_line, summary
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the command the arguments name and return its exit code."""
     arguments = _parser().parse_args(argv)
+    if arguments.area == "env":
+        return env_check(arguments)
     checked = _check_file(arguments.path)
     write = _as_json if arguments.format == "json" else _as_text
     sys.stdout.write(write(str(arguments.path), checked))
@@ -40,6 +41,28 @@ def _parser() -> argparse.ArgumentParser:
     check_one.add_argument("path", type=Path, help="the contract file")
     check_one.add_argument(
         "--format", choices=("text", "json"), default="text", help="how the findings are written"
+    )
+    env = areas.add_parser("env", help="work with the environment of a verified project")
+    env_actions = env.add_subparsers(dest="action", required=True, metavar="ACTION")
+    env_one = env_actions.add_parser(
+        "check",
+        help="self-check a pack on the history of its project",
+        description="Self-check a pack: find two commits whose tests go from red to green.",
+    )
+    env_one.add_argument(
+        "--from", dest="start", required=True, help="the full name of the commit to start from"
+    )
+    env_one.add_argument(
+        "--project", type=Path, default=Path(), help="the project; the current directory if absent"
+    )
+    env_one.add_argument(
+        "--pack",
+        type=Path,
+        default=None,
+        help="the pack; .dokime/pack.yaml of the project if absent",
+    )
+    env_one.add_argument(
+        "--format", choices=("text", "json"), default="text", help="how the result is written"
     )
     return parser
 
@@ -61,31 +84,8 @@ def _check_file(path: Path) -> Checked:
 
 
 def _as_text(path: str, checked: Checked) -> str:
-    lines = [_line(path, finding) for finding in checked.findings]
-    return "\n".join([*lines, _summary(checked)]) + "\n"
-
-
-def _line(path: str, finding: Finding) -> str:
-    place = f"{path}:{finding.lines[0]}" if finding.lines else path
-    others = finding.lines[1:]
-    also = ""
-    if others:
-        word = "lines" if len(others) > 1 else "line"
-        also = f" (also {word} {', '.join(str(line) for line in others)})"
-    return f"{place}: {finding.verdict.value} {finding.code}: {finding.message}{also}"
-
-
-def _summary(checked: Checked) -> str:
-    total = len(checked.findings)
-    if not total:
-        return f"{checked.verdict.value}: no findings"
-    counts = [
-        f"{count} {verdict.value.lower()}"
-        for verdict in _COUNTED
-        if (count := sum(finding.verdict is verdict for finding in checked.findings))
-    ]
-    noun = "finding" if total == 1 else "findings"
-    return f"{checked.verdict.value}: {total} {noun} ({', '.join(counts)})"
+    lines = [finding_line(path, finding) for finding in checked.findings]
+    return "\n".join([*lines, summary(checked.verdict, checked.findings)]) + "\n"
 
 
 def _as_json(path: str, checked: Checked) -> str:

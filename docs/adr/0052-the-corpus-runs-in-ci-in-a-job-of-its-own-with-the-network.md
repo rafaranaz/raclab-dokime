@@ -1,6 +1,6 @@
 # ADR-0052 · The corpus runs in CI in a job of its own, with the network
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

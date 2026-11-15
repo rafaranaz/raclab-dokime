@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:746de8c10a7416ee -->
+<!-- translation-of: README.md sha256:f4e232f8fc98712c -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -67,4 +67,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0053](0053-the-plan-of-work-lives-in-the-repository.es.md) | El plan de trabajo vive en el repositorio | Aceptada |
 | [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md) | Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse | Aceptada |
-| [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Propuesta |
+| [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Aceptada |

@@ -1,6 +1,6 @@
 # ADR-0056 · The pack names the configuration of its tests, which is protected
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

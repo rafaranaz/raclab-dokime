@@ -179,28 +179,27 @@ measured. A SIGTERM in the middle of a run of cachetools, sent to `python -m dok
 the installed `dokime` and to `uv run dokime`, left no container and no temporary directory;
 `uv run` passes the signal on and ends with 143.
 
-Then the hardening, in the order that the three runs suggest:
+A2 closes with its exit criterion, not with the whole hardening. What is left to close it:
 
 1. The packs of the three repositories in this repository, run as its tests against each project
-   at its commit, which is not copied. They live outside the repository until then.
+   at its commit, which is not copied, in a job `corpus` of CI that fails unless every project was
+   self-checked and passed (ADR-0052).
 2. A line for each candidate as `env check` looks at it: mdformat ran for 254 s with nothing
    written between the programs and the result.
-3. A test with podman that runs up to three times and demands `memory-limit` at least once: no test
-   with a real engine demands it now, so a podman or conmon that stopped reporting it would go
-   unseen.
-4. The reader of the report in a process of its own and the opening of its path without links
-   (ADR-0045).
-5. A run with `--cap-drop=ALL` and `--security-opt no-new-privileges`.
-6. The docker adapter, so that the tests of the guarantees run with both engines.
-7. `--from` optional, with a `head()` of the git adapter.
-8. An operation of the port that gives the tree of a commit, instead of composing a commit with
-   itself; and one place for the handling of SIGTERM, copied today in `sandbox`, `packs` and
-   `interfaces`.
-9. An image whose `USER` is not root, run with `--userns=keep-id` and the uid and gid of that user,
-   which still has to be tried when `USER` is a name, since its uid has to be read from the image.
-   None of the three packs needs it.
 
 Then the closing of A2.
+
+Noted as debt, which blocks no milestone:
+
+- A test with podman that runs up to three times and demands `memory-limit` at least once: no test
+  with a real engine demands it now, so a podman or conmon that stopped reporting it would go
+  unseen.
+- The docker adapter, so that the tests of the guarantees run with both engines.
+- `--from` optional, with a `head()` of the git adapter.
+- An operation of the port that gives the tree of a commit, instead of composing a commit with
+  itself; and one place for the handling of SIGTERM, copied today in `sandbox`, `packs` and
+  `interfaces`.
+- Optional: `pip install --require-hashes` in the Dockerfiles of the corpus.
 
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 
@@ -209,7 +208,12 @@ Still to decide before a milestone opens. They are written down here and not dec
   which is a protected path; and the configuration of the project: the git adapter reads the facts
   of the project with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs
   to the person who runs the harness; in A3 it has to be checked that the change of an agent
-  cannot touch `.git/config`.
+  cannot touch `.git/config`. The code under check becomes hostile in A3, so these protections of
+  the hardening of A2 come before it: the reader of the report in a process of its own and the
+  opening of its path without links (ADR-0045); a run with `--cap-drop=ALL` and
+  `--security-opt no-new-privileges`; and an image whose `USER` is not root, run with
+  `--userns=keep-id` and the uid and gid of that user, which still has to be tried when `USER` is
+  a name.
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.
@@ -232,6 +236,6 @@ A ruleset on `main` (Settings → Rules → Rulesets):
 - Pull request required to merge, with *Rebase* as the only merge method. No approval count is
   required, because GitHub does not let authors approve their own pull requests; merging is the
   approval.
-- The four CI checks must pass (`lint, types and tests`, `governance checks`,
+- The five CI checks must pass (`lint, types and tests`, `corpus`, `governance checks`,
   `commits and branch scope`, `dependency audit`), on a branch that is up to date with `main`.
 - Linear history required; force pushes and deletion blocked.

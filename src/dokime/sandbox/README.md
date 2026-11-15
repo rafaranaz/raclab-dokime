@@ -12,6 +12,7 @@ from dokime.sandbox.podman import PodmanRuntime
 
 runtime = PodmanRuntime()  # refuses a podman older than 4.9
 runtime.podman_path, runtime.podman_version  # the podman that every command runs
+runtime.expat_version  # the Expat that reads the reports, refused if older than 2.8.5
 built = runtime.build(dockerfile, directory, BuildLimits())
 built.image, built.base  # the base by the digest of its platform, or None from scratch
 result = runtime.run(built.image, command, project, output, RunLimits())
@@ -45,8 +46,14 @@ and then neither podman nor conmon reports it. The same safe failure applies. Th
 guarantee therefore takes either ending as proof that the memory was bounded, and `memory-limit`
 itself is tested with a podman that reports it.
 
-`read_report` reads the JUnit report with its limit of size and refuses a `DOCTYPE`. Each test is
-named by its class name, `::` and its name, as pytest writes it.
+`read_report` reads the JUnit report, which the code under check wrote. It opens the path part by
+part from the output directory with `O_NOFOLLOW`, refuses a link or anything that is not a regular
+file with `report-not-a-file`, and passes the open file to `reader_process.py`, started with
+`python -I`. That program sets its own `RLIMIT_AS` and `RLIMIT_CPU` from the limits of reading
+before it reads, which is safe with threads; bounds the size; and refuses a `DOCTYPE`. A crash, a
+reached limit or an output that is not a report is refused with `report-reader-failed`. The
+process bounds the parser; it is not isolation, since it runs with the permissions of the person.
+Each test is named by its class name, `::` and its name, as pytest writes it.
 
 The tests of the four guarantees load the container, and run over the list of engines in
 `tests/sandbox/engines.py`. A test of an engine that is not installed skips, except in CI, where

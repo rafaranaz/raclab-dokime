@@ -1,0 +1,8 @@
+format: 1
+name: cachetools
+environment:
+  dockerfile: Dockerfile
+tests:
+  command: [python, -m, pytest, -p, no:cacheprovider, -q, --junitxml, /dokime/out/report.xml, tests]
+  report: report.xml
+  paths: ["tests/**"]

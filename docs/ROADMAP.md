@@ -151,8 +151,8 @@ opened by increments, as `core` is
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.md)).
 
 A2 is built first as the thinnest path that works, `dokime env check` on cachetools behind the
-ports, and then hardened one piece at a time, each with its requirement and its test. The skeleton
-goes in this order:
+ports, and then hardened one piece at a time, each with its requirement and its test. The
+skeleton went in this order, and it is done:
 
 1. `core`: the outcome of a run, its report and the limits of its reader; the port of the
    verification runtime.
@@ -165,11 +165,42 @@ goes in this order:
 5. `interfaces`: the command `dokime env check`.
 6. Run it on cachetools. Two witnesses among the first ten candidates mean the skeleton walks.
 
-Then the hardening: the reader of the report in a process of its own and the opening of its path
-without links (ADR-0045); a run with `--cap-drop=ALL` and `--security-opt no-new-privileges`; an
-image whose `USER` is not root run with `--userns=keep-id` and the uid and gid of that user, which
-still has to be tried when `USER` is a name, since its uid has to be read from the image; the docker
-adapter, python-semver and mdformat; and the closing of A2.
+The skeleton walked on 2026-11-15, with git 2.47.3 and podman 5.4.2, on the three repositories
+of the corpus, each with a pack written for it:
+
+| Project | Commit | Candidates looked at | Witnesses | Time | Left behind |
+|---|---|---|---|---|---|
+| cachetools | `1ce79ef` | 3 | 2 | 21 s | nothing |
+| python-semver | `b6e83e3` | 3 | 2 | 37 s | nothing |
+| mdformat | `56b24ef` | 6 | 2 | 254 s | nothing |
+
+The image `python:3.13-slim` was already in the store; the times with an empty store were not
+measured. A SIGTERM in the middle of a run of cachetools, sent to `python -m dokime.interfaces`, to
+the installed `dokime` and to `uv run dokime`, left no container and no temporary directory;
+`uv run` passes the signal on and ends with 143.
+
+Then the hardening, in the order that the three runs suggest:
+
+1. The packs of the three repositories in this repository, run as its tests against each project
+   at its commit, which is not copied. They live outside the repository until then.
+2. A line for each candidate as `env check` looks at it: mdformat ran for 254 s with nothing
+   written between the programs and the result.
+3. A test with podman that runs up to three times and demands `memory-limit` at least once: no test
+   with a real engine demands it now, so a podman or conmon that stopped reporting it would go
+   unseen.
+4. The reader of the report in a process of its own and the opening of its path without links
+   (ADR-0045).
+5. A run with `--cap-drop=ALL` and `--security-opt no-new-privileges`.
+6. The docker adapter, so that the tests of the guarantees run with both engines.
+7. `--from` optional, with a `head()` of the git adapter.
+8. An operation of the port that gives the tree of a commit, instead of composing a commit with
+   itself; and one place for the handling of SIGTERM, copied today in `sandbox`, `packs` and
+   `interfaces`.
+9. An image whose `USER` is not root, run with `--userns=keep-id` and the uid and gid of that user,
+   which still has to be tried when `USER` is a name, since its uid has to be read from the image.
+   None of the three packs needs it.
+
+Then the closing of A2.
 
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 
@@ -179,7 +210,9 @@ Still to decide before a milestone opens. They are written down here and not dec
   of the project with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs
   to the person who runs the harness; in A3 it has to be checked that the change of an agent
   cannot touch `.git/config`.
-- **Before A4:** how the harness is versioned and published.
+- **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
+  of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
+  `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
 the metrics in block B.

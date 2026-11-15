@@ -22,8 +22,10 @@ report = runtime.read_report(output, PurePosixPath("report.xml"), ReportLimits()
 
 A run has no network, limits of memory with swap, processor and processes, a read-only root with
 a `/tmp` of its own, the project read-only at `/dokime/project`, which is the working directory,
-and the output writable at `/dokime/out`. Each run has a container of its own, removed however
-the run ends; on SIGINT or SIGTERM the adapter removes it and lets the interruption go on.
+and the output writable at `/dokime/out`. Its processes have no capabilities in any set and cannot
+gain privileges by running a program (`--cap-drop ALL`, `--security-opt no-new-privileges`). Each
+run has a container of its own, removed however the run ends; on SIGINT or SIGTERM the adapter
+removes it and lets the interruption go on.
 
 Only an image that runs as root is run, and any other user is refused with `user-not-root` before
 anything runs: in a rootless engine, root in the container is the person who runs the harness, and
@@ -49,8 +51,10 @@ itself is tested with a podman that reports it.
 `read_report` reads the JUnit report, which the code under check wrote. It opens the path part by
 part from the output directory with `O_NOFOLLOW`, refuses a link or anything that is not a regular
 file with `report-not-a-file`, and passes the open file to `reader_process.py`, started with
-`python -I`. That program sets its own `RLIMIT_AS` and `RLIMIT_CPU` from the limits of reading
-before it reads, which is safe with threads; bounds the size; and refuses a `DOCTYPE`. A crash, a
+`python -I`. Its interpreter starts without limits; the program sets its own `RLIMIT_AS` and
+`RLIMIT_CPU` from the limits of reading before it reads any byte of the report, which is safe with
+threads, unlike a function run between fork and exec. It then bounds the size and refuses a
+`DOCTYPE`. A crash, a
 reached limit or an output that is not a report is refused with `report-reader-failed`. The
 process bounds the parser; it is not isolation, since it runs with the permissions of the person.
 Each test is named by its class name, `::` and its name, as pytest writes it.

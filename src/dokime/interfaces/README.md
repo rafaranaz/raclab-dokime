@@ -52,9 +52,10 @@ PASS: no findings
 - `--from` takes the full name of a commit, 40 lowercase hexadecimal characters; any other text is
   `not-a-commit-name`. A full name that is not a commit of the project is `unknown-commit`, from
   the git adapter.
-- The lines of the programs are written before the self-check starts. The candidates and the
-  findings come at the end, with the verdict on the last line; `--format json` gives one document
-  with the trees, images and bases of each side as well.
+- The lines of the programs are written before the self-check starts, and the line of each
+  candidate as soon as it has been looked at. The findings come at the end, with the verdict on
+  the last line; `--format json` gives one document with the trees, images and bases of each side
+  as well.
 - The exit code is that of the verdict, as for `contract check`.
 - SIGINT and SIGTERM close every layer, from the inside out: the container of the run, the
   directories of the side, then the adapters. No container and no temporary directory is left,

@@ -45,6 +45,26 @@ def test_each_candidate_is_written_with_its_commit_whether_it_is_a_witness_and_i
     ]
 
 
+def test_the_line_of_a_candidate_is_written_before_the_next_candidate_runs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    project = tmp_path / "project"
+    write_pack(project / ".dokime")
+    repository = FakeRepository()
+    one = fixing_commit(repository, root(repository), "one", 200)
+    two = not_a_witness(repository, one, "two", 300)
+    written: list[str] = []
+
+    def look(project_dir: Path, output: Path) -> None:
+        written.append(capsys.readouterr().out)
+
+    use_doubles(monkeypatch, repository, FakeRuntime(while_running=look))
+    env_check(capsys, two, "--project", str(project))
+    so_far = "".join(written[:3])
+    assert f"candidate {two.text}: not a witness" in so_far
+    assert one.text not in so_far
+
+
 def test_a_finding_is_written_with_the_file_of_the_pack_and_the_verdict_ends_the_output(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

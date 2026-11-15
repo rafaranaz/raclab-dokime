@@ -58,3 +58,7 @@ paths = ["src/dokime/packs/**", "tests/packs/**", "docs/requirements/packs.md"]
 [scopes.platform]
 description = "Adapters of the project repository, the signer, the stores and the forge, and the system clock and randomness."
 paths = ["src/dokime/platform/**", "tests/platform/**", "docs/requirements/platform.md"]
+
+[scopes.sandbox]
+description = "Adapters of the verification runtime, and later of the isolation of the agent."
+paths = ["src/dokime/sandbox/**", "tests/sandbox/**", "docs/requirements/sandbox.md"]

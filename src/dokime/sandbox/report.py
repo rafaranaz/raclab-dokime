@@ -1,0 +1,91 @@
+"""The reader of a test report in JUnit XML, shared by the adapters of the verification runtime.
+
+The report is written by the code under check, so it is read with a bound on its size and with
+`pyexpat` handlers that refuse a `DOCTYPE` before any entity is declared (ADR-0045). The reader
+runs in the process of the harness, and opens the path without refusing links, until the
+hardening of ADR-0045.
+"""
+
+from pathlib import Path, PurePosixPath
+from typing import NoReturn
+from xml.parsers import expat
+
+from dokime.core.outcomes import Outcome, Report, ReportLimits
+from dokime.core.repository import RefusalError
+
+_CHILDREN = {"failure": Outcome.FAILED, "error": Outcome.ERROR, "skipped": Outcome.SKIPPED}
+_PRECEDENCE = (Outcome.ERROR, Outcome.FAILED, Outcome.SKIPPED)
+
+
+class _DoctypeError(Exception):
+    pass
+
+
+def _refuse_doctype(*_: object) -> NoReturn:
+    raise _DoctypeError
+
+
+class _Cases:
+    """Collects the outcome of each test case as the parser goes through the report."""
+
+    def __init__(self) -> None:
+        self.report: dict[str, Outcome] = {}
+        self._case: str | None = None
+        self._seen: set[Outcome] = set()
+
+    def start(self, tag: str, attributes: dict[str, str]) -> None:
+        if tag == "testcase" and self._case is None:
+            self._case = f"{attributes.get('classname', '')}::{attributes.get('name', '')}"
+            self._seen = set()
+        elif self._case is not None and tag in _CHILDREN:
+            self._seen.add(_CHILDREN[tag])
+
+    def end(self, tag: str) -> None:
+        if tag != "testcase" or self._case is None:
+            return
+        if self._case in self.report:
+            raise RefusalError(
+                "report-duplicate-test", f"the report names the test {self._case!r} twice"
+            )
+        outcome = next((o for o in _PRECEDENCE if o in self._seen), Outcome.PASSED)
+        self.report[self._case] = outcome
+        self._case = None
+
+
+def read_report(output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
+    """Read the report at `report` inside the output directory."""
+    if report.is_absolute() or ".." in report.parts:
+        raise RefusalError(
+            "path-outside-output", f"the path of the report {str(report)!r} leaves the output"
+        )
+    path = output.joinpath(*report.parts)
+    try:
+        with open(path, "rb") as handle:
+            data = handle.read(limits.report_bytes + 1)
+    except FileNotFoundError:
+        raise RefusalError("report-missing", f"the run wrote no report at {report}") from None
+    except OSError as error:
+        raise RefusalError(
+            "report-unreadable", f"the report {report} cannot be read: {error}"
+        ) from None
+    if len(data) > limits.report_bytes:
+        raise RefusalError(
+            "report-too-large",
+            f"the report {report} is larger than its limit of {limits.report_bytes} bytes",
+        )
+    cases = _Cases()
+    parser = expat.ParserCreate()
+    parser.StartDoctypeDeclHandler = _refuse_doctype
+    parser.EntityDeclHandler = _refuse_doctype
+    parser.ExternalEntityRefHandler = _refuse_doctype
+    parser.StartElementHandler = cases.start
+    parser.EndElementHandler = cases.end
+    try:
+        parser.Parse(data, True)
+    except _DoctypeError:
+        raise RefusalError("report-has-doctype", f"the report {report} has a DOCTYPE") from None
+    except expat.ExpatError as error:
+        raise RefusalError(
+            "report-unreadable", f"the report {report} is not well-formed XML: {error}"
+        ) from None
+    return cases.report

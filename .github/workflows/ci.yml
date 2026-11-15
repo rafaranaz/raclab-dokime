@@ -29,7 +29,7 @@ jobs:
         run: uv run mypy
       - name: Import contracts between modules
         run: uv run lint-imports
-      - name: Podman enforces the limits of a run
+      - name: Podman accepts the limits of a run
         run: |
           systemctl --version | head -n 1
           podman --version

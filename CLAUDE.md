@@ -66,6 +66,9 @@ The full working agreement is in [CONTRIBUTING.md](CONTRIBUTING.md) and the phas
 
 ## Gates locally
 
+`uv run python -m tools.gates` runs every command of this block in order, each line in a bash
+of its own with `set -euo pipefail`, and ends with the exit code of the first one that fails.
+
 ```bash
 uv sync --locked
 uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports

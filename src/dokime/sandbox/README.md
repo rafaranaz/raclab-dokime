@@ -1,0 +1,46 @@
+# sandbox
+
+Adapters of the verification runtime, and later of the isolation of the agent. It imports only
+`core`, and only `interfaces` imports it. This increment has the adapter that builds and runs with
+the `podman` command; its requirements are in
+[sandbox.md](../../../docs/requirements/sandbox.md).
+
+## The podman adapter
+
+```python
+from dokime.sandbox.podman import PodmanRuntime
+
+runtime = PodmanRuntime()  # refuses a podman older than 4.9
+runtime.podman_path, runtime.podman_version  # the podman that every command runs
+built = runtime.build(dockerfile, directory, BuildLimits())
+built.image, built.base  # the base by the digest of its platform, or None from scratch
+result = runtime.run(built.image, command, project, output, RunLimits())
+result.ending, result.exit_code  # exited, time-limit or memory-limit
+report = runtime.read_report(output, PurePosixPath("report.xml"), ReportLimits())
+```
+
+A run has no network, limits of memory with swap, processor and processes, a read-only root with
+a `/tmp` of its own, the project read-only at `/dokime/project`, which is the working directory,
+and the output writable at `/dokime/out`. Each run has a container of its own, removed however
+the run ends; on SIGINT or SIGTERM the adapter removes it and lets the interruption go on.
+
+Only an image that runs as root is run, and any other user is refused with `user-not-root` before
+anything runs: in a rootless engine, root in the container is the person who runs the harness, and
+another user is a subordinate one that cannot write in the output. The user can come from the base
+image; the person can set `USER root` in the Dockerfile of the pack.
+
+A run that ends with 137 is `memory-limit` when podman reports `OOMKilled`, or when conmon has left
+a file `oom` in the working directory from which the adapter started podman, a temporary directory
+of each run. podman 4.9 never reports `OOMKilled`, because it looks for that file in another
+directory, so with 4.9 the file is what tells the memory limit. That file is not documented; it was
+read in the sources of conmon 2.1.10 and podman 4.9.3. If conmon stops writing it, a run killed by
+the memory limit on podman 4.9 is given as `exited` with 137. That failure is safe: the limit still
+kills the container, and a command killed this way writes no report, so reading it is refused with
+`report-missing` and the self-check ends in `ERROR` as it would with `memory-limit`.
+
+`read_report` reads the JUnit report with its limit of size and refuses a `DOCTYPE`. Each test is
+named by its class name, `::` and its name, as pytest writes it.
+
+The tests of the four guarantees load the container, and run over the list of engines in
+`tests/sandbox/engines.py`. A test of an engine that is not installed skips, except in CI, where
+it fails.

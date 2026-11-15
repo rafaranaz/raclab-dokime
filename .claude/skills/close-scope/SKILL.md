@@ -47,5 +47,15 @@ disable it or lower its threshold without an ADR.
 
 ## 4. Update the roadmap
 
-Tick the exit criteria met in `docs/ROADMAP.md` and its Spanish version. The next scope does not
-open until this pull request is merged.
+`docs/ROADMAP.md` is the only source of the plan
+([ADR-0053](../../../docs/adr/0053-the-plan-of-work-lives-in-the-repository.md)). Update it and
+its Spanish version in the same pull request:
+
+- Tick the exit criteria met.
+- **When the scope closes a milestone**, update the note of the milestone with what was measured,
+  the hypotheses it resolved (in the table of hypotheses) and the list "Still to decide": remove
+  what was decided, and add what the milestone showed has to be decided before a later one.
+- **When the scope closes a block**, end the closing report with a reminder for the maintainer to
+  review their strategic orientation, which lives outside the repository.
+
+The next scope does not open until this pull request is merged.

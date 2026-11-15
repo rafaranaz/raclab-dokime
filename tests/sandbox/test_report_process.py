@@ -1,4 +1,6 @@
-# SDD-EARS: SANDBOX-060 SANDBOX-064
+# SDD-EARS: SANDBOX-060 SANDBOX-061 SANDBOX-064
+import os
+import subprocess
 import textwrap
 from pathlib import Path, PurePosixPath
 
@@ -66,3 +68,19 @@ def test_a_reader_that_ends_without_giving_a_report_is_refused(
 
 def test_the_real_reader_gives_the_report(tmp_path: Path) -> None:
     assert read_report(tmp_path, written(tmp_path), ReportLimits()) == {"t::one": Outcome.PASSED}
+
+
+def test_a_report_replaced_after_the_adapter_opened_it_is_read_as_it_was(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = written(tmp_path)
+    other = tmp_path / "other.xml"
+    other.write_bytes(b'<testsuite><testcase classname="t" name="other"/></testsuite>')
+    start = subprocess.run
+
+    def replace_then_start(*args: object, **kwargs: object) -> object:
+        os.replace(other, tmp_path / "report.xml")
+        return start(*args, **kwargs)  # type: ignore[call-overload]
+
+    monkeypatch.setattr(subprocess, "run", replace_then_start)
+    assert read_report(tmp_path, path, ReportLimits()) == {"t::one": Outcome.PASSED}

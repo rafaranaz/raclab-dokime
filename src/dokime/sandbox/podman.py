@@ -3,8 +3,8 @@
 `podman build` and `podman run` share the local store of images, so the image a build gives is
 the one a run starts. A run has no network, limits of memory with swap, processor and processes, a
 read-only root with a `/tmp` of its own, the project mounted read-only and the output directory
-writable (ADR-0043). Each run has a container named for it alone, which is removed however the run
-ends, an interruption of the harness included.
+writable (ADR-0043), and no capabilities and no way to gain privileges. Each run has a container
+named for it alone, which is removed however the run ends, an interruption of the harness included.
 """
 
 import contextlib
@@ -252,6 +252,10 @@ class PodmanRuntime:
                     "never",
                     "--network",
                     "none",
+                    "--cap-drop",
+                    "ALL",
+                    "--security-opt",
+                    "no-new-privileges",
                     "--read-only",
                     "--read-only-tmpfs=false",
                     "--mount",

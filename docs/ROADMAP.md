@@ -138,7 +138,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 | A0 Tests by hand | Three real changes with a hand-written contract approved by a person, timed; three repositories chosen for the corpus | None | The share of requirements that fit as examples and the minutes per contract are known, and the format is confirmed or revised |
 | A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract`, `interfaces` (the command only) | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
 | A2 Reproducible environment | A command that builds the image of a project from its pack and checks the pack against the history of the project | `packs`, `sandbox`, `platform` (the project repository only), `interfaces` (the command only) | The packs of the three repositories build and pass their self-check |
-| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file | `platform`, `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
+| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file; the directory of the change (`.dokime/changes/<story>/`) and the ledger of events with chained hashes, planned for A1 and not built | `core`, `platform`, `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
 | A4 Audit in CI | A workflow that audits a pull request and attaches the evidence, enabled on this repository; version 0.1 | `interfaces` | A real pull request of this repository carries its evidence |
 
 `interfaces` is opened three times in block A: in A1 for the command `contract check`, which only
@@ -217,6 +217,12 @@ Still to decide before a milestone opens. They are written down here and not dec
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.
+- **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
+  recipients.
+- **Before C1:** what happens when two changes run at the same time on the same repository; and a
+  limit of spending for a run, since the budgets of the flow count repetitions, not money.
+- **Before D2:** how the differences found outside the change are grouped without the gateway to
+  a model.
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
 the metrics in block B.

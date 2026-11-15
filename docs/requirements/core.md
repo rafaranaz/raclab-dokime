@@ -148,8 +148,8 @@ needs more than the default limits of a build or of a run cannot ask for them in
 
 - **CORE-081** The port shall offer three operations: build an image from a Dockerfile and a directory, run a command in an image, and read the report that a run wrote.
 - **CORE-082** The build shall receive the Dockerfile, the directory it builds from and the limits of the build.
-- **CORE-083** The build shall return the digest of the image it built and the base image of the final stage of the Dockerfile, or no base image when that stage has none.
-- **CORE-084** The base image shall carry the reference of the image as the build resolved it, the digest of the manifest of the platform that was built, and the digest of the index that the reference resolved to, or no index digest when it resolved to no index.
+- **CORE-083** The build shall return the digest of the image it built and the base image of the final stage of the Dockerfile, or no base image when that stage starts from `scratch`.
+- **CORE-084** The base image shall carry only the digest of the manifest of the platform that was built.
 - **CORE-085** The run shall receive the digest of the image, the command as a list of arguments, the directory of the project, the output directory and the limits of the run.
 - **CORE-086** The result of a run shall say how it ended: it exited by itself, it was killed when it reached the time limit, it was killed when it reached the memory limit, or it was killed for another reason.
 - **CORE-087** The result of a run shall carry the exit code of the command when the run exited by itself, and no exit code otherwise.

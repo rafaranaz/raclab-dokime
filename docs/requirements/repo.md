@@ -80,3 +80,16 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-121** If a command of the block fails, a command inside a pipeline included, then the gate runner shall stop and end with the exit code of that command.
 - **REPO-122** When every command of the block passes, the gate runner shall end with the exit code 0.
 - **REPO-123** If `CLAUDE.md` has no block "Gates locally", then the gate runner shall end with a non-zero exit code and a message that names the missing block.
+
+## The run of the corpus in CI (`tools/check_corpus.py`)
+
+The job `corpus` of CI runs the self-checks of `tests/corpus` and then this check on their JUnit
+report, so that the job cannot pass without self-checking every project
+([ADR-0052](../adr/0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md)).
+
+- **REPO-130** When the report of the corpus is checked, the corpus check shall pass only if the report has exactly one self-check for each project of `tests/corpus` and every one of them passed.
+- **REPO-131** If a self-check of a project is missing from the report, was skipped, failed or gave an error, then the corpus check shall fail with a line that names the project and what happened.
+- **REPO-132** If a self-check failed with a message that starts with `network:`, then the corpus check shall say that the cause was the network.
+- **REPO-133** When the report of the corpus is checked, the corpus check shall write the duration of each self-check that ran.
+- **REPO-134** If the report of the corpus cannot be read, then the corpus check shall fail with a line that names the report.
+

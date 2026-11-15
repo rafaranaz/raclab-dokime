@@ -78,6 +78,18 @@ hardening of ADR-0045.
 - **SANDBOX-045** If the report does not exist, then the verification runtime adapter shall refuse with the code `report-missing`, naming its path.
 - **SANDBOX-046** If two test cases of the report have the same name, then the verification runtime adapter shall refuse with the code `report-duplicate-test`, naming it.
 - **SANDBOX-047** If the path of the report is absolute or has a part `..`, then the verification runtime adapter shall refuse with the code `path-outside-output`, naming the path, before opening anything.
+- **SANDBOX-048** If a part of the path of the report, the report included, is a symbolic link, then the verification runtime adapter shall refuse with the code `report-not-a-file`, naming the path, without following the link.
+- **SANDBOX-049** If the report is not a regular file, then the verification runtime adapter shall refuse with the code `report-not-a-file`, naming the path.
+
+### The process that reads the report
+
+- **SANDBOX-060** When a report is read, the verification runtime adapter shall parse it in a process other than the process of the harness.
+- **SANDBOX-061** When a report is read, the verification runtime adapter shall give the process that reads it the report as the adapter opened it, so that a file put at its path after the opening is not read.
+- **SANDBOX-062** When a report is read, the verification runtime adapter shall limit the address space of the process that reads it to the reader memory of the limits of reading.
+- **SANDBOX-063** When a report is read, the verification runtime adapter shall limit the processor time of the process that reads it to the reader processor time of the limits of reading.
+- **SANDBOX-064** If the process that reads the report ends on a signal, reaches one of its limits or ends without giving a report, then the verification runtime adapter shall refuse with the code `report-reader-failed`.
+- **SANDBOX-065** If the version of Expat of the Python that runs the harness is older than 2.8.5, then the verification runtime adapter shall refuse with the code `expat-too-old`, quoting that version, when it opens.
+- **SANDBOX-066** The verification runtime adapter shall give the version of Expat that reads its reports.
 
 ### The tests of an engine
 

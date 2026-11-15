@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:fec6eb97bf3b121e -->
+<!-- translation-of: README.md sha256:de97a022a182822f -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -62,4 +62,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0048](0048-requirements-go-up-with-their-first-tests.es.md) | Los requisitos se suben con sus primeros tests | Aceptada |
 | [0049](0049-every-pull-request-says-what-it-advances.es.md) | Toda pull request dice qué hace avanzar | Aceptada |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.es.md) | Un experimento entra en el repositorio como un test | Aceptada |
-| [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Propuesta |
+| [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Aceptada |

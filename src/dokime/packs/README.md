@@ -63,6 +63,8 @@ result.programs  # the git and the podman that ran, as the caller names them
   the tree of the commit. `run_tests` builds the image of a side from the Dockerfile read once
   from the working copy, with the tree as the context, runs the test command and reads the report.
   `verify` reuses it in A3.
+- `on_candidate` receives each candidate as soon as both of its sides have run, so that a caller
+  can show it while the next one runs.
 - The second witness ends the loop, and so does a finding with the verdict `ERROR`: a refusal of
   a port, an unreadable report, or `run-killed` when the container dies at a limit.
 - Each side lives in a temporary directory, removed after it runs and on SIGINT or SIGTERM.

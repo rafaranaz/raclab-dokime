@@ -11,7 +11,7 @@ import contextlib
 import signal
 import tempfile
 import threading
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from types import FrameType
@@ -176,8 +176,12 @@ def run_self_check(
     repository: ProjectRepository,
     runtime: VerificationRuntime,
     programs: tuple[Program, ...],
+    on_candidate: Callable[[Candidate], None] = lambda _: None,
 ) -> SelfCheckResult:
-    """Self-check a pack from a commit, with the Dockerfile read once from the working copy."""
+    """Self-check a pack from a commit, with the Dockerfile read once from the working copy.
+
+    `on_candidate` receives each candidate as soon as it has been looked at.
+    """
     looked: list[Candidate] = []
     with _sigterm_raises(), tempfile.TemporaryDirectory(prefix="dokime-pack-") as work:
         copy = Path(work) / "Dockerfile"
@@ -185,6 +189,7 @@ def run_self_check(
         try:
             for candidate in _candidates(pack, copy, start, repository, runtime):
                 looked.append(candidate)
+                on_candidate(candidate)
                 witnesses = sum(c.witness for c in looked)
                 if witnesses == WITNESSES_NEEDED or len(looked) == CANDIDATES_LOOKED_AT:
                     break

@@ -1,6 +1,6 @@
 # ADR-0051 · The adapters that run a program are exempt from S603
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

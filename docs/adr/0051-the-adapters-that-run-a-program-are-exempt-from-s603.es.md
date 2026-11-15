@@ -1,7 +1,7 @@
-<!-- translation-of: 0051-the-adapters-that-run-a-program-are-exempt-from-s603.md sha256:ef9ef8356560ffe9 -->
+<!-- translation-of: 0051-the-adapters-that-run-a-program-are-exempt-from-s603.md sha256:2e86e1bfcd5d1c6c -->
 # ADR-0051 · Los adaptadores que ejecutan un programa quedan fuera de S603
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

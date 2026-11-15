@@ -46,6 +46,61 @@ skipped.
 - **PACKS-035** When at least two of the first ten candidates are witnesses, the self-check shall give no finding.
 - **PACKS-036** If fewer than two of the first ten candidates are witnesses, then the self-check shall report a finding with the code `too-few-witnesses` that says how many candidates and how many witnesses there were.
 
+## The order of the history ([ADR-0044](../adr/0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md))
+
+The port of the project repository gives the history from a commit with no order; `packs` orders
+it, so that every adapter gives the same candidates.
+
+- **PACKS-040** When the history from a commit is ordered, the order shall place no commit before a commit that descends from it.
+- **PACKS-041** When more than one commit can come next, the order shall place first the one with the later commit date.
+- **PACKS-042** When commits that can come next have the same commit date, the order shall place first the one that became able to come next earlier, a commit becoming able when every commit that descends from it is placed, and the parents of a commit in the order the commit names them.
+- **PACKS-043** When the history is ordered, the order shall leave out every commit that does not have exactly one parent.
+
+## Running the tests of a pack on a directory
+
+The operation that the self-check runs on each side of a candidate, and that `verify` reuses in
+milestone A3. The pack and its Dockerfile are read once, from the working copy, and used the same
+for every directory: old commits do not have the pack.
+
+- **PACKS-050** When the tests of a pack are run on a directory, the test run shall build the image from the Dockerfile of the pack read from the working copy, with the directory as the context of the build, and ignore any `.dokime/` that the directory holds.
+- **PACKS-051** When the tests of a pack are run on a directory, the test run shall run the test command of the pack in the image it built, with the directory as the project and an empty output directory of its own.
+- **PACKS-052** When the command ends by itself, whatever its exit code, the test run shall give the report read at the path of the report of the pack.
+- **PACKS-053** The test run shall give the digest of the image it built and the base of that image.
+- **PACKS-054** The test run shall pass the default limits of a build, of a run and of the reading of a report.
+- **PACKS-055** If the build, the run or the reading of the report is refused, then the test run shall give the finding of the refusal, with the verdict `ERROR`.
+- **PACKS-056** If the container of the run is killed at the time limit, at the memory limit or for another reason, then the test run shall give a finding with the code `run-killed` and the verdict `ERROR`, naming the cause.
+
+## The loop of the self-check ([ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md), [ADR-0044](../adr/0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md))
+
+`packs` drives the self-check over the ports that `interfaces` gives it. A finding with the
+verdict `ERROR` ends it, because nothing found later changes that verdict
+([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md)).
+
+Known limit: the self-check has no limit of time of its own. In the worst case it takes ten
+candidates, by two sides, by the 30 minutes of a build and the 15 of a run. The budget of a whole
+run belongs to the flow ([ADR-0018](../adr/0018-the-flow-is-a-state-machine-in-a-yaml-file.md)),
+in block C.
+
+- **PACKS-060** When a pack is self-checked from a commit, the self-check shall look at the commits in the order of PACKS-040 to PACKS-043 and take as candidates those of PACKS-030.
+- **PACKS-061** When a candidate is looked at, the self-check shall run the tests on the tree of the parent with the test paths taken from the commit.
+- **PACKS-062** When a candidate is looked at, the self-check shall run the tests on the tree of the commit.
+- **PACKS-063** When the second witness is found, the self-check shall look at no further candidate.
+- **PACKS-064** When ten candidates have been looked at, the self-check shall look at no further candidate.
+- **PACKS-065** If a test run gives a finding with the verdict `ERROR`, then the self-check shall end with that finding and look at no further candidate.
+- **PACKS-066** If a port refuses an operation, then the self-check shall end with the finding of the refusal and look at no further candidate.
+- **PACKS-067** When the history ends before ten candidates, the self-check shall decide with the candidates it looked at.
+
+## What the self-check records
+
+- **PACKS-070** When a candidate has been looked at, the result shall record the commit, the digest of each of its two trees, the digest and the base of each of its two images, and whether it is a witness.
+- **PACKS-071** When a candidate is a witness, the result shall record the names of the tests that pass on the commit and failed, gave an error or were missing on the parent.
+- **PACKS-072** The result shall record once the path and the version of each program that the caller says runs a port.
+
+## The directories of each side
+
+- **PACKS-080** When a side of a candidate has run, the self-check shall remove the directory of its tree and its output directory.
+- **PACKS-081** If the harness receives SIGINT or SIGTERM while a side runs, then the self-check shall remove the directories of that side and let the interruption go on.
+
 ## Table of fields
 
 A name is a text of letters, digits and hyphens that starts with a letter. A relative path does not

@@ -1,7 +1,7 @@
-<!-- translation-of: 0054-the-policy-is-an-optional-file-of-values.md sha256:8fe8567b37b72039 -->
+<!-- translation-of: 0054-the-policy-is-an-optional-file-of-values.md sha256:a9ab3c616a385fdf -->
 # ADR-0054 · La política es un fichero opcional de valores, y la primera versión tiene dos
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

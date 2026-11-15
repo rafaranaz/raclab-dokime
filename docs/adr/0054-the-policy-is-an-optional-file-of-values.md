@@ -1,6 +1,6 @@
 # ADR-0054 · The policy is an optional file of values, and the first version holds two
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -95,6 +95,7 @@ in block C.
 - **PACKS-070** When a candidate has been looked at, the result shall record the commit, the digest of each of its two trees, the digest and the base of each of its two images, and whether it is a witness.
 - **PACKS-071** When a candidate is a witness, the result shall record the names of the tests that pass on the commit and failed, gave an error or were missing on the parent.
 - **PACKS-072** The result shall record once the path and the version of each program that the caller says runs a port.
+- **PACKS-073** When a candidate has been looked at, the self-check shall give it to the caller before it looks at the next candidate.
 
 ## The directories of each side
 

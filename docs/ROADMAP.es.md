@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:24de67ce131cdd5c -->
+<!-- translation-of: ROADMAP.md sha256:dd36f96d1aff83d4 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -184,27 +184,27 @@ midieron. Un SIGTERM a mitad de una ejecución de cachetools, enviado a `python 
 a la orden `dokime` instalada y a `uv run dokime`, no dejó ningún contenedor ni ningún directorio
 temporal; `uv run` reenvía la señal y termina con 143.
 
-Después, el endurecimiento, en el orden que sugieren las tres ejecuciones:
+A2 se cierra con su criterio de salida, no con todo el endurecimiento. Lo que falta para cerrarlo:
 
 1. Los packs de los tres repositorios en este repositorio, ejecutados como sus tests contra cada
-   proyecto en su commit, que no se copia. Hasta entonces viven fuera del repositorio.
+   proyecto en su commit, que no se copia, en un job `corpus` de CI que falla salvo que cada
+   proyecto se haya autocomprobado y haya pasado (ADR-0052).
 2. Una línea por candidato según `env check` lo mira: mdformat estuvo 254 s sin escribir nada entre
    los programas y el resultado.
-3. Un test con podman que se ejecuta hasta tres veces y exige `memory-limit` al menos una: hoy
-   ningún test con un motor real lo exige, así que un podman o un conmon que dejara de informarlo
-   pasaría sin verse.
-4. El lector del informe en un proceso propio y la apertura de su ruta sin enlaces (ADR-0045).
-5. Una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`.
-6. El adaptador de docker, para que los tests de las garantías se ejecuten con los dos motores.
-7. `--from` opcional, con un `head()` del adaptador de git.
-8. Una operación del puerto que dé el árbol de un commit, en vez de componer un commit consigo
-   mismo; y un solo sitio para el tratamiento de SIGTERM, hoy copiado en `sandbox`, `packs` e
-   `interfaces`.
-9. Una imagen cuyo `USER` no es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese
-   usuario, lo que falta probar cuando `USER` es un nombre, porque su uid hay que leerlo de la
-   imagen. Ninguno de los tres packs lo necesita.
 
 Después, el cierre de A2.
+
+Apuntado como deuda, que no bloquea ningún hito:
+
+- Un test con podman que se ejecuta hasta tres veces y exige `memory-limit` al menos una: hoy
+  ningún test con un motor real lo exige, así que un podman o un conmon que dejara de informarlo
+  pasaría sin verse.
+- El adaptador de docker, para que los tests de las garantías se ejecuten con los dos motores.
+- `--from` opcional, con un `head()` del adaptador de git.
+- Una operación del puerto que dé el árbol de un commit, en vez de componer un commit consigo
+  mismo; y un solo sitio para el tratamiento de SIGTERM, hoy copiado en `sandbox`, `packs` e
+  `interfaces`.
+- Opcional: `pip install --require-hashes` en los Dockerfile del conjunto de casos.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
@@ -212,7 +212,12 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   salida de A3 exige; el formato de la política, cuya huella va en la evidencia y que es una ruta
   protegida; y la configuración del proyecto: el adaptador de git lee los hechos del proyecto con
   `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en A3
-  hay que comprobar que el cambio de un agente no puede tocar `.git/config`.
+  hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
+  comprueba pasa a ser hostil en A3, así que estas protecciones del endurecimiento de A2 van antes:
+  el lector del informe en un proceso propio y la apertura de su ruta sin enlaces (ADR-0045); una
+  ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`; y una imagen cuyo `USER` no
+  es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese usuario, lo que falta probar
+  cuando `USER` es un nombre.
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
@@ -235,6 +240,6 @@ Un ruleset sobre `main` (Settings → Rules → Rulesets):
 
 - PR obligatorio para integrar, con *Rebase* como único método de merge. No se exige ninguna
   aprobación, porque GitHub no deja a los autores aprobar sus propios PR; mergear es la aprobación.
-- Los cuatro checks de CI tienen que pasar (`lint, types and tests`, `governance checks`,
+- Los cinco checks de CI tienen que pasar (`lint, types and tests`, `corpus`, `governance checks`,
   `commits and branch scope`, `dependency audit`), sobre una rama al día con `main`.
 - Historial lineal obligatorio; push forzado y borrado bloqueados.

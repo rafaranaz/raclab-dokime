@@ -47,6 +47,7 @@ _STOP_SECONDS = 10
 _OOM_EXIT = 137
 _NOT_STARTED = (126, 127)
 """What podman returns when the command cannot be invoked or is not found."""
+_ROOT = ("", "0", "root")
 _ENDED = ("exited", "stopped")
 """The states of a container whose command has ended: cleaned up or not yet."""
 _CONMON_OOM = "oom"
@@ -199,6 +200,7 @@ class PodmanRuntime:
         for role, directory in (("project", project), ("output", output)):
             if not directory.is_dir():
                 raise ValueError(f"the {role} directory {directory} is not an existing directory")
+        self._check_user(image)
         name = f"dokime-{uuid.uuid4().hex}"
         try:
             with _sigterm_raises(), tempfile.TemporaryDirectory(prefix="dokime-run-") as work:
@@ -209,6 +211,23 @@ class PodmanRuntime:
             raise
         finally:
             self._remove(name)
+
+    def _check_user(self, image: Digest) -> None:
+        """Refuse an image that runs as a user other than root.
+
+        In a rootless engine, root in the container is the person who runs the harness; another
+        user is a subordinate one, which cannot write in the output.
+        """
+        user = self._podman("image", "inspect", "--format", "{{.Config.User}}", image.text)
+        name, _, group = user.partition(":")
+        if name in _ROOT and (not group or group in _ROOT):
+            return
+        raise RefusalError(
+            "user-not-root",
+            f"the image runs as the user {user!r}, not as root, so it could not write its"
+            " report in the output; the user can come from the base image, and the person can"
+            " set USER root in the Dockerfile of the pack",
+        )
 
     def _run(
         self,

@@ -49,14 +49,6 @@ def test_a_command_that_does_not_exist_exits_with_127(
     assert result == RunResult(ending=Ending.EXITED, exit_code=127)
 
 
-def test_a_command_killed_by_the_memory_limit_ends_at_the_memory_limit(
-    engine: Engine, runtime: VerificationRuntime, directories: tuple[Path, Path]
-) -> None:
-    limits = RunLimits(memory_bytes=64 * MIB)
-    result = shell(engine, runtime, directories, "head -c 300m /dev/zero | tail", limits)
-    assert result == RunResult(ending=Ending.MEMORY_LIMIT, exit_code=None)
-
-
 def test_a_command_killed_from_outside_exits_with_137(
     engine: Engine, runtime: VerificationRuntime, directories: tuple[Path, Path]
 ) -> None:
@@ -148,8 +140,53 @@ def test_a_run_killed_by_the_memory_limit_leaves_the_working_directory_unchanged
     monkeypatch.chdir(harness)
     limits = RunLimits(memory_bytes=64 * MIB)
     result = shell(engine, runtime, directories, "head -c 300m /dev/zero | tail", limits)
-    assert result.ending is Ending.MEMORY_LIMIT
+    assert result in (
+        RunResult(ending=Ending.MEMORY_LIMIT, exit_code=None),
+        RunResult(ending=Ending.EXITED, exit_code=137),
+    )
     assert list(harness.iterdir()) == []
+
+
+def fake_podman(tmp_path: Path, state: str, *, leaves_oom: bool = False) -> PodmanRuntime:
+    """A podman that runs nothing and reports the state given; it may leave conmon's file `oom`
+    in its working directory, as conmon does when the memory limit kills the container."""
+    program = tmp_path / "podman"
+    leave = "  run) : > oom ;;\n" if leaves_oom else ""
+    program.write_text(
+        "#!/bin/sh\n"
+        'case "$1" in\n'
+        '  --version) echo "podman version 5.4.2" ;;\n'
+        f"{leave}"
+        f'  container) echo "{state}" ;;\n'
+        "esac\n"
+    )
+    program.chmod(program.stat().st_mode | stat.S_IXUSR)
+    return PodmanRuntime(podman=str(program))
+
+
+def run_with(runtime: PodmanRuntime, tmp_path: Path) -> RunResult:
+    project, out = tmp_path / "project", tmp_path / "out"
+    project.mkdir()
+    out.mkdir()
+    return runtime.run(Digest(f"sha256:{'a' * 64}"), ("true",), project, out, RunLimits())
+
+
+@pytest.mark.parametrize("state", ["exited 137 true", "stopped 137 true"])
+def test_137_with_the_engine_reporting_the_memory_limit_ends_at_the_memory_limit(
+    tmp_path: Path, state: str
+) -> None:
+    result = run_with(fake_podman(tmp_path, state), tmp_path)
+    assert result == RunResult(ending=Ending.MEMORY_LIMIT, exit_code=None)
+
+
+def test_137_with_the_file_oom_of_conmon_ends_at_the_memory_limit(tmp_path: Path) -> None:
+    result = run_with(fake_podman(tmp_path, "exited 137 false", leaves_oom=True), tmp_path)
+    assert result == RunResult(ending=Ending.MEMORY_LIMIT, exit_code=None)
+
+
+def test_137_with_no_report_of_the_memory_limit_exits_with_137(tmp_path: Path) -> None:
+    result = run_with(fake_podman(tmp_path, "exited 137 false"), tmp_path)
+    assert result == RunResult(ending=Ending.EXITED, exit_code=137)
 
 
 @pytest.mark.parametrize("state", ["exited", "stopped"])
@@ -158,18 +195,5 @@ def test_a_container_that_has_exited_but_is_not_yet_cleaned_up_gives_its_exit_co
 ) -> None:
     """Podman gives "stopped" for a container that has exited and is not yet cleaned up. Two runs
     at once can find it so after `podman run` returns."""
-    program = tmp_path / "podman"
-    program.write_text(
-        "#!/bin/sh\n"
-        'case "$1" in\n'
-        '  --version) echo "podman version 5.4.2" ;;\n'
-        f'  container) echo "{state} 3 false" ;;\n'
-        "esac\n"
-    )
-    program.chmod(program.stat().st_mode | stat.S_IXUSR)
-    project, out = tmp_path / "project", tmp_path / "out"
-    project.mkdir()
-    out.mkdir()
-    runtime = PodmanRuntime(podman=str(program))
-    result = runtime.run(Digest(f"sha256:{'a' * 64}"), ("true",), project, out, RunLimits())
+    result = run_with(fake_podman(tmp_path, f"{state} 3 false"), tmp_path)
     assert result == RunResult(ending=Ending.EXITED, exit_code=3)

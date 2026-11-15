@@ -1,7 +1,7 @@
-<!-- translation-of: 0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md sha256:45942671e1a72173 -->
+<!-- translation-of: 0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md sha256:cb01e715afe4f797 -->
 # ADR-0052 · El conjunto de casos se ejecuta en CI en un job propio, con red
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

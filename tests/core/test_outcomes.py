@@ -13,8 +13,8 @@ def test_the_outcome_of_a_test_is_one_of_four() -> None:
 
 
 def test_a_report_gives_the_outcome_of_each_test_by_its_name() -> None:
-    report: Report = {"tests/test_a.py::test_one": Outcome.PASSED}
-    assert report["tests/test_a.py::test_one"] is Outcome.PASSED
+    report: Report = {"tests.test_a::test_one": Outcome.PASSED}
+    assert report["tests.test_a::test_one"] is Outcome.PASSED
     assert Report.__value__.__args__ == (str, Outcome)
 
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:8ba8c97828ea28ab -->
+<!-- translation-of: ROADMAP.md sha256:24de67ce131cdd5c -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -155,7 +155,7 @@ se abren por incrementos, como `core`
 
 A2 se construye primero como el camino más delgado que funciona, `dokime env check` sobre cachetools
 detrás de los puertos, y después se endurece una pieza cada vez, cada una con su requisito y su
-test. El esqueleto va en este orden:
+test. El esqueleto fue en este orden, y está terminado:
 
 1. `core`: el resultado de una ejecución, su informe y los límites de su lector; el puerto del
    entorno de verificación.
@@ -170,11 +170,41 @@ test. El esqueleto va en este orden:
 6. Ejecutarla sobre cachetools. Dos testigos entre los diez primeros candidatos significan que el
    esqueleto camina.
 
-Después, el endurecimiento: el lector del informe en un proceso propio y la apertura de su ruta sin
-enlaces (ADR-0045); una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`; una
-imagen cuyo `USER` no es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese usuario, lo
-que falta probar cuando `USER` es un nombre, porque su uid hay que leerlo de la imagen; el adaptador
-de docker, python-semver y mdformat; y el cierre de A2.
+El esqueleto caminó el 2026-11-15, con git 2.47.3 y podman 5.4.2, sobre los tres repositorios del
+conjunto de casos, cada uno con un pack escrito para él:
+
+| Proyecto | Commit | Candidatos mirados | Testigos | Tiempo | Restos |
+|---|---|---|---|---|---|
+| cachetools | `1ce79ef` | 3 | 2 | 21 s | ninguno |
+| python-semver | `b6e83e3` | 3 | 2 | 37 s | ninguno |
+| mdformat | `56b24ef` | 6 | 2 | 254 s | ninguno |
+
+La imagen `python:3.13-slim` ya estaba en el almacén; los tiempos con el almacén vacío no se
+midieron. Un SIGTERM a mitad de una ejecución de cachetools, enviado a `python -m dokime.interfaces`,
+a la orden `dokime` instalada y a `uv run dokime`, no dejó ningún contenedor ni ningún directorio
+temporal; `uv run` reenvía la señal y termina con 143.
+
+Después, el endurecimiento, en el orden que sugieren las tres ejecuciones:
+
+1. Los packs de los tres repositorios en este repositorio, ejecutados como sus tests contra cada
+   proyecto en su commit, que no se copia. Hasta entonces viven fuera del repositorio.
+2. Una línea por candidato según `env check` lo mira: mdformat estuvo 254 s sin escribir nada entre
+   los programas y el resultado.
+3. Un test con podman que se ejecuta hasta tres veces y exige `memory-limit` al menos una: hoy
+   ningún test con un motor real lo exige, así que un podman o un conmon que dejara de informarlo
+   pasaría sin verse.
+4. El lector del informe en un proceso propio y la apertura de su ruta sin enlaces (ADR-0045).
+5. Una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`.
+6. El adaptador de docker, para que los tests de las garantías se ejecuten con los dos motores.
+7. `--from` opcional, con un `head()` del adaptador de git.
+8. Una operación del puerto que dé el árbol de un commit, en vez de componer un commit consigo
+   mismo; y un solo sitio para el tratamiento de SIGTERM, hoy copiado en `sandbox`, `packs` e
+   `interfaces`.
+9. Una imagen cuyo `USER` no es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese
+   usuario, lo que falta probar cuando `USER` es un nombre, porque su uid hay que leerlo de la
+   imagen. Ninguno de los tres packs lo necesita.
+
+Después, el cierre de A2.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
@@ -183,7 +213,10 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   protegida; y la configuración del proyecto: el adaptador de git lee los hechos del proyecto con
   `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en A3
   hay que comprobar que el cambio de un agente no puede tocar `.git/config`.
-- **Antes de A4:** cómo se versiona y se publica el arnés.
+- **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
+  GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
+  `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
+  completa.
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
 automatiza y calcula las métricas en el bloque B.

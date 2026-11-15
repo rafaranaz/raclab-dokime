@@ -1,9 +1,11 @@
 """The reader of a test report in JUnit XML, shared by the adapters of the verification runtime.
 
-The report is written by the code under check, so it is read with a bound on its size and with
-`pyexpat` handlers that refuse a `DOCTYPE` before any entity is declared (ADR-0045). The reader
-runs in the process of the harness, and opens the path without refusing links, until the
-hardening of ADR-0045.
+The report is written by the code under check (ADR-0045). The adapter opens it part by part from
+the output directory following no link, and passes the open file to a program of its own, which
+sets its limits of memory and processor time before it reads, bounds the size, and refuses a
+`DOCTYPE` with handlers of `pyexpat` before any entity is declared. That process bounds the parser
+and turns its crash into a refusal; it is not isolation, since it runs with the permissions of the
+person.
 """
 
 import errno

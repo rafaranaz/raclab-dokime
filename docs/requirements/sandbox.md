@@ -22,9 +22,9 @@ conmon leaves in its working directory, which is not documented, and if conmon s
 run is given as "exited" with 137, which still ends without a report; with podman 5.4.2 too, a run
 killed by the memory limit was given as "exited" with 137 in 2 of about 12 runs of the whole suite,
 not reproduced alone, and the reason is only reasoned: that conmon handles the end of the process
-before the event of the memory limit, so that neither podman nor conmon reports it; the report is
-read in the process of the harness, and its path is opened without refusing links, until the
-hardening of ADR-0045.
+before the event of the memory limit, so that neither podman nor conmon reports it; the process
+that reads the report bounds the parser and turns its crash into a refusal, and it is not
+isolation: it runs with the permissions of the person who runs the harness.
 
 ### Opening
 

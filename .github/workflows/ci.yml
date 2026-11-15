@@ -29,6 +29,13 @@ jobs:
         run: uv run mypy
       - name: Import contracts between modules
         run: uv run lint-imports
+      - name: Podman enforces the limits of a run
+        run: |
+          systemctl --version | head -n 1
+          podman --version
+          cat "/sys/fs/cgroup/user.slice/user-$(id -u).slice/user@$(id -u).service/cgroup.controllers"
+          podman run --rm --network none --cpus 0.5 --memory 64m --memory-swap 64m \
+            --pids-limit 16 docker.io/library/busybox:1.36 true
       - name: Tests and coverage
         run: uv run pytest --cov
 

@@ -73,3 +73,10 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-080** When a pull request description contains an attribution line added by tooling, the description cleaner shall remove that line together with the separator line directly above it.
 - **REPO-081** When a pull request description contains a line that is only a link to a Claude session, the description cleaner shall remove that line.
 - **REPO-082** The description cleaner shall leave unchanged every line that is not an attribution line, its separator, a session link or a trailing blank line.
+
+## The gates in one command (`tools/gates.py`)
+
+- **REPO-120** When the gate runner runs, the gate runner shall run every command of the block "Gates locally" of `CLAUDE.md`, in its order, with `<branch>` replaced by the name of the current branch as one argument of the shell.
+- **REPO-121** If a command of the block fails, a command inside a pipeline included, then the gate runner shall stop and end with the exit code of that command.
+- **REPO-122** When every command of the block passes, the gate runner shall end with the exit code 0.
+- **REPO-123** If `CLAUDE.md` has no block "Gates locally", then the gate runner shall end with a non-zero exit code and a message that names the missing block.

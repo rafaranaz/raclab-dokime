@@ -62,3 +62,7 @@ paths = ["src/dokime/platform/**", "tests/platform/**", "docs/requirements/platf
 [scopes.sandbox]
 description = "Adapters of the verification runtime, and later of the isolation of the agent."
 paths = ["src/dokime/sandbox/**", "tests/sandbox/**", "docs/requirements/sandbox.md"]
+
+[scopes.corpus]
+description = "The packs of the repositories of the corpus and the tests that self-check them at their commits."
+paths = ["tests/corpus/**", "docs/requirements/corpus.md"]

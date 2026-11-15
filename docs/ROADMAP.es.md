@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:51c397718679924d -->
+<!-- translation-of: ROADMAP.md sha256:2d55112430b5598b -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -176,8 +176,10 @@ enlaces (ADR-0045), el adaptador de docker, python-semver y mdformat, y el cierr
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
 - **Antes de A3:** cómo se etiquetan los casos del corpus antes de ejecutarlos, que el criterio de
-  salida de A3 exige; y el formato de la política, cuya huella va en la evidencia y que es una ruta
-  protegida.
+  salida de A3 exige; el formato de la política, cuya huella va en la evidencia y que es una ruta
+  protegida; y la configuración del proyecto: el adaptador de git lee los hechos del proyecto con
+  `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en A3
+  hay que comprobar que el cambio de un agente no puede tocar `.git/config`.
 - **Antes de A4:** cómo se versiona y se publica el arnés.
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo

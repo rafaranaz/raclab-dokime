@@ -166,7 +166,10 @@ goes in this order:
 6. Run it on cachetools. Two witnesses among the first ten candidates mean the skeleton walks.
 
 Then the hardening: the reader of the report in a process of its own and the opening of its path
-without links (ADR-0045), the docker adapter, python-semver and mdformat, and the closing of A2.
+without links (ADR-0045); a run with `--cap-drop=ALL` and `--security-opt no-new-privileges`; an
+image whose `USER` is not root run with `--userns=keep-id` and the uid and gid of that user, which
+still has to be tried when `USER` is a name, since its uid has to be read from the image; the docker
+adapter, python-semver and mdformat; and the closing of A2.
 
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 

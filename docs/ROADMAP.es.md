@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:2d55112430b5598b -->
+<!-- translation-of: ROADMAP.md sha256:8ba8c97828ea28ab -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -171,7 +171,10 @@ test. El esqueleto va en este orden:
    esqueleto camina.
 
 Después, el endurecimiento: el lector del informe en un proceso propio y la apertura de su ruta sin
-enlaces (ADR-0045), el adaptador de docker, python-semver y mdformat, y el cierre de A2.
+enlaces (ADR-0045); una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`; una
+imagen cuyo `USER` no es root, ejecutada con `--userns=keep-id` y el uid y el gid de ese usuario, lo
+que falta probar cuando `USER` es un nombre, porque su uid hay que leerlo de la imagen; el adaptador
+de docker, python-semver y mdformat; y el cierre de A2.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 

@@ -39,6 +39,34 @@ jobs:
       - name: Tests and coverage
         run: uv run pytest --cov
 
+  corpus:
+    # The packs of the corpus at the commits of their projects, with the network (ADR-0052).
+    name: corpus
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        # With a shell named, GitHub runs bash with -eo pipefail; without one it runs bash -e, and
+        # the gate below would end with the code of tee.
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Self-check the pack of each project
+        id: self-check
+        env:
+          DOKIME_CORPUS: "1"
+        run: |
+          start=$(date +%s)
+          set +e
+          uv run pytest -p no:cacheprovider -s tests/corpus/test_corpus_self_check.py \
+            -k pack_of_a_project --junitxml=corpus.xml
+          echo "pytest ended with $? in $(( $(date +%s) - start )) s" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Every project was self-checked and passed
+        if: always()
+        run: uv run python -m tools.check_corpus --report corpus.xml | tee -a "$GITHUB_STEP_SUMMARY"
+
   governance:
     name: governance checks
     runs-on: ubuntu-24.04

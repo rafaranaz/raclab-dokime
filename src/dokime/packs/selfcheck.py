@@ -1,26 +1,14 @@
 """The rules of the self-check of a pack, as decisions over reports obtained elsewhere."""
 
-from collections.abc import Iterable, Mapping, Sequence
-from enum import StrEnum, auto
+from collections.abc import Iterable, Sequence
 
 from dokime.core.findings import Finding
+from dokime.core.outcomes import Outcome, Report
 from dokime.core.verdicts import Verdict
 from dokime.packs.model import Pack
 
 WITNESSES_NEEDED = 2
 CANDIDATES_LOOKED_AT = 10
-
-
-class Outcome(StrEnum):
-    """What happened to one test in one run."""
-
-    PASSED = auto()
-    FAILED = auto()
-    ERROR = auto()
-    SKIPPED = auto()
-
-
-type Report = Mapping[str, Outcome]
 
 
 def is_candidate(pack: Pack, changed: Iterable[str]) -> bool:

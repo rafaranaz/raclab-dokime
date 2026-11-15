@@ -1,9 +1,10 @@
 # SDD-EARS: PACKS-020 PACKS-021 PACKS-030 PACKS-031 PACKS-032 PACKS-033 PACKS-034 PACKS-035
 import pytest
 
+from dokime.core.outcomes import Outcome
 from dokime.packs.check import check
 from dokime.packs.model import Pack
-from dokime.packs.selfcheck import Outcome, is_candidate, is_witness, self_check
+from dokime.packs.selfcheck import is_candidate, is_witness, self_check
 from tests.packs.packs import VALID
 
 PASSED, FAILED, ERROR, SKIPPED = Outcome.PASSED, Outcome.FAILED, Outcome.ERROR, Outcome.SKIPPED

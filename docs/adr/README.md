@@ -62,3 +62,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0049](0049-every-pull-request-says-what-it-advances.md) | Every pull request says what it advances | Accepted |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.md) | An experiment enters the repository as a test | Accepted |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.md) | The adapters that run a program are exempt from S603 | Accepted |
+| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) | The corpus runs in CI in a job of its own, with the network | Proposed |

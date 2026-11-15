@@ -6,6 +6,9 @@ runs in the process of the harness, and opens the path without refusing links, u
 hardening of ADR-0045.
 """
 
+import errno
+import os
+import stat
 from pathlib import Path, PurePosixPath
 from typing import NoReturn
 from xml.parsers import expat
@@ -52,22 +55,61 @@ class _Cases:
         self._case = None
 
 
+def _not_a_file(report: PurePosixPath, why: str) -> RefusalError:
+    return RefusalError("report-not-a-file", f"the report {report} is not a regular file: {why}")
+
+
+def _open(output: Path, report: PurePosixPath) -> int:
+    """Open the report part by part from the output directory, following no link."""
+    directory = os.open(output, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
+    try:
+        *parents, name = report.parts
+        for part in parents:
+            opened = _open_part(
+                part, directory, report, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+            )
+            os.close(directory)
+            directory = opened
+        descriptor = _open_part(
+            name, directory, report, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+        )
+    finally:
+        os.close(directory)
+    if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+        os.close(descriptor)
+        raise _not_a_file(report, "it is not a file")
+    return descriptor
+
+
+def _open_part(part: str, directory: int, report: PurePosixPath, flags: int) -> int:
+    try:
+        return os.open(part, flags | os.O_CLOEXEC, dir_fd=directory)
+    except FileNotFoundError:
+        raise RefusalError("report-missing", f"the run wrote no report at {report}") from None
+    except OSError as error:
+        if error.errno in (errno.ELOOP, errno.ENOTDIR):
+            raise _not_a_file(report, f"{part!r} is a link or not a directory") from None
+        raise RefusalError(
+            "report-unreadable", f"the report {report} cannot be read: {error}"
+        ) from None
+
+
 def read_report(output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
     """Read the report at `report` inside the output directory."""
     if report.is_absolute() or ".." in report.parts:
         raise RefusalError(
             "path-outside-output", f"the path of the report {str(report)!r} leaves the output"
         )
-    path = output.joinpath(*report.parts)
+    descriptor = _open(output, report)
     try:
-        with open(path, "rb") as handle:
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
             data = handle.read(limits.report_bytes + 1)
-    except FileNotFoundError:
-        raise RefusalError("report-missing", f"the run wrote no report at {report}") from None
     except OSError as error:
         raise RefusalError(
             "report-unreadable", f"the report {report} cannot be read: {error}"
         ) from None
+    finally:
+        os.close(descriptor)
     if len(data) > limits.report_bytes:
         raise RefusalError(
             "report-too-large",

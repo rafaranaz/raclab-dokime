@@ -130,11 +130,11 @@ ReportLimits().report_bytes  # 33554432
 ## The port of the verification runtime
 
 `VerificationRuntime` builds an image from a Dockerfile, runs a command in it and reads the report
-the run wrote. A build gives the digest of the image and the base image of its final stage: the
-reference as the build resolved it, the digest of the platform manifest and, if the reference named
-an index, its digest. A run gives how it ended (`exited` with its exit code, `time-limit`,
-`memory-limit` or `killed`) and decides no verdict. `BuildLimits` (30 minutes) and `RunLimits` (2 GiB, 2 processors,
-512 processes, 15 minutes) are passed by the caller; a pack cannot change them.
+the run wrote. A build gives the digest of the image and the base image of its final stage, by the
+digest of the manifest of its platform, or no base when that stage starts from `scratch`. A run
+gives how it ended (`exited` with its exit code, `time-limit`, `memory-limit` or `killed`) and
+decides no verdict. `BuildLimits` (30 minutes) and `RunLimits` (2 GiB, 2 processors, 512 processes,
+15 minutes) are passed by the caller; a pack cannot change them.
 
 ```python
 from dokime.core.runtime import Ending, RunLimits, RunResult

@@ -47,12 +47,9 @@ class Digest:
 
 @dataclass(frozen=True)
 class BaseImage:
-    """The image a stage starts from: the reference as the build resolved it, the digest of
-    the manifest of the platform built, and the digest of the index it resolved to, if any."""
+    """The image a stage starts from, by the digest of the manifest of the platform built."""
 
-    reference: str
     platform: Digest
-    index: Digest | None
 
 
 @dataclass(frozen=True)

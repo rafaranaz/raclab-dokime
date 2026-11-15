@@ -1,4 +1,5 @@
 # SDD-EARS: CORE-081 CORE-082 CORE-083 CORE-084 CORE-085 CORE-086 CORE-087 CORE-088 CORE-089
+from dataclasses import fields
 from pathlib import Path, PurePosixPath
 from typing import get_type_hints
 
@@ -19,7 +20,6 @@ from dokime.core.runtime import (
 
 HEX = "0123456789abcdef" * 4
 IMAGE = Digest(f"sha256:{HEX}")
-OTHER = Digest(f"sha256:{'f' * 64}")
 
 
 def test_the_port_offers_the_three_operations() -> None:
@@ -39,14 +39,10 @@ def test_the_build_returns_the_image_and_the_base_image_of_the_final_stage_or_no
     assert get_type_hints(Build)["base"] == BaseImage | None
 
 
-RESOLVED = "docker.io/library/python:3.13-slim"
-
-
-def test_the_base_image_carries_the_reference_the_platform_digest_and_the_index_digest() -> None:
-    base = BaseImage(reference=RESOLVED, platform=IMAGE, index=OTHER)
-    assert (base.reference, base.platform, base.index) == (RESOLVED, IMAGE, OTHER)
-    assert BaseImage(reference=RESOLVED, platform=IMAGE, index=None).index is None
-    assert get_type_hints(BaseImage)["index"] == Digest | None
+def test_the_base_image_carries_only_the_digest_of_the_platform_manifest() -> None:
+    assert [field.name for field in fields(BaseImage)] == ["platform"]
+    assert BaseImage(platform=IMAGE).platform == IMAGE
+    assert get_type_hints(BaseImage)["platform"] is Digest
 
 
 def test_the_run_receives_the_image_the_command_the_directories_and_its_limits() -> None:

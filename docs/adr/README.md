@@ -63,3 +63,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.md) | An experiment enters the repository as a test | Accepted |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.md) | The adapters that run a program are exempt from S603 | Accepted |
 | [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) | The corpus runs in CI in a job of its own, with the network | Accepted |
+| [0053](0053-the-plan-of-work-lives-in-the-repository.md) | The plan of work lives in the repository | Proposed |

@@ -58,7 +58,7 @@ command does not resolve `HEAD`.
 ### What `env check` writes
 
 - **INTERFACES-060** When the adapters are open, the command shall write one line for each program, with its name, its path and its version, before the self-check starts.
-- **INTERFACES-061** When the self-check ends, the command shall write one line for each candidate looked at, with its commit, whether it is a witness and the tests that turned green.
+- **INTERFACES-061** When a candidate has been looked at, the command shall write its line, with its commit, whether it is a witness and the tests that turned green, before the next candidate is looked at.
 - **INTERFACES-062** The command shall write each finding of `env check` as `path: VERDICT code: message`, the path being the file of the pack.
 - **INTERFACES-063** The command shall end the output of `env check` with the line of the verdict of INTERFACES-005.
 - **INTERFACES-064** When the option `--format json` is given to `env check`, the command shall write one JSON document with the pack, the verdict, the programs, the candidates and the findings, each candidate with its commit, the tree, the image and the base of each side, whether it is a witness and the tests that turned green.

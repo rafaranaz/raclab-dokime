@@ -1,6 +1,6 @@
 # ADR-0055 · A case of the corpus is labelled by how it is built, and confirmed before it runs
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -8,12 +8,15 @@ it needs nothing of the harness. The report is refused if it is larger than its 
 """
 
 import json
+import resource
 import sys
 from typing import NoReturn
 from xml.parsers import expat
 
 _CHILDREN = {"failure": "failed", "error": "error", "skipped": "skipped"}
 _PRECEDENCE = ("error", "failed", "skipped")
+_NO_MEMORY = expat.errors.codes[expat.errors.XML_ERROR_NO_MEMORY]
+"""Expat tells that it reached the limit of memory as an error of parsing, which it is not."""
 
 
 class _RefusedError(Exception):
@@ -69,14 +72,28 @@ def read(descriptor: int, limit: int) -> dict[str, object]:
     except _RefusedError as refused:
         return {"refusal": refused.code, "detail": refused.detail}
     except expat.ExpatError as error:
+        if error.code == _NO_MEMORY:
+            raise MemoryError(str(error)) from None
         return {"refusal": "report-unreadable", "detail": str(error)}
     return {"cases": cases.report}
 
 
+def bound(memory: int, processor: int) -> None:
+    """Limit the address space and the processor time of this process, before it reads.
+
+    The process sets its own limits, so that nothing runs between the fork and the start of the
+    program, which would not be safe in a harness with several threads.
+    """
+    resource.setrlimit(resource.RLIMIT_AS, (memory, memory))
+    resource.setrlimit(resource.RLIMIT_CPU, (processor, processor))
+
+
 def main(argv: list[str]) -> None:
     """Read the report given by the arguments: the descriptor where the adapter opened it, which
-    this process inherits, and its limit of size in bytes."""
-    descriptor, limit = int(argv[1]), int(argv[2])
+    this process inherits, its limit of size in bytes, and the limits of memory in bytes and of
+    processor time in seconds of this process."""
+    descriptor, limit, memory, processor = (int(given) for given in argv[1:5])
+    bound(memory, processor)
     sys.stdout.write(json.dumps(read(descriptor, limit)))
 
 

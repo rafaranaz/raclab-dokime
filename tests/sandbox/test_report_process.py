@@ -1,7 +1,9 @@
-# SDD-EARS: SANDBOX-060 SANDBOX-061 SANDBOX-064
+# SDD-EARS: SANDBOX-060 SANDBOX-061 SANDBOX-062 SANDBOX-063 SANDBOX-064
 import os
+import resource
 import subprocess
 import textwrap
+import time
 from pathlib import Path, PurePosixPath
 
 import pytest
@@ -84,3 +86,55 @@ def test_a_report_replaced_after_the_adapter_opened_it_is_read_as_it_was(
 
     monkeypatch.setattr(subprocess, "run", replace_then_start)
     assert read_report(tmp_path, path, ReportLimits()) == {"t::one": Outcome.PASSED}
+
+
+def a_report_with_one_attribute_of(tmp_path: Path, size: int) -> PurePosixPath:
+    (tmp_path / "report.xml").write_bytes(
+        b'<testsuite><testcase classname="t" name="one" message="'
+        + b"a" * size
+        + b'"/></testsuite>'
+    )
+    return PurePosixPath("report.xml")
+
+
+def test_a_reader_that_needs_more_memory_than_its_limit_is_refused(tmp_path: Path) -> None:
+    path = a_report_with_one_attribute_of(tmp_path, 30 * 1024 * 1024)
+    finding = refusal(
+        lambda: read_report(tmp_path, path, ReportLimits(reader_memory_bytes=64 * 1024 * 1024))
+    )
+    assert finding.code == "report-reader-failed"
+
+
+def test_the_same_report_is_read_within_the_default_memory_and_the_harness_keeps_its_limits(
+    tmp_path: Path,
+) -> None:
+    before = resource.getrlimit(resource.RLIMIT_AS), resource.getrlimit(resource.RLIMIT_CPU)
+    path = a_report_with_one_attribute_of(tmp_path, 30 * 1024 * 1024)
+    assert read_report(tmp_path, path, ReportLimits()) == {"t::one": Outcome.PASSED}
+    after = resource.getrlimit(resource.RLIMIT_AS), resource.getrlimit(resource.RLIMIT_CPU)
+    assert after == before
+
+
+LOOP = """import time
+
+
+def loop(*_):
+    end = time.monotonic() + 20
+    while time.monotonic() < end:
+        pass
+    return {"cases": {}}
+
+
+reader.read = loop
+"""
+
+
+def test_a_reader_that_uses_more_processor_time_than_its_limit_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    reader_whose_read_is(tmp_path, monkeypatch, LOOP)
+    started = time.monotonic()
+    finding = refusal(
+        lambda: read_report(tmp_path, written(tmp_path), ReportLimits(reader_cpu_seconds=1))
+    )
+    assert (finding.code, time.monotonic() - started < 10) == ("report-reader-failed", True)

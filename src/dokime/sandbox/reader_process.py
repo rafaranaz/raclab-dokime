@@ -1,6 +1,7 @@
 """The program that parses a test report in JUnit XML, in a process of its own.
 
-The adapter starts it with `python -I` and reads one JSON object on its output: `{"cases": {name:
+The adapter opens the report, starts this program with `python -I` and the open file, so that the
+program never resolves the path, and reads one JSON object on its output: `{"cases": {name:
 outcome}}`, or `{"refusal": code, "detail": text}`. It imports only the standard library, so that
 it needs nothing of the harness. The report is refused if it is larger than its limit, has a
 `DOCTYPE`, is not well-formed or names a test twice (ADR-0045).
@@ -50,9 +51,9 @@ class _Cases:
         self._case = None
 
 
-def read(source: str, limit: int) -> dict[str, object]:
-    """Parse the report and give its cases, or the refusal and its detail."""
-    with open(source, "rb") as handle:
+def read(descriptor: int, limit: int) -> dict[str, object]:
+    """Parse the report open at `descriptor` and give its cases, or the refusal and its detail."""
+    with open(descriptor, "rb") as handle:
         data = handle.read(limit + 1)
     if len(data) > limit:
         return {"refusal": "report-too-large", "detail": ""}
@@ -73,9 +74,10 @@ def read(source: str, limit: int) -> dict[str, object]:
 
 
 def main(argv: list[str]) -> None:
-    """Read the report named by the arguments: its source and its limit of size in bytes."""
-    source, limit = argv[1], int(argv[2])
-    sys.stdout.write(json.dumps(read(source, limit)))
+    """Read the report given by the arguments: the descriptor where the adapter opened it, which
+    this process inherits, and its limit of size in bytes."""
+    descriptor, limit = int(argv[1]), int(argv[2])
+    sys.stdout.write(json.dumps(read(descriptor, limit)))
 
 
 if __name__ == "__main__":

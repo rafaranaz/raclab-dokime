@@ -71,19 +71,23 @@ def read_report(output: Path, report: PurePosixPath, limits: ReportLimits) -> Re
         raise RefusalError(
             "path-outside-output", f"the path of the report {str(report)!r} leaves the output"
         )
-    os.close(_open(output, report))
-    done = subprocess.run(
-        [
-            sys.executable,
-            "-I",
-            str(READER_PROGRAM),
-            str(output.joinpath(*report.parts)),
-            str(limits.report_bytes),
-        ],
-        stdin=subprocess.DEVNULL,
-        capture_output=True,
-        check=False,
-    )
+    descriptor = _open(output, report)
+    try:
+        done = subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                str(READER_PROGRAM),
+                str(descriptor),
+                str(limits.report_bytes),
+            ],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            check=False,
+            pass_fds=(descriptor,),
+        )
+    finally:
+        os.close(descriptor)
     return _result(report, limits, done)
 
 

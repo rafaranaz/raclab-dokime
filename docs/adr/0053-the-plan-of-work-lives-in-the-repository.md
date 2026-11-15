@@ -1,6 +1,6 @@
 # ADR-0053 · The plan of work lives in the repository
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

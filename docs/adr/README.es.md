@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:69ff8efcb73da336 -->
+<!-- translation-of: README.md sha256:1eb43ca84c4aeab0 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -64,4 +64,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.es.md) | Un experimento entra en el repositorio como un test | Aceptada |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Aceptada |
 | [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) | El conjunto de casos se ejecuta en CI en un job propio, con red | Aceptada |
-| [0053](0053-the-plan-of-work-lives-in-the-repository.es.md) | El plan de trabajo vive en el repositorio | Propuesta |
+| [0053](0053-the-plan-of-work-lives-in-the-repository.es.md) | El plan de trabajo vive en el repositorio | Aceptada |

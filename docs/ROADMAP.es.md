@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:dd36f96d1aff83d4 -->
+<!-- translation-of: ROADMAP.md sha256:90c6dc50b91fd773 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -141,7 +141,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 | A0 Pruebas a mano | Tres cambios reales con un contrato escrito a mano y aprobado por una persona, cronometrado; tres repositorios elegidos para el conjunto de casos | Ninguno | Se conocen la proporción de requisitos que caben como ejemplos y los minutos por contrato, y el formato se confirma o se revisa |
 | A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract`, `interfaces` (solo la orden) | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
 | A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox`, `platform` (solo el repositorio del proyecto), `interfaces` (solo la orden) | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
-| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia | `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
+| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia; el directorio del cambio (`.dokime/changes/<story>/`) y el registro de eventos con hashes encadenados, planeados para A1 y no construidos | `core`, `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
 | A4 Auditoría en CI | Un flujo que audita un pull request y adjunta la evidencia, activado en este repositorio; versión 0.1 | `interfaces` | Un pull request real de este repositorio lleva su evidencia |
 
 `interfaces` se abre tres veces en el bloque A: en A1 para la orden `contract check`, que solo lee
@@ -222,6 +222,13 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
   completa.
+- **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
+  lista de destinatarios.
+- **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y
+  un tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no
+  dinero.
+- **Antes de D2:** cómo se agrupan las diferencias encontradas fuera del cambio sin la pasarela a
+  un modelo.
 
 En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
 automatiza y calcula las métricas en el bloque B.

@@ -171,8 +171,11 @@ without links (ADR-0045), the docker adapter, python-semver and mdformat, and th
 Still to decide before a milestone opens. They are written down here and not decided in A2:
 
 - **Before A3:** how the cases of the corpus are labelled before they are run, which the exit
-  criterion of A3 requires; and the format of the policy, whose digest goes into the evidence and
-  which is a protected path.
+  criterion of A3 requires; the format of the policy, whose digest goes into the evidence and
+  which is a protected path; and the configuration of the project: the git adapter reads the facts
+  of the project with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs
+  to the person who runs the harness; in A3 it has to be checked that the change of an agent
+  cannot touch `.git/config`.
 - **Before A4:** how the harness is versioned and published.
 
 In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes

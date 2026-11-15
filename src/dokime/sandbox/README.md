@@ -38,6 +38,13 @@ the memory limit on podman 4.9 is given as `exited` with 137. That failure is sa
 kills the container, and a command killed this way writes no report, so reading it is refused with
 `report-missing` and the self-check ends in `ERROR` as it would with `memory-limit`.
 
+With podman 5.4.2 too, the cause can be lost: a run killed by the memory limit was given as `exited`
+with 137 in 2 of about 12 runs of the whole suite, and never when its test ran alone. The reason is
+reasoned, not shown: conmon may handle the end of the process before the event of the memory limit,
+and then neither podman nor conmon reports it. The same safe failure applies. The test of the
+guarantee therefore takes either ending as proof that the memory was bounded, and `memory-limit`
+itself is tested with a podman that reports it.
+
 `read_report` reads the JUnit report with its limit of size and refuses a `DOCTYPE`. Each test is
 named by its class name, `::` and its name, as pytest writes it.
 

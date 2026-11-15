@@ -19,9 +19,12 @@ Known limits: the bases of the stages that the final stage copies from with `COP
 recorded; a build stopped at its time limit leaves the working container of `podman build` in the
 store of images; with podman 4.9, a run killed by the memory limit is told by the file `oom` that
 conmon leaves in its working directory, which is not documented, and if conmon stops writing it the
-run is given as "exited" with 137, which still ends without a report; the report is read in the
-process of the harness, and its path is opened without refusing links, until the hardening of
-ADR-0045.
+run is given as "exited" with 137, which still ends without a report; with podman 5.4.2 too, a run
+killed by the memory limit was given as "exited" with 137 in 2 of about 12 runs of the whole suite,
+not reproduced alone, and the reason is only reasoned: that conmon handles the end of the process
+before the event of the memory limit, so that neither podman nor conmon reports it; the report is
+read in the process of the harness, and its path is opened without refusing links, until the
+hardening of ADR-0045.
 
 ### Opening
 

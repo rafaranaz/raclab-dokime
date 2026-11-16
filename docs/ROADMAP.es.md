@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:e0778f1da6276ed6 -->
+<!-- translation-of: ROADMAP.md sha256:905af8f8ae24c6db -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -239,17 +239,20 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 
 - **Antes de A3:** la configuración del proyecto: el adaptador de git lee los hechos del proyecto
   con `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en
-  A3 hay que comprobar que el cambio de un agente no puede tocar `.git/config`. El código que se
-  comprueba pasa a ser hostil en A3, así que el endurecimiento de A2 va antes; ya están construidos
-  el lector del informe en un proceso propio, con su ruta abierta sin enlaces (ADR-0045), y una
-  ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`. El formato de la política,
-  cómo se etiquetan los casos del corpus y la configuración de los tests en el pack los deciden la
-  ADR-0054, la ADR-0055 y la ADR-0056. La ADR-0056 deja dos puntos para cuando se abra A3, antes de
-  construir el gate `protected-paths`: los ficheros que guardan la configuración de los tests junto
-  con la del proyecto, como hace mdformat en `pyproject.toml`; y cómo cuenta la autocomprobación un
-  commit que cambia solo configuración y código. Y los doctests: pytest ejecuta los `docs/*.rst` de
-  python-semver como doctests, pero su pack solo cuenta como tests `tests/**`, así que un parche que
-  edite un doctest para que encaje no se vería como uno que edita tests.
+  A3 el cambio de un agente no debe llegar a `.git/config`. El adaptador no ejecuta ningún programa
+  que nombren la configuración de git en cualquier nivel, los hooks del proyecto o los atributos de
+  los árboles que lee (PLATFORM-047); cuando se construya `compose_with_patch` en A3, rechaza un
+  parche con una ruta que tenga una parte `.git`, que git 2.47.3 ya rechaza como ruta inválida. El
+  código que se comprueba pasa a ser hostil en A3, así que el endurecimiento de A2 va antes; ya
+  están construidos el lector del informe en un proceso propio, con su ruta abierta sin enlaces
+  (ADR-0045), y una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`. El formato
+  de la política, cómo se etiquetan los casos del corpus y la configuración de los tests en el pack
+  los deciden la ADR-0054, la ADR-0055 y la ADR-0056. La ADR-0056 deja dos puntos para cuando se
+  abra A3, antes de construir el gate `protected-paths`: los ficheros que guardan la configuración
+  de los tests junto con la del proyecto, como hace mdformat en `pyproject.toml`; y cómo cuenta la
+  autocomprobación un commit que cambia solo configuración y código. Y los doctests: pytest ejecuta
+  los `docs/*.rst` de python-semver como doctests, pero su pack solo cuenta como tests `tests/**`,
+  así que un parche que edite un doctest para que encaje no se vería como uno que edita tests.
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia

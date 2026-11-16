@@ -1,4 +1,4 @@
-<!-- translation-of: 0059-a-mixed-file-protects-the-section-that-configures-the-tests.md sha256:6695c31fdf371170 -->
+<!-- translation-of: 0059-a-mixed-file-protects-the-section-that-configures-the-tests.md sha256:e941bc33e2281a2d -->
 # ADR-0059 · Un fichero mixto protege la sección que configura los tests
 
 **Estado:** propuesta
@@ -21,6 +21,10 @@ configuración de pytest en `pyproject.toml`. La
   requisito de `packs`.
 - **Un cambio en esa sección cuenta como un cambio de los tests para `protected-paths`.** El resto
   del fichero queda libre.
+- **El pack pone en `tests.config` los ficheros que pytest leería antes que el fichero mixto**,
+  aunque no existan, como permite la ADR-0056 con un patrón que no coincide con ningún fichero. Si
+  no, un parche que añade un `pytest.ini` en la raíz dejaría sin efecto la sección protegida sin
+  tocarla.
 - **Autorizar un fichero mixto en `may_modify_tests` autoriza solo su sección.**
 - **`existing-tests` no restaura esa sección.** Si cambió, `protected-paths` ya da `FAIL` salvo que
   el contrato lo autorice. Es un límite declarado: un fichero mixto lo vigila una sola puerta, no
@@ -33,10 +37,21 @@ Leído en el commit del conjunto (`56b24ef`): el `pyproject.toml` de mdformat ti
 `xfail_strict = true`. Un parche que añada ahí `--deselect` o `-p no:…` a `addopts` cambia qué
 tests se ejecutan sin tocar un fichero de tests.
 
-Leído: los ataques documentados a SWE-bench van por la configuración que carga pytest
-([BenchJack, sección 3](https://arxiv.org/abs/2605.12673)) y por el propio proceso de los tests,
-parcheando el informe o llamando a `sys.exit(0)` (una entrada de tianpan.co, de abril de 2026,
-fuente secundaria). La segunda vía confirma el límite de la [ADR-0010](0010-threat-model.es.md):
+Medido el 2026-11-16 con pytest 8.3.4 en la imagen del conjunto, por el `configfile` que informa
+pytest, con cada par de ficheros en un directorio: `pytest.ini` gana a todos, aunque esté vacío;
+después `.pytest.ini`; después `pyproject.toml`, solo con `[tool.pytest.ini_options]`; después
+`tox.ini`, solo con `[pytest]`; después `setup.cfg`, solo con `[tool:pytest]`. `pytest.toml` no se
+lee. Cuando la orden nombra un directorio, como el pack de mdformat nombra `tests`, un `pytest.ini`
+en ese directorio gana al `pyproject.toml` de la raíz. Para mdformat, entonces, un parche que añade
+un `pytest.ini` vacío en la raíz sustituye `[tool.pytest.ini_options]` por ninguna configuración,
+y quita `--strict-markers`, `--strict-config` y `xfail_strict`; su pack pone `pytest.ini` y
+`.pytest.ini` en `tests.config`, y el de `tests/` ya está bajo `tests.paths`. La lista depende de
+la versión de pytest, como dice la ADR-0056.
+
+Leído: los ataques documentados a benchmarks de agentes van por la configuración que carga pytest
+([BenchJack, sección 3](https://arxiv.org/abs/2605.12673), sobre SWE-bench) y por el propio proceso
+de los tests, parcheando el informe o llamando a `sys.exit(0)`
+([una entrada de tianpan.co](https://tianpan.co/blog/2026-04-17-specification-gaming-production-ai-agents), de abril de 2026, fuente secundaria). La segunda vía confirma el límite de la [ADR-0010](0010-threat-model.es.md):
 los tests se ejecutan en el proceso del código que se comprueba.
 
 Buscado y no encontrado: una herramienta que proteja la configuración de pytest por sección.

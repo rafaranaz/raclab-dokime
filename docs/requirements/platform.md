@@ -41,6 +41,7 @@ faithfully.
 - **PLATFORM-015** If git ends with an error that no other requirement names, then the git adapter shall refuse with the code `git-failed`, quoting what git wrote on its error output.
 - **PLATFORM-016** When the git adapter is closed, the git adapter shall remove its temporary directory.
 - **PLATFORM-017** If the opening of the git adapter is refused, then the git adapter shall leave no temporary directory.
+- **PLATFORM-047** The git adapter shall run no program that the configuration of git at any level, the hooks of the project or the attributes of the trees it reads name.
 
 ### History and change
 

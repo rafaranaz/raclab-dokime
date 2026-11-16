@@ -3,8 +3,9 @@
 Domain types that every module shares: the verdicts of a gate and the findings that explain them,
 the strict reader of the files of the harness and the shape check, the ports of the project
 repository and of the verification runtime, the canonical form that digests are taken over, the
-policy, and the ledger with the ports of its store and of the clock. Each requirement follows an
-EARS template and has at least one test that declares it in its `SDD-EARS:` marker.
+policy, the ledger with the ports of its store and of the clock, and the layout of a project. Each
+requirement follows an EARS template and has at least one test that declares it in its `SDD-EARS:`
+marker.
 
 ## Verdicts ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md))
 
@@ -248,7 +249,27 @@ Each finding of the verification has the verdict `FAIL` and the number of its li
 - **CORE-139** If the `prev` of an event is not the `hash` of the event before it, or is not null for the first, then the verification shall report a finding with the code `broken-chain`.
 - **CORE-140** If the `seq` of an event is not the one after that of the event before it, or is not 1 for the first, then the verification shall report a finding with the code `wrong-sequence`.
 
+### The head
+
+The head of a ledger is what the evidence keeps of it, so that a ledger whose last events were
+removed, or that was written again from the start, does not pass as the one the evidence describes.
+
+- **CORE-141** The head of a ledger shall be the `hash` of its last event and the number of its events.
+- **CORE-142** The head of a ledger without events shall have no hash and 0 events.
+- **CORE-143** If the head of a ledger is asked for and its lines do not verify, then the head shall be refused with an error that gives the findings of the verification.
+- **CORE-144** If a ledger is verified against an expected head and its head differs from it, then the verification shall report a finding with the code `wrong-head` that gives both heads.
+
 ### The ports of the ledger store and of the clock
 
 - **CORE-145** The port of the ledger store shall offer two operations: append a line, and give the lines in the order they were appended.
 - **CORE-146** The port of the clock shall offer one operation, which gives the current time with its time zone.
+
+## The layout of a project ([ADR-0027](../adr/0027-memory-has-one-layout-and-three-scopes.md), [ADR-0054](../adr/0054-the-policy-is-an-optional-file-of-values.md))
+
+The paths are relative to the root of the project. `core` gives them; it opens nothing. A story is a
+name: a text of letters, digits and hyphens that starts with a letter, as the `story` of a contract.
+
+- **CORE-150** The policy of a project shall be at `.dokime/policy.yaml`.
+- **CORE-151** The directory of a change shall be `.dokime/changes/<story>/`, with the story of the change.
+- **CORE-152** The contract of a change shall be the file `contract.yaml` in the directory of the change.
+- **CORE-153** If a story is not a name, then the directory of the change shall be refused with an error that names the story.

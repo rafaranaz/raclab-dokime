@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:ed64f6dec7584895 -->
+<!-- translation-of: ROADMAP.md sha256:898063beccf22cc7 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -158,8 +158,8 @@ A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
 1. `core`: el directorio del cambio, el registro con hashes encadenados y la lectura de la
    política ([ADR-0054](adr/0054-the-policy-is-an-optional-file-of-values.es.md)), que usan todos
    los demás ámbitos.
-2. `corpus`, una primera vez: los diez casos con sus etiquetas, la puerta de las etiquetas y el
-   script de los testigos. La etiqueta de un caso queda fijada en `main` antes de que el arnés vea
+2. `corpus`, una primera vez: los diez casos con sus etiquetas y la puerta de las etiquetas. La
+   etiqueta de un caso queda fijada en `main` antes de que el arnés vea
    el caso ([ADR-0055](adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md)), así
    que las puertas no se construyen con los casos delante y sin fijar.
 3. `platform`: los almacenes y el reloj, `compose_with_patch`, que rechaza una ruta con una parte
@@ -174,8 +174,11 @@ A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
 7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
 8. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
 9. `interfaces`: la orden `audit`.
-10. `corpus`, una segunda vez: la auditoría ejecutada sobre los diez casos, y el criterio de salida
-    medido.
+10. `corpus`, una segunda vez: una pull request de `repo` que da al job `corpus` los clones que
+    necesita además de las autocomprobaciones; el script de los testigos (ADR-0057) y
+    `git apply --check` de cada parche sobre su base; la auditoría ejecutada sobre los diez casos; y
+    el criterio de salida medido. Los clones hacen falta aquí de todos modos, y nada entre las dos
+    pasadas depende de ellos.
 
 A2 se construye primero como el camino más delgado que funciona, `dokime env check` sobre cachetools
 detrás de los puertos, y después se endurece una pieza cada vez, cada una con su requisito y su

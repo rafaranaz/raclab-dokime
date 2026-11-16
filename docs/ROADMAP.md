@@ -155,8 +155,7 @@ A3 opens its scopes in this order, each after the ones it depends on:
 1. `core`: the directory of the change, the ledger with chained hashes and the reading of the
    policy ([ADR-0054](adr/0054-the-policy-is-an-optional-file-of-values.md)), which every other
    scope uses.
-2. `corpus`, a first time: the ten cases with their labels, the gate of the labels and the script
-   of the witnesses. The label of a case is fixed in `main` before the harness sees the case
+2. `corpus`, a first time: the ten cases with their labels and the gate of the labels. The label of a case is fixed in `main` before the harness sees the case
    ([ADR-0055](adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md)), so the gates are
    not built with the cases in front and unfixed.
 3. `platform`: the stores and the clock, `compose_with_patch`, which refuses a path with a part
@@ -172,7 +171,10 @@ A3 opens its scopes in this order, each after the ones it depends on:
    aggregation.
 8. `evidence`: the evidence file, without signatures, which are of block E.
 9. `interfaces`: the command `audit`.
-10. `corpus`, a second time: the audit run on the ten cases, and the exit criterion measured.
+10. `corpus`, a second time: a pull request of `repo` that gives the job `corpus` the clones it
+    needs beyond the self-checks; the script of the witnesses (ADR-0057) and `git apply --check` of
+    each patch on its base; the audit run on the ten cases; and the exit criterion measured. The
+    clones are needed here anyway, and nothing between the two passes depends on them.
 
 A2 is built first as the thinnest path that works, `dokime env check` on cachetools behind the
 ports, and then hardened one piece at a time, each with its requirement and its test. The

@@ -1,4 +1,4 @@
-<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:5f713b237dd518fe -->
+<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:2648f669f256a6dd -->
 # ADR-0062 · Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él
 
 **Estado:** aceptada
@@ -53,8 +53,9 @@ Leído:
   Go, acepta enteros y textos y rechaza las claves duplicadas, los decimales y los sustitutos
   sueltos.
 
-Los tests de la forma canónica usan los vectores de los apéndices de la RFC 8785 que se aplican a
-la restricción: el orden de las claves y las cadenas. Llegan con el ámbito `core`.
+Los tests de la forma canónica usan los vectores de la RFC 8785 que se aplican a la restricción: las
+cadenas de la sección 3.2.2 y el orden de las claves de la sección 3.2.3; el apéndice B trata de
+números con decimales y no se aplica. Llegan con el ámbito `core`.
 
 Razonamiento, sin test: que ningún valor que el arnés convierte en huella en el bloque A necesita
 un decimal, así que dejar fuera los números de ECMAScript quita la parte más difícil de JCS sin

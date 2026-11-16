@@ -1,6 +1,6 @@
 # ADR-0055 · A case of the corpus is labelled by how it is built, and confirmed before it runs
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md)
 
 ## Context
 

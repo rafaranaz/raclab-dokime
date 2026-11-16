@@ -5,4 +5,4 @@ environment:
 tests:
   command: [python, -m, pytest, -p, no:cacheprovider, -q, --junitxml, /dokime/out/report.xml]
   report: report.xml
-  paths: ["tests/**"]
+  paths: ["tests/**", "docs/**/*.rst"]

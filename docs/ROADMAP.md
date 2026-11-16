@@ -239,6 +239,8 @@ Noted as debt, which blocks no milestone:
 - Optional: `pip install --require-hashes` in the Dockerfiles of the corpus.
 - The witnesses recorded so that the next run of a self-check uses the same ones, as ADR-0041
   says: not built in A2.
+- An `at` of the ledger earlier than that of the event before it is not found. The clock of the
+  system can go back for real, so it is decided when there is a case.
 - Of adoption: an image whose `USER` is not root. SANDBOX-038 refuses it today, so it is not a
   protection against hostile code but the support of images that set a user, and none of the three
   packs needs it. Five variants were measured with podman 5.4.2

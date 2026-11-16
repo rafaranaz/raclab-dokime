@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:c7a15d9f8237750a -->
+<!-- translation-of: ROADMAP.md sha256:45ac0898ca8d0692 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -245,6 +245,8 @@ Apuntado como deuda, que no bloquea ningún hito:
 - Opcional: `pip install --require-hashes` en los Dockerfile del conjunto de casos.
 - Los testigos guardados para que la siguiente ejecución de una autocomprobación use los mismos,
   como dice la ADR-0041: no se construyó en A2.
+- Un `at` del registro anterior al del evento previo no se detecta. El reloj del sistema puede
+  retroceder de verdad, así que se decide cuando haya un caso.
 - De adopción: una imagen cuyo `USER` no es root. SANDBOX-038 la rechaza hoy, así que no es una
   protección contra código hostil sino la compatibilidad con imágenes que fijan un usuario, y
   ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2

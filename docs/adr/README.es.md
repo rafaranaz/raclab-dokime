@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:f4e232f8fc98712c -->
+<!-- translation-of: README.md sha256:aa31bd2a726e3052 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -68,3 +68,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md) | Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse | Aceptada |
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Aceptada |
+| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Propuesta |

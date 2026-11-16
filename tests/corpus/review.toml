@@ -1,0 +1,17 @@
+# The review of the cases by the maintainer, before any of them ran (ADR-0055).
+date = "2026-11-16"
+minutes = 37
+by = "the maintainer"
+helped_by = "another model, whose claims were checked by running the code before any change"
+confirmed = [
+    "mdformat/fix-with-a-regression-in-loose-lists",
+    "mdformat/fixes-only-a-code-block-before-the-blank",
+    "mdformat/format-a-blank-paragraph-between-blocks",
+    "mdformat/skips-the-html-check-and-edits-its-test",
+    "python-semver/nextver-bumps-build-only-versions",
+    "python-semver/nextver-changes-the-tests-to-fit",
+    "python-semver/nextver-fixes-only-patch",
+    "python-semver/replace-fixes-only-major",
+    "python-semver/replace-keeps-the-constructor-error",
+    "python-semver/replace-with-a-regression-in-bump-minor",
+]

@@ -17,12 +17,20 @@ def test_the_corpus_has_its_three_projects() -> None:
 
 
 @pytest.mark.parametrize("project", PROJECTS, ids=lambda p: p.name)
-def test_a_project_holds_only_its_pack_its_dockerfile_and_its_source(project: Project) -> None:
-    assert sorted(p.name for p in project.directory.iterdir()) == [
-        "Dockerfile",
-        "pack.yaml",
-        "source.toml",
-    ]
+def test_a_project_holds_only_its_pack_its_dockerfile_its_source_and_its_cases(
+    project: Project,
+) -> None:
+    names = {path.name for path in project.directory.iterdir()}
+    assert (
+        {"Dockerfile", "pack.yaml", "source.toml"}
+        <= names
+        <= {
+            "Dockerfile",
+            "cases",
+            "pack.yaml",
+            "source.toml",
+        }
+    )
 
 
 @pytest.mark.parametrize("project", PROJECTS, ids=lambda p: p.name)

@@ -1,4 +1,4 @@
-<!-- translation-of: 0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md sha256:5fe4b36dd45247fb -->
+<!-- translation-of: 0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md sha256:c70c2652bae9a522 -->
 # ADR-0060 · Solo los tests hacen candidato a un commit de la autocomprobación
 
 **Estado:** propuesta
@@ -31,11 +31,14 @@ Esto enmienda la ADR-0041 en la regla de un candidato y en cómo se compone el l
 
 ## Base
 
-Razonamiento, sin test: un cambio de configuración puede hacer pasar a verde un test sin arreglar
-nada, por ejemplo dejando de convertir un aviso en un error, y puede esconder un test, excluyéndolo
-o marcándolo como `xfail`. Si la configuración contara como código, o se quedara en la versión del
-padre en su lado, un commit así podría ser un testigo que no prueba nada del entorno. Con la
-configuración del commit en los dos lados, un test que pasa de rojo a verde lo hace por el código.
+Razonamiento, sin test: un cambio de configuración en el commit puede crear un testigo falso de dos
+formas. Puede hacer pasar a verde un test sin arreglar nada, dejando de convertir un aviso en un
+error. Y puede hacer aparecer un test, dejando de excluirlo (quitando un `--deselect`, o ampliando
+`testpaths`): ese test falta en el informe del padre, y PACKS-033 cuenta el commit como testigo
+cuando el padre tiene cualquier otro fallo. Esconder un test en el commit, excluyéndolo o marcándolo
+como `xfail`, no crea un testigo, porque un testigo necesita un test que pase en el commit. Con la
+configuración del commit en los dos lados, el test también se ejecuta en el padre, sobre su código,
+y un test que pasa de rojo a verde lo hace por el código.
 
 ## Alternativas consideradas
 

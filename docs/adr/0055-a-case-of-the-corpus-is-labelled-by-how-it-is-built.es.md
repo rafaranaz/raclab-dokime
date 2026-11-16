@@ -1,7 +1,7 @@
-<!-- translation-of: 0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md sha256:ed9f1a281c830516 -->
+<!-- translation-of: 0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md sha256:2d6a4c7c646c8173 -->
 # ADR-0055 · Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md)
 
 ## Contexto
 

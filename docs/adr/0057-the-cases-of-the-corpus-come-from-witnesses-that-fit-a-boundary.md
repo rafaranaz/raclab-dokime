@@ -1,6 +1,6 @@
 # ADR-0057 · The cases of the corpus come from witnesses past the second, that fit a boundary
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

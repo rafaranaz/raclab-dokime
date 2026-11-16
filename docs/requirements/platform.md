@@ -58,7 +58,10 @@ faithfully.
 
 - **PLATFORM-030** When a tree is composed from a base with the paths of a source, the project repository adapter shall give a tree that holds, under the paths the rule takes, exactly the files of the source with their modes.
 - **PLATFORM-031** When a tree is composed from a base with the paths of a source, the project repository adapter shall keep every file of the base whose path the rule does not take.
-- **PLATFORM-032** When a tree is composed from a base with a patch, the project repository adapter shall refuse with the code `patch-not-supported`.
+- **PLATFORM-032** When a tree is composed from a base with a patch, the project repository adapter shall give the tree of the base with the patch applied, each file it touches with the bytes and the mode the patch gives it.
+- **PLATFORM-033** When a tree is composed from a base with a patch, the project repository adapter shall keep every file of the base that the patch does not touch.
+- **PLATFORM-034** If the patch does not apply to the base, then the project repository adapter shall refuse with the code `patch-does-not-apply`, quoting what git wrote.
+- **PLATFORM-035** If a path that the patch names has a part that is `.git` in any case of letters, then the project repository adapter shall refuse with the code `patch-touches-git`, naming the path, before it applies anything.
 
 ### Extraction
 
@@ -83,6 +86,8 @@ event of the ledger, which its canonical form keeps on one line.
 - **PLATFORM-064** If a line holds a newline or a carriage return, then the file ledger store shall refuse it with an error and write nothing.
 - **PLATFORM-065** If its file is not empty and does not end with a newline, then the file ledger store shall refuse to append, with an error that says its last line is cut.
 - **PLATFORM-066** If its file is not valid UTF-8, then the file ledger store shall refuse to give its lines, with an error that names the file.
+- **PLATFORM-067** If the system writes fewer bytes of a line than it was given, then the file ledger store shall write the rest until the line is complete, or refuse with an error when the system writes none.
+- **PLATFORM-068** When the file ledger store creates its file, the file ledger store shall flush the directory that holds it to the storage device.
 
 ## The system clock
 

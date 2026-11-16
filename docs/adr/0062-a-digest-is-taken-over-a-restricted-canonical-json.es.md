@@ -1,7 +1,7 @@
-<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:be392b6c1f460edf -->
+<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:5f713b237dd518fe -->
 # ADR-0062 · Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

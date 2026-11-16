@@ -1,6 +1,6 @@
 # ADR-0062 · A digest is taken over a restricted canonical JSON, and a hashed record is kept in it
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

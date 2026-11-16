@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:705b8a63e90ab1ff -->
+<!-- translation-of: README.md sha256:036d1879b1b731d5 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -70,3 +70,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Aceptada |
 | [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.es.md) | existing-tests ejecuta los tests de la base sobre el código del parche | Aceptada |
+| [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.es.md) | Un fichero mixto protege la sección que configura los tests | Propuesta |

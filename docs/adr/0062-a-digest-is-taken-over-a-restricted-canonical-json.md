@@ -44,8 +44,11 @@ Read:
   refuses whole numbers outside ±(2^53 − 1) citing the appendix B of the RFC, and refuses lone
   surrogates when it encodes to UTF-8
   ([rfc8785.py](https://github.com/trailofbits/rfc8785.py/blob/main/src/rfc8785/_impl.py)).
-- Found by the maintainer: implementations of a subset of JCS that refuse decimals, as this one
-  does.
+- Found by the session that reviews the work, not checked further: implementations of a subset of
+  JCS that refuse decimals, as this one does. [MPP.JCS](https://mpp.hexdocs.pm/MPP.JCS.html), in
+  Elixir, is a subset of JCS without decimals; [jcs of
+  musereel-sdk](https://pkg.go.dev/github.com/emiya-dev/musereel-sdk/jcs), in Go, accepts whole
+  numbers and texts and refuses duplicate keys, decimals and lone surrogates.
 
 The tests of the canonical form use the vectors of the appendices of RFC 8785 that apply to the
 restriction: the order of keys and the strings. They come with the scope `core`.

@@ -1,4 +1,4 @@
-<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:5c80d0f4215faba9 -->
+<!-- translation-of: 0062-a-digest-is-taken-over-a-restricted-canonical-json.md sha256:be392b6c1f460edf -->
 # ADR-0062 · Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él
 
 **Estado:** propuesta
@@ -46,8 +46,12 @@ Leído:
   rechaza los enteros fuera de ±(2^53 − 1) citando el apéndice B de la RFC, y rechaza los
   sustitutos sueltos al codificar en UTF-8
   ([rfc8785.py](https://github.com/trailofbits/rfc8785.py/blob/main/src/rfc8785/_impl.py)).
-- Encontrado por el mantenedor: implementaciones de un subconjunto de JCS que rechazan los
-  decimales, como esta.
+- Encontrado por la sesión que revisa el trabajo, sin comprobar más: implementaciones de un
+  subconjunto de JCS que rechazan los decimales, como esta.
+  [MPP.JCS](https://mpp.hexdocs.pm/MPP.JCS.html), en Elixir, es un subconjunto de JCS sin
+  decimales; [jcs de musereel-sdk](https://pkg.go.dev/github.com/emiya-dev/musereel-sdk/jcs), en
+  Go, acepta enteros y textos y rechaza las claves duplicadas, los decimales y los sustitutos
+  sueltos.
 
 Los tests de la forma canónica usan los vectores de los apéndices de la RFC 8785 que se aplican a
 la restricción: el orden de las claves y las cadenas. Llegan con el ámbito `core`.

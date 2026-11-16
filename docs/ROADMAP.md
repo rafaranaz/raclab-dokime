@@ -232,17 +232,20 @@ Still to decide before a milestone opens. They are written down here and not dec
 
 - **Before A3:** the configuration of the project: the git adapter reads the facts of the project
   with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs to the person
-  who runs the harness; in A3 it has to be checked that the change of an agent cannot touch
-  `.git/config`. The code under check becomes hostile in A3, so the hardening of A2 comes before it;
-  the reader of the report in a process of its own, with its path opened without links (ADR-0045),
-  and a run with `--cap-drop=ALL` and `--security-opt no-new-privileges` are built. The format of
-  the policy, how the cases of the corpus are labelled and the configuration of the tests in the
-  pack are decided by ADR-0054, ADR-0055 and ADR-0056. ADR-0056 leaves two points for when A3 opens,
-  before the gate `protected-paths` is built: the files that hold the configuration of the tests
-  together with that of the project, as mdformat does in `pyproject.toml`; and how the self-check
-  counts a commit that changes only configuration and code. And the doctests: pytest runs the
-  `docs/*.rst` of python-semver as doctests, but its pack counts as tests only `tests/**`, so a
-  patch that edits a doctest to make it fit would not be seen as one that edits tests.
+  who runs the harness; in A3 the change of an agent must not reach `.git/config`. The adapter runs
+  no program that the configuration of git at any level, the hooks of the project or the attributes
+  of the trees it reads name (PLATFORM-047); when `compose_with_patch` is built in A3, it refuses a
+  patch with a path that has a part `.git`, which git 2.47.3 already refuses as an invalid path. The
+  code under check becomes hostile in A3, so the hardening of A2 comes before it; the reader of the
+  report in a process of its own, with its path opened without links (ADR-0045), and a run with
+  `--cap-drop=ALL` and `--security-opt no-new-privileges` are built. The format of the policy, how
+  the cases of the corpus are labelled and the configuration of the tests in the pack are decided by
+  ADR-0054, ADR-0055 and ADR-0056. ADR-0056 leaves two points for when A3 opens, before the gate
+  `protected-paths` is built: the files that hold the configuration of the tests together with that
+  of the project, as mdformat does in `pyproject.toml`; and how the self-check counts a commit that
+  changes only configuration and code. And the doctests: pytest runs the `docs/*.rst` of
+  python-semver as doctests, but its pack counts as tests only `tests/**`, so a patch that edits a
+  doctest to make it fit would not be seen as one that edits tests.
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.

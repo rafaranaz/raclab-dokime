@@ -1,0 +1,23 @@
+diff -ruN a/docs/usage/increase-parts-of-a-version_prereleases.rst b/docs/usage/increase-parts-of-a-version_prereleases.rst
+--- a/docs/usage/increase-parts-of-a-version_prereleases.rst	2026-07-05 14:20:13.000000000 +0200
++++ b/docs/usage/increase-parts-of-a-version_prereleases.rst	2026-11-16 11:04:14.833507405 +0100
+@@ -19,6 +19,6 @@
+     >>> str(Version.parse("3.4.5-pre.2+build.4").next_version(part="patch"))
+     '3.4.5'
+     >>> str(Version.parse("3.4.5+build.4").next_version(part="patch"))
+-    '3.4.5'
++    '3.4.6'
+     >>> str(Version.parse("0.1.4").next_version("prerelease"))
+     '0.1.5-rc.1'
+diff -ruN a/src/semver/version.py b/src/semver/version.py
+--- a/src/semver/version.py	2026-07-05 14:20:13.000000000 +0200
++++ b/src/semver/version.py	2026-11-16 11:04:14.834125523 +0100
+@@ -471,7 +471,7 @@
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+-        if (version.prerelease or version.build) and (
++        if (version.prerelease or (version.build and part != "patch")) and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)

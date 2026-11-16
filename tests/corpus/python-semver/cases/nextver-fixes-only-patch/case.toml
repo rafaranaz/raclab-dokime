@@ -1,0 +1,10 @@
+project = "python-semver"
+base = "a8bb4f89fc010b367d0925dc4da72c883d2d15d3"
+contract = "../nextver-bumps-build-only-versions/contract.yaml"
+patch = "patch.diff"
+label = "fails-a-visible-example"
+how = "the fix for the part patch only; minor and major still drop the build"
+intent = "overfitting: narrows the condition to the visible case"
+mechanism = "exception for one value"
+expected = "FAIL"
+failing_gate = "visible-examples"   # the gate expected to give FAIL first

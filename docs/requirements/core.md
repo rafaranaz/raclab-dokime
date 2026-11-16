@@ -1,8 +1,9 @@
 # Requirements of the `core` scope
 
-Domain types that every module shares. This first increment holds what the contract check of
-milestone A1 needs: the verdicts of a gate, the findings that explain them, and the strict reader
-of contract and flow files. Each requirement follows an EARS template and has at least one test
+Domain types that every module shares: the verdicts of a gate and the findings that explain them,
+the strict reader of the files of the harness and the shape check, the ports of the project
+repository and of the verification runtime, the canonical form that digests are taken over, and
+the policy. Each requirement follows an EARS template and has at least one test
 that declares it in its `SDD-EARS:` marker.
 
 ## Verdicts ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md))
@@ -164,3 +165,39 @@ needs more than the default limits of a build or of a run cannot ask for them in
 - **CORE-093** The limits of a run shall carry the memory in bytes, the number of processors, the number of processes and the time on the clock in seconds.
 - **CORE-094** The limits of a run shall default to 2 GiB of memory, 2 processors, 512 processes and 900 seconds.
 - **CORE-095** If the memory, the processes or the time of a run is not a whole number greater than zero, or the processors are not a finite number greater than zero, then the limits of the run shall be rejected with an error that names the limit.
+
+## The canonical form ([ADR-0062](../adr/0062-a-digest-is-taken-over-a-restricted-canonical-json.md))
+
+The canonical form is the JSON text of RFC 8785, restricted to the values of I-JSON (RFC 7493)
+without decimals: texts, whole numbers, booleans, null, lists and mappings with text keys. The
+place of a part is its path from the root, the keys and the positions that lead to it.
+
+- **CORE-100** The canonical form of a value shall be its JSON text with no space between its parts.
+- **CORE-101** The canonical form shall write the keys of every mapping in the order of their UTF-16 code units.
+- **CORE-102** The canonical form shall write every character as itself except the quotation mark, the reverse solidus and the control characters below U+0020, which it escapes as RFC 8785 says.
+- **CORE-103** If a value holds a number that is not a whole number, then the canonical form shall be refused with an error that names the place of the number.
+- **CORE-104** If a value holds a whole number below −(2^53 − 1) or above 2^53 − 1, then the canonical form shall be refused with an error that names the place of the number.
+- **CORE-105** If a text or a key holds a lone surrogate of UTF-16, then the canonical form shall be refused with an error that names its place.
+- **CORE-106** If a value holds anything but a text, a whole number, a boolean, null, a list or a mapping whose keys are texts, then the canonical form shall be refused with an error that names its place.
+- **CORE-107** The digest of a value shall be `sha256:` followed by the hexadecimal SHA-256 of its canonical form in UTF-8.
+
+## The policy ([ADR-0054](../adr/0054-the-policy-is-an-optional-file-of-values.md))
+
+The reader of the policy receives the text of `.dokime/policy.yaml`; it does not open the file.
+
+| Mapping | Field | Mandatory | Holds | Default |
+|---|---|---|---|---|
+| Policy | `format` | Yes | The number 1 | — |
+| Policy | `baseline` | No | A mapping | Its fields by default |
+| Policy | `verification` | No | A mapping | Its fields by default |
+| Baseline | `runs` | No | A whole number of at least 2 | 2 |
+| Verification | `runs` | No | A whole number of at least 2 | 2 |
+
+- **CORE-110** The reader of the policy shall read its text by the strict rules of CORE-020 to CORE-042, and check it against the table of fields of the policy with the shape check of CORE-050 to CORE-054.
+- **CORE-111** If `runs` is a whole number below 2, then the reader of the policy shall report a finding with the code `wrong-type` that names the field, with its line.
+- **CORE-112** If the text of the policy has any finding, then the reader of the policy shall give no policy.
+- **CORE-113** When a field of the policy that is not mandatory is absent, the reader of the policy shall give it its default.
+- **CORE-114** When there is no policy file, the effective policy shall be the defaults of the table.
+- **CORE-115** The effective policy shall say whether it came from the policy file or from the defaults.
+- **CORE-116** The normalised form of the policy shall hold its format and every field of the table with its value, the defaults included.
+- **CORE-117** The digest of the policy shall be the digest of its normalised form.

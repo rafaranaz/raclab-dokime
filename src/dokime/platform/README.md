@@ -23,3 +23,21 @@ temporary directory removed on `close()`, which reads the objects of the project
 The configuration and the attributes of the project and of the person do not reach it, and the
 `.git` of the project is not written. A tree with a submodule is refused, and a composition with a
 patch is refused until milestone A3.
+
+## The ledger store of a file and the system clock
+
+`LedgerFile(path)` implements the port of the ledger store of `core` over one file of the state
+directory of the harness: one event per line, each ended by a newline, written with one call in
+append mode and flushed to the storage device before `append` returns. It refuses a line with a
+newline or a carriage return, and appending after a last line that was cut. A file that does not
+exist has no lines and is created by the first append. `SystemClock` implements the port of the
+clock with the time of the system in UTC.
+
+```python
+from dokime.core.ledger import Ledger
+from dokime.platform.clock import SystemClock
+from dokime.platform.ledger_file import LedgerFile
+
+ledger = Ledger(LedgerFile(state / "ledger.jsonl"), SystemClock())
+ledger.record("run.started", {})
+```

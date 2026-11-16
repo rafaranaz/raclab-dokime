@@ -1,8 +1,8 @@
 # Requirements of the `platform` scope
 
-The adapters of the outside world that do not run code of others: the project repository, and
-later the signer, the stores, the forge, the clock and randomness. This first increment has the
-adapter of the project repository that runs the `git` command. Each requirement follows an EARS
+The adapters of the outside world that do not run code of others: the project repository, the
+ledger store and the clock, and later the signer, the other stores, the forge and randomness. The
+adapter of the project repository runs the `git` command. Each requirement follows an EARS
 template and has at least one test that declares it in its `SDD-EARS:` marker.
 
 ## The git adapter of the project repository ([ADR-0042](../adr/0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md), [ADR-0044](../adr/0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md))
@@ -69,3 +69,21 @@ faithfully.
 - **PLATFORM-044** If the tree to extract holds a submodule, then the project repository adapter shall refuse with the code `submodule-in-tree`, naming its path, before writing anything.
 - **PLATFORM-045** If a name given as a tree is not a tree that the adapter can read, then the project repository adapter shall refuse with the code `unknown-tree`, naming it.
 - **PLATFORM-046** If the directory to extract into is not an empty directory, then the project repository adapter shall reject it with an error that names the directory.
+
+## The ledger store of a file ([ADR-0023](../adr/0023-evidence-is-an-attestation-bound-to-the-tree.md))
+
+The adapter implements the port of the ledger store of `core` over one file, whose path the caller
+gives: the state directory of the harness, outside the working tree of the project. A line is one
+event of the ledger, which its canonical form keeps on one line.
+
+- **PLATFORM-060** When a line is appended, the file ledger store shall add the line and a newline at the end of its file.
+- **PLATFORM-061** When its lines are asked for, the file ledger store shall give the lines of its file in the order they were appended, without their newlines.
+- **PLATFORM-062** While its file does not exist, the file ledger store shall give no lines.
+- **PLATFORM-063** When a line is appended and its file does not exist, the file ledger store shall create the file.
+- **PLATFORM-064** If a line holds a newline or a carriage return, then the file ledger store shall refuse it with an error and write nothing.
+- **PLATFORM-065** If its file is not empty and does not end with a newline, then the file ledger store shall refuse to append, with an error that says its last line is cut.
+- **PLATFORM-066** If its file is not valid UTF-8, then the file ledger store shall refuse to give its lines, with an error that names the file.
+
+## The system clock
+
+- **PLATFORM-070** The system clock shall give the current time of the system, in UTC.

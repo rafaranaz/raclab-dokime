@@ -241,6 +241,10 @@ Noted as debt, which blocks no milestone:
   says: not built in A2.
 - An `at` of the ledger earlier than that of the event before it is not found. The clock of the
   system can go back for real, so it is decided when there is a case.
+- A story, the name of a change and of the `story` of its contract, has no limit of length, and
+  a file system admits 255 bytes for a name; and `Fix` and `fix` would be one directory on a file
+  system that does not tell upper from lower case, as macOS by default. Changing the rule changes
+  that of the contract too.
 - Of adoption: an image whose `USER` is not root. SANDBOX-038 refuses it today, so it is not a
   protection against hostile code but the support of images that set a user, and none of the three
   packs needs it. Five variants were measured with podman 5.4.2

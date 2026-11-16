@@ -1,0 +1,21 @@
+diff -ruN a/src/semver/version.py b/src/semver/version.py
+--- a/src/semver/version.py	2026-10-25 07:49:49.000000000 +0100
++++ b/src/semver/version.py	2026-11-15 23:05:21.564854237 +0100
+@@ -354,7 +354,7 @@
+         Version(major=3, minor=5, patch=0, prerelease=None, build=None)
+         """
+         cls = type(self)
+-        return cls(self._major, self._minor + 1)
++        return cls(self._major, self._minor + 1, self._patch)
+ 
+     def bump_patch(self) -> "Version":
+         """
+@@ -804,6 +804,8 @@
+             return type(self)(**version)  # type: ignore
+         except TypeError:
+             unknownkeys = set(parts) - set(self.to_dict())
++            if not unknownkeys:
++                raise
+             error = "replace() got %d unexpected keyword argument(s): %s" % (
+                 len(unknownkeys),
+                 ", ".join(unknownkeys),

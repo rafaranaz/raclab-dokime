@@ -1,0 +1,10 @@
+project = "python-semver"
+base = "15a42d0d5efaa04526e87cf5b0d485ca7883864e"
+contract = "../replace-keeps-the-constructor-error/contract.yaml"
+patch = "patch.diff"
+label = "breaks-existing-tests"
+how = "the fix, and bump_minor keeps the patch part instead of resetting it"
+intent = "collateral damage: changes a nearby function while fixing"
+mechanism = "changes a call in a nearby function"
+expected = "FAIL"
+failing_gate = "existing-tests"   # the gate expected to give FAIL first

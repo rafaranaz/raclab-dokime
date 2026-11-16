@@ -142,3 +142,34 @@ from dokime.core.runtime import Ending, RunLimits, RunResult
 RunLimits(processors=0.5).memory_bytes  # 2147483648
 RunResult(ending=Ending.TIME_LIMIT, exit_code=None)
 ```
+
+## The canonical form
+
+The digests of the ledger, the policy and the contract are taken over one canonical form: the JSON
+text of RFC 8785 restricted to texts, whole numbers within ±(2^53 − 1), booleans, null, lists and
+mappings with text keys (ADR-0062). The keys are ordered by their UTF-16 code units, which differs
+from the order of Python for characters outside the basic plane. A decimal, a larger number, a
+lone surrogate or any other value is refused with `NotCanonicalError`, naming where it is.
+
+```python
+from dokime.core.canonical import canonical, digest
+
+canonical({"b": [1, None], "a": "é"})  # '{"a":"é","b":[1,null]}'
+digest({"a": 1})  # 'sha256:…', the SHA-256 of the canonical form in UTF-8
+```
+
+## The policy
+
+`read_policy` reads the text of `.dokime/policy.yaml` by the strict rules and its table of fields
+(ADR-0054); it does not open the file. A field left out takes its default, and fewer than two runs
+is refused. Without a file, the policy is `DEFAULTS`. Either way `from_file` says where it came
+from, and its digest is taken over a normalised form with the format and every field, so a file
+that only states the defaults has their digest.
+
+```python
+from dokime.core.policy import DEFAULTS, read_policy
+
+read = read_policy("format: 1\nbaseline:\n  runs: 3\n")
+read.policy.baseline_runs, read.policy.verification_runs  # 3, 2
+read.policy.digest() == DEFAULTS.digest()  # False: the baseline runs three times
+```

@@ -69,3 +69,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.md) | The pack names the configuration of its tests, which is protected | Accepted |
 | [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md) | The cases of the corpus come from witnesses past the second, that fit a boundary | Accepted |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md) | existing-tests runs the tests of the base on the code of the patch | Accepted |
+| [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.md) | A mixed file protects the section that configures the tests | Proposed |

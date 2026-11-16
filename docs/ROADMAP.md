@@ -209,8 +209,9 @@ Noted as debt, which blocks no milestone:
 - The docker adapter, so that the tests of the guarantees run with both engines.
 - `--from` optional, with a `head()` of the git adapter.
 - An operation of the port that gives the tree of a commit, instead of composing a commit with
-  itself; and one place for the handling of SIGTERM, copied today in `sandbox`, `packs` and
-  `interfaces`.
+  itself, and a composition of paths over a tree, the base with the patch applied, which
+  `existing-tests` needs in A3 (ADR-0058); and one place for the handling of SIGTERM, copied today
+  in `sandbox`, `packs` and `interfaces`.
 - Optional: `pip install --require-hashes` in the Dockerfiles of the corpus.
 - The witnesses recorded so that the next run of a self-check uses the same ones, as ADR-0041
   says: not built in A2.

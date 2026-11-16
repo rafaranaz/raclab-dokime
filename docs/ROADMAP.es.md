@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:f5f8e9485548aff9 -->
+<!-- translation-of: ROADMAP.md sha256:e0778f1da6276ed6 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -214,9 +214,10 @@ Apuntado como deuda, que no bloquea ningún hito:
   pasaría sin verse.
 - El adaptador de docker, para que los tests de las garantías se ejecuten con los dos motores.
 - `--from` opcional, con un `head()` del adaptador de git.
-- Una operación del puerto que dé el árbol de un commit, en vez de componer un commit consigo
-  mismo; y un solo sitio para el tratamiento de SIGTERM, hoy copiado en `sandbox`, `packs` e
-  `interfaces`.
+- Una operación del puerto que dé el árbol de un commit, en vez de componer un commit consigo mismo,
+  y una composición de rutas sobre un árbol, la base con el parche aplicado, que `existing-tests`
+  necesita en A3 (ADR-0058); y un solo sitio para el tratamiento de SIGTERM, hoy copiado en
+  `sandbox`, `packs` e `interfaces`.
 - Opcional: `pip install --require-hashes` en los Dockerfile del conjunto de casos.
 - Los testigos guardados para que la siguiente ejecución de una autocomprobación use los mismos,
   como dice la ADR-0041: no se construyó en A2.

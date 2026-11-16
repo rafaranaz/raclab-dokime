@@ -50,8 +50,9 @@ Read:
   musereel-sdk](https://pkg.go.dev/github.com/emiya-dev/musereel-sdk/jcs), in Go, accepts whole
   numbers and texts and refuses duplicate keys, decimals and lone surrogates.
 
-The tests of the canonical form use the vectors of the appendices of RFC 8785 that apply to the
-restriction: the order of keys and the strings. They come with the scope `core`.
+The tests of the canonical form use the vectors of RFC 8785 that apply to the restriction: the
+strings of section 3.2.2 and the order of keys of section 3.2.3; the appendix B is about numbers
+with decimals and does not apply. They come with the scope `core`.
 
 Reasoning, without a test: that no value the harness hashes in block A needs a decimal, so leaving
 the numbers of ECMAScript out removes the hardest part of JCS without losing anything; and that

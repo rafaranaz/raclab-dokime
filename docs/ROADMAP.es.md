@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:8d1f944ef8a52cc6 -->
+<!-- translation-of: ROADMAP.md sha256:f5f8e9485548aff9 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -246,7 +246,9 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   ADR-0054, la ADR-0055 y la ADR-0056. La ADR-0056 deja dos puntos para cuando se abra A3, antes de
   construir el gate `protected-paths`: los ficheros que guardan la configuración de los tests junto
   con la del proyecto, como hace mdformat en `pyproject.toml`; y cómo cuenta la autocomprobación un
-  commit que cambia solo configuración y código.
+  commit que cambia solo configuración y código. Y los doctests: pytest ejecuta los `docs/*.rst` de
+  python-semver como doctests, pero su pack solo cuenta como tests `tests/**`, así que un parche que
+  edite un doctest para que encaje no se vería como uno que edita tests.
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia

@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:69578d33874138e1 -->
+<!-- translation-of: README.md sha256:7236ffa8b48d702f -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -73,3 +73,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.es.md) | Un fichero mixto protege la sección que configura los tests | Aceptada |
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Aceptada |
+| [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.es.md) | Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él | Propuesta |

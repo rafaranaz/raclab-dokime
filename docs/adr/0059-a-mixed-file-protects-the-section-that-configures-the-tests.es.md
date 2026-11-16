@@ -1,7 +1,7 @@
-<!-- translation-of: 0059-a-mixed-file-protects-the-section-that-configures-the-tests.md sha256:e941bc33e2281a2d -->
+<!-- translation-of: 0059-a-mixed-file-protects-the-section-that-configures-the-tests.md sha256:137cc489c7cf89e3 -->
 # ADR-0059 · Un fichero mixto protege la sección que configura los tests
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -1,6 +1,6 @@
 # ADR-0059 · A mixed file protects the section that configures the tests
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

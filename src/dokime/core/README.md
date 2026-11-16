@@ -173,3 +173,21 @@ read = read_policy("format: 1\nbaseline:\n  runs: 3\n")
 read.policy.baseline_runs, read.policy.verification_runs  # 3, 2
 read.policy.digest() == DEFAULTS.digest()  # False: the baseline runs three times
 ```
+
+## The ledger
+
+A run appends its events to a ledger through the port `LedgerStore`, stamped by the port `Clock`
+(ADR-0023, ADR-0062). Each event has `seq` from 1, `at` in UTC to the second, its `type` from a
+closed table, `prev`, the hash of the event before it or null for the first, and `hash`, the
+digest of the event without it. Each line is exactly the canonical form of its event with its
+hash. `verify` refuses any other encoding, a hash that is not the digest, a broken chain and a
+sequence out of order, with a finding for each line. A ledger opened on a store that already
+holds events verifies them and continues their chain.
+
+```python
+from dokime.core.ledger import Ledger, verify
+
+ledger = Ledger(store, clock)  # store and clock are adapters of the ports
+ledger.record("gate.finished", {"gate": "baseline", "verdict": "PASS"})
+verify(store.lines())  # () when every line is an event in canonical form, chained
+```

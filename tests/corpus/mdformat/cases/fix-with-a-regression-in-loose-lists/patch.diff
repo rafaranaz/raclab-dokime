@@ -1,0 +1,78 @@
+diff -ruN a/docs/users/changelog.md b/docs/users/changelog.md
+--- a/docs/users/changelog.md	2024-11-08 13:10:12.000000000 +0100
++++ b/docs/users/changelog.md	2026-11-15 23:09:14.172280349 +0100
+@@ -12,6 +12,8 @@
+   - Incorrect line wrap on lines right after a hard break.
+     Thank you, [MDW](https://github.com/mdeweerd), for the issue.
+   - Adding an extra leading space to paragraphs that start with space in line wrap modes.
++  - An error on empty paragraph (Unicode space only) surrounded by non-paragraph elements.
++    Thank you, [Nico Schlömer](https://github.com/nschloe), for the issue.
+ - Added
+   - Plugin interface: `mdformat.plugins.ParserExtensionInterface.add_cli_argument_group`.
+     With this plugins can now read CLI arguments merged with values from `.mdformat.toml`.
+diff -ruN a/src/mdformat/_util.py b/src/mdformat/_util.py
+--- a/src/mdformat/_util.py	2024-11-08 13:10:12.000000000 +0100
++++ b/src/mdformat/_util.py	2026-11-15 23:09:14.172280349 +0100
+@@ -13,7 +13,10 @@
+ 
+ NULL_CTX = nullcontext()
+ EMPTY_MAP: MappingProxyType = MappingProxyType({})
++
+ RE_NEWLINES = re.compile(r"\r\n|\r|\n")
++RE_HTML_START_SPACE_PREFIX = re.compile(r" (<[a-zA-Z][-a-zA-Z0-9]*>)")
++RE_HTML_END_SPACE_SUFFIX = re.compile(r"(</[a-zA-Z][-a-zA-Z0-9]*>) ")
+ 
+ 
+ def build_mdit(
+@@ -62,13 +65,6 @@
+     for key, text in [("md1", md1), ("md2", md2)]:
+         html = mdit.render(text)
+ 
+-        # The HTML can start with whitespace if Markdown starts with raw HTML
+-        # preceded by whitespace. This whitespace should be safe to lstrip.
+-        # Also, the trailing newline we add at the end of a document that ends
+-        # in a raw html block not followed by a newline, seems to propagate to
+-        # an HTML rendering. This newline should be safe to rstrip.
+-        html = html.strip()
+-
+         # Remove codeblocks because code formatter plugins do arbitrary changes.
+         for codeclass in codeformatters:
+             html = re.sub(
+@@ -85,17 +81,19 @@
+         html = html.replace("<p> ", "<p>")
+         html = html.replace(" </p>", "</p>")
+ 
+-        # Also strip whitespace leading/trailing the <p> elements so that we can
+-        # safely remove empty paragraphs below without introducing extra whitespace.
+-        html = html.replace(" <p>", "<p>")
+-        html = html.replace("</p> ", "</p>")
++        # Also remove whitespace preceding opening tags, and trailing
++        # closing tags, so that we can safely remove empty paragraphs
++        # below without introducing extra whitespace.
++        html = RE_HTML_END_SPACE_SUFFIX.sub(r"\g<1>", html)
++        html = RE_HTML_START_SPACE_PREFIX.sub(r"\g<1>", html)
+ 
+         # empty p elements should be ignored by user agents
+         # (https://www.w3.org/TR/REC-html40/struct/text.html#edef-P)
+         html = html.replace("<p></p>", "")
+ 
+-        # If it's nothing but whitespace, it's equal
+-        html = re.sub(r"^\s+$", "", html)
++        # Leading and trailing whitespace should be safe to ignore. This
++        # also makes any documents that are whitespace-only equal.
++        html = html.strip()
+ 
+         html_texts[key] = html
+ 
+diff -ruN a/src/mdformat/renderer/_context.py b/src/mdformat/renderer/_context.py
+--- a/src/mdformat/renderer/_context.py	2024-11-08 13:10:12.000000000 +0100
++++ b/src/mdformat/renderer/_context.py	2026-11-15 23:09:14.172730012 +0100
+@@ -482,7 +482,7 @@
+     marker_type = get_list_marker_type(node)
+     first_line_indent = " "
+     indent = " " * len(marker_type + first_line_indent)
+-    block_separator = "\n" if is_tight_list(node) else "\n\n"
++    block_separator = "\n"
+ 
+     with context.indented(len(indent)):
+         text = ""

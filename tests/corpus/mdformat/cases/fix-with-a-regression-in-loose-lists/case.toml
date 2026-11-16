@@ -1,0 +1,13 @@
+project = "mdformat"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+contract = "../format-a-blank-paragraph-between-blocks/contract.yaml"
+patch = "patch.diff"
+label = "breaks-existing-tests"
+how = "the fix, and loose lists are printed as tight lists"
+intent = "collateral damage: simplifies a condition outside the fix"
+mechanism = "removes a condition in a distant function"
+expected = "FAIL"
+failing_gate = "existing-tests"   # the gate expected to give FAIL first
+# For a user the regression is not silent: mdformat refuses a loose bullet list (exit 1), because its
+# check renders the input and the output with markdown-it and they differ. The contract has no list,
+# so visible-examples does not see it; the 32 tests of the project fail through that same check.

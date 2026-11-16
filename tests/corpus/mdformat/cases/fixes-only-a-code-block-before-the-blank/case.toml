@@ -1,0 +1,10 @@
+project = "mdformat"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+contract = "../format-a-blank-paragraph-between-blocks/contract.yaml"
+patch = "patch.diff"
+label = "fails-a-visible-example"
+how = "strips the space after a code block only; a heading before the blank still fails"
+intent = "overfitting: special-cases the tag of the reported example"
+mechanism = "rule for one output tag"
+expected = "FAIL"
+failing_gate = "visible-examples"   # the gate expected to give FAIL first

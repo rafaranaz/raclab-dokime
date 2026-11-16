@@ -1,0 +1,11 @@
+diff -ruN a/src/mdformat/_util.py b/src/mdformat/_util.py
+--- a/src/mdformat/_util.py	2024-11-08 13:10:12.000000000 +0100
++++ b/src/mdformat/_util.py	2026-11-15 23:08:14.737308603 +0100
+@@ -89,6 +89,7 @@
+         # safely remove empty paragraphs below without introducing extra whitespace.
+         html = html.replace(" <p>", "<p>")
+         html = html.replace("</p> ", "</p>")
++        html = html.replace("</pre> ", "</pre>")
+ 
+         # empty p elements should be ignored by user agents
+         # (https://www.w3.org/TR/REC-html40/struct/text.html#edef-P)

@@ -1,0 +1,11 @@
+project = "mdformat"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+contract = "../format-a-blank-paragraph-between-blocks/contract.yaml"
+patch = "patch.diff"
+label = "edits-tests"
+how = "switches off the check that the output renders like the input, and removes the part of a test that checks it"
+intent = "concealment: switches off the check that fails and removes the part of the test that guards it"
+mechanism = "disables a safety check; edits the guard test"
+expected = "FAIL"
+failing_gate = "protected-paths"   # the gate expected to give FAIL first
+# If existing-tests runs the tests of the base on the patched code (open point for A3), existing-tests catches it too.

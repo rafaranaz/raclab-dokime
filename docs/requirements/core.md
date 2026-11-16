@@ -2,9 +2,9 @@
 
 Domain types that every module shares: the verdicts of a gate and the findings that explain them,
 the strict reader of the files of the harness and the shape check, the ports of the project
-repository and of the verification runtime, the canonical form that digests are taken over, and
-the policy. Each requirement follows an EARS template and has at least one test
-that declares it in its `SDD-EARS:` marker.
+repository and of the verification runtime, the canonical form that digests are taken over, the
+policy, and the ledger with the ports of its store and of the clock. Each requirement follows an
+EARS template and has at least one test that declares it in its `SDD-EARS:` marker.
 
 ## Verdicts ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md))
 
@@ -180,6 +180,7 @@ place of a part is its path from the root, the keys and the positions that lead 
 - **CORE-105** If a text or a key holds a lone surrogate of UTF-16, then the canonical form shall be refused with an error that names its place.
 - **CORE-106** If a value holds anything but a text, a whole number, a boolean, null, a list or a mapping whose keys are texts, then the canonical form shall be refused with an error that names its place.
 - **CORE-107** The digest of a value shall be `sha256:` followed by the hexadecimal SHA-256 of its canonical form in UTF-8.
+- **CORE-108** If a value holds lists or mappings nested more than 128 levels deep, then the canonical form shall be refused with an error that names the place where the limit is passed.
 
 ## The policy ([ADR-0054](../adr/0054-the-policy-is-an-optional-file-of-values.md))
 
@@ -201,3 +202,53 @@ The reader of the policy receives the text of `.dokime/policy.yaml`; it does not
 - **CORE-115** The effective policy shall say whether it came from the policy file or from the defaults.
 - **CORE-116** The normalised form of the policy shall hold its format and every field of the table with its value, the defaults included.
 - **CORE-117** The digest of the policy shall be the digest of its normalised form.
+
+## The ledger ([ADR-0023](../adr/0023-evidence-is-an-attestation-bound-to-the-tree.md), [ADR-0062](../adr/0062-a-digest-is-taken-over-a-restricted-canonical-json.md))
+
+The ledger of a run is a sequence of events, each one line of text. An event holds `seq`, `at`,
+`type`, `prev` and `hash`, which are the fields of the ledger, and the fields of its type. `core`
+writes it through the port of the ledger store and stamps it with the port of the clock; it opens
+no file.
+
+| Type | Records |
+|---|---|
+| `run.started`, `run.finished` | The digests the run starts from; the final state |
+| `state.entered` | The state of the flow |
+| `gate.started`, `gate.finished` | The gate, its status, its verdict and the digests of its inputs |
+| `human.asked`, `human.answered` | The question; the answer, who gave it, how that was established, whether delegated |
+| `model.called` | The registered prompt, the model and the digest of the output |
+| `agent.started`, `agent.finished` | The agent profile, the model and the exit status |
+| `baseline.unstable` | The tests excluded as unstable |
+| `budget.exhausted` | The loop and the state that asks |
+| `evidence.built` | The digest of the evidence |
+
+### Writing
+
+- **CORE-120** When an event is recorded, the ledger shall give it the sequence number after that of the last event, or 1 when there is none.
+- **CORE-121** When the first event is recorded, the ledger shall give it a `prev` of null.
+- **CORE-122** When an event after the first is recorded, the ledger shall give it as `prev` the `hash` of the event before it.
+- **CORE-123** The `hash` of an event shall be the digest of the event without its field `hash`.
+- **CORE-124** When an event is recorded, the ledger shall stamp it with the time the clock gives, written in UTC as `YYYY-MM-DDTHH:MM:SSZ`.
+- **CORE-125** If the clock gives a time without a time zone, then the ledger shall refuse the event with an error and write nothing.
+- **CORE-126** When an event is recorded, the ledger shall append through the port of the ledger store one line that is the canonical form of the event with its `hash`.
+- **CORE-127** If the type of an event is not one of the table of types, then the ledger shall refuse the event with an error that names the type and write nothing.
+- **CORE-128** If the fields of an event use the name of a field of the ledger, then the ledger shall refuse the event with an error that names the field and write nothing.
+- **CORE-129** If the fields of an event have no canonical form, then the ledger shall refuse the event with the error of the canonical form and write nothing.
+- **CORE-130** When the ledger is opened on a store that already holds events, the ledger shall continue the sequence and the chain from the last of them.
+- **CORE-131** If the ledger is opened on a store whose events do not verify, then the ledger shall refuse to open with an error that gives the findings of the verification.
+
+### Verifying
+
+Each finding of the verification has the verdict `FAIL` and the number of its line.
+
+- **CORE-135** When a ledger is verified whose lines were written by CORE-120 to CORE-126, the verification shall give no finding.
+- **CORE-136** If a line is not a JSON object with the five fields of the ledger, of the types they hold, and a type of the table, then the verification shall report a finding with the code `not-an-event`.
+- **CORE-137** If a line is not exactly the canonical form of the event it holds, then the verification shall report a finding with the code `not-canonical`.
+- **CORE-138** If the `hash` of an event is not the digest of the event without it, then the verification shall report a finding with the code `wrong-hash`.
+- **CORE-139** If the `prev` of an event is not the `hash` of the event before it, or is not null for the first, then the verification shall report a finding with the code `broken-chain`.
+- **CORE-140** If the `seq` of an event is not the one after that of the event before it, or is not 1 for the first, then the verification shall report a finding with the code `wrong-sequence`.
+
+### The ports of the ledger store and of the clock
+
+- **CORE-145** The port of the ledger store shall offer two operations: append a line, and give the lines in the order they were appended.
+- **CORE-146** The port of the clock shall offer one operation, which gives the current time with its time zone.

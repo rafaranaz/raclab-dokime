@@ -109,3 +109,8 @@ def test_a_file_that_states_the_defaults_has_the_digest_of_the_defaults() -> Non
     read = read_policy("format: 1\n").policy
     assert read is not None
     assert read.digest() == DEFAULTS.digest()
+
+
+def test_a_policy_that_is_not_yaml_gives_no_policy_and_the_finding_of_the_reader() -> None:
+    read = read_policy("format: [1\n")
+    assert (read.policy, [finding.code for finding in read.findings]) == (None, ["not-yaml"])

@@ -30,12 +30,14 @@ This amends ADR-0041 in the rule of a candidate and in how the side of the paren
 
 ## Basis
 
-Reasoning, without a test: a change of configuration can turn a test green without fixing anything,
-for instance by no longer turning a warning into an error, and it can hide a test, by excluding it
-or marking it `xfail`. If the configuration counted as code, or stayed at the version of the parent
-on its side, such a commit could be a witness that proves nothing about the environment. With the
-configuration of the commit on both sides, a test that goes from red to green does so because of the
-code.
+Reasoning, without a test: a change of configuration in the commit can make a false witness in two
+ways. It can turn a test green without fixing anything, by no longer turning a warning into an
+error. And it can make a test appear, by no longer excluding it (removing a `--deselect`, or
+widening `testpaths`): that test is missing from the report of the parent, and PACKS-033 counts the
+commit as a witness when the parent has any other failure. Hiding a test in the commit, by excluding
+it or marking it `xfail`, makes no witness, since a witness needs a test that passes on the commit.
+With the configuration of the commit on both sides, the test also runs on the parent, over its code,
+and a test that goes from red to green does so because of the code.
 
 ## Alternatives considered
 

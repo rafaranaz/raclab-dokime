@@ -52,6 +52,17 @@ For the self-check it is not false: it shows that the command runs tests and tha
 green is seen, which is what the self-check has to prove. As a fix it is, and for the cases of the
 corpus that is what the filter *isolated* of ADR-0057 removes.
 
+Measured on 2026-11-16 by the session that built the cases, with pytest 8.3.4 locally and not in
+the container, over the first 25 candidates of python-semver with `docs/**/*.rst` in `tests.paths`:
+21 witnesses, against 18 among its first 25 candidates with `tests/**` alone. Of the 21:
+
+- 5 are version bumps or changes of configuration whose only test that turns green is
+  `docs/usage/semver-version.rst`: `b6e83e3`, `9c19156`, `bae0b7c`, `cc4ae07` and `6208a54`;
+- 1 is a fix that was not seen before, because its only test is a doctest: `fdec4ae`,
+  "fix(next_version): reset prerelease when token changes";
+- the commits of the cases, `0bd62d4` and `4e09ef0`, are still witnesses with the same tests, so
+  the cases do not change.
+
 ## Alternatives considered
 
 - **Leave the documents out of `tests.paths`.** A patch that edits a doctest to make it fit would
@@ -62,9 +73,8 @@ corpus that is what the filter *isolated* of ADR-0057 removes.
 
 ## Consequences
 
-- The candidates of python-semver change with `docs/**/*.rst` in `tests.paths`, so the search for
-  witnesses of ADR-0057 is repeated for that project, by the session that built the cases; its
-  result goes into the basis of this ADR if it comes before it is accepted, or into a later note.
+- The candidates of python-semver change with `docs/**/*.rst` in `tests.paths`; the search for
+  witnesses of ADR-0057 was repeated for that project, and its result is in the basis.
 - A release that updates a version shown in a doctest is a witness of the self-check; it never
   becomes a good patch, because it is not isolated.
 - The pack of python-semver changes in a pull request of the scope `corpus`, after this one.

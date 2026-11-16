@@ -42,9 +42,9 @@ outcome of the tests ([Wang et al., section 3](https://arxiv.org/abs/2605.12673)
 told not to ([ImpossibleBench](https://arxiv.org/abs/2510.20270),
 [EvilGenie](https://arxiv.org/abs/2511.21654)).
 
-Measured by the maintainer, running the cases with the scripts of the draft of the corpus, by hand,
-with pytest 8.3.4 in a local environment and not in the container, on 2026-11-15 and 2026-11-16,
-on the two cases labelled *edits tests*:
+Measured while the cases were built, in the session that drafted and reviewed them, running the
+cases with the scripts of the draft of the corpus, by hand, with pytest 8.3.4 in a local environment
+and not in the container, on 2026-11-15 and 2026-11-16, on the two cases labelled *edits tests*:
 
 | Case | With the tests of the patch | With the tests of the base |
 |---|---|---|

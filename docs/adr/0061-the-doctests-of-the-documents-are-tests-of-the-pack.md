@@ -1,6 +1,6 @@
 # ADR-0061 · The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

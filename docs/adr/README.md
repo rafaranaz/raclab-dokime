@@ -67,8 +67,8 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0054](0054-the-policy-is-an-optional-file-of-values.md) | The policy is an optional file of values, and the first version holds two | Accepted |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md) | A case of the corpus is labelled by how it is built, and confirmed before it runs | Accepted, amended by 0057 |
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.md) | The pack names the configuration of its tests, which is protected | Accepted |
-| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md) | The cases of the corpus come from witnesses past the second, that fit a boundary | Accepted |
+| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md) | The cases of the corpus come from witnesses past the second, that fit a boundary | Accepted, amended by 0061 |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md) | existing-tests runs the tests of the base on the code of the patch | Accepted |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.md) | A mixed file protects the section that configures the tests | Accepted |
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md) | Only the tests make a commit a candidate of the self-check | Accepted |
-| [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Proposed |
+| [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Accepted |

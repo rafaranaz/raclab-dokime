@@ -1,7 +1,7 @@
 # Requirements of the `corpus` scope
 
-The packs of the three repositories of the corpus and the tests that self-check each project at
-its commit ([ADR-0052](../adr/0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md)).
+The packs of the three repositories of the corpus, the tests that self-check each project at its
+commit, and the cases of the corpus with their labels ([ADR-0052](../adr/0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md), [ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md), [ADR-0057](../adr/0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md)).
 A pack is ours; the code of a project is not copied, it is named by its repository and its commit.
 The self-checks need the network, so they run only when asked for, in the job `corpus` of CI. Each
 requirement follows an EARS template and has at least one test that declares it in its `SDD-EARS:`
@@ -9,7 +9,7 @@ marker.
 
 ## The files of a project
 
-- **CORPUS-001** The directory of each project of the corpus shall hold only its `pack.yaml`, its `Dockerfile` and its `source.toml`.
+- **CORPUS-001** The directory of each project of the corpus shall hold only its `pack.yaml`, its `Dockerfile`, its `source.toml` and the directory `cases` of its cases.
 - **CORPUS-002** The `source.toml` of each project shall give the address of its repository and the full name of its commit.
 - **CORPUS-003** The pack of each project shall pass the check of packs.
 - **CORPUS-004** The Dockerfile of each project shall name its base image by its digest.
@@ -22,3 +22,45 @@ marker.
 - **CORPUS-012** When the self-check of a project ends, the test shall demand that no container and no temporary directory of the run is left.
 - **CORPUS-013** If cloning the repository of a project fails, then the test shall fail with a message that starts with `network:` and names the address.
 - **CORPUS-014** If the self-checks of the corpus are not asked for, then the test of each project shall skip.
+
+## The cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md), [ADR-0057](../adr/0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md))
+
+A case is a directory `tests/corpus/<project>/cases/<case>/`. A good case holds its `case.toml`, its
+`contract.yaml` and its `patch.diff`; a bad case holds its `case.toml` and its `patch.diff`, and
+uses the contract of a good case of its project.
+
+| Field of `case.toml` | Holds | In |
+|---|---|---|
+| `project` | The name of the directory of its project | Every case |
+| `base` | The full name of the commit the patch applies to | Every case |
+| `contract` | `contract.yaml` in a good case; the path of the contract of a good case of the project, from the directory of the case, in a bad case | Every case |
+| `patch` | `patch.diff` | Every case |
+| `label` | `good`, `fails-a-visible-example`, `edits-tests` or `breaks-existing-tests` | Every case |
+| `how` | How the patch was built, in one line | Every case |
+| `expected` | `PASS` for a good case, `FAIL` for a bad one | Every case |
+| `intent` | What the patch tries, in one line | A bad case |
+| `mechanism` | How it tries it, in one line | A bad case |
+| `failing_gate` | The gate expected to give `FAIL` first: `visible-examples`, `protected-paths` or `existing-tests` | A bad case |
+
+### The files of a case
+
+- **CORPUS-020** The corpus shall hold ten cases: three good, and seven bad that are derived from them.
+- **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`.
+- **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
+- **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.
+- **CORPUS-024** The `project` of each case shall be the name of the directory of its project.
+- **CORPUS-025** The `base` of each case shall be the full name of a commit.
+- **CORPUS-026** The `expected` of each case shall be `PASS` when its `label` is `good`, and `FAIL` otherwise.
+- **CORPUS-027** The `contract` of each bad case shall name the contract of a good case of the same project and the same base.
+- **CORPUS-028** The contract of each good case shall pass the check of contracts with no finding.
+- **CORPUS-029** The `story` of the contract of each good case shall be the name of the directory of the case.
+
+### The labels do not change ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
+
+A label never changes after the case ran: a correction is a new case, and the old one is withdrawn
+in `tests/corpus/withdrawn.toml` without touching its files.
+
+- **CORPUS-030** The files of each case shall be added by one commit, and changed by no other.
+- **CORPUS-031** If a file of a case was deleted or renamed in the history, then the test of the cases shall fail naming it.
+- **CORPUS-032** If the history of the repository is shallow, then the test of the cases shall fail instead of passing.
+- **CORPUS-033** The file `tests/corpus/review.toml` shall name every case as confirmed by the maintainer, with the date and the minutes of the review.

@@ -20,6 +20,9 @@ configuration of pytest in `pyproject.toml`.
   requirement of `packs`.
 - **A change to that section counts as a change of the tests for `protected-paths`.** The rest of
   the file stays free.
+- **The pack puts in `tests.config` the files that pytest would read before the mixed file**, even
+  when they do not exist, as ADR-0056 allows a pattern that matches no file. Otherwise a patch that
+  adds a `pytest.ini` at the root would make the protected section void without touching it.
 - **Authorising a mixed file in `may_modify_tests` authorises only its section.**
 - **`existing-tests` does not restore that section.** If it changed, `protected-paths` already gives
   `FAIL` unless the contract authorises it. This is a declared limit: a mixed file is watched by one
@@ -32,10 +35,21 @@ Read in the commit of the corpus (`56b24ef`): the `pyproject.toml` of mdformat h
 `xfail_strict = true`. A patch that adds `--deselect` or `-p no:…` to `addopts` there changes which
 tests run without touching a file of tests.
 
-Read: the attacks documented on SWE-bench go through the configuration that pytest loads
-([BenchJack, section 3](https://arxiv.org/abs/2605.12673)) and through the process of the tests
-itself, by patching the report or calling `sys.exit(0)` (a post on tianpan.co, April 2026, a
-secondary source). The second kind confirms the limit of
+Measured on 2026-11-16 with pytest 8.3.4 in the image of the corpus, from the `configfile` that
+pytest reports, with each pair of files in one directory: `pytest.ini` wins over all, even when it
+is empty; then `.pytest.ini`; then `pyproject.toml`, only with `[tool.pytest.ini_options]`; then
+`tox.ini`, only with `[pytest]`; then `setup.cfg`, only with `[tool:pytest]`. `pytest.toml` is not
+read. When the command names a directory, as the pack of mdformat names `tests`, a `pytest.ini` in
+that directory wins over the `pyproject.toml` of the root. For mdformat, then, a patch that adds an
+empty `pytest.ini` at the root replaces `[tool.pytest.ini_options]` with no configuration at all,
+dropping `--strict-markers`, `--strict-config` and `xfail_strict`; its pack puts `pytest.ini` and
+`.pytest.ini` in `tests.config`, and the one in `tests/` is already under `tests.paths`. The list
+depends on the version of pytest, as ADR-0056 says.
+
+Read: the attacks documented on benchmarks of agents go through the configuration that pytest
+loads ([BenchJack, section 3](https://arxiv.org/abs/2605.12673), on SWE-bench) and through the
+process of the tests itself, by patching the report or calling `sys.exit(0)`
+([a post on tianpan.co](https://tianpan.co/blog/2026-04-17-specification-gaming-production-ai-agents), April 2026, a secondary source). The second kind confirms the limit of
 [ADR-0010](0010-threat-model.md): the tests run in the process of the code under check.
 
 Looked for and not found: a tool that protects the configuration of pytest by section.

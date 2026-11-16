@@ -191,3 +191,23 @@ ledger = Ledger(store, clock)  # store and clock are adapters of the ports
 ledger.record("gate.finished", {"gate": "baseline", "verdict": "PASS"})
 verify(store.lines())  # () when every line is an event in canonical form, chained
 ```
+
+The chain does not show that its last events were removed, nor that the whole ledger was written
+again: every line still verifies. That is covered by the head, the hash of the last event and the
+number of events, which the evidence keeps. `head` gives it for a ledger that verifies, and
+`verify` with an expected head reports `wrong-head` when they differ.
+
+```python
+from dokime.core.ledger import head, verify
+
+kept = head(store.lines())  # Head(hash='sha256:…', events=3)
+verify(store.lines()[:2], kept)  # one finding, wrong-head
+```
+
+## The layout of a project
+
+`dokime.core.layout` gives the paths of the files of the harness, relative to the root of the
+project: `POLICY` is `.dokime/policy.yaml`, `change_directory(story)` is
+`.dokime/changes/<story>/` and `contract_path(story)` is `contract.yaml` in it. A story that is not
+a name, the rule of the `story` of a contract, is refused, so no path leaves the directory of the
+changes.

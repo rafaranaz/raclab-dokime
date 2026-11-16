@@ -1,0 +1,25 @@
+diff --git a/docs/usage/increase-parts-of-a-version_prereleases.rst b/docs/usage/increase-parts-of-a-version_prereleases.rst
+index 845f229..c2088c5 100644
+--- a/docs/usage/increase-parts-of-a-version_prereleases.rst
++++ b/docs/usage/increase-parts-of-a-version_prereleases.rst
+@@ -19,6 +19,6 @@ would perhaps a better fit.
+     >>> str(Version.parse("3.4.5-pre.2+build.4").next_version(part="patch"))
+     '3.4.5'
+     >>> str(Version.parse("3.4.5+build.4").next_version(part="patch"))
+-    '3.4.5'
++    '3.4.6'
+     >>> str(Version.parse("0.1.4").next_version("prerelease"))
+     '0.1.5-rc.1'
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 31e0d38..5592e92 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -471,7 +471,7 @@ build='build.10')
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+-        if (version.prerelease or version.build) and (
++        if version.prerelease and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)

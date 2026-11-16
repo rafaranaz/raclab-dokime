@@ -1,7 +1,7 @@
-<!-- translation-of: 0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md sha256:6b80713a3fbc2d04 -->
+<!-- translation-of: 0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md sha256:1cea78086490f805 -->
 # ADR-0058 · existing-tests ejecuta los tests de la base sobre el código del parche
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -1,6 +1,6 @@
 # ADR-0058 · existing-tests runs the tests of the base on the code of the patch
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

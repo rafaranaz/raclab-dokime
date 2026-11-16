@@ -71,3 +71,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md) | existing-tests runs the tests of the base on the code of the patch | Accepted |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.md) | A mixed file protects the section that configures the tests | Accepted |
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md) | Only the tests make a commit a candidate of the self-check | Accepted |
+| [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Proposed |

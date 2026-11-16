@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:890c79d6eac55ec3 -->
+<!-- translation-of: README.md sha256:69578d33874138e1 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -68,8 +68,8 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md) | Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse | Aceptada, enmendada por el 0057 |
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Aceptada |
-| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada |
+| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada, enmendada por el 0061 |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.es.md) | existing-tests ejecuta los tests de la base sobre el código del parche | Aceptada |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.es.md) | Un fichero mixto protege la sección que configura los tests | Aceptada |
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |
-| [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Propuesta |
+| [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Aceptada |

@@ -1,7 +1,7 @@
-<!-- translation-of: 0061-the-doctests-of-the-documents-are-tests-of-the-pack.md sha256:8d786f66b52685b2 -->
+<!-- translation-of: 0061-the-doctests-of-the-documents-are-tests-of-the-pack.md sha256:4932468cf7b1ccb2 -->
 # ADR-0061 · Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

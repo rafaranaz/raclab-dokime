@@ -1,6 +1,6 @@
 # ADR-0057 · The cases of the corpus come from witnesses past the second, that fit a boundary
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md)
 
 ## Context
 

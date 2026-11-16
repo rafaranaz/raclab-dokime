@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:45ac0898ca8d0692 -->
+<!-- translation-of: ROADMAP.md sha256:2f2ed2ca345076bd -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -247,6 +247,10 @@ Apuntado como deuda, que no bloquea ningún hito:
   como dice la ADR-0041: no se construyó en A2.
 - Un `at` del registro anterior al del evento previo no se detecta. El reloj del sistema puede
   retroceder de verdad, así que se decide cuando haya un caso.
+- Un story, el nombre de un cambio y del `story` de su contrato, no tiene límite de longitud, y un
+  sistema de ficheros admite 255 bytes por nombre; y `Fix` y `fix` serían un mismo directorio en un
+  sistema de ficheros que no distingue mayúsculas, como macOS por defecto. Cambiar la regla cambia
+  también la del contrato.
 - De adopción: una imagen cuyo `USER` no es root. SANDBOX-038 la rechaza hoy, así que no es una
   protección contra código hostil sino la compatibilidad con imágenes que fijan un usuario, y
   ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2

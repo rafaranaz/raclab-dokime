@@ -1,4 +1,4 @@
-<!-- translation-of: 0061-the-doctests-of-the-documents-are-tests-of-the-pack.md sha256:8c64a7840b23a85b -->
+<!-- translation-of: 0061-the-doctests-of-the-documents-are-tests-of-the-pack.md sha256:8d786f66b52685b2 -->
 # ADR-0061 · Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado
 
 **Estado:** propuesta
@@ -54,6 +54,17 @@ la autocomprobación no es falso: muestra que la orden ejecuta tests y que se ve
 verde, que es lo que la autocomprobación tiene que probar. Como arreglo sí lo es, y para los casos
 del conjunto eso es lo que quita el filtro *aislado* de la ADR-0057.
 
+Medido el 2026-11-16 por la sesión que construyó los casos, con pytest 8.3.4 en local y no en el
+contenedor, sobre los 25 primeros candidatos de python-semver con `docs/**/*.rst` en `tests.paths`:
+21 testigos, frente a 18 entre sus 25 primeros candidatos con solo `tests/**`. De los 21:
+
+- 5 son subidas de versión o cambios de configuración cuyo único test que pasa a verde es
+  `docs/usage/semver-version.rst`: `b6e83e3`, `9c19156`, `bae0b7c`, `cc4ae07` y `6208a54`;
+- 1 es un arreglo que antes no se veía, porque su único test es un doctest: `fdec4ae`,
+  "fix(next_version): reset prerelease when token changes";
+- los commits de los casos, `0bd62d4` y `4e09ef0`, siguen siendo testigos con los mismos tests, así
+  que los casos no cambian.
+
 ## Alternativas consideradas
 
 - **Dejar los documentos fuera de `tests.paths`.** Un parche que edite un doctest para que encaje
@@ -64,9 +75,8 @@ del conjunto eso es lo que quita el filtro *aislado* de la ADR-0057.
 
 ## Consecuencias
 
-- Los candidatos de python-semver cambian con `docs/**/*.rst` en `tests.paths`, así que la búsqueda
-  de testigos de la ADR-0057 se repite para ese proyecto, por la sesión que construyó los casos; su
-  resultado va en la base de esta ADR si llega antes de aceptarla, o en una nota posterior.
+- Los candidatos de python-semver cambian con `docs/**/*.rst` en `tests.paths`; la búsqueda de
+  testigos de la ADR-0057 se repitió para ese proyecto, y su resultado está en la base.
 - Una versión publicada que actualiza la versión que muestra un doctest es un testigo de la
   autocomprobación; nunca llega a ser un parche bueno, porque no está aislada.
 - El pack de python-semver cambia en una pull request del ámbito `corpus`, después de esta.

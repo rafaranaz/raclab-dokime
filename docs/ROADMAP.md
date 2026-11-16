@@ -280,9 +280,18 @@ Still to decide before a milestone opens. They are written down here and not dec
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
-  recipients.
+  recipients; and the cases that the review of the corpus left for it, held out and on the coverage
+  of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
+  sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that
+  special-cases `</pre>` and `</h1>`, with sealed examples of a quote, two `##` headings and a
+  `<div>` before a heading; a twin of `nextver-changes-the-tests-to-fit` with an example of
+  `bump_prerelease`; a concealment that touches no test; overfitting by returning the expected
+  value, by excluding the visible input or by matching it exactly; and `replace("1.2.3",
+  major=1.5)`, which returns `1.2.3`, a candidate of unspecified behaviour.
 - **Before C1:** what happens when two changes run at the same time on the same repository; and a
-  limit of spending for a run, since the budgets of the flow count repetitions, not money.
+  limit of spending for a run, since the budgets of the flow count repetitions, not money; and the
+  expected verdict of `replace-fixes-only-major` and `nextver-changes-the-tests-to-fit` under the
+  loop of attempts, which may fix or clean them, so it depends on the budget of attempts.
 - **Before D2:** how the differences found outside the change are grouped without the gateway to
   a model.
 

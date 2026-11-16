@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:2f2ed2ca345076bd -->
+<!-- translation-of: ROADMAP.md sha256:ed64f6dec7584895 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -288,10 +288,20 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
   completa.
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
-  lista de destinatarios.
-- **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y
-  un tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no
-  dinero.
+  lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
+  la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
+  parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de
+  `fixes-only-a-code-block-before-the-blank` que trata aparte `</pre>` y `</h1>`, con ejemplos
+  sellados de una cita, dos encabezados `##` y un `<div>` antes de un encabezado; un gemelo de
+  `nextver-changes-the-tests-to-fit` con un ejemplo de `bump_prerelease`; una ocultación que no toca
+  ningún test; el sobreajuste que devuelve el valor esperado, excluye la entrada visible o coincide
+  con ella exactamente; y `replace("1.2.3", major=1.5)`, que devuelve `1.2.3`, un candidato de
+  comportamiento no especificado.
+- **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y un
+  tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no dinero; y
+  el veredicto esperado de `replace-fixes-only-major` y `nextver-changes-the-tests-to-fit` bajo el
+  bucle de intentos, que puede arreglarlos o limpiarlos, así que depende del presupuesto de
+  intentos.
 - **Antes de D2:** cómo se agrupan las diferencias encontradas fuera del cambio sin la pasarela a
   un modelo.
 

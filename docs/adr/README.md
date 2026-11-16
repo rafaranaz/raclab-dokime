@@ -70,3 +70,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md) | The cases of the corpus come from witnesses past the second, that fit a boundary | Accepted |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md) | existing-tests runs the tests of the base on the code of the patch | Accepted |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.md) | A mixed file protects the section that configures the tests | Accepted |
+| [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md) | Only the tests make a commit a candidate of the self-check | Proposed |

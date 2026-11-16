@@ -138,7 +138,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 | A0 Tests by hand | Three real changes with a hand-written contract approved by a person, timed; three repositories chosen for the corpus | None | The share of requirements that fit as examples and the minutes per contract are known, and the format is confirmed or revised |
 | A1 Checkable contract | A command that validates a contract and says what it lacks | `core`, `contract`, `interfaces` (the command only) | It detects every defect seeded in test contracts: syntax, contradictory examples, duplicates, requirements without an example |
 | A2 Reproducible environment | A command that builds the image of a project from its pack and checks the pack against the history of the project | `packs`, `sandbox`, `platform` (the project repository only), `interfaces` (the command only) | The packs of the three repositories build and pass their self-check |
-| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file; the directory of the change (`.dokime/changes/<story>/`) and the ledger of events with chained hashes, planned for A1 and not built | `core`, `platform`, `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
+| A3 Audit | A command that audits a change: baseline, protected paths, visible examples at the `cli` and `function` boundaries, existing tests, an aggregated verdict and an evidence file; the directory of the change (`.dokime/changes/<story>/`) and the ledger of events with chained hashes, planned for A1 and not built | `core`, `corpus`, `platform`, `packs`, `oracle` (comparing only), `verify`, `evidence`, `interfaces` | The exit criterion of the block, on the first ten cases of the corpus, labelled before they are run |
 | A4 Audit in CI | A workflow that audits a pull request and attaches the evidence, enabled on this repository; version 0.1 | `interfaces` | A real pull request of this repository carries its evidence |
 
 `interfaces` is opened three times in block A: in A1 for the command `contract check`, which only
@@ -149,6 +149,30 @@ opened twice: in A2 for the adapter of the project repository
 in A3 for the stores and the clock. The scopes of a module are
 opened by increments, as `core` is
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.md)).
+
+A3 opens its scopes in this order, each after the ones it depends on:
+
+1. `core`: the directory of the change, the ledger with chained hashes and the reading of the
+   policy ([ADR-0054](adr/0054-the-policy-is-an-optional-file-of-values.md)), which every other
+   scope uses.
+2. `corpus`, a first time: the ten cases with their labels, the gate of the labels and the script
+   of the witnesses. The label of a case is fixed in `main` before the harness sees the case
+   ([ADR-0055](adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md)), so the gates are
+   not built with the cases in front and unfixed.
+3. `platform`: the stores and the clock, `compose_with_patch`, which refuses a path with a part
+   `.git` in any case of letters, and the composition over a tree of
+   [ADR-0058](adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md).
+4. `packs`: `tests.config`, the sections of the mixed files and the rule of the candidates
+   (ADR-0056, ADR-0059, ADR-0060), which `verify` reads.
+5. An ADR on the program that runs an example at its boundary inside the zone of verification,
+   before the modules that use its observations.
+6. `oracle`: comparing observations with what is expected; splitting visible from sealed examples
+   stays in block B.
+7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` and the
+   aggregation.
+8. `evidence`: the evidence file, without signatures, which are of block E.
+9. `interfaces`: the command `audit`.
+10. `corpus`, a second time: the audit run on the ten cases, and the exit criterion measured.
 
 A2 is built first as the thinnest path that works, `dokime env check` on cachetools behind the
 ports, and then hardened one piece at a time, each with its requirement and its test. The

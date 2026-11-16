@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:905af8f8ae24c6db -->
+<!-- translation-of: ROADMAP.md sha256:c7a15d9f8237750a -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -141,7 +141,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 | A0 Pruebas a mano | Tres cambios reales con un contrato escrito a mano y aprobado por una persona, cronometrado; tres repositorios elegidos para el conjunto de casos | Ninguno | Se conocen la proporción de requisitos que caben como ejemplos y los minutos por contrato, y el formato se confirma o se revisa |
 | A1 Contrato comprobable | Una orden que valida un contrato y dice qué le falta | `core`, `contract`, `interfaces` (solo la orden) | Detecta todos los defectos sembrados en contratos de prueba: sintaxis, ejemplos contradictorios, duplicados, requisitos sin ejemplo |
 | A2 Entorno reproducible | Una orden que construye la imagen de un proyecto desde su pack y comprueba el pack con la historia del proyecto | `packs`, `sandbox`, `platform` (solo el repositorio del proyecto), `interfaces` (solo la orden) | Los packs de los tres repositorios se construyen y pasan su autocomprobación |
-| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia; el directorio del cambio (`.dokime/changes/<story>/`) y el registro de eventos con hashes encadenados, planeados para A1 y no construidos | `core`, `platform`, `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
+| A3 Auditoría | Una orden que audita un cambio: línea base, rutas protegidas, ejemplos visibles en las fronteras `cli` y `function`, tests existentes, un veredicto agregado y un fichero de evidencia; el directorio del cambio (`.dokime/changes/<story>/`) y el registro de eventos con hashes encadenados, planeados para A1 y no construidos | `core`, `corpus`, `platform`, `packs`, `oracle` (solo comparar), `verify`, `evidence`, `interfaces` | El criterio de salida del bloque, sobre los diez primeros casos del conjunto, etiquetados antes de ejecutarlos |
 | A4 Auditoría en CI | Un flujo que audita un pull request y adjunta la evidencia, activado en este repositorio; versión 0.1 | `interfaces` | Un pull request real de este repositorio lleva su evidencia |
 
 `interfaces` se abre tres veces en el bloque A: en A1 para la orden `contract check`, que solo lee
@@ -152,6 +152,30 @@ veces: en A2 para el adaptador del repositorio del proyecto
 en A3 para los almacenes y el reloj. Los ámbitos de un módulo
 se abren por incrementos, como `core`
 ([ADR-0036](adr/0036-a-milestone-may-open-an-increment-of-a-later-module.es.md)).
+
+A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
+
+1. `core`: el directorio del cambio, el registro con hashes encadenados y la lectura de la
+   política ([ADR-0054](adr/0054-the-policy-is-an-optional-file-of-values.es.md)), que usan todos
+   los demás ámbitos.
+2. `corpus`, una primera vez: los diez casos con sus etiquetas, la puerta de las etiquetas y el
+   script de los testigos. La etiqueta de un caso queda fijada en `main` antes de que el arnés vea
+   el caso ([ADR-0055](adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md)), así
+   que las puertas no se construyen con los casos delante y sin fijar.
+3. `platform`: los almacenes y el reloj, `compose_with_patch`, que rechaza una ruta con una parte
+   `.git` en mayúsculas o minúsculas, y la composición sobre un árbol de la
+   [ADR-0058](adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.es.md).
+4. `packs`: `tests.config`, las secciones de los ficheros mixtos y la regla de los candidatos
+   (ADR-0056, ADR-0059, ADR-0060), que lee `verify`.
+5. Una ADR sobre el programa que ejecuta un ejemplo en su frontera dentro de la zona de
+   verificación, antes de los módulos que usan sus observaciones.
+6. `oracle`: comparar observaciones con lo esperado; separar los ejemplos visibles de los sellados
+   sigue en el bloque B.
+7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
+8. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
+9. `interfaces`: la orden `audit`.
+10. `corpus`, una segunda vez: la auditoría ejecutada sobre los diez casos, y el criterio de salida
+    medido.
 
 A2 se construye primero como el camino más delgado que funciona, `dokime env check` sobre cachetools
 detrás de los puertos, y después se endurece una pieza cada vez, cada una con su requisito y su

@@ -239,7 +239,9 @@ Still to decide before a milestone opens. They are written down here and not dec
   pack are decided by ADR-0054, ADR-0055 and ADR-0056. ADR-0056 leaves two points for when A3 opens,
   before the gate `protected-paths` is built: the files that hold the configuration of the tests
   together with that of the project, as mdformat does in `pyproject.toml`; and how the self-check
-  counts a commit that changes only configuration and code.
+  counts a commit that changes only configuration and code. And the doctests: pytest runs the
+  `docs/*.rst` of python-semver as doctests, but its pack counts as tests only `tests/**`, so a
+  patch that edits a doctest to make it fit would not be seen as one that edits tests.
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.

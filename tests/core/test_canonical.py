@@ -1,4 +1,4 @@
-# SDD-EARS: CORE-100 CORE-101 CORE-102 CORE-103 CORE-104 CORE-105 CORE-106 CORE-107
+# SDD-EARS: CORE-100 CORE-101 CORE-102 CORE-103 CORE-104 CORE-105 CORE-106 CORE-107 CORE-108
 """The canonical form, with the vectors of sections 3.2.2 and 3.2.3 of RFC 8785.
 
 Characters outside ASCII are built with `chr` so that this file says which code point it means.
@@ -116,3 +116,20 @@ def test_the_digest_is_the_sha_256_of_the_canonical_form_in_utf_8() -> None:
     value = {"b": chr(0xE9), "a": 1}
     expected = hashlib.sha256(('{"a":1,"b":"' + chr(0xE9) + '"}').encode()).hexdigest()
     assert digest(value) == f"sha256:{expected}"
+
+
+def nested(levels: int) -> object:
+    value: object = 0
+    for level in range(levels):
+        value = [value] if level % 2 else {"k": value}
+    return value
+
+
+def test_a_value_nested_128_levels_deep_is_written() -> None:
+    assert canonical(nested(128)).count("[") + canonical(nested(128)).count("{") == 128
+
+
+@pytest.mark.parametrize("levels", [129, 3000])
+def test_a_value_nested_deeper_is_refused_with_its_own_error(levels: int) -> None:
+    with pytest.raises(NotCanonicalError, match="128"):
+        canonical(nested(levels))

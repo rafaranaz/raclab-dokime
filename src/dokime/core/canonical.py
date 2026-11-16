@@ -13,6 +13,9 @@ from collections.abc import Mapping, Sequence
 LIMIT = 2**53 - 1
 """The largest whole number of I-JSON, RFC 7493: the numbers of a double that are exact."""
 
+DEPTH = 128
+"""How many lists and mappings deep a value may be: a deeper one is refused, not overflowed."""
+
 _SURROGATES = range(0xD800, 0xE000)
 
 type Place = tuple[str | int, ...]
@@ -57,6 +60,11 @@ def _write(value: object, place: Place) -> list[str]:
         raise _refuse(place, "is a number that is not whole")
     if isinstance(value, str):
         return [_text(value, place)]
+    container = isinstance(value, Mapping) or (
+        isinstance(value, Sequence) and not isinstance(value, bytes | bytearray)
+    )
+    if container and len(place) >= DEPTH:
+        raise _refuse(place, f"is nested more than {DEPTH} levels deep")
     if isinstance(value, Mapping):
         return _mapping(value, place)
     if isinstance(value, Sequence) and not isinstance(value, bytes | bytearray):

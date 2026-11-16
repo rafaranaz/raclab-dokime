@@ -1,0 +1,12 @@
+diff -ruN a/src/semver/version.py b/src/semver/version.py
+--- a/src/semver/version.py	2026-10-25 07:49:49.000000000 +0100
++++ b/src/semver/version.py	2026-11-15 23:05:17.625554072 +0100
+@@ -804,6 +804,8 @@
+             return type(self)(**version)  # type: ignore
+         except TypeError:
+             unknownkeys = set(parts) - set(self.to_dict())
++            if not unknownkeys and "major" in parts:
++                raise
+             error = "replace() got %d unexpected keyword argument(s): %s" % (
+                 len(unknownkeys),
+                 ", ".join(unknownkeys),

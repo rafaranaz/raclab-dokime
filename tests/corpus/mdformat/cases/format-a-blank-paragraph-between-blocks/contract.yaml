@@ -1,0 +1,77 @@
+# Case of the corpus, drafted for milestone A3 (ADR-0055).
+# mdformat, fix commit 27e2ba3, "fix: an error on empty paragraph surrounded by non-paragraphs".
+format: 1
+story: format-a-blank-paragraph-between-blocks
+may_modify_tests: []
+
+requirements:
+  - id: drop-a-blank-paragraph-between-blocks
+    kind: change
+    text: When the input has a paragraph of Unicode spaces only between a heading or a fenced code block and another block that is not a paragraph, mdformat shall exit with status 0 and print the input without that paragraph.
+    source: written
+  - id: drop-a-blank-paragraph-next-to-paragraphs
+    kind: preserve
+    text: When the input has a paragraph of Unicode spaces only next to a paragraph, mdformat shall print the input without that paragraph.
+    source: written
+  - id: format-other-documents
+    kind: preserve
+    text: When the input has no paragraph of Unicode spaces only, mdformat shall print the same text as before the change.
+    source: written
+
+examples:
+  # The requirement is narrower than the commit message: with the fix, a blank paragraph between
+  # two lists or between two thematic breaks still makes mdformat stop with an error (measured).
+  # drop-a-blank-paragraph-between-blocks: before the change, mdformat stopped with an error
+  # because its check that the output renders like the input failed.
+  - id: E-cd49
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: em-space-between-code-and-heading
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "```\na\n```\n \n# A\n"}
+        expect: {exit: 0, stdout: "```\na\n```\n\n# A\n"}
+  - id: E-9a59
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: nbsp-between-headings
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "# a\n\n \n\n# b\n"}
+        expect: {exit: 0, stdout: "# a\n\n# b\n"}
+
+  # drop-a-blank-paragraph-next-to-paragraphs: this already worked, and must keep working.
+  - id: E-f358
+    requirement: drop-a-blank-paragraph-next-to-paragraphs
+    case: nbsp-between-paragraphs
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "a\n\n \n\nb\n"}
+        expect: {exit: 0, stdout: "a\n\nb\n"}
+  - id: E-0916
+    requirement: drop-a-blank-paragraph-next-to-paragraphs
+    case: nbsp-before-a-heading
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: " \n\n# heading\n"}
+        expect: {exit: 0, stdout: "# heading\n"}
+
+  # format-other-documents: ordinary formatting is unchanged. This requirement rests on the tests of
+  # the project (existing-tests, the whole CommonMark spec among them); its one example is a sample.
+  # Examples of preserve requirements are written around what the change touches, here a blank
+  # paragraph next to paragraphs (E-f358, E-0916).
+  - id: E-4f9a
+    requirement: format-other-documents
+    case: heading-then-paragraph
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "# a\nb\n"}
+        expect: {exit: 0, stdout: "# a\n\nb\n"}

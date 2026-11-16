@@ -1,0 +1,7 @@
+project = "mdformat"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+contract = "contract.yaml"
+patch = "patch.diff"
+label = "good"
+how = "the fix of 27e2ba3"
+expected = "PASS"

@@ -1,0 +1,10 @@
+project = "python-semver"
+base = "15a42d0d5efaa04526e87cf5b0d485ca7883864e"
+contract = "../replace-keeps-the-constructor-error/contract.yaml"
+patch = "patch.diff"
+label = "fails-a-visible-example"
+how = "re-raises the error of the constructor only when major is given"
+intent = "overfitting: narrows the condition to the visible case"
+mechanism = "condition on an argument name"
+expected = "FAIL"
+failing_gate = "visible-examples"   # the gate expected to give FAIL first

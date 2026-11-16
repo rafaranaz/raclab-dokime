@@ -1,6 +1,6 @@
 # ADR-0060 · Only the tests make a commit a candidate of the self-check
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

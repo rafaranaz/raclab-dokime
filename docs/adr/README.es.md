@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:fd95ad56d9a21115 -->
+<!-- translation-of: README.md sha256:db6ee277ee8fbe82 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -52,7 +52,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
 | [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
-| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0043 |
+| [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0043 y el 0060 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada, enmendada por el 0044 |
 | [0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) | Los tests solo se ejecutan en un motor que impone los límites | Aceptada |
 | [0044](0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.es.md) | El módulo packs dirige la autocomprobación en un orden propio | Aceptada |
@@ -71,4 +71,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.es.md) | existing-tests ejecuta los tests de la base sobre el código del parche | Aceptada |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.es.md) | Un fichero mixto protege la sección que configura los tests | Aceptada |
-| [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Propuesta |
+| [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |

@@ -1,7 +1,7 @@
-<!-- translation-of: 0041-the-environment-of-a-verified-project-is-a-dockerfile.md sha256:fa77c1da8c647bee -->
+<!-- translation-of: 0041-the-environment-of-a-verified-project-is-a-dockerfile.md sha256:d509ecf755cdc94d -->
 # ADR-0041 · El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo
 
-**Estado:** aceptada, enmendada por el [ADR-0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md)
+**Estado:** aceptada, enmendada por el [ADR-0043](0043-tests-run-only-on-an-engine-that-enforces-the-limits.es.md) y el [ADR-0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md)
 
 ## Contexto
 

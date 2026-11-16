@@ -1,4 +1,4 @@
-<!-- translation-of: 0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md sha256:2a2688fe819d1e9d -->
+<!-- translation-of: 0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md sha256:6b80713a3fbc2d04 -->
 # ADR-0058 · existing-tests ejecuta los tests de la base sobre el código del parche
 
 **Estado:** propuesta
@@ -43,9 +43,9 @@ resultado de los tests ([Wang et al., sección 3](https://arxiv.org/abs/2605.126
 cuando se les dice que no lo hagan ([ImpossibleBench](https://arxiv.org/abs/2510.20270),
 [EvilGenie](https://arxiv.org/abs/2511.21654)).
 
-Medido por el mantenedor, ejecutando los casos con los scripts del borrador del conjunto, a mano,
-con pytest 8.3.4 en un entorno local y no en el contenedor, el 2026-11-15 y el 2026-11-16, sobre
-los dos casos etiquetados *edita tests*:
+Medido mientras se construían los casos, en la sesión que los redactó y revisó, ejecutando los casos
+con los scripts del borrador del conjunto, a mano, con pytest 8.3.4 en un entorno local y no en el
+contenedor, el 2026-11-15 y el 2026-11-16, sobre los dos casos etiquetados *edita tests*:
 
 | Caso | Con los tests del parche | Con los tests de la base |
 |---|---|---|

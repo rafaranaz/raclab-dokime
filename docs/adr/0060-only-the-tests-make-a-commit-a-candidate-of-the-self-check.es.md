@@ -1,7 +1,7 @@
-<!-- translation-of: 0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md sha256:c70c2652bae9a522 -->
+<!-- translation-of: 0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md sha256:ccfc442027fe59a2 -->
 # ADR-0060 · Solo los tests hacen candidato a un commit de la autocomprobación
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

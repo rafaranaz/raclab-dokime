@@ -1,4 +1,4 @@
-<!-- translation-of: 0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md sha256:cba285a81622c14e -->
+<!-- translation-of: 0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md sha256:37aeeb374c6f4240 -->
 # ADR-0064 · La evidencia de A3 es un statement sin firmar con un predicado cerrado
 
 **Estado:** propuesta
@@ -77,12 +77,17 @@ predicado.
   para los tests; `human`, `derived` o `model` para los ejemplos), cuando la puerta ejecuta
   comprobaciones.
 - Una puerta que no aplica tiene `gate`, `status: "not-applicable"` y su `reason`.
-- Un hallazgo tiene `code`, `verdict`, `lines`, `message` y `untrusted`.
-  - **`message` lleva solo palabras de dokime**, y los identificadores que el lector estricto del
-    contrato ha comprobado contra su patrón.
-  - **`untrusted` lleva todo texto que dokime no escribió**, como una lista de `{label, text}`. La
-    etiqueta es una palabra de dokime, como `expected`, `observed`, `test` o `path`. El texto es un
-    dato y quien lo muestre tiene que escaparlo. Cada texto se corta a 200 caracteres.
+- Un hallazgo tiene `code`, `verdict`, `lines` y `untrusted`.
+  - **La parte fiable de un hallazgo es la que fija dokime**: su `code`, su `verdict` y sus
+    `lines`. En el resto del predicado lo son también los identificadores que el lector estricto
+    del contrato ha comprobado contra su patrón, como la historia y los ids de requisitos y
+    ejemplos.
+  - **`untrusted` lleva textos que pueden contener lo que dokime no escribió**, como una lista de
+    `{label, text}`. La etiqueta es una palabra de dokime. El texto es un dato, y quien lo muestre
+    tiene que escaparlo.
+  - **En A3 el mensaje entero de un hallazgo va a `untrusted`, con la etiqueta `message`**, porque
+    los mensajes de los módulos mezclan las palabras de dokime con texto citado del contrato, del
+    árbol, del parche o de lo que se ejecutó en la zona.
 
 **Lo que no se comprobó en A3.** Cada entrada tiene `code`, `what`, `reason` y, cuando nombra algo
 que dokime no escribió, `untrusted`.
@@ -130,8 +135,9 @@ Razonamiento, sin prueba:
   herramientas del ecosistema.
 - **Ausente y no `null`.** Un `null` puede leerse como "comprobado y vacío", y el esquema sigue
   cerrado de las dos maneras.
-- **`untrusted` aparte de `message`.** Quien muestre la evidencia puede escapar un campo y mostrar
-  el otro tal cual, en vez de adivinar qué parte de un texto vino del código evaluado.
+- **El mensaje entero en `untrusted`.** Quien muestre la evidencia escapa ese campo y muestra tal
+  cual solo los campos que fija dokime, en vez de adivinar qué parte de un texto vino del código
+  evaluado. El coste es que las palabras de dokime también se escapan.
 - **`ran_on` es `developer`.** Nada distingue una ejecución en CI hasta que exista la independencia
   `ci-verified`.
 - **La huella del contrato y la del pack son las de sus bytes.** Es lo que una persona lee y, en el
@@ -154,8 +160,14 @@ bloque E lo envuelva en un sobre. Se ejecuta en el bloque E.
 - **Solo el veredicto de cada puerta, como en el ejemplo de la arquitectura, con los motivos en el
   ledger.** Un `FAIL` sin su motivo sirve de poco en una pull request, y el ledger no está a su
   lado.
-- **Los hallazgos con el texto citado dentro de `message`, como hoy.** Quien los muestre no puede
-  saber qué escapar.
+- **Los hallazgos con el texto citado dentro de un `message` fiable, como hoy.** Quien los muestre
+  no puede saber qué escapar.
+- **La separación fina ya: un `message` con solo las palabras de dokime, y cada módulo pasando a
+  `untrusted` el texto que cita.** Es la forma mejor, y cuesta un cambio de `Finding` en `core` y
+  siete pull requests, una por cada módulo cuyos hallazgos citan texto que dokime no escribió:
+  `contract`, `packs`, `oracle`, `sandbox`, `platform`, `verify` e `interfaces`. Queda para
+  después: en A4, cuando la evidencia se muestre en las pull requests, o en cada módulo cuando se
+  toque por otro motivo.
 - **El resumen de verificación de SLSA como predicado.** No tiene sitio para lo no comprobado.
 - **El comando que verifica, construido ya sin firmas.** La mitad de lo que comprueba esperaría al
   bloque E, y su interfaz cambiaría entonces.
@@ -166,9 +178,8 @@ bloque E lo envuelva en un sobre. Se ejecuta en el bloque E.
   fichero de evidencia v0.1 sigue pudiéndose leer como tal.
 - La evidencia de A3 no está firmada, así que cualquiera puede escribir una a mano. Dice
   `self-attested`, y T6 de la ADR-0010 sigue fuera del modelo de amenazas.
-- `Finding` en `core` gana el campo `untrusted`. Cada módulo cuyos hallazgos citan texto que dokime
-  no escribió lo mueve ahí antes de que `evidence` escriba hallazgos: hoy `contract`, `packs`,
-  `oracle`, `sandbox`, `platform`, `verify` e `interfaces`.
+- `Finding` en `core` y los módulos que citan no cambian en A3. La separación fina del mensaje
+  queda apuntada en el roadmap, antes de A4.
 - El resultado de una puerta en `verify` gana sus comprobaciones por origen.
 - `audit` escribe el fichero fuera del árbol. Dónde escribe por defecto se decide en `interfaces`.
 - La verificación de un fichero de evidencia espera al bloque E. Hasta entonces, `evidence` solo

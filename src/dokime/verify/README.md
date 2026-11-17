@@ -35,6 +35,13 @@ The gates of a change that arrives already made, and their aggregation. The requ
   or starts with that and a `.`. Known limit: beside a module `tests/test_a.py`, a test of a
   package `tests/test_a/` counts as of the module.
 
+- `aggregate_state(gates, results)`: the aggregation of the gates of a state (ADR-0015,
+  ADR-0034). It lists every gate of the state in its order, run with its result or not applicable
+  with where it is built, and gives the verdict by precedence: `ERROR`, then `FAIL`, which drops the
+  `ASK` of the round, then `ASK`, then `PASS`. A built gate without a result, a result of a gate
+  outside the state, a gate not in the table of the architecture, or two results of one gate, are
+  an `ERROR` of the aggregation.
+
 The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), on a double of the runtime that gives the reports listed in a file of
 the project, and on a double of the port that observes that answers from a file
 of the extracted project,

@@ -55,6 +55,8 @@ isolation: it runs with the permissions of the person who runs the harness.
 - **SANDBOX-026** While a command runs, the verification runtime adapter shall mount the output directory writable.
 - **SANDBOX-027** While a command runs, the verification runtime adapter shall give it a writable `/tmp` that is not kept after the run.
 - **SANDBOX-028** When a run ends, the verification runtime adapter shall leave the files that the command wrote in the output directory owned by the user who runs the harness.
+- **SANDBOX-029** While a command runs, the verification runtime adapter shall keep the writable `/tmp` within a quarter of the memory of the run, so that filling it fails on its size and not on the memory limit.
+- **SANDBOX-039** While a command runs, the verification runtime adapter shall keep every file it writes within 64 MiB, in the mounts of the disk as in `/tmp`.
 
 ### The privileges of a run
 
@@ -127,3 +129,22 @@ under test needs its dependencies. The adapter that starts it in a container is 
 - **SANDBOX-106** If the output, the error or the files of a step at `cli` hold more bytes than the bytes of one example, then the child shall read no more than that and end, so that the example is observed as having reached its limit of output.
 - **SANDBOX-107** If the name of a file of a step at `cli` is absolute or has a part `..`, then the main program shall end with an error before it runs any example.
 - **SANDBOX-108** If the message of an exception raised by a step cannot be read, then the child shall observe the exception with a message that says so.
+
+## The adapter that observes the examples ([ADR-0063](../adr/0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md))
+
+The podman adapter also implements the port that observes the examples of `core`. It starts the
+program of SANDBOX-090 in a container of the image, with the guarantees of a run, and reads what it
+wrote. Known limit: the output directory is a mount of the disk of the person, which podman cannot
+bound in size; each file in it is bounded by SANDBOX-039 and the time of the run bounds how many,
+for the run of the tests as for the observation of the examples.
+
+- **SANDBOX-110** When examples are observed, the podman adapter shall run the main program with `python -I -S` in a container of the image, with the guarantees of SANDBOX-020 to SANDBOX-029 and SANDBOX-039, the project read-only at `/dokime/project`, the program and its requests read-only at `/dokime/probe`, and the output directory at `/dokime/out`.
+- **SANDBOX-111** When examples are observed, the podman adapter shall give the program the time of one example and, as the bytes of one example, the bytes of the observations divided by the number of examples.
+- **SANDBOX-112** When the program has ended, the podman adapter shall read `observations.json` from the output directory without following a link, and no more than the bytes of the observations and one byte.
+- **SANDBOX-113** If the program wrote no observations, then the podman adapter shall refuse with the code `observations-missing`.
+- **SANDBOX-114** If the observations are larger than the bytes of the observations, then the podman adapter shall refuse with the code `observations-too-large`.
+- **SANDBOX-115** If the observations are not JSON, repeat a key, hold `NaN` or an infinity, are nested more than 128 levels, or do not have the shape of the observations, then the podman adapter shall refuse with the code `observations-unreadable`.
+- **SANDBOX-116** If the observations are not those of the requested examples, in their order, then the podman adapter shall refuse with the code `observations-unreadable`.
+- **SANDBOX-117** If the container ends at a limit of the run, or the program ends with an error, then the podman adapter shall refuse with the code `observation-failed`, quoting the last lines that the program wrote on its error output.
+- **SANDBOX-118** When the observations are read, the podman adapter shall give each one as the types of the port of `core`, the decimals of a returned value kept.
+- **SANDBOX-119** The podman adapter shall give the digest of the program that it mounts.

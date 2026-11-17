@@ -60,3 +60,22 @@ PASS: no findings
 - SIGINT and SIGTERM close every layer, from the inside out: the container of the run, the
   directories of the side, then the adapters. No container and no temporary directory is left,
   except the working container of a build that was interrupted, a known limit of `podman build`.
+
+## `audit`
+
+Audits a change that arrives already made. The command is built over three pull requests; the
+first gives its inputs, in `inputs.py`.
+
+- The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,
+  or from the file given with `--contract`, never from the patch. Its `story` has to be the name of
+  the directory that holds it (`story-not-directory`), and a story that is not a name is
+  `not-a-story`.
+- The pack comes from `.dokime/pack.yaml` of the tree of the base, with its Dockerfile beside it,
+  or from the file given with `--pack`, never from the patch: the pack says what is protected, and
+  a patch that changed it could unprotect its own tests.
+- The policy comes from `.dokime/policy.yaml` of the tree of the base, or its defaults when the
+  file is absent.
+- A file of the extracted tree is opened part by part without following a link, and is at most
+  1 MiB: `file-not-regular` for a link or anything that is not a regular file, `file-missing`,
+  `file-too-large`, and `path-outside-tree` for a path that leaves the tree. A file given from
+  outside is the person's, and is read as it is.

@@ -1,7 +1,7 @@
-<!-- translation-of: 0066-the-untrusted-texts-of-the-evidence-are-bounded.md sha256:4759c858e29ed242 -->
+<!-- translation-of: 0066-the-untrusted-texts-of-the-evidence-are-bounded.md sha256:4bd230ee01f55e17 -->
 # ADR-0066 · Los textos no fiables de la evidencia están acotados
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

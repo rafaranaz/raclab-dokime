@@ -66,3 +66,7 @@ paths = ["src/dokime/sandbox/**", "tests/sandbox/**", "docs/requirements/sandbox
 [scopes.corpus]
 description = "The packs of the repositories of the corpus and the tests that self-check them at their commits."
 paths = ["tests/corpus/**", "docs/requirements/corpus.md"]
+
+[scopes.oracle]
+description = "Compare what the zone observed of an example with what the example expects; later, split the visible from the sealed examples and apply relations."
+paths = ["src/dokime/oracle/**", "tests/oracle/**", "docs/requirements/oracle.md"]

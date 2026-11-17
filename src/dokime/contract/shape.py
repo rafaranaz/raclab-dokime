@@ -283,6 +283,17 @@ def example(notes: Notes, item: Value, path: Path) -> Example | None:
     )
 
 
+def _files_inside(notes: Notes, files: Expected, path: Path) -> None:
+    """Note each file of a command named outside its working directory: the program that
+    observes writes and reads them there, next to the mount of the output."""
+    if not isinstance(files, dict):
+        return
+    for name in files:
+        if not name or name.startswith("/") or ".." in name.split("/"):
+            message = f"the file {name!r} is not a relative path inside the working directory"
+            notes.add("path-outside-directory", message, path)
+
+
 def _step(notes: Notes, item: Value, path: Path, boundary: str) -> Step | None:
     fields = _mapping(notes, item, path, "a step")
     if fields is None:
@@ -304,6 +315,9 @@ def _step(notes: Notes, item: Value, path: Path, boundary: str) -> Step | None:
         return None
     check_fields(notes, inputs, (*path, "input"), _INPUT[boundary])
     check_fields(notes, expects, (*path, "expect"), _EXPECT[boundary])
+    if boundary == "cli":
+        for part, values in (("input", inputs), ("expect", expects)):
+            _files_inside(notes, values.get("files"), (*path, part, "files"))
     declared = [name for name in _EXPECT[boundary] if name in expects]
     if not declared:
         notes.add("no-expectation", "a step expects at least one thing", (*path, "expect"))

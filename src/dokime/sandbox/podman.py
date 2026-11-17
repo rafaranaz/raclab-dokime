@@ -8,6 +8,7 @@ named for it alone, which is removed however the run ends, an interruption of th
 """
 
 import contextlib
+import hashlib
 import json
 import os
 import re
@@ -21,6 +22,7 @@ from collections.abc import Iterator
 from pathlib import Path, PurePosixPath
 from types import FrameType
 
+from dokime.core.observation import ExampleObservation, ExampleRequest, ObservationLimits
 from dokime.core.outcomes import Report, ReportLimits
 from dokime.core.repository import RefusalError
 from dokime.core.runtime import (
@@ -32,6 +34,7 @@ from dokime.core.runtime import (
     RunLimits,
     RunResult,
 )
+from dokime.sandbox.observations import read_observations
 from dokime.sandbox.report import expat_version, read_report
 
 MINIMUM_VERSION = (4, 9)
@@ -42,6 +45,8 @@ FILE_BYTES = 64 * 1024 * 1024
 or for the observations, whose limits are 32 MiB, and not for a file that grows without end."""
 
 PROJECT = "/dokime/project"
+PROBE = "/dokime/probe"
+_PROGRAM = Path(__file__).with_name("observe_program.py")
 OUTPUT = "/dokime/out"
 
 _VERSION = re.compile(r"podman version (\d+)\.(\d+)\.\S+")
@@ -206,10 +211,26 @@ class PodmanRuntime:
             if not directory.is_dir():
                 raise ValueError(f"the {role} directory {directory} is not an existing directory")
         self._check_user(image)
+        return self._contained(image, command, project, output, limits, ())[0]
+
+    def _contained(
+        self,
+        image: Digest,
+        command: tuple[str, ...],
+        project: Path,
+        output: Path,
+        limits: RunLimits,
+        mounts: tuple[str, ...],
+    ) -> tuple[RunResult, str]:
+        """Run a command in a container of its own, removed however it ends; give how it
+        ended and the last lines of its error output."""
         name = f"dokime-{uuid.uuid4().hex}"
         try:
             with _sigterm_raises(), tempfile.TemporaryDirectory(prefix="dokime-run-") as work:
-                return self._run(name, image, command, project, output, limits, Path(work))
+                result = self._run(
+                    name, image, command, project, output, limits, Path(work), mounts
+                )
+                return result, _last_lines(Path(work) / "errors")
         except _TerminatedError:
             self._remove(name)
             signal.raise_signal(signal.SIGTERM)
@@ -243,6 +264,7 @@ class PodmanRuntime:
         output: Path,
         limits: RunLimits,
         work: Path,
+        mounts: tuple[str, ...] = (),
     ) -> RunResult:
         errors = work / "errors"
         with errors.open("wb") as written:
@@ -279,6 +301,7 @@ class PodmanRuntime:
                     f"{project.resolve()}:{PROJECT}:ro",
                     "--volume",
                     f"{output.resolve()}:{OUTPUT}:rw",
+                    *mounts,
                     "--workdir",
                     PROJECT,
                     image.text,
@@ -348,6 +371,60 @@ class PodmanRuntime:
             check=False,
         )
 
+    observe_program_digest = "sha256:" + hashlib.sha256(_PROGRAM.read_bytes()).hexdigest()
+    """The digest of the program that observes the examples, which the evidence records."""
+
+    def observe(
+        self,
+        image: Digest,
+        project: Path,
+        requests: tuple[ExampleRequest, ...],
+        limits: ObservationLimits,
+    ) -> tuple[ExampleObservation, ...]:
+        """Observe the examples of the requests in a container of the image (ADR-0063).
+
+        The program and the requests are mounted read-only; each example gets its share of the
+        bytes of the observations, which are read with bounds when the program has ended.
+        """
+        if not project.is_dir():
+            raise ValueError(f"the project directory {project} is not an existing directory")
+        self._check_user(image)
+        with tempfile.TemporaryDirectory(prefix="dokime-observe-") as work:
+            probe, output = Path(work) / "probe", Path(work) / "out"
+            probe.mkdir()
+            output.mkdir()
+            shutil.copyfile(_PROGRAM, probe / _PROGRAM.name)
+            share = max(1, limits.observations_bytes // max(1, len(requests)))
+            (probe / "requests.json").write_text(
+                json.dumps(
+                    {
+                        "example_seconds": limits.example_seconds,
+                        "example_bytes": share,
+                        "examples": [_request(request) for request in requests],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            command = ("python", "-I", "-S", f"{PROBE}/{_PROGRAM.name}", PROBE, OUTPUT)
+            mounts = ("--volume", f"{probe.resolve()}:{PROBE}:ro")
+            result, said = self._contained(image, command, project, output, limits.run, mounts)
+            if result != RunResult(ending=Ending.EXITED, exit_code=0):
+                raise RefusalError(
+                    "observation-failed",
+                    f"the program that observes ended as {result.ending}"
+                    f" ({result.exit_code}):\n{said or 'no output'}",
+                )
+            return read_observations(output, requests, limits.observations_bytes)
+
     def read_report(self, output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
         """Read the report that a run wrote at `report` inside the output directory."""
         return read_report(output, report, limits)
+
+
+def _request(request: ExampleRequest) -> dict[str, object]:
+    return {
+        "example": request.example,
+        "boundary": str(request.boundary),
+        "target": request.target,
+        "inputs": [dict(step) for step in request.inputs],
+    }

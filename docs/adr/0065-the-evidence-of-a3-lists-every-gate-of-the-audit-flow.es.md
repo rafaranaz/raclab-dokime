@@ -1,7 +1,7 @@
-<!-- translation-of: 0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md sha256:e02466d64862016e -->
+<!-- translation-of: 0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md sha256:eb745d8a79eaeb04 -->
 # ADR-0065 · La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

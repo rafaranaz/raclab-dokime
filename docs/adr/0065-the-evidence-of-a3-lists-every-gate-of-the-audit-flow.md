@@ -1,6 +1,6 @@
 # ADR-0065 · The evidence of A3 lists every gate of the audit flow, reached or not
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

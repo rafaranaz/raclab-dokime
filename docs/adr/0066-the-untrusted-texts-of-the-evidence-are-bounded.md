@@ -1,6 +1,6 @@
 # ADR-0066 · The untrusted texts of the evidence are bounded
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

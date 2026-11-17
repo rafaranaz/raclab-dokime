@@ -74,3 +74,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Accepted |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.md) | A digest is taken over a restricted canonical JSON, and a hashed record is kept in it | Accepted |
 | [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Accepted |
+| [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Proposed |

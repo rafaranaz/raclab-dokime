@@ -110,6 +110,9 @@ it is given, runs the gates of `verify` and builds the evidence with `evidence`
 - **INTERFACES-098** When `audit` runs, the command shall record in the ledger `run.started`, `state.entered` for each state, `gate.started` and `gate.finished` for each gate that ran, `baseline.unstable` for each gate that left something out as unstable, `evidence.built` with the digest of the evidence, and `run.finished` with the verdict.
 - **INTERFACES-099** When the run has gone through its states, the command shall build its evidence with the head of the ledger before `evidence.built`, the gates of every state, and the inputs the run reached.
 - **INTERFACES-100** If the aggregation of a state gives findings of its own, then the command shall stop with the verdict `ERROR` and those findings, record `run.finished` with them, and write no evidence, since they are a fault of the harness and not a result of the run.
+- **INTERFACES-101** When the state `verifying` runs, the command shall observe the examples of `visible-examples` in an image built with the tree of the change of [ADR-0058](../adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md) as the context, as those of `baseline` are observed in the image built with the tree of the base, so that a pack that installs the project observes the code and the dependencies of the patch.
+- **INTERFACES-102** If the build of the image of the change is refused, then the command shall give the gate `visible-examples` the finding of the refusal.
+- **INTERFACES-103** When the image of the change has been built, the command shall record its digest in the event `gate.finished` of `visible-examples`, since the predicate records only the image of the environment.
 
 ## `audit`: from `verify` to `evidence`
 

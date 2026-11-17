@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from dokime.core.observation import ExampleObservation, ExampleRequest, ObservationLimits
 from dokime.core.runtime import Build, BuildLimits, Digest
 from dokime.interfaces.audit import Audited, Ports, Request, run_audit
 from tests.core.ledgers import Lines, Ticks
@@ -91,14 +92,41 @@ def change(**sets: str) -> bytes:
 
 @dataclass
 class BuildsRecorded(RuntimeDouble):
-    """The runtime double, recording the Dockerfile and the context of each build."""
+    """The runtime double, recording the Dockerfile and the files of the context of each build,
+    and giving each build an image of its own."""
 
-    builds: list[tuple[Path, bytes, Path, set[str]]] = field(default_factory=list)
+    builds: list[tuple[Path, bytes, Path, dict[str, bytes]]] = field(default_factory=list)
 
     def build(self, dockerfile: Path, directory: Path, limits: BuildLimits) -> Build:
-        context = {p.relative_to(directory).as_posix() for p in directory.rglob("*")}
+        context = {
+            p.relative_to(directory).as_posix(): p.read_bytes()
+            for p in directory.rglob("*")
+            if p.is_file()
+        }
         self.builds.append((dockerfile, dockerfile.read_bytes(), directory, context))
-        return Build(image=Digest("sha256:" + "b" * 64), base=None)
+        return Build(image=self.image(len(self.builds) - 1), base=None)
+
+    @staticmethod
+    def image(position: int) -> Digest:
+        """The image of the build at a position."""
+        return Digest(f"sha256:{position + 1:064x}")
+
+
+@dataclass
+class ObservesRecorded(ObserverDouble):
+    """The observer double, recording the image of each call."""
+
+    images: list[Digest] = field(default_factory=list)
+
+    def observe(
+        self,
+        image: Digest,
+        project: Path,
+        requests: tuple[ExampleRequest, ...],
+        limits: ObservationLimits,
+    ) -> tuple[ExampleObservation, ...]:
+        self.images.append(image)
+        return super().observe(image, project, requests, limits)
 
 
 @dataclass

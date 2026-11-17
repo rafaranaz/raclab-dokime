@@ -89,8 +89,11 @@ the ledger store:
   it as not reached, or as not applicable when this version does not build it.
 - The gate `contract` has the findings of the contract read. The gate `environment` has those of
   the pack, and builds the image with the Dockerfile read from the base, copied out of the tree,
-  and the tree of the base as the context. The gates of `verify` run with the contract, the pack,
-  the policy and that image.
+  and the tree of the base as the context. The gates of `verify` run with the contract, the pack
+  and the policy. The examples of each side are observed in an image built with that side as the
+  context: `baseline` in the image of the environment, `visible-examples` in one built with the
+  tree of the change of ADR-0058, whose digest goes in its `gate.finished`. So a pack that
+  installs the project observes the code and the dependencies of the patch.
 - The ledger records `run.started`, `state.entered`, `gate.started` and `gate.finished`,
   `baseline.unstable`, `evidence.built` and `run.finished`. The evidence carries the head of the
   ledger before `evidence.built`.

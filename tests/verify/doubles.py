@@ -115,7 +115,8 @@ class AuditedDouble:
 @dataclass
 class ObserverDouble:
     """The port that observes, in memory: each example returns what `answers.json` of the project
-    says, a mapping from the example to the value; an example it does not name raises."""
+    says, a mapping from the example to the value, or a list of them, one for each call in turn; an
+    example it does not name raises."""
 
     calls: list[tuple[dict[str, str], tuple[ExampleRequest, ...]]] = field(default_factory=list)
     refusal: RefusalError | None = None
@@ -135,7 +136,8 @@ class ObserverDouble:
         self.calls.append((files, requests))
         if self.refusal is not None:
             raise self.refusal
-        answers = json.loads(files.get("answers.json", "{}"))
+        given = json.loads(files.get("answers.json", "{}"))
+        answers = given[(len(self.calls) - 1) % len(given)] if isinstance(given, list) else given
         return tuple(
             ExampleObservation(
                 example=request.example,

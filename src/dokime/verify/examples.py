@@ -2,11 +2,12 @@
 
 Both extract a tree into a directory of their own, ask the port that observes for every example of
 the contract with the inputs of its steps, and compare each observation with its example through
-the oracle. `baseline` observes the base: an example of a `preserve` requirement has to hold there,
-and one of a `new` or `change` requirement should not yet. `visible-examples` observes the tree of
-the change of ADR-0058, the code of the patch with the tests of the base: an example that does not
-hold fails the change, unless its origin is `model`, whose expected result no person stands behind,
-so it asks (ADR-0013).
+the oracle. `baseline` observes the base as many times as `baseline.runs` says: an example that
+holds in some runs and not in others asks, and is listed; otherwise an example of a `preserve`
+requirement has to hold there, and one of a `new` or `change` requirement should not yet.
+`visible-examples` observes the tree of the change of ADR-0058, the code of the patch with the tests
+of the base: an example that does not hold fails the change, unless its origin is `model`, whose
+expected result no person stands behind, so it asks (ADR-0013).
 """
 
 import tempfile
@@ -21,6 +22,7 @@ from dokime.core.observation import (
     ExampleRequest,
     ObservationLimits,
 )
+from dokime.core.policy import Policy
 from dokime.core.repository import AuditedRepository, CommitName, RefusalError, TreeName
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
@@ -39,24 +41,16 @@ _QUOTED = 200
 
 def baseline(
     contract: Contract,
+    policy: Policy,
     base: CommitName,
     image: Digest,
     repository: AuditedRepository,
     observer: ExampleObserver,
     limits: ObservationLimits,
 ) -> GateResult:
-    """Check what the examples of the contract do on the base, before the change."""
+    """Check what the examples of the contract do on the base, as many times as the policy says."""
     kinds = {requirement.id: requirement.kind for requirement in contract.requirements}
-
-    def judge(example: Example, comparison: Comparison) -> Finding | None:
-        preserved = kinds.get(example.requirement) == "preserve"
-        if preserved and not comparison.holds:
-            return _finding("preserved-example-fails-on-base", Verdict.FAIL, example, comparison)
-        if not preserved and comparison.holds:
-            return _finding("example-holds-on-base", Verdict.ASK, example, comparison)
-        return None
-
-    return _gate(
+    observed = _observe(
         BASELINE,
         contract,
         lambda: base_tree(repository, base),
@@ -64,8 +58,26 @@ def baseline(
         repository,
         observer,
         limits,
-        judge,
+        policy.baseline_runs,
     )
+    if isinstance(observed, GateResult):
+        return observed
+    findings, unstable = [], []
+    for example, comparisons in zip(contract.examples, observed, strict=True):
+        if len({comparison.holds for comparison in comparisons}) > 1:
+            failing = next(comparison for comparison in comparisons if not comparison.holds)
+            findings.append(_finding("example-varies-on-base", Verdict.ASK, example, failing))
+            unstable.append(example.id)
+            continue
+        (comparison, *_) = comparisons
+        preserved = kinds.get(example.requirement) == "preserve"
+        if preserved and not comparison.holds:
+            findings.append(
+                _finding("preserved-example-fails-on-base", Verdict.FAIL, example, comparison)
+            )
+        elif not preserved and comparison.holds:
+            findings.append(_finding("example-holds-on-base", Verdict.ASK, example, comparison))
+    return GateResult(gate=BASELINE, findings=tuple(findings), unstable=tuple(unstable))
 
 
 def visible_examples(
@@ -78,16 +90,8 @@ def visible_examples(
     observer: ExampleObserver,
     limits: ObservationLimits,
 ) -> GateResult:
-    """Check that the examples of the contract hold on the base with the patch."""
-
-    def judge(example: Example, comparison: Comparison) -> Finding | None:
-        if comparison.holds:
-            return None
-        if example.origin == "model":
-            return _finding("model-example-fails", Verdict.ASK, example, comparison)
-        return _finding("example-fails", Verdict.FAIL, example, comparison)
-
-    return _gate(
+    """Check that the examples of the contract hold on the tree of the change."""
+    observed = _observe(
         VISIBLE,
         contract,
         lambda: change_tree(pack, contract, base, patch, repository),
@@ -95,11 +99,22 @@ def visible_examples(
         repository,
         observer,
         limits,
-        judge,
+        1,
     )
+    if isinstance(observed, GateResult):
+        return observed
+    findings = []
+    for example, (comparison,) in zip(contract.examples, observed, strict=True):
+        if comparison.holds:
+            continue
+        if example.origin == "model":
+            findings.append(_finding("model-example-fails", Verdict.ASK, example, comparison))
+        else:
+            findings.append(_finding("example-fails", Verdict.FAIL, example, comparison))
+    return GateResult(gate=VISIBLE, findings=tuple(findings))
 
 
-def _gate(
+def _observe(
     gate: str,
     contract: Contract,
     tree: Callable[[], TreeName],
@@ -107,8 +122,9 @@ def _gate(
     repository: AuditedRepository,
     observer: ExampleObserver,
     limits: ObservationLimits,
-    judge: Callable[[Example, Comparison], Finding | None],
-) -> GateResult:
+    runs: int,
+) -> list[list[Comparison]] | GateResult:
+    """The comparisons of each example in each run, or the result of a gate that could not run."""
     if not contract.examples:
         return GateResult(gate=gate, findings=())
     requests = tuple(_request(example) for example in contract.examples)
@@ -118,15 +134,13 @@ def _gate(
             project = Path(work) / "project"
             project.mkdir()
             repository.extract(composed, project)
-            observations = observer.observe(image, project, requests, limits)
+            observations = [observer.observe(image, project, requests, limits) for _ in range(runs)]
     except RefusalError as refusal:
         return GateResult(gate=gate, findings=(refusal.finding,))
-    findings = []
-    for example, observation in zip(contract.examples, observations, strict=True):
-        found = judge(example, compare(example, observation))
-        if found is not None:
-            findings.append(found)
-    return GateResult(gate=gate, findings=tuple(findings))
+    return [
+        [compare(example, run[position]) for run in observations]
+        for position, example in enumerate(contract.examples)
+    ]
 
 
 def _request(example: Example) -> ExampleRequest:

@@ -5,11 +5,13 @@ import json
 from dokime.contract.model import Contract, Example, Requirement, Step
 from dokime.core.findings import Finding
 from dokime.core.observation import ObservationLimits
+from dokime.core.policy import Policy
 from dokime.core.repository import CommitName
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.packs.model import Pack
 from dokime.verify.examples import baseline, visible_examples
+from dokime.verify.result import GateResult
 from tests.verify.doubles import AuditedDouble, Files, ObserverDouble, patch
 
 IMAGE = Digest("sha256:" + "a" * 64)
@@ -59,16 +61,34 @@ def answers(**values: int) -> bytes:
 
 
 def on_base(
-    given: Contract, held: dict[str, int], *, missing_base: bool = False
+    given: Contract,
+    held: dict[str, int] | list[dict[str, int]],
+    *,
+    missing_base: bool = False,
+    runs: int = 1,
 ) -> tuple[list[Finding], ObserverDouble]:
-    """Run `baseline` on a base whose observer answers `held`."""
+    """Run `baseline` on a base whose observer answers `held`, or each of a list in turn."""
+    result, observer = run_baseline(given, held, missing_base=missing_base, runs=runs)
+    return list(result.findings), observer
+
+
+def run_baseline(
+    given: Contract,
+    held: dict[str, int] | list[dict[str, int]],
+    *,
+    missing_base: bool = False,
+    runs: int = 1,
+) -> tuple[GateResult, ObserverDouble]:
+    """Run `baseline` and give its whole result."""
     repository, observer = AuditedDouble(), ObserverDouble()
-    base = repository.add({"answers.json": answers(**held), "src/p.py": b"code"})
+    base = repository.add({"answers.json": json.dumps(held).encode(), "src/p.py": b"code"})
     if missing_base:
         base = CommitName("0" * 40)
-    result = baseline(given, base, IMAGE, repository, observer, ObservationLimits())
+    result = baseline(
+        given, Policy(baseline_runs=runs), base, IMAGE, repository, observer, ObservationLimits()
+    )
     assert result.gate == "baseline"
-    return list(result.findings), observer
+    return result, observer
 
 
 def on_change(

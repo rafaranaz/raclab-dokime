@@ -62,6 +62,10 @@ faithfully.
 - **PLATFORM-033** When a tree is composed from a base with a patch, the project repository adapter shall keep every file of the base that the patch does not touch.
 - **PLATFORM-034** If the patch does not apply to the base, then the project repository adapter shall refuse with the code `patch-does-not-apply`, quoting what git wrote.
 - **PLATFORM-035** If a path that the patch names has a part that is `.git` in any case of letters, then the project repository adapter shall refuse with the code `patch-touches-git`, naming the path, before it applies anything.
+- **PLATFORM-036** The project repository adapter shall apply a patch with the protections of git for NTFS and for HFS turned on, whatever the defaults of the git it runs.
+- **PLATFORM-037** When a tree is composed with the paths of a commit, the project repository adapter shall give a tree that holds, under the paths the rule takes, exactly the files of the commit with their modes, and no file of the tree.
+- **PLATFORM-038** When a tree is composed with the paths of a commit, the project repository adapter shall keep every file of the tree whose path the rule does not take.
+- **PLATFORM-039** If a name given as the tree to compose is not a tree that the adapter can read, then the project repository adapter shall refuse with the code `unknown-tree`, naming it.
 
 ### Extraction
 

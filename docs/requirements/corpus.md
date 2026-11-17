@@ -14,6 +14,7 @@ marker.
 - **CORPUS-003** The pack of each project shall pass the check of packs.
 - **CORPUS-004** The Dockerfile of each project shall name its base image by its digest.
 - **CORPUS-005** The Dockerfile of each project shall install every package with an exact version and without resolving dependencies of its own.
+- **CORPUS-006** The pack of each project shall name as the configuration of its tests `pytest.ini`, `.pytest.ini` and every `conftest.py`, and as its sections those of pytest in `pyproject.toml`, `tox.ini` and `setup.cfg`, whether they exist or not.
 
 ## The self-check of a project
 

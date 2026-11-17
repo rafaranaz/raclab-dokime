@@ -168,9 +168,12 @@ A3 opens its scopes in this order, each after the ones it depends on:
 6. `oracle`: comparing observations with what is expected; splitting visible from sealed examples
    stays in block B.
 7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` and the
-   aggregation.
+   aggregation. A patch can bring a symbolic link that points outside the tree, so whatever reads a
+   file of the extracted tree on the machine of the person opens it without following links, as
+   the reader of the report does (ADR-0045).
 8. `evidence`: the evidence file, without signatures, which are of block E.
-9. `interfaces`: the command `audit`.
+9. `interfaces`: the command `audit`, which opens the contract of the directory of the change, and
+   any other file of the tree, without following links, for the same reason.
 10. `corpus`, a second time: a pull request of `repo` that gives the job `corpus` the clones it
     needs beyond the self-checks; the script of the witnesses (ADR-0057) and `git apply --check` of
     each patch on its base; the audit run on the ten cases; and the exit criterion measured. The

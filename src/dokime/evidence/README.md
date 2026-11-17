@@ -26,5 +26,13 @@ fixes it for A3. The requirements are in
   name of the test untrusted, `example-unstable`, and `outside-threat-model` for each of
   `existing-tests`, `baseline` and `visible-examples` that ran.
 
-Reading the bytes back against the schema of the predicate comes next. Signing and verifying an
-evidence file come with block E.
+- `read_back(data)`: the findings of bytes of evidence, none when they meet the schema. Bytes that
+  are not JSON of whole numbers give `evidence-not-json`; JSON that is not in the canonical form
+  gives `evidence-not-canonical`; and each place that breaks the closed schema of the predicate (an
+  unknown field, a missing one, a `null`, a value of another type, list or pattern, a gate listed
+  twice) gives an `evidence-schema` that names it, in the order of the statement. `build` reads its
+  own bytes back and refuses a run whose bytes do not meet the schema, such as an empty version of
+  the harness or an empty reason. The patterns of digests, commits, trees, verdicts and codes are
+  those of the types of `core`.
+
+Signing and verifying an evidence file come with block E.

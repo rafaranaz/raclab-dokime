@@ -6,21 +6,14 @@ is left out, never written as `null`. `evidence` records the verdicts it is give
 """
 
 import hashlib
-import re
 from collections import Counter
 from dataclasses import dataclass
 
 from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
 from dokime.evidence.run import Contract, Gate, GateRan, Inputs, Run
+from dokime.evidence.schema import NAME, ORIGINS, PREDICATE, STATEMENT, read_back
 from dokime.evidence.unchecked import not_checked
-
-STATEMENT = "https://in-toto.io/Statement/v1"
-PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1"
-ORIGINS = ("existing", "human", "derived", "model")
-"""The origins of the checks of a gate."""
-_NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
-"""A name, as the story or the id of a requirement or an example."""
 
 type Value = dict[str, object]
 
@@ -35,9 +28,13 @@ class Evidence:
 
 
 def build(run: Run) -> Evidence:
-    """Build the evidence of a run, or refuse a run that breaks the rules of its fields."""
+    """Build the evidence of a run, read back against the schema, or refuse the run."""
     _check(run)
     data = canonical(statement(run)).encode("utf-8")
+    found = read_back(data)
+    if found:
+        listed = "; ".join(f"{finding.code}: {finding.message}" for finding in found)
+        raise ValueError(f"the evidence of the run does not read back: {listed}")
     return Evidence(
         name=f"{run.story}.statement.json",
         data=data,
@@ -130,7 +127,7 @@ def _check(run: Run) -> None:
     ran = [gate for gate in run.gates if isinstance(gate, GateRan)]
     names += [example for gate in ran for example in gate.unstable_examples]
     for name in names:
-        if _NAME.fullmatch(name) is None:
+        if NAME.fullmatch(name) is None:
             raise ValueError(
                 f"the name {name!r} of the story, a requirement or an unstable example is not"
                 " letters and digits in words joined by hyphens, starting with a letter"

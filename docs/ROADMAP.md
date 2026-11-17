@@ -164,19 +164,23 @@ A3 opens its scopes in this order, each after the ones it depends on:
 4. `packs`: `tests.config`, the sections of the mixed files and the rule of the candidates
    (ADR-0056, ADR-0059, ADR-0060), which `verify` reads.
 5. An ADR on the program that runs an example at its boundary inside the zone of verification,
-   before the modules that use its observations.
-6. `oracle`: comparing observations with what is expected; splitting visible from sealed examples
+   before the modules that use its observations: ADR-0063.
+6. `core`, an increment: the type of an observation and the port that observes, apart from the port
+   of the verification runtime, which `oracle` reads and `sandbox` implements (ADR-0063).
+7. `oracle`: comparing observations with what is expected; splitting visible from sealed examples
    stays in block B.
-7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` and the
+8. `sandbox`: the program that observes the examples inside the zone and the adapter of podman of
+   the port (ADR-0063).
+9. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` and the
    aggregation. A patch can bring a symbolic link that points outside the tree, so whatever reads a
    file of the extracted tree on the machine of the person opens it without following links, as
    the reader of the report does (ADR-0045). The double of the port of the audited repository that
    `verify` writes is tested against CORE-099, which says that the composition over a tree replaces
    its region: a double that overlaid would let tests of `verify` pass that should fail.
-8. `evidence`: the evidence file, without signatures, which are of block E.
-9. `interfaces`: the command `audit`, which opens the contract of the directory of the change, and
-   any other file of the tree, without following links, for the same reason.
-10. `corpus`, a second time: a pull request of `repo` that gives the job `corpus` the clones it
+10. `evidence`: the evidence file, without signatures, which are of block E.
+11. `interfaces`: the command `audit`, which opens the contract of the directory of the change,
+    and any other file of the tree, without following links, for the same reason.
+12. `corpus`, a second time: a pull request of `repo` that gives the job `corpus` the clones it
     needs beyond the self-checks; the script of the witnesses (ADR-0057) and `git apply --check` of
     each patch on its base; the audit run on the ten cases; and the exit criterion measured. The
     clones are needed here anyway, and nothing between the two passes depends on them.

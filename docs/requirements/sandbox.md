@@ -99,3 +99,26 @@ isolation: it runs with the permissions of the person who runs the harness.
 ### The tests of an engine
 
 - **SANDBOX-050** If the engine that a test of the adapter needs is not installed while the tests run in CI, then the test shall fail.
+
+## The program that observes the examples ([ADR-0063](../adr/0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md))
+
+The program runs inside the container, from a directory mounted read-only: it reads the requests
+of the examples, observes each one in a child process, and writes what it saw in the output
+directory. It needs nothing but the standard library. The main program runs with `python -I -S`;
+each example runs in a child `python -I`, which has the site-packages of the image, since the code
+under test needs its dependencies. The adapter that starts it in a container is a later increment.
+
+- **SANDBOX-090** If the main program runs without the isolation of `-I` or with `site` imported, then the main program shall end with an error before it reads any request.
+- **SANDBOX-091** When the main program observes the examples, the main program shall run each example in a child Python process of its own, started with `-I`.
+- **SANDBOX-092** When the main program runs an example, the main program shall give it a working directory of its own, empty and writable.
+- **SANDBOX-093** When the child of an example runs, the child shall run every step of the example in its own process, in order.
+- **SANDBOX-094** When the child of an example starts, the child shall import its own modules before it appends to the end of `sys.path` the entries of the variable `PYTHONPATH`.
+- **SANDBOX-095** If an example does not end within the time of one example, then the main program shall end its process and every process it started, and observe the example as having reached its limit of time, with the steps observed before.
+- **SANDBOX-096** If the process of an example ends by a signal, or with an exit code before it observed its last step, then the main program shall observe the example as crashed, with the signal or the exit code.
+- **SANDBOX-097** When a step at `function` returns a value that JSON holds without `NaN` or infinities, the child shall observe the value it returned.
+- **SANDBOX-098** If a step at `function` returns a value that JSON cannot hold, then the child shall observe the name of the type of the value.
+- **SANDBOX-099** When a step at `function` raises an exception, the child shall observe the name of its class, its full name from `__module__` and `__qualname__`, the full names of the classes of its MRO, and its message.
+- **SANDBOX-100** When a step at `cli` runs, the child shall run the target split as the words of a shell with the arguments of the step, give it the standard input of the step, add the variables of the step to the environment, and write the files of the step in the working directory first.
+- **SANDBOX-101** When a step at `cli` ends, the child shall observe its exit code, its standard output and its standard error decoded as UTF-8 with the character of replacement, and the regular files of the working directory, decoded the same way.
+- **SANDBOX-102** When a step at `cli` reads the files of the working directory, the child shall observe no file that it reaches through a link.
+- **SANDBOX-103** When every example has been observed, the main program shall write the observations of all of them to `observations.json` in the output directory.

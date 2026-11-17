@@ -36,6 +36,8 @@ schema of the predicate are built; signing and verifying come with block E.
 - **EVIDENCE-043** When a finding is written, the builder shall write its `code`, its `verdict`, its `lines` and, in `untrusted`, the one entry with the `label` `message` and the whole message as its `text`.
 - **EVIDENCE-044** If two gates of the run have the same name, then the builder shall refuse the run with an error that names the gate.
 - **EVIDENCE-045** If a check names an origin other than `existing`, `human`, `derived` or `model`, or has a total below one, then the builder shall refuse the run with an error that names the check.
+- **EVIDENCE-046** When a gate was not reached, the builder shall write its entry with `gate`, `status` as `not-reached` and its `reason` ([ADR-0065](../adr/0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md)).
+- **EVIDENCE-047** When the message of a finding has more than 4096 characters, the builder shall write its first 4095 characters followed by `…` ([ADR-0066](../adr/0066-the-untrusted-texts-of-the-evidence-are-bounded.md)).
 
 ## What was not checked
 
@@ -47,6 +49,7 @@ schema of the predicate are built; signing and verifying come with block E.
 - **EVIDENCE-065** When the gate `existing-tests`, `baseline` or `visible-examples` ran, the builder shall list in `not_checked` one entry `outside-threat-model` for it, with the gate in `what`.
 - **EVIDENCE-066** The builder shall list `not_checked` by code in the order `no-holdout`, `requirement-without-example`, `only-model-checks`, `test-excluded-unstable`, `example-unstable`, `outside-threat-model`, the entries of each code in the order of the requirements or of the gates.
 - **EVIDENCE-067** When an entry of `not_checked` is listed, the builder shall give it a `reason` in words of its own for its code.
+- **EVIDENCE-068** When the name of an unstable test has more than 200 characters, the builder shall write its first 199 characters followed by `…`.
 
 ## Reading the bytes back
 
@@ -57,3 +60,6 @@ schema of the predicate are built; signing and verifying come with block E.
 - **EVIDENCE-084** When the bytes break the schema in more than one place, the reader shall report one finding for each place, in the order of the statement.
 - **EVIDENCE-085** If the bytes that the builder gives for a run do not read back without a finding, then the builder shall refuse the run with an error that lists the findings.
 - **EVIDENCE-086** If no gate of the predicate ran, or its verdict is not the one that the precedence of [ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md) gives over the verdicts of the gates that ran, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names `predicate/verdict`.
+- **EVIDENCE-087** If the gates of the predicate are not, by name, `contract`, `environment`, `baseline`, `protected-paths`, `existing-tests`, `visible-examples`, `relations`, `changed-line-coverage`, `behaviour-differences`, `repeatability` and `sealed-examples`, in that order, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names `predicate/gates` ([ADR-0065](../adr/0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md)).
+- **EVIDENCE-088** If a gate is `not-reached` and no earlier gate ran with a verdict other than `PASS`, or a gate ran after a `not-reached` gate, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names the place of the gate.
+- **EVIDENCE-089** If a text of `untrusted` with the label `message` has more than 4096 characters, or another text of `untrusted` has more than 200, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names its place ([ADR-0066](../adr/0066-the-untrusted-texts-of-the-evidence-are-bounded.md)).

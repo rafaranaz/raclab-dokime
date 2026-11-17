@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:fa02b68a9b33f9df -->
+<!-- translation-of: ROADMAP.md sha256:46653c97050ea8f3 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -263,7 +263,9 @@ Apuntado como deuda, que no bloquea ningún hito:
 - Un story, el nombre de un cambio y del `story` de su contrato, no tiene límite de longitud, y un
   sistema de ficheros admite 255 bytes por nombre; y `Fix` y `fix` serían un mismo directorio en un
   sistema de ficheros que no distingue mayúsculas, como macOS por defecto. Cambiar la regla cambia
-  también la del contrato.
+  también la del contrato. El patrón de un nombre está además copiado de `core.layout` en
+  `evidence`, que comprueba el story, los requisitos y los ejemplos inestables: cuando cambie la
+  regla, `core` la expone y `evidence` la usa, para que las dos copias no se separen.
 - De adopción: una imagen cuyo `USER` no es root. SANDBOX-038 la rechaza hoy, así que no es una
   protección contra código hostil sino la compatibilidad con imágenes que fijan un usuario, y
   ninguno de los tres packs la necesita. Se midieron cinco variantes con podman 5.4.2

@@ -13,11 +13,13 @@ The gates of a change that arrives already made, and their aggregation. The requ
   `.dokime/` is protected whatever the contract says. A patch that does not apply gives the
   `ERROR` of the repository.
 
-- `baseline(contract, base, image, repository, observer, limits)` and
+- `baseline(contract, policy, base, image, repository, observer, limits)` and
   `visible_examples(pack, contract, base, patch, image, repository, observer, limits)`: they extract the
   base, or the tree of the change (the code of the patch with the tests and their configuration of
   the base, except what the contract authorises, ADR-0058), ask the port that observes for every example of the contract
-  with its inputs alone, and compare each one through `oracle`. On the base, an example of a
+  with its inputs alone, and compare each one through `oracle`. The base is observed
+  `baseline.runs` times, and an example that holds in some runs and not in others asks
+  (`example-varies-on-base`) and is listed in `unstable`. Otherwise, on the base, an example of a
   `preserve` requirement that does not hold is a `FAIL`, and one of a `new` or `change` requirement
   that already holds asks. With the patch, an example that does not hold is a `FAIL`, or an `ASK`
   when its origin is `model` (ADR-0013). A finding names the example, its requirement and up to five
@@ -30,7 +32,8 @@ The gates of a change that arrives already made, and their aggregation. The requ
   `unstable`. Then they run once on the tree of the change. A test of the baseline that no longer
   passes, or disappears, is a `FAIL`; one that disappears from a file that the contract authorises
   asks. A test belongs to a file when its class name is the path with `/` as `.` and without `.py`,
-  or starts with that and a `.`.
+  or starts with that and a `.`. Known limit: beside a module `tests/test_a.py`, a test of a
+  package `tests/test_a/` counts as of the module.
 
 The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), on a double of the runtime that gives the reports listed in a file of
 the project, and on a double of the port that observes that answers from a file

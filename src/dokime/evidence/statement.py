@@ -11,8 +11,8 @@ from dataclasses import dataclass
 
 from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
-from dokime.evidence.run import Contract, Gate, GateRan, Inputs, Run
-from dokime.evidence.schema import NAME, ORIGINS, PREDICATE, STATEMENT, read_back
+from dokime.evidence.run import Contract, Gate, GateNotReached, GateRan, Inputs, Run
+from dokime.evidence.schema import MESSAGE, NAME, ORIGINS, PREDICATE, STATEMENT, cut, read_back
 from dokime.evidence.unchecked import not_checked
 
 type Value = dict[str, object]
@@ -100,7 +100,8 @@ def _gate(gate: Gate) -> Value:
         if gate.checks:
             entry["checks"] = [{"origin": c.origin, "total": c.total} for c in gate.checks]
         return entry
-    return {"gate": gate.gate, "status": "not-applicable", "reason": gate.reason}
+    status = "not-reached" if isinstance(gate, GateNotReached) else "not-applicable"
+    return {"gate": gate.gate, "status": status, "reason": gate.reason}
 
 
 def _finding(finding: Finding) -> Value:
@@ -108,7 +109,7 @@ def _finding(finding: Finding) -> Value:
         "code": finding.code,
         "verdict": finding.verdict.value,
         "lines": list(finding.lines),
-        "untrusted": [{"label": "message", "text": finding.message}],
+        "untrusted": [{"label": "message", "text": cut(finding.message, MESSAGE)}],
     }
 
 

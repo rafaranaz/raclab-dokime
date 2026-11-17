@@ -15,7 +15,9 @@ from dokime.core.verdicts import Verdict
 from dokime.evidence.run import (
     Checks,
     Contract,
+    Gate,
     GateNotApplicable,
+    GateNotReached,
     GateRan,
     Image,
     Inputs,
@@ -45,8 +47,9 @@ VARIES = Finding(
     verdict=Verdict.ASK,
     lines=(20, 21),
 )
-GATES = (
+GATES: tuple[Gate, ...] = (
     GateRan("contract", Verdict.PASS),
+    GateRan("environment", Verdict.PASS),
     GateRan(
         "baseline",
         Verdict.ASK,
@@ -54,6 +57,7 @@ GATES = (
         checks=(Checks("human", 1), Checks("model", 3)),
         unstable_examples=("E-2",),
     ),
+    GateRan("protected-paths", Verdict.PASS),
     GateRan(
         "existing-tests", Verdict.PASS, checks=(Checks("existing", 3),), unstable_tests=(TEST,)
     ),
@@ -63,8 +67,39 @@ GATES = (
         findings=(FAILS,),
         checks=(Checks("human", 1), Checks("model", 3)),
     ),
+    GateNotApplicable("relations", "the gate is built in block B"),
+    GateNotApplicable("changed-line-coverage", "the gate is built in block D"),
+    GateNotApplicable("behaviour-differences", "the gate is built in block D"),
+    GateNotApplicable("repeatability", "the gate is not built in A3"),
     GateNotApplicable("sealed-examples", "the gate is built in block B"),
 )
+"""The eleven gates of the audit flow of A3, in its order."""
+STOPPED = "the run stopped at the gate contract"
+
+
+def gates_with(*replacements: Gate) -> tuple[Gate, ...]:
+    """The gates of the whole run, with those of the same names replaced."""
+    by_name = {gate.gate: gate for gate in replacements}
+    return tuple(by_name.get(gate.gate, gate) for gate in GATES)
+
+
+def stopped_at_contract() -> Run:
+    """A run whose contract failed, so that every gate built after it was not reached."""
+    reached = {"contract", *(g.gate for g in GATES if isinstance(g, GateNotApplicable))}
+    failed = Finding(
+        code="contract-invalid", message="the contract is not valid", verdict=Verdict.FAIL
+    )
+    gates = tuple(
+        GateRan("contract", Verdict.FAIL, findings=(failed,))
+        if gate.gate == "contract"
+        else gate
+        if gate.gate in reached
+        else GateNotReached(gate.gate, STOPPED)
+        for gate in GATES
+    )
+    return run(gates=gates, contract=None)
+
+
 CONTRACT = Contract(
     text=b"story: S-1\n",
     requirements=(

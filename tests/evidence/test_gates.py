@@ -2,22 +2,17 @@
 from dokime.core.findings import Finding
 from dokime.core.verdicts import Verdict
 from dokime.evidence.run import GateRan
-from tests.evidence.runs import FAILS, predicate, run
+from tests.evidence.runs import FAILS, GATES, gates_with, predicate, run
 
 
 def test_every_gate_is_listed_in_the_order_given() -> None:
     names = [gate["gate"] for gate in predicate()["gates"]]
-    assert names == [
-        "contract",
-        "baseline",
-        "existing-tests",
-        "visible-examples",
-        "sealed-examples",
-    ]
+    assert names == [gate.gate for gate in GATES]
+    assert len(names) == 11
 
 
 def test_a_gate_that_ran_has_its_verdict_findings_and_checks() -> None:
-    visible = predicate()["gates"][3]
+    visible = predicate()["gates"][5]
     assert visible == {
         "gate": "visible-examples",
         "status": "run",
@@ -41,13 +36,13 @@ def test_a_gate_without_checks_or_findings_has_neither_checks_nor_null() -> None
 
 def test_a_finding_without_lines_has_an_empty_list() -> None:
     bare = Finding(code="c", message="m", verdict=Verdict.FAIL)
-    gate = GateRan("g", Verdict.FAIL, findings=(bare,))
-    (written,) = predicate(run(gates=(gate,)))["gates"][0]["findings"]
+    gate = GateRan("visible-examples", Verdict.FAIL, findings=(bare,))
+    (written,) = predicate(run(gates=gates_with(gate)))["gates"][5]["findings"]
     assert written["lines"] == []
 
 
 def test_a_gate_that_does_not_apply_has_its_reason() -> None:
-    sealed = predicate()["gates"][4]
+    sealed = predicate()["gates"][10]
     assert sealed == {
         "gate": "sealed-examples",
         "status": "not-applicable",

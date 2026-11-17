@@ -75,7 +75,15 @@ class GateNotApplicable:
     reason: str
 
 
-type Gate = GateRan | GateNotApplicable
+@dataclass(frozen=True)
+class GateNotReached:
+    """A gate that the run did not reach, since an earlier gate stopped it, with the reason."""
+
+    gate: str
+    reason: str
+
+
+type Gate = GateRan | GateNotApplicable | GateNotReached
 
 
 @dataclass(frozen=True)

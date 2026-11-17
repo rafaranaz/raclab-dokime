@@ -1,18 +1,18 @@
 # SDD-EARS: EVIDENCE-086
+from typing import Any
+
 import pytest
 
-from dokime.core.verdicts import Verdict
 from tests.evidence.runs import changed, statement
 
 
-def ran(*verdicts: str) -> list[dict[str, object]]:
-    return [
-        {"gate": f"gate-{n}", "status": "run", "verdict": v, "findings": []}
-        for n, v in enumerate(verdicts)
-    ]
-
-
-NOT_APPLICABLE = {"gate": "sealed-examples", "status": "not-applicable", "reason": "block B"}
+def gates_ran(**verdicts: str) -> list[dict[str, Any]]:
+    """The gates of the whole run, each one that ran with PASS unless given another verdict."""
+    gates: list[dict[str, Any]] = statement()["predicate"]["gates"]
+    for gate in gates:
+        if gate["status"] == "run":
+            gate["verdict"] = verdicts.get(gate["gate"].replace("-", "_"), "PASS")
+    return gates
 
 
 @pytest.mark.parametrize("written", ["PASS", "ASK", "ERROR"])
@@ -22,8 +22,11 @@ def test_a_verdict_that_is_not_the_precedence_over_the_gates_is_refused(written:
     assert "predicate/verdict" in message
 
 
-@pytest.mark.parametrize("gates", [[], [NOT_APPLICABLE]])
-def test_a_predicate_where_no_gate_ran_is_refused(gates: list[object]) -> None:
+def test_a_predicate_where_no_gate_ran_is_refused() -> None:
+    gates = [
+        {"gate": gate["gate"], "status": "not-applicable", "reason": "not here"}
+        for gate in statement()["predicate"]["gates"]
+    ]
     ((code, message),) = changed(("predicate/gates", gates), ("predicate/verdict", "PASS"))
     assert code == "evidence-schema"
     assert "predicate/verdict" in message
@@ -32,15 +35,14 @@ def test_a_predicate_where_no_gate_ran_is_refused(gates: list[object]) -> None:
 @pytest.mark.parametrize(
     ("verdicts", "written"),
     [
-        (("PASS",), "PASS"),
-        (("PASS", "ASK"), "ASK"),
-        (("ASK", "FAIL", "PASS"), "FAIL"),
-        (("FAIL", "ERROR", "ASK"), "ERROR"),
+        ({}, "PASS"),
+        ({"baseline": "ASK"}, "ASK"),
+        ({"baseline": "ASK", "visible_examples": "FAIL"}, "FAIL"),
+        ({"contract": "FAIL", "environment": "ERROR", "baseline": "ASK"}, "ERROR"),
     ],
 )
 def test_the_precedence_over_the_gates_that_ran_is_accepted(
-    verdicts: tuple[str, ...], written: str
+    verdicts: dict[str, str], written: str
 ) -> None:
-    gates = [*ran(*verdicts), NOT_APPLICABLE]
+    gates = gates_ran(**verdicts)
     assert changed(("predicate/gates", gates), ("predicate/verdict", written)) == []
-    assert statement()["predicate"]["verdict"] == Verdict.FAIL.value

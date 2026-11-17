@@ -1,6 +1,7 @@
 """What was not checked in a run, listed mechanically (ADR-0064)."""
 
 from dokime.evidence.run import Contract, GateRan, Run
+from dokime.evidence.schema import QUOTED, cut
 
 _IN_PROCESS = {
     "existing-tests": "the tests run in the process of the code under test, which can change"
@@ -24,7 +25,7 @@ def not_checked(run: Run) -> list[Entry]:
                 "test-excluded-unstable",
                 gate.gate,
                 "the outcome of the test varied between the runs of the base, so it was left out",
-                [{"label": "test", "text": test}],
+                [{"label": "test", "text": cut(test, QUOTED)}],
             )
             for gate in ran
             for test in gate.unstable_tests

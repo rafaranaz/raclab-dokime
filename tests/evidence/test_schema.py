@@ -11,7 +11,7 @@ from tests.evidence.runs import GONE, changed, statement
         ("subject", "x"),
         ("predicate/verifier", "x"),
         ("predicate/gates", "x"),
-        ("predicate/gates/1/findings", "x"),
+        ("predicate/gates/2/findings", "x"),
         ("_type", "https://in-toto.io/Statement/v0.1"),
         ("predicateType", "https://example.org/other"),
         ("subject/0/digest/gitTree", "XYZ"),
@@ -33,15 +33,15 @@ from tests.evidence.runs import GONE, changed, statement
         ("predicate/inputs/pack/level", "P2"),
         ("predicate/inputs/probe", "sha256:short"),
         ("predicate/gates/0/status", "skipped"),
-        ("predicate/gates/1/findings/0/verdict", "PASS"),
-        ("predicate/gates/1/findings/0/code", "Not A Code"),
-        ("predicate/gates/1/findings/0/lines", [0]),
-        ("predicate/gates/1/findings/0/untrusted", []),
-        ("predicate/gates/1/findings/0/untrusted/0/label", "observed"),
-        ("predicate/gates/1/checks/0/origin", "sealed"),
-        ("predicate/gates/1/checks/0/total", 0),
-        ("predicate/gates/1/checks", []),
-        ("predicate/gates/4/reason", GONE),
+        ("predicate/gates/2/findings/0/verdict", "PASS"),
+        ("predicate/gates/2/findings/0/code", "Not A Code"),
+        ("predicate/gates/2/findings/0/lines", [0]),
+        ("predicate/gates/2/findings/0/untrusted", []),
+        ("predicate/gates/2/findings/0/untrusted/0/label", "observed"),
+        ("predicate/gates/2/checks/0/origin", "sealed"),
+        ("predicate/gates/2/checks/0/total", 0),
+        ("predicate/gates/2/checks", []),
+        ("predicate/gates/10/reason", GONE),
         ("predicate/human_decisions", [{}]),
         ("predicate/not_checked/0/code", "made-up"),
         ("predicate/not_checked/0/what", "a b"),
@@ -67,10 +67,9 @@ def test_a_third_subject_is_refused() -> None:
 
 def test_a_repeated_gate_is_refused() -> None:
     gates = statement()["predicate"]["gates"]
-    ((code, message),) = changed(("predicate/gates", [*gates, gates[0]]))
-    assert code == "evidence-schema"
-    assert "predicate/gates" in message
-    assert "contract" in message
+    found = changed(("predicate/gates", [*gates, gates[0]]))
+    assert {code for code, _ in found} == {"evidence-schema"}
+    assert any("'contract' more than once" in message for _, message in found)
 
 
 def test_every_place_that_breaks_is_reported_in_the_order_of_the_statement() -> None:

@@ -8,9 +8,9 @@ from dokime.core.verdicts import Verdict
 from dokime.evidence.run import GateNotApplicable, GateRan
 from dokime.evidence.schema import read_back
 from dokime.evidence.statement import build
-from tests.evidence.runs import inputs, run, statement
+from tests.evidence.runs import gates_with, inputs, run, statement
 
-PASSED = GateRan("contract", Verdict.PASS)
+PASSED = gates_with(GateRan("baseline", Verdict.PASS), GateRan("visible-examples", Verdict.PASS))
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ PASSED = GateRan("contract", Verdict.PASS)
         run(contract=None),
         run(inputs=inputs(image=None, pack=None, probe=None)),
         run(ledger=Head(hash=None, events=0)),
-        run(verdict=Verdict.PASS, harness="0.0.0-ñ", gates=(PASSED,)),
+        run(verdict=Verdict.PASS, harness="0.0.0-ñ", gates=PASSED),
     ],
 )
 def test_the_bytes_of_a_run_read_back_without_a_finding(given: object) -> None:
@@ -62,7 +62,7 @@ def test_bytes_that_are_not_the_canonical_form_are_refused(data: bytes) -> None:
     [
         (run(harness=""), "harness"),
         (
-            run(gates=(PASSED, GateNotApplicable("sealed-examples", "")), verdict=Verdict.PASS),
+            run(gates=gates_with(GateNotApplicable("sealed-examples", ""))),
             "reason",
         ),
     ],

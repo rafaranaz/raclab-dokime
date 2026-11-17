@@ -26,11 +26,23 @@ The decisions behind these requirements are in
 - **PACKS-013** If the path of the Dockerfile is absolute or goes above the directory of the pack, then the checker shall report a finding with the code `path-outside-pack`, with its line.
 - **PACKS-014** If the path of the report is absolute or goes above the output directory, then the checker shall report a finding with the code `path-outside-output`, with its line.
 - **PACKS-015** If a pattern of the test paths is absolute or goes above the project, then the checker shall report a finding with the code `path-outside-project`, with its line.
+- **PACKS-016** If a pattern of the configuration of the tests, or the file of a section, is absolute or goes above the project, then the checker shall report a finding with the code `path-outside-project`, with its line.
 
-## Which files are tests
+## Which files are tests ([ADR-0056](../adr/0056-the-pack-names-the-configuration-of-its-tests.md), [ADR-0060](../adr/0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md))
 
 - **PACKS-020** When a path of the project matches a pattern of the test paths, the pack shall count that path as a test.
-- **PACKS-021** When a path of the project matches no pattern of the test paths, the pack shall count that path as code that is not a test.
+- **PACKS-021** When a path of the project matches no pattern of the test paths and no pattern of the configuration of the tests, the pack shall count that path as code that is not a test.
+- **PACKS-022** When a path of the project matches a pattern of the configuration of the tests and no pattern of the test paths, the pack shall count that path as configuration of the tests, which is neither a test nor code.
+
+## The sections of a mixed file ([ADR-0059](../adr/0059-a-mixed-file-protects-the-section-that-configures-the-tests.md))
+
+A section is named by the pack with its file, its format and its name. A section is compared between
+two versions of its file; a file that is absent has no section, and a section that is absent is
+compared as absent.
+
+- **PACKS-023** When a section of the format `ini` is compared, the pack shall count it as changed when its text differs: each occurrence of its header, with the lines up to the next header or the end of the file, in order.
+- **PACKS-024** When a section of the format `toml` is compared, the pack shall count it as changed when the value that `tomllib` reads at the dotted path of its name differs, or is present in one version and absent in the other.
+- **PACKS-025** If a version of the file of a section is not UTF-8, or not TOML for the format `toml`, then the pack shall count the section as changed.
 
 ## The rules of the self-check
 
@@ -39,7 +51,8 @@ itself, which gives two reports: for each test, whether it passed, failed, gave 
 skipped.
 
 - **PACKS-030** When a commit changes a path that is a test and a path that is not, the rule shall count the commit as a candidate.
-- **PACKS-031** When a commit changes only tests or only code that is not a test, the rule shall not count the commit as a candidate.
+- **PACKS-031** When a commit changes no test, or no code that is not a test, the rule shall not count the commit as a candidate.
+- **PACKS-037** When a commit changes a section that the pack names, the rule shall not count the commit as a candidate.
 - **PACKS-032** When a test passes on the commit and fails or gives an error on the parent, the rule shall count the commit as a witness.
 - **PACKS-033** When a test passes on the commit and is missing from the report of the parent, and that report has a test that fails or gives an error, the rule shall count the commit as a witness.
 - **PACKS-034** If the report of the parent has no test that fails or gives an error, then the rule shall not count the commit as a witness.
@@ -82,7 +95,7 @@ run belongs to the flow ([ADR-0018](../adr/0018-the-flow-is-a-state-machine-in-a
 in block C.
 
 - **PACKS-060** When a pack is self-checked from a commit, the self-check shall look at the commits in the order of PACKS-040 to PACKS-043 and take as candidates those of PACKS-030.
-- **PACKS-061** When a candidate is looked at, the self-check shall run the tests on the tree of the parent with the test paths taken from the commit.
+- **PACKS-061** When a candidate is looked at, the self-check shall run the tests on the tree of the parent with the test paths and the paths of the configuration of the tests taken from the commit.
 - **PACKS-062** When a candidate is looked at, the self-check shall run the tests on the tree of the commit.
 - **PACKS-063** When the second witness is found, the self-check shall look at no further candidate.
 - **PACKS-064** When ten candidates have been looked at, the self-check shall look at no further candidate.
@@ -117,3 +130,8 @@ start with `/` and has no `..` part.
 | Tests | `command` | Yes | A list of texts, not empty: the command and its arguments |
 | Tests | `report` | Yes | A relative path, from the output directory: the report in JUnit XML |
 | Tests | `paths` | Yes | A list of patterns, not empty, where `*` stays inside a part of the path and `**` crosses parts |
+| Tests | `config` | No | A list of patterns, as the test paths: the files that configure how the tests run, whether they exist or not |
+| Tests | `sections` | No | A list of sections |
+| Section | `file` | Yes | A relative path, from the project: a file that holds the configuration of the tests with that of the project |
+| Section | `format` | Yes | `toml` or `ini` |
+| Section | `section` | Yes | A text of one line: for `toml`, the dotted path of its table; for `ini`, the name between its brackets |

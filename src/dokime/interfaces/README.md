@@ -63,8 +63,38 @@ PASS: no findings
 
 ## `audit`
 
-Audits a change that arrives already made. The command is built over three pull requests: its
-inputs, in `inputs.py`; its run over the ports, in `audit.py`; and the command line.
+Audits a change that arrives already made: its inputs are in `inputs.py`, its run over the ports in
+`audit.py`, and the command line in `audit_command.py`.
+
+```console
+$ python -m dokime.interfaces audit --project ../semver --base 1ce79ef... --patch change.patch \
+    --story replace-keeps-the-constructor-error --out ../runs/replace
+program git /usr/bin/git 2.47.3
+program podman /usr/bin/podman 5.4.2
+gate contract: run PASS
+gate environment: run PASS
+gate baseline: run PASS
+gate protected-paths: run PASS
+gate existing-tests: run PASS
+gate visible-examples: run PASS
+gate relations: not-applicable: the gate is built in block B
+...
+evidence ../runs/replace/replace-keeps-the-constructor-error.statement.json sha256:...
+PASS: no findings
+```
+
+- `--base` is the full name of a commit and `--patch` the file of the patch; exactly one of
+  `--story` and `--contract` is given; `--pack` takes the pack from outside the patch.
+- `--out` is a directory that is empty, or absent, and outside the project (`out-not-empty`,
+  `out-inside-project`); it gets the ledger of the run, `ledger.jsonl`, and the evidence,
+  `<story>.statement.json`.
+- Each finding is written as `<gate>: VERDICT code: message`, with its lines in parentheses; a
+  finding that ended the audit outside a gate is written under `audit`. `--format json` gives one
+  document with the verdict, the evidence, the ledger, the gates and the findings. The exit code is
+  that of the verdict, as for `contract check`.
+- The version of the harness in the evidence is that of the installed package, or `unversioned`
+  when it runs from a checkout that is not installed.
+- SIGINT and SIGTERM close every layer, from the inside out, as for `env check`.
 
 - The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,
   or from the file given with `--contract`, never from the patch. Its `story` has to be the name of

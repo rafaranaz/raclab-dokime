@@ -13,6 +13,7 @@ from dokime.contract.check import check
 from dokime.contract.model import Checked
 from dokime.core.findings import Finding
 from dokime.core.verdicts import Verdict
+from dokime.interfaces.audit_command import audit_command
 from dokime.interfaces.env import env_check
 from dokime.interfaces.text import EXIT_CODES, finding_line, summary
 
@@ -22,6 +23,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
     if arguments.area == "env":
         return env_check(arguments)
+    if arguments.area == "audit":
+        return audit_command(arguments)
     checked = _check_file(arguments.path)
     write = _as_json if arguments.format == "json" else _as_text
     sys.stdout.write(write(str(arguments.path), checked))
@@ -62,6 +65,27 @@ def _parser() -> argparse.ArgumentParser:
         help="the pack; .dokime/pack.yaml of the project if absent",
     )
     env_one.add_argument(
+        "--format", choices=("text", "json"), default="text", help="how the result is written"
+    )
+    audit = areas.add_parser(
+        "audit",
+        help="audit a change that arrives already made",
+        description="Audit a patch on a base commit against its contract, and write its evidence.",
+    )
+    audit.add_argument(
+        "--project", type=Path, default=Path(), help="the project; the current directory if absent"
+    )
+    audit.add_argument("--base", required=True, help="the full name of the base commit")
+    audit.add_argument("--patch", type=Path, required=True, help="the file of the patch")
+    audit.add_argument("--story", default=None, help="the story of the change in the base")
+    audit.add_argument(
+        "--contract", type=Path, default=None, help="the contract, from outside the patch"
+    )
+    audit.add_argument("--pack", type=Path, default=None, help="the pack, from outside the patch")
+    audit.add_argument(
+        "--out", type=Path, required=True, help="an empty directory outside the project"
+    )
+    audit.add_argument(
         "--format", choices=("text", "json"), default="text", help="how the result is written"
     )
     return parser

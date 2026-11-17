@@ -62,7 +62,7 @@ def _raise_terminated(_signal: int, _frame: FrameType | None) -> None:
 
 
 @contextlib.contextmanager
-def _sigterm_raises() -> Iterator[None]:
+def sigterm_raises() -> Iterator[None]:
     """Turn SIGTERM into an exception while the adapters are open, so that they close, and raise
     it again with the previous handler on the way out.
 
@@ -131,7 +131,7 @@ def _self_check(pack_path: Path, project: Path, start: str, as_json: bool) -> Se
         return ended(*checked.findings)
     dockerfile = pack_path.parent / checked.pack.dockerfile
     try:
-        with _sigterm_raises(), open_ports(project) as ports:
+        with sigterm_raises(), open_ports(project) as ports:
             if not as_json:
                 for program in ports.programs:
                     sys.stdout.write(f"program {program.name} {program.path} {program.version}\n")

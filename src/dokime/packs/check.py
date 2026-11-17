@@ -42,7 +42,7 @@ _TESTS: Mapping[str, Field] = {
     "command": Field("a list of texts: the command and its arguments", _is_lines),
     "report": Field("a path of one line", _is_line),
     "paths": Field("a list of patterns", _is_lines),
-    "config": Field("a list of patterns", _is_lines, mandatory=False),
+    "config": Field("a list of patterns", _is_lines),
     "sections": Field("a list of sections", _is_sections, mandatory=False),
 }
 _SECTION: Mapping[str, Field] = {
@@ -98,7 +98,7 @@ def _tests(notes: Notes, tests: dict[str, Value]) -> None:
     """Note what does not fit in the mapping of the tests and in each of its sections."""
     check_fields(notes, tests, ("tests",), _TESTS)
     _inside(notes, tests.get("report"), ("tests", "report"), "output")
-    for name in ("command", "paths"):
+    for name in ("command", "paths", "config"):
         if tests.get(name) == []:
             notes.add("empty-list", f"{name!r} has at least one item", ("tests", name))
     for name in ("paths", "config"):

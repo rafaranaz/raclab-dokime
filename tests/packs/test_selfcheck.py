@@ -110,9 +110,7 @@ def test_two_witnesses_among_the_first_ten_candidates_give_no_finding(
 
 
 def configured() -> Pack:
-    checked = check(
-        VALID.replace('"src/**/test_*.py"]', '"src/**/test_*.py"]\n  config: ["pytest.ini"]')
-    )
+    checked = check(VALID)
     assert checked.pack is not None
     return checked.pack
 

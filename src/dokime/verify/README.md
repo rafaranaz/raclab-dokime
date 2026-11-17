@@ -24,7 +24,16 @@ The gates of a change that arrives already made, and their aggregation. The requ
   differences, each value quoted within 200 characters. A refusal of a port is the `ERROR` of its
   finding.
 
-The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), and on a double of the port that observes that answers from a file
+- `existing_tests(pack, contract, policy, base, patch, dockerfile, repository, runtime)`: the gate
+  `existing-tests`. The tests run on the base `baseline.runs` times; a test counts as passing in
+  the baseline only when it passed in every run, and one that varied is left out and listed in
+  `unstable`. Then they run once on the tree of the change. A test of the baseline that no longer
+  passes, or disappears, is a `FAIL`; one that disappears from a file that the contract authorises
+  asks. A test belongs to a file when its class name is the path with `/` as `.` and without `.py`,
+  or starts with that and a `.`.
+
+The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), on a double of the runtime that gives the reports listed in a file of
+the project, and on a double of the port that observes that answers from a file
 of the extracted project,
 itself tested against the rule of CORE-099, so that a double that overlays instead of replacing
 cannot let the gates pass.

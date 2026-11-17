@@ -17,6 +17,7 @@ from dokime.core.observation import (
     Raised,
     Returned,
 )
+from dokime.core.outcomes import Outcome, Report, ReportLimits
 from dokime.core.repository import (
     Change,
     CommitName,
@@ -25,7 +26,7 @@ from dokime.core.repository import (
     RepoPath,
     TreeName,
 )
-from dokime.core.runtime import Digest
+from dokime.core.runtime import Build, BuildLimits, Digest, Ending, RunLimits, RunResult
 
 Entry = bytes | tuple[str, bytes] | tuple[str, str]
 Files = dict[str, Entry]
@@ -152,3 +153,44 @@ class ObserverDouble:
             )
             for request in requests
         )
+
+
+@dataclass
+class RuntimeDouble:
+    """The runtime of the tests, in memory: a run of a project gives the next report of the list in
+    its `outcomes.json`, by the number of runs of that project, and a project whose list says
+    `"killed"` ends at the time limit."""
+
+    runs: list[dict[str, str]] = field(default_factory=list)
+    _counts: dict[str, int] = field(default_factory=dict)
+    _reports: dict[Path, Report] = field(default_factory=dict)
+
+    def build(self, dockerfile: Path, directory: Path, limits: BuildLimits) -> Build:
+        return Build(image=Digest("sha256:" + "b" * 64), base=None)
+
+    def run(
+        self,
+        image: Digest,
+        command: tuple[str, ...],
+        project: Path,
+        output: Path,
+        limits: RunLimits,
+    ) -> RunResult:
+        files = {
+            p.relative_to(project).as_posix(): p.read_text()
+            for p in sorted(project.rglob("*"))
+            if p.is_file()
+        }
+        self.runs.append(files)
+        given = json.loads(files["outcomes.json"])
+        if given == "killed":
+            return RunResult(ending=Ending.TIME_LIMIT, exit_code=None)
+        key = json.dumps(files, sort_keys=True)
+        count = self._counts.get(key, 0)
+        self._counts[key] = count + 1
+        report = given[count % len(given)]
+        self._reports[output] = {name: Outcome(value) for name, value in report.items()}
+        return RunResult(ending=Ending.EXITED, exit_code=1)
+
+    def read_report(self, output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
+        return self._reports[output]

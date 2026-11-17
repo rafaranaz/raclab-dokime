@@ -15,7 +15,7 @@ from dokime.core.canonical import NotCanonicalError, canonical
 from dokime.core.findings import Finding
 from dokime.core.repository import CommitName, TreeName
 from dokime.core.runtime import Digest
-from dokime.core.verdicts import Verdict
+from dokime.core.verdicts import EmptyRoundError, Verdict, aggregate
 
 STATEMENT = "https://in-toto.io/Statement/v1"
 PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1"
@@ -221,7 +221,7 @@ _NOT_CHECKED = _fields(
     },
     {"untrusted": _list(_UNTRUSTED, at_least=1)},
 )
-_PREDICATE = _fields(
+_PREDICATE_FIELDS = _fields(
     {
         "verdict": _VERDICT,
         "delivered": _is(False),
@@ -252,6 +252,30 @@ _PREDICATE = _fields(
         "ledger": _fields({"events": _whole(0)}, {"head": _DIGEST}),
     }
 )
+
+
+def _predicate(check: _Check, value: object, place: Place) -> None:
+    """The fields of the predicate, then whether its verdict is that of the gates that ran."""
+    _PREDICATE_FIELDS(check, value, place)
+    if not isinstance(value, dict) or not isinstance(value.get("gates"), list):
+        return
+    known = {verdict.value for verdict in Verdict}
+    ran = [g for g in value["gates"] if isinstance(g, dict) and g.get("status") != "not-applicable"]
+    given = [gate.get("verdict") for gate in ran]
+    if value.get("verdict") not in known or any(verdict not in known for verdict in given):
+        return
+    try:
+        expected = aggregate(Verdict(str(verdict)) for verdict in given)
+    except EmptyRoundError:
+        check.bad((*place, "verdict"), "has no gate that ran to be the verdict of")
+        return
+    if value["verdict"] != expected.value:
+        check.bad(
+            (*place, "verdict"),
+            f"is not {expected.value}, the precedence over the verdicts of the gates that ran",
+        )
+
+
 _SUBJECT = _fields(
     {
         "name": _is("tree"),
@@ -286,6 +310,6 @@ _statement = _fields(
         "_type": _is(STATEMENT),
         "subject": _subject,
         "predicateType": _is(PREDICATE),
-        "predicate": _PREDICATE,
+        "predicate": _predicate,
     }
 )

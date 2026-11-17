@@ -1,9 +1,11 @@
 """A whole run, which the tests of the evidence change one part of at a time."""
 
+import copy
 import json
 from dataclasses import replace
 from typing import Any
 
+from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
 from dokime.core.ledger import Head
 from dokime.core.policy import Policy
@@ -20,6 +22,7 @@ from dokime.evidence.run import (
     Requirement,
     Run,
 )
+from dokime.evidence.schema import read_back
 from dokime.evidence.statement import build
 
 TREE = TreeName("1" * 40)
@@ -109,3 +112,24 @@ def predicate(given: Run | None = None) -> dict[str, Any]:
     """The predicate of the statement of a run."""
     value: dict[str, Any] = statement(given)["predicate"]
     return value
+
+
+GONE = object()
+"""A field taken out of the statement."""
+
+
+def changed(*changes: tuple[str, object]) -> list[tuple[str, str]]:
+    """The findings of the statement of the whole run with each place given changed."""
+    value = copy.deepcopy(statement())
+    for place, new in changes:
+        *path, last = [int(part) if part.isdigit() else part for part in place.split("/")]
+        parent: Any = value
+        for part in path:
+            parent = parent[part]
+        if new is GONE:
+            del parent[last]
+        else:
+            parent[last] = new
+    found = read_back(canonical(value).encode())
+    assert all(f.verdict is Verdict.ERROR for f in found)
+    return [(f.code, f.message) for f in found]

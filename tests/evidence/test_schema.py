@@ -1,33 +1,7 @@
 # SDD-EARS: EVIDENCE-083 EVIDENCE-084
-import copy
-from typing import Any
-
 import pytest
 
-from dokime.core.canonical import canonical
-from dokime.core.verdicts import Verdict
-from dokime.evidence.schema import read_back
-from tests.evidence.runs import statement
-
-GONE = object()
-"""A field taken out of the statement."""
-
-
-def changed(*changes: tuple[str, object]) -> list[tuple[str, str]]:
-    """The findings of the statement of the whole run with each place given changed."""
-    value = copy.deepcopy(statement())
-    for place, new in changes:
-        *path, last = [int(part) if part.isdigit() else part for part in place.split("/")]
-        parent: Any = value
-        for part in path:
-            parent = parent[part]
-        if new is GONE:
-            del parent[last]
-        else:
-            parent[last] = new
-    found = read_back(canonical(value).encode())
-    assert all(f.verdict is Verdict.ERROR for f in found)
-    return [(f.code, f.message) for f in found]
+from tests.evidence.runs import GONE, changed, statement
 
 
 @pytest.mark.parametrize(

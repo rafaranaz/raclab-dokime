@@ -122,3 +122,18 @@ class ProjectRepository(Protocol):
     def extract(self, tree: TreeName, directory: Path) -> None:
         """Write the tree to a directory, byte for byte."""
         ...
+
+
+class AuditedRepository(ProjectRepository, Protocol):
+    """The port of the repository of an audited change (ADR-0058).
+
+    It extends the port of the project repository with the composition over a tree, which
+    `existing-tests` needs and the self-check of a pack does not, so that the adapters and the
+    doubles of the self-check keep the port they implement.
+    """
+
+    def compose_tree_with_paths(
+        self, tree: TreeName, source: CommitName, take: Callable[[RepoPath], bool]
+    ) -> TreeName:
+        """Compose `tree` with the paths of `source` that `take` accepts."""
+        ...

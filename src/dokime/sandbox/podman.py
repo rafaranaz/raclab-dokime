@@ -37,6 +37,10 @@ from dokime.sandbox.report import expat_version, read_report
 MINIMUM_VERSION = (4, 9)
 """The podman of ubuntu-24.04, where CI runs: reasoning, not a measurement of older versions."""
 
+FILE_BYTES = 64 * 1024 * 1024
+"""The largest file a run may write, in `/tmp` and in the mounts of the disk: room for a report
+or for the observations, whose limits are 32 MiB, and not for a file that grows without end."""
+
 PROJECT = "/dokime/project"
 OUTPUT = "/dokime/out"
 
@@ -259,7 +263,10 @@ class PodmanRuntime:
                     "--read-only",
                     "--read-only-tmpfs=false",
                     "--mount",
-                    "type=tmpfs,destination=/tmp,tmpfs-mode=1777",
+                    "type=tmpfs,destination=/tmp,tmpfs-mode=1777,"
+                    f"tmpfs-size={limits.memory_bytes // 4}",
+                    "--ulimit",
+                    f"fsize={FILE_BYTES}",
                     "--memory",
                     str(limits.memory_bytes),
                     "--memory-swap",

@@ -31,6 +31,17 @@ adapter from the tree of the base, so no working tree and no git directory of th
 touched. A patch that does not apply is refused with `patch-does-not-apply`, quoting git. Before
 applying, the paths that git reads from the patch are checked, and one with a part `.git` in any
 case of letters is refused with `patch-touches-git`.
+The patch is applied with `core.protectNTFS` and `core.protectHFS` on, so that the names those
+file systems take as `.git`, such as `.git.`, `git~1` or `.g` with an ignorable character of HFS
+and `it`, are refused by git whatever its defaults.
+
+## The composition over a tree
+
+The adapter implements the port of the audited repository of `core`. `compose_tree_with_paths(tree,
+source, take)` replaces, in a tree such as the base with the patch applied, the region that the
+rule takes with the files of a commit (ADR-0058). It replaces and does not overlay: a file of the
+tree under that region that the commit does not have, such as a `conftest.py` that the patch added,
+is not in the result.
 
 ## The ledger store of a file and the system clock
 

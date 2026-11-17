@@ -8,8 +8,8 @@ in-toto statement alone, without an envelope, with the predicate v0.1 of
 `interfaces` gives it the run and writes its bytes outside the tree they describe. Each requirement
 follows an EARS template and has at least one test that declares it in its `SDD-EARS:` marker.
 
-The statement of a run, its predicate and its canonical bytes are built. The reading back of the
-bytes against the schema of the predicate comes next; signing and verifying come with block E.
+The statement of a run, its predicate, its canonical bytes and their reading back against the
+schema of the predicate are built; signing and verifying come with block E.
 
 ## The statement
 
@@ -47,3 +47,12 @@ bytes against the schema of the predicate comes next; signing and verifying come
 - **EVIDENCE-065** When the gate `existing-tests`, `baseline` or `visible-examples` ran, the builder shall list in `not_checked` one entry `outside-threat-model` for it, with the gate in `what`.
 - **EVIDENCE-066** The builder shall list `not_checked` by code in the order `no-holdout`, `requirement-without-example`, `only-model-checks`, `test-excluded-unstable`, `example-unstable`, `outside-threat-model`, the entries of each code in the order of the requirements or of the gates.
 - **EVIDENCE-067** When an entry of `not_checked` is listed, the builder shall give it a `reason` in words of its own for its code.
+
+## Reading the bytes back
+
+- **EVIDENCE-080** When bytes of evidence are read back, the reader shall give no finding for the bytes that the builder gives for a run.
+- **EVIDENCE-081** If the bytes are not JSON in UTF-8, or hold a repeated key, a number that is not whole, `NaN` or an infinity, then the reader shall report a finding with the code `evidence-not-json` and the verdict `ERROR`.
+- **EVIDENCE-082** If the bytes are JSON but differ from the canonical form of their value, then the reader shall report a finding with the code `evidence-not-canonical` and the verdict `ERROR`.
+- **EVIDENCE-083** If a field of the statement is unknown, a required field is missing, or a field holds `null`, a value of another type, or a value outside its closed list or its pattern, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names the place of the field.
+- **EVIDENCE-084** When the bytes break the schema in more than one place, the reader shall report one finding for each place, in the order of the statement.
+- **EVIDENCE-085** If the bytes that the builder gives for a run do not read back without a finding, then the builder shall refuse the run with an error that lists the findings.

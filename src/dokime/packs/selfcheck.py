@@ -14,10 +14,12 @@ CANDIDATES_LOOKED_AT = 10
 def is_candidate(pack: Pack, changed: Iterable[str]) -> bool:
     """Say whether a commit that changed these paths may prove the pack.
 
-    It may when it changed a test and code that is not a test: a fix that came with its test.
+    It may when it changed a test and code that is not a test: a fix that came with its test. The
+    configuration of the tests is neither, so it makes no commit a candidate (ADR-0060); whether
+    the commit changed a section of a mixed file is decided apart, on the contents.
     """
-    are_tests = {pack.is_test(path) for path in changed}
-    return are_tests == {True, False}
+    paths = list(changed)
+    return any(pack.is_test(path) for path in paths) and any(pack.is_code(path) for path in paths)
 
 
 def turned_green(parent: Report, commit: Report) -> tuple[str, ...]:

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:081bfc4b096f09bd -->
+<!-- translation-of: ROADMAP.md sha256:ba51d0da90239575 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -174,7 +174,9 @@ A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
 7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
    Un parche puede traer un enlace simbólico que apunte fuera del árbol, así que lo que lea un
    fichero del árbol extraído en la máquina de la persona lo abre sin seguir enlaces, como el
-   lector del informe (ADR-0045).
+   lector del informe (ADR-0045). El doble del puerto del repositorio auditado que escriba
+   `verify` se prueba contra CORE-099, que dice que la composición sobre un árbol sustituye su
+   región: un doble que la superpusiera haría pasar tests de `verify` que deberían fallar.
 8. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
 9. `interfaces`: la orden `audit`, que abre el contrato del directorio del cambio, y cualquier otro
    fichero del árbol, sin seguir enlaces, por la misma razón.

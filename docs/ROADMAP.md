@@ -170,7 +170,9 @@ A3 opens its scopes in this order, each after the ones it depends on:
 7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` and the
    aggregation. A patch can bring a symbolic link that points outside the tree, so whatever reads a
    file of the extracted tree on the machine of the person opens it without following links, as
-   the reader of the report does (ADR-0045).
+   the reader of the report does (ADR-0045). The double of the port of the audited repository that
+   `verify` writes is tested against CORE-099, which says that the composition over a tree replaces
+   its region: a double that overlaid would let tests of `verify` pass that should fail.
 8. `evidence`: the evidence file, without signatures, which are of block E.
 9. `interfaces`: the command `audit`, which opens the contract of the directory of the change, and
    any other file of the tree, without following links, for the same reason.

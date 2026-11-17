@@ -14,6 +14,8 @@ The result of a gate, the gates `protected-paths`, `baseline`, `visible-examples
 
 - **VERIFY-001** The result of a gate shall carry the name of the gate, its verdict and its findings.
 - **VERIFY-002** The verdict of the result of a gate shall be the summary of its findings, `PASS` when it has none.
+- **VERIFY-003** The result of a gate shall carry its checks as one entry for each origin that has checks, with the number of its checks, in the order `existing`, `human`, `derived`, `model` ([ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)).
+- **VERIFY-004** If the checks given to a result name an origin outside those four, repeat an origin, break that order or give an origin fewer than one check, then the result shall refuse to be built with an error that names the checks.
 
 ## The gate `protected-paths` ([ADR-0016](../adr/0016-verification-in-a-container-on-base-plus-patch.md), [ADR-0056](../adr/0056-the-pack-names-the-configuration-of-its-tests.md), [ADR-0059](../adr/0059-a-mixed-file-protects-the-section-that-configures-the-tests.md))
 
@@ -42,6 +44,8 @@ the port that observes, in the image that the pack built, and compare each one w
 - **VERIFY-042** When the gate reports a finding on an example, the gate shall give the line of the example and name the example, its requirement and the parts of its steps that did not hold, quoting each value within 200 characters.
 - **VERIFY-043** If the contract has no example, then the gate shall pass without asking the port that observes.
 - **VERIFY-044** When a change is checked, the gates `visible-examples` and `existing-tests` shall use as the tree of the change the base with the patch applied, with the paths of the tests and of the configuration of the tests taken from the base, except those that the contract authorises in `may_modify_tests` ([ADR-0058](../adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md)).
+- **VERIFY-045** When the examples of the contract have been observed, the gates `baseline` and `visible-examples` shall give as their checks the examples of the contract counted by their origin.
+- **VERIFY-046** If the gate reports the finding of a refusal, or the contract has no example, then the gate shall give no checks.
 
 ## The gate `baseline` ([ADR-0016](../adr/0016-verification-in-a-container-on-base-plus-patch.md))
 
@@ -73,6 +77,8 @@ not import both well at once, so it is unlikely.
 - **VERIFY-106** If a test that passed in the baseline is not in the run of the change and is of a file that the contract authorises, then the gate `existing-tests` shall report a finding with the code `authorised-test-disappears` and the verdict `ASK`.
 - **VERIFY-107** The gate `existing-tests` shall count a test as of a file when its class name is the path of the file with each `/` as a `.`, without the suffix `.py`, or starts with that and a `.`.
 - **VERIFY-108** If a run of the tests ends with a finding, then the gate `existing-tests` shall report that finding, with the verdict `ERROR`.
+- **VERIFY-109** When the run of the change has ended, the gate `existing-tests` shall give as its checks one entry of origin `existing` with the number of tests that passed in the baseline, and no entry when none passed.
+- **VERIFY-110** If a run of the tests ends with a finding, then the gate `existing-tests` shall give no checks.
 
 ## The aggregation of a state ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md), [ADR-0034](../adr/0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md))
 

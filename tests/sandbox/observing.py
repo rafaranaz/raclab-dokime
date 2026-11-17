@@ -40,13 +40,14 @@ def observe(
     code: Path,
     *examples: dict[str, Any],
     seconds: int = 20,
+    limit: int = 1_000_000,
     flags: tuple[str, ...] = ("-I", "-S"),
 ) -> Run:
     """Run the main program on these examples, with `code` on `PYTHONPATH`."""
     probe, out = tmp_path / "probe", tmp_path / "out"
     probe.mkdir(parents=True)
     out.mkdir()
-    requests = {"example_seconds": seconds, "examples": list(examples)}
+    requests = {"example_seconds": seconds, "example_bytes": limit, "examples": list(examples)}
     (probe / "requests.json").write_text(json.dumps(requests))
     environment = {k: v for k, v in os.environ.items() if not k.startswith("PYTHON")}
     environment |= {"PYTHONPATH": str(code), "TMPDIR": str(tmp_path)}

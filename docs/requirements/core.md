@@ -113,6 +113,17 @@ be tested. The order in which the self-check takes the commits of a history belo
 - **CORE-070** The composition with paths of another commit shall receive the paths to take as a rule that says, for each path of the repository, whether it is taken.
 - **CORE-071** The port shall return the name of the composed tree from each composition.
 
+### The composition over a tree ([ADR-0058](../adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md))
+
+`existing-tests` runs the tests of the base on the code of the patch: the base with the patch
+applied, a tree, with the paths of the tests taken from the base commit. The port that audits a
+change extends the port of the project repository with that composition, so that the modules that
+only self-check a pack and their doubles are not changed.
+
+- **CORE-096** The port of the audited repository shall offer the operations of the port of the project repository and one more: compose a tree with paths of a commit.
+- **CORE-097** The composition of a tree with paths of a commit shall receive the tree, the commit and the paths to take as the rule of CORE-070.
+- **CORE-098** The composition of a tree with paths of a commit shall return the name of the composed tree.
+
 ### Refusals
 
 A refusal is how an adapter says that it cannot do an operation. It is not an error of the

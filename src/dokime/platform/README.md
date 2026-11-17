@@ -24,14 +24,22 @@ The configuration and the attributes of the project and of the person do not rea
 `.git` of the project is not written. A tree with a submodule is refused, and a composition with a
 patch is refused until milestone A3.
 
+## The composition with a patch
+
+`compose_with_patch(base, patch)` applies the patch with `git apply --cached` to an index of the
+adapter from the tree of the base, so no working tree and no git directory of the project is
+touched. A patch that does not apply is refused with `patch-does-not-apply`, quoting git. Before
+applying, the paths that git reads from the patch are checked, and one with a part `.git` in any
+case of letters is refused with `patch-touches-git`.
+
 ## The ledger store of a file and the system clock
 
 `LedgerFile(path)` implements the port of the ledger store of `core` over one file of the state
-directory of the harness: one event per line, each ended by a newline, written with one call in
-append mode and flushed to the storage device before `append` returns. It refuses a line with a
-newline or a carriage return, and appending after a last line that was cut. A file that does not
-exist has no lines and is created by the first append. `SystemClock` implements the port of the
-clock with the time of the system in UTC.
+directory of the harness: one event per line, each ended by a newline, written in append mode until
+every byte of the line is written, and flushed to the storage device before `append` returns, with
+its directory when the file is new. It refuses a line with a newline or a carriage return, and
+appending after a last line that was cut. A file that does not exist has no lines and is created by
+the first append. `SystemClock` implements the port of the clock with the time of the system in UTC.
 
 ```python
 from dokime.core.ledger import Ledger

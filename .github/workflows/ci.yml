@@ -42,7 +42,8 @@ jobs:
         run: uv run pytest --cov
 
   corpus:
-    # The packs of the corpus at the commits of their projects, with the network (ADR-0052).
+    # The packs and the cases of the corpus at the commits of their projects, with the network
+    # (ADR-0052).
     name: corpus
     runs-on: ubuntu-24.04
     defaults:
@@ -52,19 +53,35 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The tests of the cases read their history, and refuse a shallow clone.
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
       - name: Install locked dependencies
         run: uv sync --locked
-      - name: Self-check the pack of each project
+      - name: Clone each project of the corpus with its whole history
+        run: |
+          clones="$RUNNER_TEMP/corpus"
+          mkdir -p "$clones"
+          for source in tests/corpus/*/source.toml; do
+            name=$(basename "$(dirname "$source")")
+            address=$(uv run python -c \
+              'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["repository"])' \
+              "$source")
+            git clone --quiet "$address" "$clones/$name"
+          done
+          echo "DOKIME_CORPUS_CLONES=$clones" >> "$GITHUB_ENV"
+      - name: Run the tests of the corpus, its self-checks and its cases
         id: self-check
         env:
           DOKIME_CORPUS: "1"
         run: |
           start=$(date +%s)
           set +e
-          uv run pytest -p no:cacheprovider -s tests/corpus/test_corpus_self_check.py \
-            -k pack_of_a_project --junitxml=corpus.xml
-          echo "pytest ended with $? in $(( $(date +%s) - start )) s" | tee -a "$GITHUB_STEP_SUMMARY"
+          uv run pytest -p no:cacheprovider -s tests/corpus --junitxml=corpus.xml
+          code=$?
+          echo "pytest ended with $code in $(( $(date +%s) - start )) s" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $code
       - name: Every project was self-checked and passed
         if: always()
         run: uv run python -m tools.check_corpus --report corpus.xml | tee -a "$GITHUB_STEP_SUMMARY"

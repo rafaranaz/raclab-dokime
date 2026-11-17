@@ -42,6 +42,7 @@ tests:
   command: {command}
   report: report.xml
   paths: ["tests/**"]
+  config: ["pytest.ini"]
 """
 
 

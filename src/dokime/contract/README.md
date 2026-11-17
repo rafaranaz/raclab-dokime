@@ -32,6 +32,7 @@ each part of a contract and the directives are listed in the
 | `replaces-without-change` | `FAIL` | `replaces` in a requirement whose kind is not `change` |
 | `unknown-requirement` | `FAIL` | An example or a relation that names a requirement the contract does not have |
 | `two-expectations`, `no-expectation` | `FAIL` | A step that expects `returns` and `raises`, or nothing |
+| `path-outside-directory` | `FAIL` | A file of a command, given or expected, named outside its working directory: empty, absolute or with `..` |
 | `unknown-directive`, `several-directives`, `directive-parameter`, `directive-value`, `matcher-in-input` | `FAIL` | A directive that is not in the table, or is not written as the table states |
 | `duplicate-example` | `FAIL` | Two examples with the same boundary, target and steps |
 | `contradictory-examples` | `FAIL` | Two examples that expect, for the same inputs, what cannot both hold |

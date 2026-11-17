@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:628f136540ce5695 -->
+<!-- translation-of: README.md sha256:225f757a8939d84d -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -77,3 +77,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Aceptada |
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md) | La evidencia de A3 es un statement sin firmar con un predicado cerrado | Aceptada |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) | La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no | Propuesta |
+| [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Propuesta |

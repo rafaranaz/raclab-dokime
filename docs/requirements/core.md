@@ -294,7 +294,7 @@ self-check uses.
 
 | Boundary | What a step observes |
 |---|---|
-| `function` | The value returned, of any type that JSON holds, decimals included; or the type and the message of the exception raised; or the name of the type of a value returned that JSON cannot hold |
+| `function` | The value returned, of any type that JSON holds, decimals included; or the exception raised, with the name of its class, its full name (module and qualified name), the full names of the classes of its MRO and its message; or the name of the type of a value returned that JSON cannot hold |
 | `cli` | The exit code, the standard output, the standard error and the files the command wrote, by name, as texts |
 
 - **CORE-160** The port that observes shall offer one operation: observe the examples of a list of requests in an image, with the directory of the project and the limits of observation.
@@ -302,8 +302,10 @@ self-check uses.
 - **CORE-162** The observation of an example shall carry the identifier of the example and an observation for each step that ran, in the order of the steps.
 - **CORE-163** The observation of a step at the boundary `function` shall be one of the three of the table.
 - **CORE-164** The observation of a step at the boundary `cli` shall carry the four parts of the table.
-- **CORE-165** When an example reaches its limit of time, the observation of the example shall say so, with the steps observed before it.
+- **CORE-165** When an example ends, the observation of the example shall say how it ended: it completed every step, it reached its limit of time, or its process crashed.
 - **CORE-166** The limits of observation shall carry the time of one example in seconds and the size of the observations in bytes, with the limits of a run for the whole.
 - **CORE-167** The limits of observation shall default to 60 seconds for one example and 32 MiB of observations.
 - **CORE-168** If the time of one example or the size of the observations is not a whole number greater than zero, then the limits of observation shall be rejected with an error that names the limit.
 - **CORE-169** When an adapter of the port that observes refuses an operation, the port shall raise the refusal of CORE-072.
+- **CORE-170** When the process of an example crashed, the observation of the example shall carry the signal that ended it, or its exit code, when they are known.
+- **CORE-171** If an observation that did not crash carries a signal or an exit code, then the observation shall be rejected with an error that names the field.

@@ -295,6 +295,11 @@ Still to decide before a milestone opens. They are written down here and not dec
   `.dokime/` protected without exception: a contract that the patch brings cannot be told from one
   that its agent wrote until approvals are signed (block E). The candidate: the patch may bring only
   the contract whose digest matches an approval, once approvals exist.
+  And the gate `repeatability` (ADR-0017): the table of the gates puts it in block A, asking when
+  two runs of the verification give different verdicts, as many as `verification.runs` of the
+  policy says, but no milestone of A3 builds it, so A3 runs the verification once and its evidence
+  shows the gate as not applicable. The candidate: an increment of `verify` in A4, before version
+  0.1, since block A closes with A4.
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
   recipients; and the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:14028666842f75bd -->
+<!-- translation-of: ROADMAP.md sha256:d9504bd21e2b3911 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -305,6 +305,11 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   distingue de uno que haya escrito su agente hasta que las aprobaciones se firmen (bloque E). La
   candidata: que el parche solo pueda traer el contrato cuya huella coincida con una aprobación,
   cuando existan las aprobaciones.
+  Y el gate `repeatability` (ADR-0017): la tabla de los gates lo pone en el bloque A, y pregunta
+  cuando dos ejecuciones de la verificación dan veredictos distintos, tantas como diga
+  `verification.runs` de la política, pero ningún hito de A3 lo construye, así que A3 ejecuta la
+  verificación una vez y su evidencia muestra el gate como no aplicable. La candidata: un
+  incremento de `verify` en A4, antes de la versión 0.1, ya que el bloque A se cierra con A4.
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
   lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in

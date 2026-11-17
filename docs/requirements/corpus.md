@@ -83,3 +83,14 @@ witnesses of the good cases are the fixture `tests/corpus/witnesses.toml`.
 - **CORPUS-046** The fixture shall name, for each good case, the witness it comes from, whose parent is the base of the case.
 - **CORPUS-047** The table of the measurement in the fixture shall be the table of the basis of ADR-0057, row by row.
 - **CORPUS-048** The witnesses of each project in the table of the measurement shall be no more than its candidates looked at.
+
+### The audit of the cases
+
+The exit criterion of A3 is measured on the ten cases: no false accept on patches that fail visible
+examples, edit tests or break existing tests.
+
+- **CORPUS-050** When the tests of the corpus are asked for, the test of each case shall audit its patch on its base with the command `audit`, in a clone of its project, with the pack of the project and the contract of the case given from outside the patch.
+- **CORPUS-051** When the audit of a case ends, the test shall demand the verdict that the `expected` of the case names.
+- **CORPUS-052** When the audit of a bad case ends, the test shall demand that the first gate, in the order of the audit flow, whose verdict is `FAIL` is the `failing_gate` of the case.
+- **CORPUS-053** When the audit of a case ends with evidence, the test shall demand that the evidence reads back without a finding.
+- **CORPUS-054** When the audit of a case ends, the test shall write one line with the case, its verdict and its `expected`, and the first gate that failed and its `failing_gate`, so that the job shows the measurement of every case.

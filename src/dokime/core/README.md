@@ -216,3 +216,15 @@ project: `POLICY` is `.dokime/policy.yaml`, `change_directory(story)` is
 `.dokime/changes/<story>/` and `contract_path(story)` is `contract.yaml` in it. A story that is not
 a name, the rule of the `story` of a contract, is refused, so no path leaves the directory of the
 changes.
+
+## The port that observes the examples
+
+`ExampleObserver.observe(image, project, requests, limits)` runs examples in the zone of
+verification and gives what it saw (ADR-0012, ADR-0063). A request carries the identifier of its
+example, its boundary (`function` or `cli`), its target and the inputs of its steps, and nothing of
+what is expected; the harness compares outside the zone. A step at `function` is `Returned` (any
+value that JSON holds, decimals included), `Raised` (the type and the message) or `NotJson` (the
+name of the type of a value that JSON cannot hold); a step at `cli` is `Exited`, with its exit code,
+its output, its error and the files it wrote. An example that reached its limit of time says so,
+with the steps observed before. `ObservationLimits` bounds one example to 60 seconds and the
+observations to 32 MiB by default, with the limits of a run for the whole.

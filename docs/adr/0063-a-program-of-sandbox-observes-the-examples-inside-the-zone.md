@@ -1,6 +1,6 @@
 # ADR-0063 · A program of sandbox observes the examples inside the zone and writes what it saw as JSON
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

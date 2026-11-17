@@ -28,7 +28,7 @@ from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.oracle.compare import Comparison, compare
 from dokime.packs.model import Pack
-from dokime.verify.result import GateResult
+from dokime.verify.result import Checks, GateResult, checks_of
 from dokime.verify.trees import base_tree, change_tree
 
 BASELINE = "baseline"
@@ -77,7 +77,12 @@ def baseline(
             )
         elif not preserved and comparison.holds:
             findings.append(_finding("example-holds-on-base", Verdict.ASK, example, comparison))
-    return GateResult(gate=BASELINE, findings=tuple(findings), unstable=tuple(unstable))
+    return GateResult(
+        gate=BASELINE,
+        findings=tuple(findings),
+        unstable=tuple(unstable),
+        checks=_checks(contract),
+    )
 
 
 def visible_examples(
@@ -111,7 +116,11 @@ def visible_examples(
             findings.append(_finding("model-example-fails", Verdict.ASK, example, comparison))
         else:
             findings.append(_finding("example-fails", Verdict.FAIL, example, comparison))
-    return GateResult(gate=VISIBLE, findings=tuple(findings))
+    return GateResult(gate=VISIBLE, findings=tuple(findings), checks=_checks(contract))
+
+
+def _checks(contract: Contract) -> tuple[Checks, ...]:
+    return checks_of(example.origin for example in contract.examples)
 
 
 def _observe(

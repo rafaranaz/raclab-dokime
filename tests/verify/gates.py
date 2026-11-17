@@ -100,6 +100,19 @@ def on_change(
     base_files: Files | None = None,
 ) -> tuple[list[Finding], ObserverDouble]:
     """Run `visible-examples` on a patch after which the observer answers `held`."""
+    result, observer = run_change(given, held, observer, changed=changed, base_files=base_files)
+    return list(result.findings), observer
+
+
+def run_change(
+    given: Contract,
+    held: dict[str, int],
+    observer: ObserverDouble | None = None,
+    *,
+    changed: bytes | None = None,
+    base_files: Files | None = None,
+) -> tuple[GateResult, ObserverDouble]:
+    """Run `visible-examples` and give its whole result."""
     repository, observer = AuditedDouble(), observer or ObserverDouble()
     base = repository.add(
         {"answers.json": b"{}", "src/p.py": b"code"} if base_files is None else base_files
@@ -110,7 +123,7 @@ def on_change(
         PACK, given, base, changed, IMAGE, repository, observer, ObservationLimits()
     )
     assert result.gate == "visible-examples"
-    return list(result.findings), observer
+    return result, observer
 
 
 def codes(findings: list[Finding]) -> list[tuple[str, Verdict]]:

@@ -36,7 +36,31 @@ NOT_CHECKED = (
     "example-unstable",
 )
 """The closed list of the codes of what was not checked."""
+AUDIT_GATES = (
+    "contract",
+    "environment",
+    "baseline",
+    "protected-paths",
+    "existing-tests",
+    "visible-examples",
+    "relations",
+    "changed-line-coverage",
+    "behaviour-differences",
+    "repeatability",
+    "sealed-examples",
+)
+"""The gates of the audit flow of A3, in its order (ADR-0065)."""
+QUOTED = 200
+"""The characters of a text that the evidence quotes by itself, such as a test (ADR-0066)."""
+MESSAGE = 4096
+"""The characters of the message of a finding (ADR-0066)."""
 _SHA256 = re.compile(r"[0-9a-f]{64}")
+
+
+def cut(text: str, limit: int) -> str:
+    """The text, or its first characters below the limit followed by `…` when it is longer."""
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
 
 type Place = tuple[str | int, ...]
 type Rule = Callable[["_Check", object, Place], None]
@@ -176,13 +200,31 @@ _NAME = _matches("is not a name", lambda text: NAME.fullmatch(text) is not None)
 _DIGEST = _matches("is not a digest", _builds(Digest))
 _VERDICT = _matches("is not a verdict", lambda text: text in {v.value for v in Verdict})
 _FOUND = _matches("is not the verdict of a finding", lambda text: text in {"FAIL", "ASK", "ERROR"})
-_UNTRUSTED = _fields({"label": _TEXT, "text": _matches("is not a text", lambda _: True)})
+_UNTRUSTED = _fields(
+    {
+        "label": _TEXT,
+        "text": _matches(
+            f"is not a text of at most {QUOTED} characters", lambda t: len(t) <= QUOTED
+        ),
+    }
+)
 _FINDING = _fields(
     {
         "code": _matches("is not a code", _builds(_code)),
         "verdict": _FOUND,
         "lines": _list(_whole(1)),
-        "untrusted": _list(_fields({"label": _is("message"), "text": _TEXT}), at_least=1),
+        "untrusted": _list(
+            _fields(
+                {
+                    "label": _is("message"),
+                    "text": _matches(
+                        f"is not a text of 1 to {MESSAGE} characters",
+                        lambda t: 0 < len(t) <= MESSAGE,
+                    ),
+                }
+            ),
+            at_least=1,
+        ),
     }
 )
 _RAN = _fields(
@@ -197,11 +239,14 @@ _RAN = _fields(
     },
 )
 _NOT_APPLICABLE = _fields({"gate": _NAME, "status": _is("not-applicable"), "reason": _TEXT})
+_NOT_REACHED = _fields({"gate": _NAME, "status": _is("not-reached"), "reason": _TEXT})
 
 
 def _gate(check: _Check, value: object, place: Place) -> None:
     status = value.get("status") if isinstance(value, dict) else None
-    (_NOT_APPLICABLE if status == "not-applicable" else _RAN)(check, value, place)
+    {"not-applicable": _NOT_APPLICABLE, "not-reached": _NOT_REACHED}.get(str(status), _RAN)(
+        check, value, place
+    )
 
 
 def _gates(check: _Check, value: object, place: Place) -> None:
@@ -211,6 +256,26 @@ def _gates(check: _Check, value: object, place: Place) -> None:
         counted = Counter(name for name in names if isinstance(name, str))
         for name in sorted(name for name, count in counted.items() if count > 1):
             check.bad(place, f"lists the gate {name!r} more than once")
+        if names != list(AUDIT_GATES):
+            check.bad(place, "are not the gates of the audit flow of A3 in its order")
+        _reached(check, value, place)
+
+
+def _reached(check: _Check, gates: list[object], place: Place) -> None:
+    """A gate is not reached only after one that stopped the run, and none runs after it."""
+    stopped = unreached = False
+    for position, gate in enumerate(gates):
+        if not isinstance(gate, dict):
+            continue
+        status = gate.get("status")
+        if status == "not-reached":
+            if not stopped:
+                check.bad((*place, position), "is not reached, but no gate before it stopped")
+            unreached = True
+        elif status == "run":
+            if unreached:
+                check.bad((*place, position), "ran after a gate that was not reached")
+            stopped = stopped or gate.get("verdict") != "PASS"
 
 
 _NOT_CHECKED = _fields(
@@ -260,7 +325,7 @@ def _predicate(check: _Check, value: object, place: Place) -> None:
     if not isinstance(value, dict) or not isinstance(value.get("gates"), list):
         return
     known = {verdict.value for verdict in Verdict}
-    ran = [g for g in value["gates"] if isinstance(g, dict) and g.get("status") != "not-applicable"]
+    ran = [g for g in value["gates"] if isinstance(g, dict) and g.get("status") == "run"]
     given = [gate.get("verdict") for gate in ran]
     if value.get("verdict") not in known or any(verdict not in known for verdict in given):
         return

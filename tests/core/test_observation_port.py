@@ -73,7 +73,8 @@ def test_a_step_at_cli_carries_its_exit_its_output_its_error_and_its_files() -> 
 
 
 def test_an_example_says_how_it_ended() -> None:
-    assert set(Ending) == {Ending.COMPLETED, Ending.TIME_LIMIT, Ending.CRASHED}
+    assert set(Ending) == {Ending.COMPLETED, Ending.TIME_LIMIT, Ending.OUTPUT_LIMIT, Ending.CRASHED}
+    assert Ending.OUTPUT_LIMIT.value == "output-limit"
     observed = ExampleObservation(
         example="E-2", steps=(Returned(value=0),), ending=Ending.TIME_LIMIT
     )
@@ -92,7 +93,7 @@ def test_a_crashed_example_carries_its_signal_or_its_exit_code_when_known() -> N
     )
 
 
-@pytest.mark.parametrize("ending", [Ending.COMPLETED, Ending.TIME_LIMIT])
+@pytest.mark.parametrize("ending", [Ending.COMPLETED, Ending.TIME_LIMIT, Ending.OUTPUT_LIMIT])
 @pytest.mark.parametrize("field_name", ["signal", "exit_code"])
 def test_a_signal_or_an_exit_code_without_a_crash_is_rejected_naming_it(
     ending: Ending, field_name: str

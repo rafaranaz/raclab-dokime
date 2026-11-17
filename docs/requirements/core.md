@@ -123,6 +123,7 @@ only self-check a pack and their doubles are not changed.
 - **CORE-096** The port of the audited repository shall offer the operations of the port of the project repository and one more: compose a tree with paths of a commit.
 - **CORE-097** The composition of a tree with paths of a commit shall receive the tree, the commit and the paths to take as the rule of CORE-070.
 - **CORE-098** The composition of a tree with paths of a commit shall return the name of the composed tree.
+- **CORE-099** The composed tree shall hold, under the paths that the rule takes, exactly the files of the commit, and elsewhere exactly the files of the tree.
 
 ### Refusals
 

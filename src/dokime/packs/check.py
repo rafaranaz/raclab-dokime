@@ -6,7 +6,7 @@ from pathlib import PurePosixPath
 
 from dokime.core.reading import Value, read
 from dokime.core.shape import Field, Notes, check_fields, one_of
-from dokime.packs.model import Checked, Pack
+from dokime.packs.model import Checked, Pack, Section
 
 _NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
 
@@ -27,6 +27,10 @@ def _is_mapping(value: object) -> bool:
     return isinstance(value, dict)
 
 
+def _is_sections(value: object) -> bool:
+    return isinstance(value, list) and all(isinstance(item, dict) for item in value)
+
+
 _PACK: Mapping[str, Field] = {
     "format": one_of(1),
     "name": Field("a name: letters, digits and hyphens, starting with a letter", _is_name),
@@ -38,6 +42,13 @@ _TESTS: Mapping[str, Field] = {
     "command": Field("a list of texts: the command and its arguments", _is_lines),
     "report": Field("a path of one line", _is_line),
     "paths": Field("a list of patterns", _is_lines),
+    "config": Field("a list of patterns", _is_lines, mandatory=False),
+    "sections": Field("a list of sections", _is_sections, mandatory=False),
+}
+_SECTION: Mapping[str, Field] = {
+    "file": Field("a path of one line", _is_line),
+    "format": one_of("toml", "ini"),
+    "section": Field("a text of one line", _is_line),
 }
 
 
@@ -66,13 +77,7 @@ def _pack(notes: Notes, root: Value) -> Pack | None:
         check_fields(notes, environment, ("environment",), _ENVIRONMENT)
         _inside(notes, environment.get("dockerfile"), ("environment", "dockerfile"), "pack")
     if isinstance(tests, dict):
-        check_fields(notes, tests, ("tests",), _TESTS)
-        _inside(notes, tests.get("report"), ("tests", "report"), "output")
-        for name in ("command", "paths"):
-            if tests.get(name) == []:
-                notes.add("empty-list", f"{name!r} has at least one item", ("tests", name))
-        for pattern in _texts(tests.get("paths")):
-            _inside(notes, pattern, ("tests", "paths"), "project")
+        _tests(notes, tests)
     if notes.findings or not isinstance(environment, dict) or not isinstance(tests, dict):
         return None
     return Pack(
@@ -81,14 +86,39 @@ def _pack(notes: Notes, root: Value) -> Pack | None:
         command=tuple(_texts(tests["command"])),
         report=str(tests["report"]),
         test_paths=tuple(_texts(tests["paths"])),
+        config_paths=tuple(_texts(tests.get("config"))),
+        sections=tuple(
+            Section(file=str(item["file"]), format=str(item["format"]), name=str(item["section"]))
+            for item in _mappings(tests.get("sections"))
+        ),
     )
+
+
+def _tests(notes: Notes, tests: dict[str, Value]) -> None:
+    """Note what does not fit in the mapping of the tests and in each of its sections."""
+    check_fields(notes, tests, ("tests",), _TESTS)
+    _inside(notes, tests.get("report"), ("tests", "report"), "output")
+    for name in ("command", "paths"):
+        if tests.get(name) == []:
+            notes.add("empty-list", f"{name!r} has at least one item", ("tests", name))
+    for name in ("paths", "config"):
+        for pattern in _texts(tests.get(name)):
+            _inside(notes, pattern, ("tests", name), "project")
+    for index, section in enumerate(_mappings(tests.get("sections"))):
+        where = ("tests", "sections", index)
+        check_fields(notes, section, where, _SECTION)
+        _inside(notes, section.get("file"), (*where, "file"), "project")
+
+
+def _mappings(value: Value | None) -> list[dict[str, Value]]:
+    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
 
 
 def _texts(value: Value) -> list[str]:
     return [item for item in value if isinstance(item, str)] if isinstance(value, list) else []
 
 
-def _inside(notes: Notes, path: Value, where: tuple[str, ...], limit: str) -> None:
+def _inside(notes: Notes, path: Value, where: tuple[str | int, ...], limit: str) -> None:
     """Note a path that is absolute or that goes above the place it is relative to."""
     if not isinstance(path, str) or not _is_line(path):
         return

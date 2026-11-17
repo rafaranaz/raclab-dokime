@@ -107,3 +107,24 @@ def test_two_witnesses_among_the_first_ten_candidates_give_no_finding(
     candidates: list[bool],
 ) -> None:
     assert self_check(candidates) == ()
+
+
+def configured() -> Pack:
+    checked = check(
+        VALID.replace('"src/**/test_*.py"]', '"src/**/test_*.py"]\n  config: ["pytest.ini"]')
+    )
+    assert checked.pack is not None
+    return checked.pack
+
+
+@pytest.mark.parametrize(
+    "changed",
+    [["pytest.ini", "src/cachetools/__init__.py"], ["tests/test_a.py", "pytest.ini"]],
+    ids=["configuration-and-code", "a-test-and-configuration"],
+)
+def test_the_configuration_makes_no_commit_a_candidate(changed: list[str]) -> None:
+    assert not is_candidate(configured(), changed)
+
+
+def test_a_test_and_code_with_configuration_is_a_candidate() -> None:
+    assert is_candidate(configured(), ["tests/test_a.py", "pytest.ini", "src/cachetools/a.py"])

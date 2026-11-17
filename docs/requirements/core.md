@@ -3,9 +3,9 @@
 Domain types that every module shares: the verdicts of a gate and the findings that explain them,
 the strict reader of the files of the harness and the shape check, the ports of the project
 repository and of the verification runtime, the canonical form that digests are taken over, the
-policy, the ledger with the ports of its store and of the clock, and the layout of a project. Each
-requirement follows an EARS template and has at least one test that declares it in its `SDD-EARS:`
-marker.
+policy, the ledger with the ports of its store and of the clock, the layout of a project, and the
+port that observes the examples. Each requirement follows an EARS template and has at least one test
+that declares it in its `SDD-EARS:` marker.
 
 ## Verdicts ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md))
 
@@ -285,3 +285,25 @@ name: a text of letters, digits and hyphens that starts with a letter, as the `s
 - **CORE-151** The directory of a change shall be `.dokime/changes/<story>/`, with the story of the change.
 - **CORE-152** The contract of a change shall be the file `contract.yaml` in the directory of the change.
 - **CORE-153** If a story is not a name, then the directory of the change shall be refused with an error that names the story.
+
+## The port that observes the examples ([ADR-0012](../adr/0012-examples-are-observations-at-a-boundary.md), [ADR-0063](../adr/0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md))
+
+The zone of verification receives only the inputs of the examples and gives back what it saw; the
+harness compares outside it. The port is apart from that of the verification runtime, which the
+self-check uses.
+
+| Boundary | What a step observes |
+|---|---|
+| `function` | The value returned, of any type that JSON holds, decimals included; or the type and the message of the exception raised; or the name of the type of a value returned that JSON cannot hold |
+| `cli` | The exit code, the standard output, the standard error and the files the command wrote, by name, as texts |
+
+- **CORE-160** The port that observes shall offer one operation: observe the examples of a list of requests in an image, with the directory of the project and the limits of observation.
+- **CORE-161** The request of an example shall carry the identifier of its example, its boundary, its target and the inputs of its steps, and nothing of what is expected.
+- **CORE-162** The observation of an example shall carry the identifier of the example and an observation for each step that ran, in the order of the steps.
+- **CORE-163** The observation of a step at the boundary `function` shall be one of the three of the table.
+- **CORE-164** The observation of a step at the boundary `cli` shall carry the four parts of the table.
+- **CORE-165** When an example reaches its limit of time, the observation of the example shall say so, with the steps observed before it.
+- **CORE-166** The limits of observation shall carry the time of one example in seconds and the size of the observations in bytes, with the limits of a run for the whole.
+- **CORE-167** The limits of observation shall default to 60 seconds for one example and 32 MiB of observations.
+- **CORE-168** If the time of one example or the size of the observations is not a whole number greater than zero, then the limits of observation shall be rejected with an error that names the limit.
+- **CORE-169** When an adapter of the port that observes refuses an operation, the port shall raise the refusal of CORE-072.

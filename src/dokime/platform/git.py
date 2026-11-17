@@ -29,6 +29,9 @@ MINIMUM_VERSION = (2, 41)
 _EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 _SUBMODULE = b"160000"
 _VERSION = re.compile(r"git version (\d+)\.(\d+)")
+_PROTECTIONS = ("-c", "core.protectNTFS=true", "-c", "core.protectHFS=true")
+"""The checks of git against names that NTFS or HFS take as `.git`, on whatever their defaults."""
+
 _SETTINGS = (
     "-c",
     "core.autocrlf=false",
@@ -148,12 +151,30 @@ class GitRepository:
         `source`."""
         self._commit(base)
         self._commit(source)
-        kept = [record for path, record in self._records(base.text) if not take(path)]
-        taken = [record for path, record in self._records(source.text) if take(path)]
+        return self._compose(base.text, source.text, take)
+
+    def _compose(self, base: str, source: str, take: Callable[[RepoPath], bool]) -> TreeName:
+        """The tree of `base` without what `take` accepts, and with that of `source`."""
+        kept = [record for path, record in self._records(base) if not take(path)]
+        taken = [record for path, record in self._records(source) if take(path)]
         with self._index() as index:
             self._run("update-index", "-z", "--index-info", data=b"".join(kept + taken), env=index)
             name = self._run("write-tree", env=index).decode().strip()
         return TreeName(name)
+
+    def compose_tree_with_paths(
+        self, tree: TreeName, source: CommitName, take: Callable[[RepoPath], bool]
+    ) -> TreeName:
+        """Compose `tree` with the paths of `source` that `take` accepts (ADR-0058).
+
+        The region the rule takes is replaced, not overlaid: a file of `tree` under it that
+        `source` does not have, such as a `conftest.py` that a patch added, is not in the result.
+        """
+        kind = self._try("cat-file", "-t", tree.text)
+        if kind is None or kind.strip() != b"tree":
+            raise RefusalError("unknown-tree", f"the tree {tree.text} cannot be read")
+        self._commit(source)
+        return self._compose(tree.text, source.text, take)
 
     def compose_with_patch(self, base: CommitName, patch: bytes) -> TreeName:
         """Compose the tree of `base` with a patch applied, in the repository of the adapter.
@@ -169,7 +190,7 @@ class GitRepository:
                 )
         with self._index() as index:
             self._run("read-tree", base.text, env=index)
-            applied = self._call(("apply", "--cached", "-"), True, patch, index)
+            applied = self._call((*_PROTECTIONS, "apply", "--cached", "-"), True, patch, index)
             if applied.returncode != 0:
                 raise _does_not_apply(applied.stderr)
             name = self._run("write-tree", env=index).decode().strip()

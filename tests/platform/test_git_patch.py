@@ -1,4 +1,4 @@
-# SDD-EARS: PLATFORM-032 PLATFORM-033 PLATFORM-034 PLATFORM-035
+# SDD-EARS: PLATFORM-032 PLATFORM-033 PLATFORM-034 PLATFORM-035 PLATFORM-036
 from pathlib import Path
 
 import pytest
@@ -117,3 +117,19 @@ def test_a_path_that_only_contains_git_in_a_name_is_applied(
     out.mkdir()
     repository.extract(tree, out)
     assert (out / "docs" / ".gitignore-notes").read_bytes() == b"echo\n"
+
+
+def test_a_name_that_hfs_takes_as_git_is_refused(project: Project) -> None:
+    base = project.commit(BASE)
+    hfs = ".g" + chr(0x200C) + "it/hooks/x"
+    repository = GitRepository(project.path)
+    finding = refusal(lambda: repository.compose_with_patch(CommitName(base), new_file(hfs)))
+    assert (finding.code, "invalid path" in finding.message) == ("patch-does-not-apply", True)
+
+
+@pytest.mark.parametrize("path", [".git./x", ".git /x", "git~1/x"])
+def test_a_name_that_ntfs_takes_as_git_is_refused(project: Project, path: str) -> None:
+    base = project.commit(BASE)
+    repository = GitRepository(project.path)
+    finding = refusal(lambda: repository.compose_with_patch(CommitName(base), new_file(path)))
+    assert (finding.code, "invalid path" in finding.message) == ("patch-does-not-apply", True)

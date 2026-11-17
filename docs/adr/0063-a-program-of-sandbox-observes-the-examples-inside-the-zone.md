@@ -63,16 +63,23 @@ Read in the code of the runners of others:
   of the tests, which is why a `conftest.py` of the agent can rewrite it
   ([BenchJack, section 3](https://arxiv.org/abs/2605.12673)).
 
-So the three decide whether a solution passed inside the process of the code under test, or trust
-what that code writes on its output; none of them keeps the expected value out of the process of
-the code under test and compares outside it, which this decision does.
+Read in their code by the session that reviews the work, on copies of the same code on Hugging Face:
+HumanEval and EvalPlus as above, and the official runner of LiveCodeBench
+(`lcb_runner/evaluation/testing_util.py`, `run_test`), which runs the cases of a problem in one
+process with `signal.alarm` for each case, inside one `multiprocessing.Process` with a limit of time
+for the whole, and compares in that process. The scorer of LiveCodeBench in
+[OpenJarvis](https://open-jarvis.github.io/OpenJarvis/api-reference/openjarvis/evals/scorers/livecodebench)
+runs each case in a subprocess of its own instead.
 
-Read in summaries, not in their code: LiveCodeBench runs each case of standard input and output in
-a subprocess of its own with a limit of time
-([OpenJarvis](https://open-jarvis.github.io/OpenJarvis/api-reference/openjarvis/evals/scorers/livecodebench),
-[Skywork](https://arxiv.org/pdf/2505.22312)); BigCodeBench runs `unittest` in a container with
-its dependencies installed
-([evalscope](https://evalscope.readthedocs.io/en/latest/benchmarks/bigcodebench.html)).
+So HumanEval, EvalPlus and LiveCodeBench decide whether a solution passed inside the process of the
+code under test, and SWE-bench trusts what that code writes on its output; none of them keeps the
+expected value out of the process of the code under test and compares outside it, which this
+decision does.
+
+Read in summaries, not in their code:
+[evalscope](https://evalscope.readthedocs.io/en/latest/benchmarks/bigcodebench.html) runs
+BigCodeBench in a sandbox of Docker with more than 70 libraries installed, and the official package
+of BigCodeBench recommends a sandbox such as Docker without imposing one; it runs `unittest`.
 
 Looked for and not found: a runner of examples that serialises the observation and compares it
 outside the zone.

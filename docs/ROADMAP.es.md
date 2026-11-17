@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:ba51d0da90239575 -->
+<!-- translation-of: ROADMAP.md sha256:9ae8bb255a763391 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -168,19 +168,23 @@ A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
 4. `packs`: `tests.config`, las secciones de los ficheros mixtos y la regla de los candidatos
    (ADR-0056, ADR-0059, ADR-0060), que lee `verify`.
 5. Una ADR sobre el programa que ejecuta un ejemplo en su frontera dentro de la zona de
-   verificación, antes de los módulos que usan sus observaciones.
-6. `oracle`: comparar observaciones con lo esperado; separar los ejemplos visibles de los sellados
+   verificación, antes de los módulos que usan sus observaciones: la ADR-0063.
+6. `core`, un incremento: el tipo de una observación y el puerto que observa, aparte del puerto del
+   entorno de verificación, que lee `oracle` e implementa `sandbox` (ADR-0063).
+7. `oracle`: comparar observaciones con lo esperado; separar los ejemplos visibles de los sellados
    sigue en el bloque B.
-7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
+8. `sandbox`: el programa que observa los ejemplos dentro de la zona y el adaptador de podman del
+   puerto (ADR-0063).
+9. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
    Un parche puede traer un enlace simbólico que apunte fuera del árbol, así que lo que lea un
    fichero del árbol extraído en la máquina de la persona lo abre sin seguir enlaces, como el
    lector del informe (ADR-0045). El doble del puerto del repositorio auditado que escriba
    `verify` se prueba contra CORE-099, que dice que la composición sobre un árbol sustituye su
    región: un doble que la superpusiera haría pasar tests de `verify` que deberían fallar.
-8. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
-9. `interfaces`: la orden `audit`, que abre el contrato del directorio del cambio, y cualquier otro
-   fichero del árbol, sin seguir enlaces, por la misma razón.
-10. `corpus`, una segunda vez: una pull request de `repo` que da al job `corpus` los clones que
+10. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
+11. `interfaces`: la orden `audit`, que abre el contrato del directorio del cambio, y cualquier
+    otro fichero del árbol, sin seguir enlaces, por la misma razón.
+12. `corpus`, una segunda vez: una pull request de `repo` que da al job `corpus` los clones que
     necesita además de las autocomprobaciones; el script de los testigos (ADR-0057) y
     `git apply --check` de cada parche sobre su base; la auditoría ejecutada sobre los diez casos; y
     el criterio de salida medido. Los clones hacen falta aquí de todos modos, y nada entre las dos

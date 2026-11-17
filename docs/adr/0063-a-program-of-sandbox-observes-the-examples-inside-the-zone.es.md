@@ -1,7 +1,7 @@
-<!-- translation-of: 0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md sha256:28438d3845747bd3 -->
+<!-- translation-of: 0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md sha256:80caedc9a797a141 -->
 # ADR-0063 · Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

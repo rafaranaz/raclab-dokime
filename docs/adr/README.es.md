@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:6bd3cc03eee8c54d -->
+<!-- translation-of: README.md sha256:efcf89292848d72a -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -74,4 +74,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Aceptada |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.es.md) | Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él | Aceptada |
-| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Propuesta |
+| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Aceptada |

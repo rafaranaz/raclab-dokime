@@ -26,7 +26,7 @@ from dokime.core.runtime import VerificationRuntime
 from dokime.core.verdicts import Verdict
 from dokime.packs.model import Pack
 from dokime.packs.testrun import run_tests
-from dokime.verify.result import GateResult
+from dokime.verify.result import GateResult, checks_of
 from dokime.verify.trees import base_tree, change_tree
 
 GATE = "existing-tests"
@@ -72,7 +72,8 @@ def existing_tests(
         elif changed[name] is not Outcome.PASSED:
             what = f"is {changed[name].value}"
             findings.append(_finding("existing-test-fails", Verdict.FAIL, name, what))
-    return GateResult(gate=GATE, findings=tuple(findings), unstable=unstable)
+    checks = checks_of("existing" for _ in passed)
+    return GateResult(gate=GATE, findings=tuple(findings), unstable=unstable, checks=checks)
 
 
 class _Room:

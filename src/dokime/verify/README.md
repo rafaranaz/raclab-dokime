@@ -3,8 +3,13 @@
 The gates of a change that arrives already made, and their aggregation. The requirements are in
 [`docs/requirements/verify.md`](../../../docs/requirements/verify.md).
 
-- `GateResult(gate, findings)`: what each gate gives; its `verdict` is the summary of its findings,
-  `PASS` when it has none.
+- `GateResult(gate, findings, unstable, checks)`: what each gate gives; its `verdict` is the
+  summary of its findings, `PASS` when it has none. `checks` has one `Checks(origin, total)` for
+  each origin that has checks, in the order `existing`, `human`, `derived`, `model`
+  ([ADR-0064](../../../docs/adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)),
+  and `checks_of` counts them. The gates of examples count the examples of the contract, and
+  `existing-tests` the tests that passed in the baseline. A gate that ends with a refusal gives no
+  checks.
 - `protected_paths(pack, contract, base, patch, repository)`: the gate `protected-paths`. It
   composes the tree of the base and that of the base with the patch, extracts both and compares
   them path by path without following a link: a file by its bytes and whether it is executable, a

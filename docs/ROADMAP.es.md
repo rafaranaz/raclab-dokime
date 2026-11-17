@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:9ae8bb255a763391 -->
+<!-- translation-of: ROADMAP.md sha256:14028666842f75bd -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -299,7 +299,12 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
-  completa.
+  completa. Y cómo encaja con la regla de A3 auditar una pull request que trae su propio
+  contrato: en A3 el contrato se toma de la base, o se le pasa a `audit` desde fuera del parche, y
+  nunca del parche, con `.dokime/` protegido sin excepción; un contrato que trae el parche no se
+  distingue de uno que haya escrito su agente hasta que las aprobaciones se firmen (bloque E). La
+  candidata: que el parche solo pueda traer el contrato cuya huella coincida con una aprobación,
+  cuando existan las aprobaciones.
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
   lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in

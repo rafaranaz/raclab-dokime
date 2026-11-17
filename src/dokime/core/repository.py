@@ -135,5 +135,10 @@ class AuditedRepository(ProjectRepository, Protocol):
     def compose_tree_with_paths(
         self, tree: TreeName, source: CommitName, take: Callable[[RepoPath], bool]
     ) -> TreeName:
-        """Compose `tree` with the paths of `source` that `take` accepts."""
+        """Compose `tree` with the paths of `source` that `take` accepts.
+
+        The composed tree holds, under the paths that `take` accepts, exactly the files of
+        `source`, and elsewhere exactly the files of `tree`: the region is replaced, not
+        overlaid, so a file of `tree` under it that `source` does not have is not in the result.
+        """
         ...

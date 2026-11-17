@@ -112,6 +112,11 @@ RepoPath.from_bytes(b"src/a.py")  # RepoPath(text="src/a.py")
 RefusalError("shallow-clone", "the repository is a shallow clone").finding.verdict  # Verdict.ERROR
 ```
 
+The port of the audited repository, `AuditedRepository`, extends it with
+`compose_tree_with_paths(tree, source, take)`: a tree, such as the base with the patch applied,
+with the paths of a commit that the rule takes (ADR-0058). Only what audits a change needs it, so
+the self-check of a pack and its doubles keep the port of the project repository.
+
 ## The outcome of a test run
 
 `Outcome` is what happened to one test in one run: passed, failed, error or skipped. A `Report`

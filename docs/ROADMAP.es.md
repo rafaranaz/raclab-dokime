@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:898063beccf22cc7 -->
+<!-- translation-of: ROADMAP.md sha256:081bfc4b096f09bd -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -172,8 +172,12 @@ A3 abre sus ámbitos en este orden, cada uno después de los que necesita:
 6. `oracle`: comparar observaciones con lo esperado; separar los ejemplos visibles de los sellados
    sigue en el bloque B.
 7. `verify`: `baseline`, `protected-paths`, `visible-examples`, `existing-tests` y la agregación.
+   Un parche puede traer un enlace simbólico que apunte fuera del árbol, así que lo que lea un
+   fichero del árbol extraído en la máquina de la persona lo abre sin seguir enlaces, como el
+   lector del informe (ADR-0045).
 8. `evidence`: el fichero de evidencia, sin firmas, que son del bloque E.
-9. `interfaces`: la orden `audit`.
+9. `interfaces`: la orden `audit`, que abre el contrato del directorio del cambio, y cualquier otro
+   fichero del árbol, sin seguir enlaces, por la misma razón.
 10. `corpus`, una segunda vez: una pull request de `repo` que da al job `corpus` los clones que
     necesita además de las autocomprobaciones; el script de los testigos (ADR-0057) y
     `git apply --check` de cada parche sobre su base; la auditoría ejecutada sobre los diez casos; y

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:d9504bd21e2b3911 -->
+<!-- translation-of: ROADMAP.md sha256:fa02b68a9b33f9df -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -310,6 +310,14 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   `verification.runs` de la política, pero ningún hito de A3 lo construye, así que A3 ejecuta la
   verificación una vez y su evidencia muestra el gate como no aplicable. La candidata: un
   incremento de `verify` en A4, antes de la versión 0.1, ya que el bloque A se cierra con A4.
+  Y la separación fina de los mensajes de los hallazgos
+  ([ADR-0064](adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md)):
+  en A3 el mensaje entero de un hallazgo va a `untrusted`, porque los módulos mezclan las palabras
+  de dokime con texto citado del contrato, del árbol, del parche o de la zona. El paso: un
+  `message` con solo las palabras de dokime, y cada módulo que cita pasando ese texto a
+  `untrusted`, un cambio de `Finding` en `core` y uno por cada uno de `contract`, `packs`,
+  `oracle`, `sandbox`, `platform`, `verify` e `interfaces`. Se hace en A4, cuando la evidencia se
+  muestre en las pull requests, o en cada módulo cuando se toque por otro motivo.
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
   lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in

@@ -22,11 +22,12 @@ The decisions behind these requirements are in
 
 - **PACKS-010** If the pack is not a mapping, then the checker shall report a finding with the code `wrong-type` and run no other check.
 - **PACKS-011** If a mapping of a pack does not fit the table of fields, then the checker shall report for it the findings of the shape check of `core`.
-- **PACKS-012** If the list of the test command or the list of the test paths has no item, then the checker shall report a finding with the code `empty-list`, with its line.
+- **PACKS-012** If the list of the test command, of the test paths or of the configuration of the tests has no item, then the checker shall report a finding with the code `empty-list`, with its line.
 - **PACKS-013** If the path of the Dockerfile is absolute or goes above the directory of the pack, then the checker shall report a finding with the code `path-outside-pack`, with its line.
 - **PACKS-014** If the path of the report is absolute or goes above the output directory, then the checker shall report a finding with the code `path-outside-output`, with its line.
 - **PACKS-015** If a pattern of the test paths is absolute or goes above the project, then the checker shall report a finding with the code `path-outside-project`, with its line.
 - **PACKS-016** If a pattern of the configuration of the tests, or the file of a section, is absolute or goes above the project, then the checker shall report a finding with the code `path-outside-project`, with its line.
+- **PACKS-017** If the mapping of the tests has no `config`, then the checker shall report a finding with the code `missing-field` that names it, so that whoever writes a pack says what configures its tests.
 
 ## Which files are tests ([ADR-0056](../adr/0056-the-pack-names-the-configuration-of-its-tests.md), [ADR-0060](../adr/0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md))
 
@@ -130,7 +131,7 @@ start with `/` and has no `..` part.
 | Tests | `command` | Yes | A list of texts, not empty: the command and its arguments |
 | Tests | `report` | Yes | A relative path, from the output directory: the report in JUnit XML |
 | Tests | `paths` | Yes | A list of patterns, not empty, where `*` stays inside a part of the path and `**` crosses parts |
-| Tests | `config` | No | A list of patterns, as the test paths: the files that configure how the tests run, whether they exist or not |
+| Tests | `config` | Yes | A list of patterns, not empty, as the test paths: the files that configure how the tests run, whether they exist or not |
 | Tests | `sections` | No | A list of sections |
 | Section | `file` | Yes | A relative path, from the project: a file that holds the configuration of the tests with that of the project |
 | Section | `format` | Yes | `toml` or `ini` |

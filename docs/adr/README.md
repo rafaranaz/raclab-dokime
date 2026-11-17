@@ -73,3 +73,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md) | Only the tests make a commit a candidate of the self-check | Accepted |
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Accepted |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.md) | A digest is taken over a restricted canonical JSON, and a hashed record is kept in it | Accepted |
+| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Proposed |

@@ -63,8 +63,8 @@ PASS: no findings
 
 ## `audit`
 
-Audits a change that arrives already made. The command is built over three pull requests; the
-first gives its inputs, in `inputs.py`.
+Audits a change that arrives already made. The command is built over three pull requests: its
+inputs, in `inputs.py`; its run over the ports, in `audit.py`; and the command line.
 
 - The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,
   or from the file given with `--contract`, never from the patch. Its `story` has to be the name of
@@ -79,3 +79,23 @@ first gives its inputs, in `inputs.py`.
   1 MiB: `file-not-regular` for a link or anything that is not a regular file, `file-missing`,
   `file-too-large`, and `path-outside-tree` for a path that leaves the tree. A file given from
   outside is the person's, and is read as it is.
+
+`run_audit(request, ports, store, clock)` runs an audit over the ports it is given and records it in
+the ledger store:
+
+- It goes through the states of the audit flow of A3 (`STATES`): `checking-contract`,
+  `preparing`, `baselining`, `verifying` and `sealed`. Their gates, joined, are `AUDIT_GATES` of
+  `evidence`. It stops at the first state whose verdict is not `PASS`, and lists every gate after
+  it as not reached, or as not applicable when this version does not build it.
+- The gate `contract` has the findings of the contract read. The gate `environment` has those of
+  the pack, and builds the image with the Dockerfile read from the base, copied out of the tree,
+  and the tree of the base as the context. The gates of `verify` run with the contract, the pack,
+  the policy and that image.
+- The ledger records `run.started`, `state.entered`, `gate.started` and `gate.finished`,
+  `baseline.unstable`, `evidence.built` and `run.finished`. The evidence carries the head of the
+  ledger before `evidence.built`.
+- The aggregation's own findings stop the run with `ERROR`, no evidence, and a `run.finished` that
+  names them. A story that is not a name, a patch that does not apply, a base that cannot be
+  extracted and a policy with a finding end the audit before the run, with nothing recorded.
+- `convert` turns a result of `verify` into the types of `evidence`, field by field; `CONVERTED`
+  names the fields of the result that it carries, and a test fails when `verify` adds one.

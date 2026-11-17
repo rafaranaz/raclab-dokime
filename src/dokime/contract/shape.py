@@ -14,7 +14,7 @@ from dokime.core.verdicts import Verdict
 
 _NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
 _FUNCTION = re.compile(r"[A-Za-z_][\w.]*:[A-Za-z_]\w*")
-_EXCEPTION = re.compile(r"[A-Za-z_][\w.]*")
+_EXCEPTION = re.compile(r"[A-Za-z_]\w*(\.[A-Za-z_]\w*)*")
 KINDS = ("new", "change", "preserve")
 BOUNDARIES = ("function", "cli", "http")
 RELATIONS = ("idempotent", "order-insensitive")

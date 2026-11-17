@@ -1,4 +1,4 @@
-# SDD-EARS: PLATFORM-027 PLATFORM-030 PLATFORM-031 PLATFORM-032
+# SDD-EARS: PLATFORM-027 PLATFORM-030 PLATFORM-031
 from pathlib import Path
 
 import pytest
@@ -89,12 +89,3 @@ def test_a_path_of_the_base_that_is_not_utf8_is_refused_quoting_its_bytes(
         lambda: repository.compose_with_paths(CommitName(base), CommitName(source), in_tests)
     )
     assert (finding.code, repr(b"caf\xe9") in finding.message) == ("path-not-utf8", True)
-
-
-def test_a_composition_with_a_patch_is_refused_until_it_is_supported(
-    tmp_path: Path, project: Project
-) -> None:
-    base = project.commit([file("a", b"0")])
-    repository = GitRepository(project.path)
-    finding = refusal(lambda: repository.compose_with_patch(CommitName(base), b"diff"))
-    assert finding.code == "patch-not-supported"

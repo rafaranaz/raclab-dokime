@@ -56,6 +56,11 @@ def _is_empty_directory(path: Path) -> bool:
     return path.is_dir() and not path.is_symlink() and next(path.iterdir(), None) is None
 
 
+def _does_not_apply(said: bytes) -> RefusalError:
+    text = said.decode(errors="replace").strip() or "no message"
+    return RefusalError("patch-does-not-apply", f"git apply refused the patch: {text}")
+
+
 def _path(raw: bytes) -> RepoPath:
     try:
         return RepoPath.from_bytes(raw)
@@ -151,10 +156,36 @@ class GitRepository:
         return TreeName(name)
 
     def compose_with_patch(self, base: CommitName, patch: bytes) -> TreeName:
-        """Refuse: applying a patch comes with milestone A3."""
-        raise RefusalError(
-            "patch-not-supported", "composing a tree with a patch is not supported yet"
-        )
+        """Compose the tree of `base` with a patch applied, in the repository of the adapter.
+
+        The patch is applied to an index of its own, never to a working tree, and a path with a
+        part `.git` in any case of letters is refused before anything is applied.
+        """
+        self._commit(base)
+        for path in self._patched_paths(patch):
+            if any(part.casefold() == ".git" for part in path.split("/")):
+                raise RefusalError(
+                    "patch-touches-git", f"the patch names the path {path!r}, which is under .git"
+                )
+        with self._index() as index:
+            self._run("read-tree", base.text, env=index)
+            applied = self._call(("apply", "--cached", "-"), True, patch, index)
+            if applied.returncode != 0:
+                raise _does_not_apply(applied.stderr)
+            name = self._run("write-tree", env=index).decode().strip()
+        return TreeName(name)
+
+    def _patched_paths(self, patch: bytes) -> list[str]:
+        """The paths a patch writes, as git reads them; for a rename, git gives the new path.
+
+        The old path of a rename or a deletion is a path of the base, which a tree of git never
+        holds under `.git`.
+        """
+        listed = self._call(("apply", "--numstat", "-z", "-"), True, patch, {})
+        if listed.returncode != 0:
+            raise _does_not_apply(listed.stderr)
+        records = (record for record in listed.stdout.split(b"\0") if record)
+        return [record.split(b"\t", 2)[2].decode("utf-8", errors="replace") for record in records]
 
     def extract(self, tree: TreeName, directory: Path) -> None:
         """Write the tree to an empty directory, each file with the bytes of its blob."""

@@ -76,3 +76,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Accepted |
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Accepted |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md) | The evidence of A3 lists every gate of the audit flow, reached or not | Proposed |
+| [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md) | The untrusted texts of the evidence are bounded | Proposed |

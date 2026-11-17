@@ -1,8 +1,9 @@
 # Requirements of the `interfaces` scope
 
 The commands a person or a pipeline runs: `contract check`, which reads a contract file, checks it
-with the `contract` module and shows what it found, and `env check`, which self-checks a pack with
-the `packs` module over the git and the podman adapters. They hold no logic of their own about
+with the `contract` module and shows what it found, `env check`, which self-checks a pack with
+the `packs` module over the git and the podman adapters, and `audit`, which audits a change that
+arrives already made. They hold no logic of their own about
 contracts or packs; `interfaces` is the place that builds the adapters. Each requirement follows an EARS template and has at least one
 test that declares it in its `SDD-EARS:` marker.
 
@@ -62,3 +63,31 @@ command does not resolve `HEAD`.
 - **INTERFACES-062** The command shall write each finding of `env check` as `path: VERDICT code: message`, the path being the file of the pack.
 - **INTERFACES-063** The command shall end the output of `env check` with the line of the verdict of INTERFACES-005.
 - **INTERFACES-064** When the option `--format json` is given to `env check`, the command shall write one JSON document with the pack, the verdict, the programs, the candidates and the findings, each candidate with its commit, the tree, the image and the base of each side, whether it is a witness and the tests that turned green.
+
+## `audit`: the inputs
+
+`audit` reads its inputs from the tree of the base commit, extracted into a directory of its own,
+or from files given from outside the patch
+([ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)).
+
+- **INTERFACES-070** When `audit` is given a story, the command shall read the contract at `.dokime/changes/<story>/contract.yaml` of the tree of the base commit.
+- **INTERFACES-071** When `audit` is given a contract file with `--contract`, the command shall read the contract from that file.
+- **INTERFACES-072** If the story given is not a name of letters and digits in words joined by hyphens, starting with a letter, then the command shall report a finding of the contract with the code `not-a-story` and the verdict `ERROR`.
+- **INTERFACES-073** When the contract has been read, the command shall give as the findings of the contract those of its check by the `contract` module.
+- **INTERFACES-074** If the `story` of the contract differs from the name of the directory that holds the contract file, then the command shall report a finding of the contract with the code `story-not-directory` and the verdict `ERROR` that names both.
+- **INTERFACES-075** When `audit` is not given `--pack`, the command shall read the pack at `.dokime/pack.yaml` of the tree of the base commit and its Dockerfile beside it in that tree, never from the patch, since the pack says what is protected (`tests.paths`, `tests.config` and the sections of its mixed files) and a patch that changed it could unprotect its own tests.
+- **INTERFACES-076** When `audit` is given a pack file with `--pack`, the command shall read the pack from that file and its Dockerfile from beside it.
+- **INTERFACES-077** When the pack has been read, the command shall give as the findings of the environment those of its check by the `packs` module.
+- **INTERFACES-079** When `audit` reads the policy, the command shall read `.dokime/policy.yaml` of the tree of the base commit, and take the defaults of the policy when the file is absent.
+
+## `audit`: reading the tree without links
+
+A patch can bring a symbolic link that points outside the tree, and the base can hold one, so what
+`audit` reads of an extracted tree on the machine of the person follows no link, as the reader of
+the report does ([ADR-0045](../adr/0045-a-test-report-is-read-by-a-bounded-reader-that-refuses-any-dtd.md)).
+
+- **INTERFACES-085** When the command reads a file of an extracted tree, the command shall open each part of its path without following a link.
+- **INTERFACES-086** If a part of the path of a file of the tree is a link, or the file is not a regular file, then the command shall report a finding with the code `file-not-regular` and the verdict `ERROR` that names the path.
+- **INTERFACES-087** If a file of the tree that the command reads is missing, then the command shall report a finding with the code `file-missing` and the verdict `ERROR` that names the path.
+- **INTERFACES-088** If a file of the tree that the command reads has more than 1 MiB, then the command shall report a finding with the code `file-too-large` and the verdict `ERROR` that names the path.
+- **INTERFACES-089** If the contract, the pack or the policy cannot be read as UTF-8 text, then the command shall report a finding with the code `unreadable-file` and the verdict `ERROR`.

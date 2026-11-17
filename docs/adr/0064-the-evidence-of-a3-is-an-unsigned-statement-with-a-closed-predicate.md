@@ -72,12 +72,17 @@ changes then.
   `checks`, one entry for each origin with the number of its checks (`existing` for the tests;
   `human`, `derived` or `model` for the examples), when the gate runs checks.
 - A gate that does not apply has `gate`, `status: "not-applicable"` and its `reason`.
-- A finding has `code`, `verdict`, `lines`, `message` and `untrusted`.
-  - **`message` holds only words of dokime**, and the identifiers that the strict reader of the
-    contract has checked against its pattern.
-  - **`untrusted` holds every text that dokime did not write**, as a list of `{label, text}`. The
-    label is a word of dokime, such as `expected`, `observed`, `test` or `path`. The text is data
-    and must be escaped by whoever shows it. Each text is cut at 200 characters.
+- A finding has `code`, `verdict`, `lines` and `untrusted`.
+  - **The part of a finding that can be trusted is what dokime fixes**: its `code`, its `verdict`
+    and its `lines`. In the rest of the predicate, so are the identifiers that the strict reader of
+    the contract has checked against its pattern, such as the story and the ids of requirements
+    and examples.
+  - **`untrusted` holds texts that may carry what dokime did not write**, as a list of
+    `{label, text}`. The label is a word of dokime. The text is data, and whoever shows it must
+    escape it.
+  - **In A3 the whole message of a finding goes to `untrusted`, with the label `message`**, since
+    the messages of the modules mix the words of dokime with text quoted from the contract, the
+    tree, the patch or what ran in the zone.
 
 **What was not checked in A3.** Each entry has `code`, `what`, `reason` and, when it names
 something dokime did not write, `untrusted`.
@@ -125,8 +130,9 @@ Reasoning, without a test:
   ecosystem.
 - **Absent and not `null`.** A `null` can be read as "checked and empty", and the schema stays
   closed either way.
-- **`untrusted` apart from `message`.** Whoever shows the evidence can escape one field and show
-  the other as it is, instead of guessing which part of a text came from the code under test.
+- **The whole message in `untrusted`.** Whoever shows the evidence escapes that field and shows
+  as they are only the fields that dokime fixes, instead of guessing which part of a text came
+  from the code under test. The cost is that the words of dokime are escaped too.
 - **`ran_on` is `developer`.** Nothing tells a run in CI apart until the independence
   `ci-verified` exists.
 - **The digest of the contract and of the pack is that of their bytes.** That is what a person
@@ -148,8 +154,14 @@ block E wraps it in an envelope. It runs in block E.
 - **Only the verdict of each gate, as in the example of the architecture, with the reasons in the
   ledger.** A `FAIL` without its reason is of little use in a pull request, and the ledger is not
   next to it.
-- **The findings with the quoted text inside `message`, as today.** Whoever shows them cannot tell
-  what to escape.
+- **The findings with the quoted text inside a trusted `message`, as today.** Whoever shows them
+  cannot tell what to escape.
+- **The fine separation now: a `message` with only the words of dokime, and each module passing the
+  text it quotes to `untrusted`.** It is the better form, and it costs a change of `Finding` in
+  `core` and seven pull requests, one for each module whose findings quote text that dokime did not
+  write: `contract`, `packs`, `oracle`, `sandbox`, `platform`, `verify` and `interfaces`. It is
+  left for later: in A4, when the evidence is shown in pull requests, or in each module when it is
+  touched for another reason.
 - **The verification summary of SLSA as the predicate.** It has no place for what was not checked.
 - **The command that verifies, built now without signatures.** Half of what it checks would wait
   for block E, and its interface would change then.
@@ -160,9 +172,8 @@ block E wraps it in an envelope. It runs in block E.
   file of v0.1 stays readable as such.
 - The evidence of A3 is not signed, so anyone can write one by hand. It says `self-attested`, and T6
   of ADR-0010 stays outside the threat model.
-- `Finding` in `core` gains the field `untrusted`. Every module whose findings quote text that dokime
-  did not write moves that text there before `evidence` writes findings: today `contract`,
-  `packs`, `oracle`, `sandbox`, `platform`, `verify` and `interfaces`.
+- `Finding` in `core` and the modules that quote do not change in A3. The fine separation of the
+  message is noted in the roadmap, before A4.
 - The result of a gate in `verify` gains its checks by origin.
 - `audit` writes the file outside the tree. Where it writes by default is decided in `interfaces`.
 - The verification of an evidence file waits for block E. Until then, `evidence` only reads back what

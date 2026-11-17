@@ -24,12 +24,14 @@ tests:
 ```
 
 A path is a test when it matches a pattern of `paths`, and configuration of the tests when it
-matches one of `config` and is not a test; anything else is code. `config` and `sections` are
-optional for now (ADR-0056, ADR-0059). A section is compared between two versions of its file: an
-`ini` one by its raw text, every occurrence from its header to the next, since pytest reads INI
-with `iniconfig` and not with `configparser`; a `toml` one by the value that `tomllib` reads at its
-dotted path, since a dotted key in another table can define it. A version that cannot be read
-counts as changed.
+matches one of `config` and is not a test; anything else is code. `config` is mandatory and not
+empty, so that whoever writes a pack says what configures its tests; `sections` is optional
+(ADR-0056, ADR-0059). A section is compared between two versions of its file: an `ini` one by its
+raw text, every occurrence from its header to the next, since pytest reads INI with `iniconfig` and
+not with `configparser`; a `toml` one by the value that `tomllib` reads at its dotted path, since a
+dotted key in another table can define it. A version that cannot be read counts as changed. The
+dotted path of a `toml` section is split on `.`, so a key whose name holds a quoted dot cannot be
+named.
 
 `check` reads the text of a pack with the strict reader of `core`, compares it with its table of
 fields and returns every finding at once, with the pack when there is none.

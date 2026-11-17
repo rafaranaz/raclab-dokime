@@ -13,6 +13,7 @@ tests:
   command: [python, -m, pytest, --junitxml, /dokime/out/report.xml]
   report: report.xml
   paths: ["tests/**", "src/**/test_*.py"]
+  config: ["pytest.ini"]
 """
 
 

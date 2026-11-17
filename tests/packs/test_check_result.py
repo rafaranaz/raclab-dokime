@@ -15,6 +15,7 @@ def test_a_valid_pack_has_no_finding_and_is_returned() -> None:
         command=("python", "-m", "pytest", "--junitxml", "/dokime/out/report.xml"),
         report="report.xml",
         test_paths=("tests/**", "src/**/test_*.py"),
+        config_paths=("pytest.ini",),
     )
 
 

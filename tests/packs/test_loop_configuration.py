@@ -15,8 +15,8 @@ PYPROJECT = b'[project]\nname = "x"\n\n[tool.pytest.ini_options]\naddopts = "-q"
 
 def configured() -> Pack:
     text = VALID.replace(
-        '"src/**/test_*.py"]',
-        '"src/**/test_*.py"]\n  config: ["pytest.ini"]\n  sections:\n'
+        '  config: ["pytest.ini"]',
+        '  config: ["pytest.ini"]\n  sections:\n'
         "    - file: pyproject.toml\n      format: toml\n      section: tool.pytest.ini_options",
     )
     checked = check(text)

@@ -122,3 +122,8 @@ under test needs its dependencies. The adapter that starts it in a container is 
 - **SANDBOX-101** When a step at `cli` ends, the child shall observe its exit code, its standard output and its standard error decoded as UTF-8 with the character of replacement, and the regular files of the working directory, decoded the same way.
 - **SANDBOX-102** When a step at `cli` reads the files of the working directory, the child shall observe no file that it reaches through a link.
 - **SANDBOX-103** When every example has been observed, the main program shall write the observations of all of them to `observations.json` in the output directory.
+- **SANDBOX-104** If a line that the child of an example wrote is not valid JSON, or is nested too deep to be read, then the main program shall observe the example as crashed, with the steps of the lines before it, and go on with the next example.
+- **SANDBOX-105** If the child of an example writes more bytes than the bytes of one example, then the main program shall end its process and every process it started, and observe the example as having reached its limit of output, with the steps observed before.
+- **SANDBOX-106** If the output, the error or the files of a step at `cli` hold more bytes than the bytes of one example, then the child shall read no more than that and end, so that the example is observed as having reached its limit of output.
+- **SANDBOX-107** If the name of a file of a step at `cli` is absolute or has a part `..`, then the main program shall end with an error before it runs any example.
+- **SANDBOX-108** If the message of an exception raised by a step cannot be read, then the child shall observe the exception with a message that says so.

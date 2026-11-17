@@ -255,7 +255,9 @@ Noted as debt, which blocks no milestone:
 - A story, the name of a change and of the `story` of its contract, has no limit of length, and
   a file system admits 255 bytes for a name; and `Fix` and `fix` would be one directory on a file
   system that does not tell upper from lower case, as macOS by default. Changing the rule changes
-  that of the contract too.
+  that of the contract too. The pattern of a name is also copied from `core.layout` into
+  `evidence`, which checks the story, the requirements and the unstable examples: when the rule
+  changes, `core` exposes it and `evidence` uses it, so that the two copies do not drift apart.
 - Of adoption: an image whose `USER` is not root. SANDBOX-038 refuses it today, so it is not a
   protection against hostile code but the support of images that set a user, and none of the three
   packs needs it. Five variants were measured with podman 5.4.2

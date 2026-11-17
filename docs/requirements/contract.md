@@ -47,6 +47,7 @@ are mandatory and what each holds.
 - **CONTRACT-032** If a step at the `function` boundary expects both `returns` and `raises`, then the checker shall report a finding with the code `two-expectations`, with the line of the expectation.
 - **CONTRACT-033** If a step expects nothing, then the checker shall report a finding with the code `no-expectation`, with the line of the expectation.
 - **CONTRACT-034** If the `type` of an expected exception is not an identifier of Python, nor identifiers joined by single dots, then the checker shall report a finding with the code `wrong-type`, with the line of the expectation.
+- **CONTRACT-035** If the name of a file that a step at `cli` gives or expects is empty, absolute or has a part `..`, then the checker shall report a finding with the code `path-outside-directory` that names it, with the line of the files.
 
 ## Directives
 
@@ -132,12 +133,12 @@ the directives allowed where it is.
 | Expectation at `function` | `raises` | No | A mapping with `type`, the name of the class of the exception, and optionally `message`, a text or a matcher. The name is an identifier of Python, or the identifiers of its module and of its class joined by single dots |
 | Input at `cli` | `args` | No | A list of texts |
 | Input at `cli` | `stdin` | No | A text |
-| Input at `cli` | `files` | No | A mapping from a file name to a text |
+| Input at `cli` | `files` | No | A mapping from a file name to a text; a file name is a relative path inside the working directory of the command, with no part `..` |
 | Input at `cli` | `env` | No | A mapping from a name to a text |
 | Expectation at `cli` | `exit` | No | An integer |
 | Expectation at `cli` | `stdout` | No | A text or a matcher |
 | Expectation at `cli` | `stderr` | No | A text or a matcher |
-| Expectation at `cli` | `files` | No | A mapping from a file name to a text or a matcher |
+| Expectation at `cli` | `files` | No | A mapping from a file name, as in the input, to a text or a matcher |
 | Relation | `id` | Yes | A name |
 | Relation | `requirement` | Yes | A name |
 | Relation | `relation` | Yes | `idempotent` or `order-insensitive` |

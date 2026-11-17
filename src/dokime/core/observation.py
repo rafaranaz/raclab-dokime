@@ -42,9 +42,16 @@ class Returned:
 
 @dataclass(frozen=True)
 class Raised:
-    """A step at `function` raised an exception, with its type and its message."""
+    """A step at `function` raised an exception: the name of its class, its full name, the full
+    names of the classes of its MRO, from its own to `object`, and its message.
+
+    The full names tell a class of the project from one of Python with the same name. The field
+    is `classes`, not `mro`, which a dataclass would take for the method of `type`.
+    """
 
     type: str
+    qualified: str
+    classes: tuple[str, ...]
     message: str
 
 
@@ -68,13 +75,30 @@ class Exited:
 type StepObservation = Returned | Raised | NotJson | Exited
 
 
+class Ending(StrEnum):
+    """How an example ended."""
+
+    COMPLETED = "completed"
+    TIME_LIMIT = "time-limit"
+    CRASHED = "crashed"
+
+
 @dataclass(frozen=True)
 class ExampleObservation:
-    """What the zone saw of one example: each step that ran, and whether it reached its limit."""
+    """What the zone saw of one example: each step that ran, and how it ended; a crash carries the
+    signal or the exit code of its process, when they are known."""
 
     example: str
     steps: tuple[StepObservation, ...]
-    time_limit: bool = False
+    ending: Ending = Ending.COMPLETED
+    signal: int | None = None
+    exit_code: int | None = None
+
+    def __post_init__(self) -> None:
+        if self.ending is not Ending.CRASHED:
+            for name in ("signal", "exit_code"):
+                if getattr(self, name) is not None:
+                    raise ValueError(f"an example that did not crash carries no {name}")
 
 
 @dataclass(frozen=True)

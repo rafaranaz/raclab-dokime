@@ -13,6 +13,17 @@ The gates of a change that arrives already made, and their aggregation. The requ
   `.dokime/` is protected whatever the contract says. A patch that does not apply gives the
   `ERROR` of the repository.
 
-The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`),
+- `baseline(contract, base, image, repository, observer, limits)` and
+  `visible_examples(contract, base, patch, image, repository, observer, limits)`: they extract the
+  base, or the base with the patch, ask the port that observes for every example of the contract
+  with its inputs alone, and compare each one through `oracle`. On the base, an example of a
+  `preserve` requirement that does not hold is a `FAIL`, and one of a `new` or `change` requirement
+  that already holds asks. With the patch, an example that does not hold is a `FAIL`, or an `ASK`
+  when its origin is `model` (ADR-0013). A finding names the example, its requirement and up to five
+  differences, each value quoted within 200 characters. A refusal of a port is the `ERROR` of its
+  finding.
+
+The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), and on a double of the port that observes that answers from a file
+of the extracted project,
 itself tested against the rule of CORE-099, so that a double that overlays instead of replacing
 cannot let the gates pass.

@@ -74,7 +74,12 @@ its own modules before it appends `PYTHONPATH` to `sys.path`, so that a module o
 cannot replace one of them, and writes each step as soon as it observed it, so that an example that
 reaches its limit keeps the steps before. An example that hangs is ended with every process it
 started; one that dies is `crashed`, with its signal or its exit code, and a target that cannot be
-imported exits with 3.
+imported exits with 3. A line that a child wrote and cannot be read, cut by a kill or written by
+the code under test on the descriptor, ends that example as `crashed` with the steps before it,
+and the next example goes on. What a child writes is read up to the bytes of one example; past
+them the child is ended and the example is `output-limit`, and so is a command whose output, error
+or files pass them. A name of a file of a step that is absolute or has `..` ends the program before
+any example runs. An exception whose `__str__` fails is observed with a message that says so.
 
 At `function` a step is `returned` (a tuple as the list that JSON holds), `not_json` with the name
 of the type (a set, `NaN`, an infinity), or `raised` with the name, the full name from `__module__`

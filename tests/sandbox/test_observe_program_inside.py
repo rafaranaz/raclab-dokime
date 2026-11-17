@@ -48,7 +48,7 @@ def test_a_command_runs_in_the_working_directory_and_its_files_are_read(
     (tmp_path / "link").symlink_to(tmp_path / "sub")
     script = "import sys; print(open('given.txt').read()); sys.exit(1)"
     seen = observe_program._command(
-        f"{sys.executable} -c {script!r}", {"files": {"given.txt": "g"}}
+        f"{sys.executable} -c {script!r}", {"files": {"given.txt": "g"}}, 1000
     )
     assert (seen["exit"], seen["stdout"]) == (1, "g\n")
     assert seen["files"] == {"given.txt": "g", "sub/deep.txt": "�"}

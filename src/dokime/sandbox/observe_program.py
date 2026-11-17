@@ -31,6 +31,12 @@ from typing import Any
 
 _IMPORT_FAILED = 3
 """The exit code of a child whose target cannot be imported or found."""
+_OUTPUT_LIMIT = 4
+"""The exit code of a child whose command wrote more than the bytes of one example."""
+
+
+class _TooLargeError(Exception):
+    """What a command wrote, or left in the working directory, passes the bytes of one example."""
 
 
 def main(argv: list[str]) -> int:
@@ -42,15 +48,34 @@ def main(argv: list[str]) -> int:
         return 2
     probe, out = Path(argv[1]), Path(argv[2])
     requests = json.loads((probe / "requests.json").read_text(encoding="utf-8"))
+    outside = _names_outside(requests["examples"])
+    if outside:
+        sys.stderr.write(f"the files {outside} would be written outside the working directory\n")
+        return 2
+    limits = requests["example_seconds"], requests["example_bytes"]
     observed = [
-        _example(probe / "requests.json", index, request, requests["example_seconds"])
+        _example(probe / "requests.json", index, request, *limits)
         for index, request in enumerate(requests["examples"])
     ]
     (out / "observations.json").write_text(json.dumps({"examples": observed}), encoding="utf-8")
     return 0
 
 
-def _example(requests: Path, index: int, request: dict[str, Any], seconds: int) -> dict[str, Any]:
+def _names_outside(examples: list[dict[str, Any]]) -> list[str]:
+    """The names of files of steps at `cli` that are absolute or go up with `..`."""
+    names = (
+        name
+        for example in examples
+        if example["boundary"] == "cli"
+        for step in example["inputs"]
+        for name in step.get("files", {})
+    )
+    return [name for name in names if name.startswith("/") or ".." in name.split("/")]
+
+
+def _example(
+    requests: Path, index: int, request: dict[str, Any], seconds: int, size: int
+) -> dict[str, Any]:
     """Run one example in a child, and observe how it ended."""
     work = tempfile.mkdtemp(prefix="example-")
     read, write = os.pipe()
@@ -65,28 +90,57 @@ def _example(requests: Path, index: int, request: dict[str, Any], seconds: int) 
     )
     os.close(write)
     lines: list[bytes] = []
-    reader = threading.Thread(target=_drain, args=(read, lines), daemon=True)
+    flooded = threading.Event()
+    reader = threading.Thread(target=_drain, args=(read, lines, size, flooded, child), daemon=True)
     reader.start()
     try:
-        code = child.wait(timeout=seconds)
+        code: int | None = child.wait(timeout=seconds)
     except subprocess.TimeoutExpired:
         _end(child)
         code = None
     reader.join()
-    steps = [json.loads(line) for line in b"".join(lines).splitlines() if line]
-    observed = {"example": request["example"], "steps": steps, "ending": "completed"}
+    steps, broken = _steps(b"".join(lines))
+    observed: dict[str, Any] = {"example": request["example"], "steps": steps}
+    if flooded.is_set() or code == _OUTPUT_LIMIT:
+        return observed | {"ending": "output-limit"}
     if code is None:
-        observed["ending"] = "time-limit"
-    elif code < 0:
-        observed |= {"ending": "crashed", "signal": -code}
-    elif code != 0 or len(steps) < len(request["inputs"]):
-        observed |= {"ending": "crashed", "exit_code": code}
-    return observed
+        return observed | {"ending": "time-limit"}
+    if code < 0:
+        return observed | {"ending": "crashed", "signal": -code}
+    if broken or code != 0 or len(steps) < len(request["inputs"]):
+        return observed | {"ending": "crashed", "exit_code": code}
+    return observed | {"ending": "completed"}
 
 
-def _drain(descriptor: int, lines: list[bytes]) -> None:
+def _steps(data: bytes) -> tuple[list[Any], bool]:
+    """The steps of the lines a child wrote, up to the first that cannot be read, and whether
+    there was one: a child cut while it wrote, or code under test that wrote on the descriptor."""
+    steps = []
+    for line in data.splitlines():
+        try:
+            steps.append(json.loads(line))
+        except (ValueError, RecursionError):
+            return steps, True
+    return steps, False
+
+
+def _drain(
+    descriptor: int,
+    lines: list[bytes],
+    size: int,
+    flooded: threading.Event,
+    child: "subprocess.Popen[bytes]",
+) -> None:
+    """Read what a child writes, no more than its bytes; past them, end it."""
+    taken = 0
     with os.fdopen(descriptor, "rb") as handle:
-        lines.extend(iter(lambda: handle.read(65536), b""))
+        for chunk in iter(lambda: handle.read(65536), b""):
+            taken += len(chunk)
+            if taken > size:
+                flooded.set()
+                _end(child)
+                return
+            lines.append(chunk)
 
 
 def _end(child: "subprocess.Popen[bytes]") -> None:
@@ -98,7 +152,8 @@ def _end(child: "subprocess.Popen[bytes]") -> None:
 
 def _child(descriptor: int, requests: Path, index: int) -> int:
     """Observe each step of one example, writing a line for each as soon as it is observed."""
-    request = json.loads(requests.read_text(encoding="utf-8"))["examples"][index]
+    loaded = json.loads(requests.read_text(encoding="utf-8"))
+    request, size = loaded["examples"][index], loaded["example_bytes"]
     output = os.fdopen(descriptor, "w", encoding="utf-8")
     sys.path.extend(entry for entry in os.environ.get("PYTHONPATH", "").split(os.pathsep) if entry)
     function: Callable[..., object] | None = None
@@ -108,7 +163,10 @@ def _child(descriptor: int, requests: Path, index: int) -> int:
         except Exception:
             return _IMPORT_FAILED
     for step in request["inputs"]:
-        seen = _call(function, step) if function else _command(request["target"], step)
+        try:
+            seen = _call(function, step) if function else _command(request["target"], step, size)
+        except _TooLargeError:
+            return _OUTPUT_LIMIT
         output.write(json.dumps(seen) + "\n")
         output.flush()
     return 0
@@ -143,32 +201,53 @@ def _raised(error: BaseException) -> dict[str, Any]:
         "type": type(error).__name__,
         "qualified": classes[0],
         "classes": classes,
-        "message": str(error),
+        "message": _message(error),
     }
 
 
-def _command(target: str, step: dict[str, Any]) -> dict[str, Any]:
+def _message(error: BaseException) -> str:
+    try:
+        return str(error)
+    except Exception as unreadable:
+        return f"the message cannot be read: {type(unreadable).__name__} from __str__"
+
+
+def _command(target: str, step: dict[str, Any], size: int) -> dict[str, Any]:
     work = Path.cwd()
     for name, text in step.get("files", {}).items():
         (work / name).write_text(text, encoding="utf-8")
-    done = subprocess.run(
-        [*shlex.split(target), *step.get("args", [])],
-        input=step.get("stdin", "").encode("utf-8"),
-        env=os.environ | step.get("env", {}),
-        capture_output=True,
-        check=False,
-    )
+    with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+        done = subprocess.run(
+            [*shlex.split(target), *step.get("args", [])],
+            input=step.get("stdin", "").encode("utf-8"),
+            env=os.environ | step.get("env", {}),
+            stdout=out,
+            stderr=err,
+            check=False,
+        )
+        stdout, stderr = _bounded(out, size), _bounded(err, size)
     return {
         "exit": done.returncode,
-        "stdout": done.stdout.decode("utf-8", errors="replace"),
-        "stderr": done.stderr.decode("utf-8", errors="replace"),
-        "files": _files(work),
+        "stdout": stdout.decode("utf-8", errors="replace"),
+        "stderr": stderr.decode("utf-8", errors="replace"),
+        "files": _files(work, size),
     }
 
 
-def _files(work: Path) -> dict[str, str]:
-    """The regular files of the working directory, by their path in it, reached by no link."""
+def _bounded(handle: Any, size: int) -> bytes:
+    """What a command wrote to a file, refused past the bytes of one example."""
+    handle.seek(0)
+    data: bytes = handle.read(size + 1)
+    if len(data) > size:
+        raise _TooLargeError
+    return data
+
+
+def _files(work: Path, size: int) -> dict[str, str]:
+    """The regular files of the working directory, by their path in it, reached by no link, and
+    no more of them in all than the bytes of one example."""
     found = {}
+    taken = 0
     for directory, names, files in os.walk(work, followlinks=False):
         here = Path(directory)
         names[:] = [name for name in names if not (here / name).is_symlink()]
@@ -176,6 +255,9 @@ def _files(work: Path) -> dict[str, str]:
             path = here / name
             if path.is_symlink() or not path.is_file():
                 continue
+            taken += path.stat().st_size
+            if taken > size:
+                raise _TooLargeError
             text = path.read_bytes().decode("utf-8", errors="replace")
             found[path.relative_to(work).as_posix()] = text
     return found

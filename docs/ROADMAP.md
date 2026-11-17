@@ -310,6 +310,11 @@ Still to decide before a milestone opens. They are written down here and not dec
   `untrusted`, a change of `Finding` in `core` and one for each of `contract`, `packs`, `oracle`,
   `sandbox`, `platform`, `verify` and `interfaces`. It is made in A4, when the evidence is shown in
   pull requests, or in each module when it is touched for another reason.
+  And the image of the change: `visible-examples` observes in an image built with the tree of the
+  change, whose digest A3 keeps in the ledger, in the `gate.finished` of that gate, and the
+  evidence binds it through the head of the ledger. The next version of the predicate adds a field
+  for it, together with what the two notes above bring to the predicate, the `repeated` of
+  `repeatability` and the `message` of the fine separation, so that its version changes once.
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
   recipients; and the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the

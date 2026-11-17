@@ -15,6 +15,7 @@ marker.
 - **CORPUS-004** The Dockerfile of each project shall name its base image by its digest.
 - **CORPUS-005** The Dockerfile of each project shall install every package with an exact version and without resolving dependencies of its own.
 - **CORPUS-006** The pack of each project shall name as the configuration of its tests `pytest.ini`, `.pytest.ini` and every `conftest.py`, and as its sections those of pytest in `pyproject.toml`, `tox.ini` and `setup.cfg`, whether they exist or not.
+- **CORPUS-007** The Dockerfile of each project shall put `/dokime/project/src` on `PYTHONPATH`, since the image does not install the project and the program that observes the examples imports it on its own, without the `pythonpath` of the configuration of pytest.
 
 ## The self-check of a project
 
@@ -23,6 +24,7 @@ marker.
 - **CORPUS-012** When the self-check of a project ends, the test shall demand that no container and no temporary directory of the run is left.
 - **CORPUS-013** If cloning the repository of a project fails, then the test shall fail with a message that starts with `network:` and names the address.
 - **CORPUS-014** If the self-checks of the corpus are not asked for, then the test of each project shall skip.
+- **CORPUS-015** Where `DOKIME_CORPUS_CLONES` names a directory, the test of each project shall clone its repository from the clone of that directory named after the project, instead of from its address.
 
 ## The cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md), [ADR-0057](../adr/0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md))
 
@@ -65,3 +67,19 @@ in `tests/corpus/withdrawn.toml` without touching its files.
 - **CORPUS-031** If a file of a case was deleted or renamed in the history, then the test of the cases shall fail naming it.
 - **CORPUS-032** If the history of the repository is shallow, then the test of the cases shall fail instead of passing.
 - **CORPUS-033** The file `tests/corpus/review.toml` shall name every case as confirmed by the maintainer, with the date and the minutes of the review.
+
+### The patches apply
+
+- **CORPUS-040** When the tests of the corpus are asked for, the test of each case shall check with `git apply --check` that its patch applies on its base, in a clone of its project.
+- **CORPUS-041** If the patch of a case does not apply on its base, then the test shall fail naming the case and quoting what git said.
+
+### The witnesses of the good cases ([ADR-0057](../adr/0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md))
+
+The good patch of each case comes from a witness of the history of its project. The search past the
+second witness is `tests/corpus/witnesses.py`, run by hand; its measurement of ADR-0057 and the
+witnesses of the good cases are the fixture `tests/corpus/witnesses.toml`.
+
+- **CORPUS-045** When the tests of the corpus are asked for, the test of each witness of the fixture shall look at its commit with the candidates of the self-check on the git and the podman adapters, and demand that it is a witness that turns green the tests the fixture names.
+- **CORPUS-046** The fixture shall name, for each good case, the witness it comes from, whose parent is the base of the case.
+- **CORPUS-047** The table of the measurement in the fixture shall be the table of the basis of ADR-0057, row by row.
+- **CORPUS-048** The witnesses of each project in the table of the measurement shall be no more than its candidates looked at.

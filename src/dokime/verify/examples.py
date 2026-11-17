@@ -3,9 +3,10 @@
 Both extract a tree into a directory of their own, ask the port that observes for every example of
 the contract with the inputs of its steps, and compare each observation with its example through
 the oracle. `baseline` observes the base: an example of a `preserve` requirement has to hold there,
-and one of a `new` or `change` requirement should not yet. `visible-examples` observes the base
-with the patch: an example that does not hold fails the change, unless its origin is `model`, whose
-expected result no person stands behind, so it asks (ADR-0013).
+and one of a `new` or `change` requirement should not yet. `visible-examples` observes the tree of
+the change of ADR-0058, the code of the patch with the tests of the base: an example that does not
+hold fails the change, unless its origin is `model`, whose expected result no person stands behind,
+so it asks (ADR-0013).
 """
 
 import tempfile
@@ -24,8 +25,9 @@ from dokime.core.repository import AuditedRepository, CommitName, RefusalError, 
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.oracle.compare import Comparison, compare
+from dokime.packs.model import Pack
 from dokime.verify.result import GateResult
-from dokime.verify.trees import base_tree
+from dokime.verify.trees import base_tree, change_tree
 
 BASELINE = "baseline"
 VISIBLE = "visible-examples"
@@ -67,6 +69,7 @@ def baseline(
 
 
 def visible_examples(
+    pack: Pack,
     contract: Contract,
     base: CommitName,
     patch: bytes,
@@ -87,7 +90,7 @@ def visible_examples(
     return _gate(
         VISIBLE,
         contract,
-        lambda: repository.compose_with_patch(base, patch),
+        lambda: change_tree(pack, contract, base, patch, repository),
         image,
         repository,
         observer,

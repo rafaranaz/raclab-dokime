@@ -14,8 +14,9 @@ The gates of a change that arrives already made, and their aggregation. The requ
   `ERROR` of the repository.
 
 - `baseline(contract, base, image, repository, observer, limits)` and
-  `visible_examples(contract, base, patch, image, repository, observer, limits)`: they extract the
-  base, or the base with the patch, ask the port that observes for every example of the contract
+  `visible_examples(pack, contract, base, patch, image, repository, observer, limits)`: they extract the
+  base, or the tree of the change (the code of the patch with the tests and their configuration of
+  the base, except what the contract authorises, ADR-0058), ask the port that observes for every example of the contract
   with its inputs alone, and compare each one through `oracle`. On the base, an example of a
   `preserve` requirement that does not hold is a `FAIL`, and one of a `new` or `change` requirement
   that already holds asks. With the patch, an example that does not hold is a `FAIL`, or an `ASK`

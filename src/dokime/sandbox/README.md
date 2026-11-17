@@ -62,3 +62,25 @@ Each test is named by its class name, `::` and its name, as pytest writes it.
 The tests of the four guarantees load the container, and run over the list of engines in
 `tests/sandbox/engines.py`. A test of an engine that is not installed skips, except in CI, where
 it fails.
+
+## The program that observes the examples
+
+`observe_program.py` runs inside the container, from a directory mounted read-only (ADR-0063). It
+needs only the standard library, and the main program refuses to read a request unless it runs with
+`python -I -S`, since `site` would process `.pth` files that the build of a project can leave. It
+reads `requests.json`, runs each example in a child `python -I` with an empty working directory and
+the time of one example, and writes `observations.json` in the output directory. The child imports
+its own modules before it appends `PYTHONPATH` to `sys.path`, so that a module of the project
+cannot replace one of them, and writes each step as soon as it observed it, so that an example that
+reaches its limit keeps the steps before. An example that hangs is ended with every process it
+started; one that dies is `crashed`, with its signal or its exit code, and a target that cannot be
+imported exits with 3.
+
+At `function` a step is `returned` (a tuple as the list that JSON holds), `not_json` with the name
+of the type (a set, `NaN`, an infinity), or `raised` with the name, the full name from `__module__`
+and `__qualname__`, the classes of its MRO and its message. At `cli` the target is split as the
+words of a shell, the files of the step are written first, and the exit code, the output, the error
+and the regular files of the working directory are observed, decoded as UTF-8 with the character of
+replacement; no file reached through a link is observed. The code under test runs in the process
+that observes it, so it can rewrite its observation: the expected value never enters the zone,
+which is the limit of T1 and part of T2 of ADR-0010.

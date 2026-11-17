@@ -74,3 +74,7 @@ paths = ["src/dokime/oracle/**", "tests/oracle/**", "docs/requirements/oracle.md
 [scopes.verify]
 description = "The gates of a change and their aggregation: baseline, protected paths, existing tests, visible examples."
 paths = ["src/dokime/verify/**", "tests/verify/**", "docs/requirements/verify.md"]
+
+[scopes.evidence]
+description = "Build the evidence of a run: the statement of in-toto, its predicate and its canonical bytes; later, sign and verify it."
+paths = ["src/dokime/evidence/**", "tests/evidence/**", "docs/requirements/evidence.md"]

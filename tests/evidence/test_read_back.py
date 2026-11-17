@@ -5,10 +5,12 @@ import pytest
 
 from dokime.core.ledger import Head
 from dokime.core.verdicts import Verdict
-from dokime.evidence.run import GateNotApplicable
+from dokime.evidence.run import GateNotApplicable, GateRan
 from dokime.evidence.schema import read_back
 from dokime.evidence.statement import build
 from tests.evidence.runs import inputs, run, statement
+
+PASSED = GateRan("contract", Verdict.PASS)
 
 
 @pytest.mark.parametrize(
@@ -17,8 +19,8 @@ from tests.evidence.runs import inputs, run, statement
         run(),
         run(contract=None),
         run(inputs=inputs(image=None, pack=None, probe=None)),
-        run(ledger=Head(hash=None, events=0), gates=()),
-        run(verdict=Verdict.PASS, harness="0.0.0-ñ"),
+        run(ledger=Head(hash=None, events=0)),
+        run(verdict=Verdict.PASS, harness="0.0.0-ñ", gates=(PASSED,)),
     ],
 )
 def test_the_bytes_of_a_run_read_back_without_a_finding(given: object) -> None:
@@ -59,7 +61,10 @@ def test_bytes_that_are_not_the_canonical_form_are_refused(data: bytes) -> None:
     ("given", "named"),
     [
         (run(harness=""), "harness"),
-        (run(gates=(GateNotApplicable("sealed-examples", ""),)), "reason"),
+        (
+            run(gates=(PASSED, GateNotApplicable("sealed-examples", "")), verdict=Verdict.PASS),
+            "reason",
+        ),
     ],
 )
 def test_a_run_whose_bytes_do_not_read_back_is_refused(given: object, named: str) -> None:

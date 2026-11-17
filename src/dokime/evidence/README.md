@@ -30,7 +30,9 @@ fixes it for A3. The requirements are in
   are not JSON of whole numbers give `evidence-not-json`; JSON that is not in the canonical form
   gives `evidence-not-canonical`; and each place that breaks the closed schema of the predicate (an
   unknown field, a missing one, a `null`, a value of another type, list or pattern, a gate listed
-  twice) gives an `evidence-schema` that names it, in the order of the statement. `build` reads its
+  twice) gives an `evidence-schema` that names it, in the order of the statement. So does a
+  `predicate/verdict` that is not the precedence of ADR-0015 over the verdicts of the gates that
+  ran, or a predicate where no gate ran: the reader checks the verdict written, it decides none. `build` reads its
   own bytes back and refuses a run whose bytes do not meet the schema, such as an empty version of
   the harness or an empty reason. The patterns of digests, commits, trees, verdicts and codes are
   those of the types of `core`.

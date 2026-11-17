@@ -24,7 +24,7 @@ def test_the_gates_that_run_the_code_under_test_in_process_are_outside_the_threa
         GateNotApplicable("existing-tests", "not here"),
         GateRan("baseline", Verdict.PASS),
     )
-    given = predicate(run(gates=gates, contract=None))["not_checked"]
+    given = predicate(run(gates=gates, contract=None, verdict=Verdict.PASS))["not_checked"]
     assert [(e["code"], e["what"]) for e in given] == [
         ("outside-threat-model", "visible-examples"),
         ("outside-threat-model", "baseline"),

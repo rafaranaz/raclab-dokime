@@ -5,7 +5,7 @@ import json
 from dokime.core.ledger import Head
 from dokime.core.policy import Policy
 from dokime.core.verdicts import Verdict
-from dokime.evidence.run import Image
+from dokime.evidence.run import GateRan, Image
 from dokime.evidence.statement import build
 from tests.evidence.runs import IMAGE, PLATFORM, inputs, predicate, run
 
@@ -15,7 +15,8 @@ def sha256(data: bytes) -> str:
 
 
 def test_the_predicate_records_the_verdict_given_and_who_verified() -> None:
-    given = predicate(run(verdict=Verdict.ASK, harness="1.2.3"))
+    asks = (GateRan("baseline", Verdict.ASK),)
+    given = predicate(run(verdict=Verdict.ASK, harness="1.2.3", gates=asks))
     assert given["verdict"] == "ASK"
     assert given["delivered"] is False
     assert given["independence"] == "self-attested"

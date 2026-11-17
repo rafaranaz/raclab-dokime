@@ -300,6 +300,14 @@ Still to decide before a milestone opens. They are written down here and not dec
   policy says, but no milestone of A3 builds it, so A3 runs the verification once and its evidence
   shows the gate as not applicable. The candidate: an increment of `verify` in A4, before version
   0.1, since block A closes with A4.
+  And the fine separation of the messages of the findings
+  ([ADR-0064](adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)):
+  in A3 the whole message of a finding goes to `untrusted`, since the modules mix the words of
+  dokime with text quoted from the contract, the tree, the patch or the zone. The step: a
+  `message` with only the words of dokime, and each module that quotes passing that text to
+  `untrusted`, a change of `Finding` in `core` and one for each of `contract`, `packs`, `oracle`,
+  `sandbox`, `platform`, `verify` and `interfaces`. It is made in A4, when the evidence is shown in
+  pull requests, or in each module when it is touched for another reason.
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
   recipients; and the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the

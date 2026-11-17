@@ -91,3 +91,36 @@ the report does ([ADR-0045](../adr/0045-a-test-report-is-read-by-a-bounded-reade
 - **INTERFACES-087** If a file of the tree that the command reads is missing, then the command shall report a finding with the code `file-missing` and the verdict `ERROR` that names the path.
 - **INTERFACES-088** If a file of the tree that the command reads has more than 1 MiB, then the command shall report a finding with the code `file-too-large` and the verdict `ERROR` that names the path.
 - **INTERFACES-089** If the contract, the pack or the policy cannot be read as UTF-8 text, then the command shall report a finding with the code `unreadable-file` and the verdict `ERROR`.
+
+## `audit`: the run
+
+`audit` goes through the states of the audit flow of A3
+([`04-states-and-flows.md`](../architecture/04-states-and-flows.md#the-audit-flow)) over the ports
+it is given, runs the gates of `verify` and builds the evidence with `evidence`
+([ADR-0065](../adr/0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md)).
+
+- **INTERFACES-090** When `audit` runs, the command shall go through the states of the audit flow in their order: `checking-contract` with `contract`, `preparing` with `environment`, `baselining` with `baseline`, `verifying` with `protected-paths`, `existing-tests`, `visible-examples`, `relations`, `changed-line-coverage`, `behaviour-differences` and `repeatability`, and `sealed` with `sealed-examples`.
+- **INTERFACES-091** The command shall give its states the gates that, joined in the order of the states, are the gates of the audit flow that `evidence` requires.
+- **INTERFACES-092** When a state ends with a verdict other than `PASS`, the command shall stop the run and list each gate of the later states as not reached, with the state and the verdict that stopped it, or as not applicable when this version does not build it.
+- **INTERFACES-093** When `audit` runs, the command shall take the contract and the pack from the tree of the base commit or from the files given, never from the tree with the patch, so that a patch can neither change its own judge nor unprotect its own tests.
+- **INTERFACES-094** When the state `checking-contract` runs, the command shall give the gate `contract` the findings of the contract read.
+- **INTERFACES-095** When the state `preparing` runs, the command shall give the gate `environment` the findings of the pack read and, when a pack was read, build its image with the Dockerfile read, copied outside the tree, and the tree of the base as the context of the build.
+- **INTERFACES-096** If the build of the image is refused, then the command shall give the gate `environment` the finding of the refusal.
+- **INTERFACES-097** When the states `baselining` and `verifying` run, the command shall run the gates of `verify` with the contract, the pack, the policy and the image of the earlier states.
+- **INTERFACES-098** When `audit` runs, the command shall record in the ledger `run.started`, `state.entered` for each state, `gate.started` and `gate.finished` for each gate that ran, `baseline.unstable` for each gate that left something out as unstable, `evidence.built` with the digest of the evidence, and `run.finished` with the verdict.
+- **INTERFACES-099** When the run has gone through its states, the command shall build its evidence with the head of the ledger before `evidence.built`, the gates of every state, and the inputs the run reached.
+- **INTERFACES-100** If the aggregation of a state gives findings of its own, then the command shall stop with the verdict `ERROR` and those findings, record `run.finished` with them, and write no evidence, since they are a fault of the harness and not a result of the run.
+
+## `audit`: from `verify` to `evidence`
+
+`evidence` imports nothing but `core`, so `audit` converts the results of `verify` into the types of
+`evidence`.
+
+- **INTERFACES-105** When a result of a gate of `verify` is converted, the command shall carry each of its fields: the gate, its verdict, its findings, its checks, and what it left out as unstable, as tests for `existing-tests` and as examples for `baseline`.
+- **INTERFACES-106** If a result of a gate other than `existing-tests` and `baseline` lists something as unstable, then the command shall refuse to convert it with an error that names the gate.
+
+## `audit`: before the run
+
+- **INTERFACES-110** If the patch does not apply on the base, or the tree of the base cannot be extracted, then the command shall end with the verdict `ERROR` and the finding of the refusal before the run starts, recording nothing and writing no evidence, since there is no tree to attest.
+- **INTERFACES-111** If the policy of the base has a finding, then the command shall end with the verdict `ERROR` and the findings of the policy before the run starts.
+- **INTERFACES-112** If the story of the run, the one given or the name of the directory of the contract given, is not a name, then the command shall end with the verdict `ERROR` and a finding with the code `not-a-story` before the run starts, since the file of the evidence is named after it.

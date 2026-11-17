@@ -1,4 +1,4 @@
-<!-- translation-of: 0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md sha256:0cd4c504e51744e3 -->
+<!-- translation-of: 0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md sha256:28438d3845747bd3 -->
 # ADR-0063 · Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON
 
 **Estado:** propuesta
@@ -65,16 +65,23 @@ Leído en el código de los runners de otros:
   los tests, por lo que un `conftest.py` del agente puede reescribirlo
   ([BenchJack, sección 3](https://arxiv.org/abs/2605.12673)).
 
-Así que los tres deciden si una solución pasó dentro del proceso del código bajo prueba, o se fían
-de lo que ese código escribe en su salida; ninguno mantiene el valor esperado fuera del proceso del
-código bajo prueba y compara fuera de él, que es lo que hace esta decisión.
+Leído en su código por la sesión que revisa el trabajo, en copias del mismo código en Hugging Face:
+HumanEval y EvalPlus como arriba, y el runner oficial de LiveCodeBench
+(`lcb_runner/evaluation/testing_util.py`, `run_test`), que ejecuta los casos de un problema en un
+proceso con `signal.alarm` por cada caso, dentro de un `multiprocessing.Process` con un límite de
+tiempo para el conjunto, y compara en ese proceso. El scorer de LiveCodeBench de
+[OpenJarvis](https://open-jarvis.github.io/OpenJarvis/api-reference/openjarvis/evals/scorers/livecodebench)
+ejecuta en cambio cada caso en un subproceso propio.
 
-Leído en resúmenes, no en su código: LiveCodeBench ejecuta cada caso de entrada y salida estándar
-en un subproceso propio con un límite de tiempo
-([OpenJarvis](https://open-jarvis.github.io/OpenJarvis/api-reference/openjarvis/evals/scorers/livecodebench),
-[Skywork](https://arxiv.org/pdf/2505.22312)); BigCodeBench ejecuta `unittest` en un contenedor con
-sus dependencias instaladas
-([evalscope](https://evalscope.readthedocs.io/en/latest/benchmarks/bigcodebench.html)).
+Así que HumanEval, EvalPlus y LiveCodeBench deciden si una solución pasó dentro del proceso del
+código bajo prueba, y SWE-bench se fía de lo que ese código escribe en su salida; ninguno mantiene
+el valor esperado fuera del proceso del código bajo prueba y compara fuera de él, que es lo que hace
+esta decisión.
+
+Leído en resúmenes, no en su código:
+[evalscope](https://evalscope.readthedocs.io/en/latest/benchmarks/bigcodebench.html) ejecuta
+BigCodeBench en un sandbox de Docker con más de 70 bibliotecas instaladas, y el paquete oficial de
+BigCodeBench recomienda un sandbox como Docker sin imponerlo; ejecuta `unittest`.
 
 Buscado y no encontrado: un runner de ejemplos que serialice la observación y la compare fuera de
 la zona.

@@ -18,11 +18,12 @@ from pathlib import Path, PurePosixPath
 
 from dokime.contract.model import Contract
 from dokime.core.findings import Finding
-from dokime.core.repository import AuditedRepository, CommitName, RefusalError, RepoPath
+from dokime.core.repository import AuditedRepository, CommitName, RefusalError
 from dokime.core.verdicts import Verdict
 from dokime.packs.model import Pack, Section
 from dokime.packs.sections import section_changed
 from dokime.verify.result import GateResult
+from dokime.verify.trees import base_tree
 
 GATE = "protected-paths"
 HARNESS = ".dokime"
@@ -43,7 +44,7 @@ def protected_paths(
 ) -> GateResult:
     """Check that the patch touches no protected path that the contract does not authorise."""
     try:
-        before_tree = repository.compose_with_paths(base, base, _nothing)
+        before_tree = base_tree(repository, base)
         after_tree = repository.compose_with_patch(base, patch)
     except RefusalError as refusal:
         return GateResult(gate=GATE, findings=(refusal.finding,))
@@ -64,10 +65,6 @@ def protected_paths(
                     Finding(code="protected-path", message=f"{path} {why}", verdict=Verdict.FAIL)
                 )
     return GateResult(gate=GATE, findings=tuple(findings))
-
-
-def _nothing(path: RepoPath) -> bool:
-    return False
 
 
 def _why(

@@ -25,6 +25,13 @@ def test_an_example_that_fails_with_the_patch_fails_unless_its_origin_is_model(o
     assert all(part in found.message for part in ("E-1", "R-new", "returns", "2", "5"))
 
 
+def test_a_finding_quotes_each_value_within_200_characters() -> None:
+    long = example("E-1", "R-new")
+    (found,) = on_change(contract(long), {"E-1": 10**1000})[0]
+    assert len(found.message) < 600
+    assert "E-1" in found.message
+
+
 def test_an_example_of_origin_model_that_fails_with_the_patch_asks() -> None:
     (found,) = on_change(contract(example("E-1", "R-new", "model")), {"E-1": 5})[0]
     assert codes([found]) == [("model-example-fails", Verdict.ASK)]

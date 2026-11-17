@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:46653c97050ea8f3 -->
+<!-- translation-of: ROADMAP.md sha256:25a1ece9be2d4b32 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -320,6 +320,11 @@ Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
   `untrusted`, un cambio de `Finding` en `core` y uno por cada uno de `contract`, `packs`,
   `oracle`, `sandbox`, `platform`, `verify` e `interfaces`. Se hace en A4, cuando la evidencia se
   muestre en las pull requests, o en cada módulo cuando se toque por otro motivo.
+  Y la imagen del cambio: `visible-examples` observa en una imagen construida con el árbol del
+  cambio, cuya huella A3 guarda en el registro, en el `gate.finished` de esa puerta, y la
+  evidencia la liga a través de la cabeza del registro. La próxima versión del predicado añade un
+  campo para ella, junto con lo que las dos notas anteriores llevan al predicado, el `repeated` de
+  `repeatability` y el `message` de la separación fina, para que su versión cambie una sola vez.
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
   lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in

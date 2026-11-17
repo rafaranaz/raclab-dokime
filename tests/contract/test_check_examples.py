@@ -1,4 +1,6 @@
-# SDD-EARS: CONTRACT-030 CONTRACT-031 CONTRACT-032 CONTRACT-033
+# SDD-EARS: CONTRACT-030 CONTRACT-031 CONTRACT-032 CONTRACT-033 CONTRACT-034
+import pytest
+
 from dokime.core.verdicts import Verdict
 from tests.contract.contracts import line_of, only, seeded
 
@@ -47,3 +49,17 @@ def test_a_cli_step_that_expects_nothing_is_a_finding() -> None:
         "              total: 10.03\n            final_newline: true\n"
     )
     assert only(seeded(old, "        expect: {}\n"), "no-expectation").lines == (line_of(old),)
+
+
+@pytest.mark.parametrize(
+    "name", ["ValueError", "mymodule.MyError", "semver._errors.My_Error", "_Private"]
+)
+def test_an_exception_named_by_its_module_and_its_class_is_accepted(name: str) -> None:
+    new = f"        expect: {{raises: {{type: {name}}}}}"
+    assert seeded(E3_EXPECT, new).findings == ()
+
+
+@pytest.mark.parametrize("name", ["a..b", "a.", ".a", "1Error", "a-b", "a b"])
+def test_an_exception_whose_type_is_not_a_dotted_name_is_a_finding(name: str) -> None:
+    new = f'        expect: {{raises: {{type: "{name}"}}}}'
+    assert only(seeded(E3_EXPECT, new), "wrong-type").lines == (line_of(E3_EXPECT),)

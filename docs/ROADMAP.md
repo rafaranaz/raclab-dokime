@@ -289,7 +289,12 @@ Still to decide before a milestone opens. They are written down here and not dec
   doctest to make it fit would not be seen as one that edits tests.
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
-  `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history.
+  `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history. And how an
+  audit of a pull request that brings its own contract fits the rule of A3, where the contract is
+  taken from the base, or given to `audit` from outside the patch, and never from the patch, with
+  `.dokime/` protected without exception: a contract that the patch brings cannot be told from one
+  that its agent wrote until approvals are signed (block E). The candidate: the patch may bring only
+  the contract whose digest matches an approval, once approvals exist.
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
   recipients; and the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the

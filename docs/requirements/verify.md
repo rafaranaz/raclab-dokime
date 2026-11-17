@@ -7,8 +7,8 @@ that observes. It imports `core`, `contract`, `oracle` and `packs`, and talks to
 agent. Each requirement follows an EARS template and has at least one test that declares it in its
 `SDD-EARS:` marker.
 
-The result of a gate, and the gates `protected-paths`, `baseline`, `visible-examples` and
-`existing-tests`, are built; the aggregation comes in the next increment.
+The result of a gate, the gates `protected-paths`, `baseline`, `visible-examples` and
+`existing-tests`, and the aggregation of the gates of a state are built.
 
 ## The result of a gate
 
@@ -45,9 +45,11 @@ the port that observes, in the image that the pack built, and compare each one w
 
 ## The gate `baseline` ([ADR-0016](../adr/0016-verification-in-a-container-on-base-plus-patch.md))
 
-- **VERIFY-060** When a change is checked, the gate `baseline` shall observe the examples of the contract on the tree of the base commit.
+- **VERIFY-060** When a change is checked, the gate `baseline` shall observe the examples of the contract on the tree of the base commit as many times as `baseline.runs` of the policy says ([ADR-0017](../adr/0017-damage-outside-the-change-against-a-baseline.md)).
 - **VERIFY-061** If an example of a requirement of kind `preserve` does not hold on the base, then the gate `baseline` shall report a finding with the code `preserved-example-fails-on-base` and the verdict `FAIL`.
 - **VERIFY-062** If an example of a requirement of kind `new` or `change` holds on the base, then the gate `baseline` shall report a finding with the code `example-holds-on-base` and the verdict `ASK`.
+- **VERIFY-063** If an example holds in some runs of the base and not in others, then the gate `baseline` shall report a finding with the code `example-varies-on-base` and the verdict `ASK`, instead of the findings of VERIFY-061 and VERIFY-062.
+- **VERIFY-064** If an example holds in some runs of the base and not in others, then the gate `baseline` shall list it as unstable in its result.
 
 ## The gate `visible-examples` ([ADR-0013](../adr/0013-provenance-decides-what-a-check-can-do.md))
 
@@ -57,7 +59,10 @@ the port that observes, in the image that the pack built, and compare each one w
 
 ## The gate `existing-tests` ([ADR-0017](../adr/0017-damage-outside-the-change-against-a-baseline.md), [ADR-0058](../adr/0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.md))
 
-A test is named as the report of the pack names it, `<class name>::<name>`.
+A test is named as the report of the pack names it, `<class name>::<name>`. Known limit of
+VERIFY-107: if a module `tests/test_a.py` and a package `tests/test_a/` live side by side, a test of
+the package counts as of the module, since its class name starts with `tests.test_a.`; Python does
+not import both well at once, so it is unlikely.
 
 - **VERIFY-100** When a change is checked, the gate `existing-tests` shall run the tests of the pack on the tree of the base as many times as `baseline.runs` of the policy says.
 - **VERIFY-101** When the base has run, the gate `existing-tests` shall count as passing in the baseline only a test that passed in every run of the base.
@@ -68,3 +73,18 @@ A test is named as the report of the pack names it, `<class name>::<name>`.
 - **VERIFY-106** If a test that passed in the baseline is not in the run of the change and is of a file that the contract authorises, then the gate `existing-tests` shall report a finding with the code `authorised-test-disappears` and the verdict `ASK`.
 - **VERIFY-107** The gate `existing-tests` shall count a test as of a file when its class name is the path of the file with each `/` as a `.`, without the suffix `.py`, or starts with that and a `.`.
 - **VERIFY-108** If a run of the tests ends with a finding, then the gate `existing-tests` shall report that finding, with the verdict `ERROR`.
+
+## The aggregation of a state ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md), [ADR-0034](../adr/0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md))
+
+A work state of the flow lists its gates, and closes with the aggregation of their verdicts. In this
+version `verify` builds `baseline`, `protected-paths`, `existing-tests` and `visible-examples`; the
+other gates of the table of [`04-states-and-flows.md`](../architecture/04-states-and-flows.md) are
+not applicable, each with the block that builds it.
+
+- **VERIFY-120** When the gates of a state have run, the aggregation shall give the verdict of the state by the precedence of ADR-0015 over the verdicts of the gates that ran.
+- **VERIFY-121** When the gates of a state have run, the aggregation shall list every gate of the state in its order, as run with its result, or as not applicable with its reason.
+- **VERIFY-122** When a gate of the state is one that this version does not build, the aggregation shall list it as not applicable, with the block or milestone that builds it as its reason.
+- **VERIFY-123** If a gate of the state that this version builds has no result, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-missing`, naming the gate.
+- **VERIFY-125** If a result is of a gate that is not of the state, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-not-of-the-state`, naming the gate.
+- **VERIFY-124** If a gate of the state is not in the table of the gates, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-unknown`, naming the gate.
+- **VERIFY-126** If two results are of the same gate, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-repeated`, naming the gate.

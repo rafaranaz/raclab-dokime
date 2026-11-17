@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-001 CORPUS-002 CORPUS-003 CORPUS-004 CORPUS-005 CORPUS-006
+# SDD-EARS: CORPUS-001 CORPUS-002 CORPUS-003 CORPUS-004 CORPUS-005 CORPUS-006 CORPUS-007
 import re
 import shlex
 
@@ -87,3 +87,16 @@ def test_the_pack_names_the_configuration_of_its_tests_and_its_sections(project:
     assert pack is not None
     assert pack.config_paths == CONFIG
     assert tuple((s.file, s.format, s.name) for s in pack.sections) == SECTIONS
+
+
+@pytest.mark.parametrize("project", PROJECTS, ids=lambda p: p.name)
+def test_the_image_of_a_project_finds_its_source_without_pytest(project: Project) -> None:
+    lines = (project.directory / "Dockerfile").read_text().splitlines()
+    paths = [
+        value.split(":")
+        for line in lines
+        if line.startswith("ENV ")
+        for name, _, value in (part.partition("=") for part in shlex.split(line[4:]))
+        if name == "PYTHONPATH"
+    ]
+    assert ["/dokime/project/src"] in [path[:1] for path in paths]

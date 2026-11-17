@@ -13,28 +13,9 @@ from pathlib import Path
 
 import pytest
 
+from tests.corpus.clones import ASKED, asked_for, clone
 from tests.corpus.projects import PROJECTS, Project
 from tests.sandbox.engines import ENGINES, require
-
-ASKED = "DOKIME_CORPUS"
-
-
-def asked_for() -> bool:
-    return os.environ.get(ASKED) == "1"
-
-
-def clone(project: Project, into: Path) -> Path:
-    address = project.source["repository"]
-    done = subprocess.run(
-        ["git", "clone", "--quiet", address, str(into)],
-        capture_output=True,
-        text=True,
-        check=False,
-        timeout=600,
-    )
-    if done.returncode != 0:
-        pytest.fail(f"network: cloning {address} failed: {done.stderr.strip()}")
-    return into
 
 
 @pytest.mark.parametrize("project", PROJECTS, ids=lambda p: p.name)

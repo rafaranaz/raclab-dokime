@@ -1,0 +1,55 @@
+# The measurement of ADR-0057 and the witnesses of the good cases (CORPUS-045 to CORPUS-048).
+# The witnesses were looked at on 2026-11-18 with the candidates of the self-check on podman.
+
+[measurement]
+date = "2026-11-15"
+how = "the order, the candidates and the rule of a witness of the harness over the first 25 candidates of each project, with pytest 8.3.4 in a local environment instead of a container"
+
+[[measurement.project]]
+name = "cachetools"
+looked_at = 25
+witnesses = 14
+
+[[measurement.project]]
+name = "python-semver"
+looked_at = 25
+witnesses = 18
+
+[[measurement.project]]
+name = "mdformat"
+looked_at = 16
+witnesses = 7
+
+[[witness]]
+project = "python-semver"
+commit = "0bd62d4547c808233f6e033059a98218c9b637c1"
+case = "replace-keeps-the-constructor-error"
+turned_green = [
+    'tests.test_replace::test_replace_preserves_constructor_type_error[None-major]',
+    'tests.test_replace::test_replace_preserves_constructor_type_error[None-minor]',
+    'tests.test_replace::test_replace_preserves_constructor_type_error[None-patch]',
+    'tests.test_replace::test_replace_preserves_constructor_type_error[value1-major]',
+    'tests.test_replace::test_replace_preserves_constructor_type_error[value1-minor]',
+    'tests.test_replace::test_replace_preserves_constructor_type_error[value1-patch]',
+]
+
+[[witness]]
+project = "python-semver"
+commit = "4e09ef0e4c94314731f960d4ce763a2da2e096f1"
+case = "nextver-bumps-build-only-versions"
+turned_green = [
+    'tests.test_parsing::test_next_version_with_versioninfo[1.2.3+build.5-patch-1.2.4]',
+    'tests.test_parsing::test_next_version_with_versioninfo[1.0.0+build.5-patch-1.0.1]',
+    'tests.test_parsing::test_next_version_with_versioninfo[0.1.4+build.5-patch-0.1.5]',
+    'tests.test_parsing::test_next_version_with_versioninfo[1.2.0+build.5-minor-1.3.0]',
+    'tests.test_parsing::test_next_version_with_versioninfo[1.0.0+build.5-major-2.0.0]',
+    'docs.usage.increase-parts-of-a-version_prereleases.rst::increase-parts-of-a-version_prereleases.rst',
+]
+
+[[witness]]
+project = "mdformat"
+commit = "27e2ba3e10dad83625662186f2dd3b295fd82079"
+case = "format-a-blank-paragraph-between-blocks"
+turned_green = [
+    'tests.test_api::test_output_is_equal[```\na\n```\n\u2003\n# A\n]',
+]

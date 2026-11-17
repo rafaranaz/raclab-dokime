@@ -35,3 +35,22 @@ renamed. The tests read that from the history, so they fail on a shallow clone.
 of its own; the old one stays as it is, and is listed in `withdrawn.toml` with the reason and the
 case that replaces it. A withdrawn case is left out of the counts. This keeps a label or an expected
 verdict from changing out of sight after the case has run.
+
+## The tests that need the network
+
+The self-checks, the check that each patch applies on its base, and the check of the witnesses of
+the good cases run only when `DOKIME_CORPUS=1` asks for them, which the job `corpus` of CI does. They
+clone each project from the directory that `DOKIME_CORPUS_CLONES` names, where the job has cloned
+it once, or from its address when there is none.
+
+## The witnesses
+
+The good patch of each case comes from a witness of the history of its project (ADR-0057).
+`witnesses.toml` names, for each good case, the commit it comes from and the tests it turned green;
+a test looks at each of those commits with the candidates of the self-check on podman and demands
+the same. The same file keeps the measurement of ADR-0057, which a test compares with the table of
+its basis. The search past the second witness is `witnesses.py`, run by hand:
+
+```console
+$ python -m tests.corpus.witnesses python-semver ../python-semver 25
+```

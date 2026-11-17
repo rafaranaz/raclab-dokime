@@ -1,0 +1,33 @@
+# Requirements of the `verify` scope
+
+The gates of a change that arrives already made, and their aggregation
+([`04-states-and-flows.md`](../architecture/04-states-and-flows.md)). `verify` runs the gates over
+the ports that `interfaces` gives it: the audited repository, the verification runtime and the port
+that observes. It imports `core`, `contract`, `oracle` and `packs`, and talks to no person and no
+agent. Each requirement follows an EARS template and has at least one test that declares it in its
+`SDD-EARS:` marker.
+
+This increment has the result of a gate and the gate `protected-paths`; `baseline`,
+`existing-tests`, `visible-examples` and the aggregation come in the next ones.
+
+## The result of a gate
+
+- **VERIFY-001** The result of a gate shall carry the name of the gate, its verdict and its findings.
+- **VERIFY-002** The verdict of the result of a gate shall be the summary of its findings, `PASS` when it has none.
+
+## The gate `protected-paths` ([ADR-0016](../adr/0016-verification-in-a-container-on-base-plus-patch.md), [ADR-0056](../adr/0056-the-pack-names-the-configuration-of-its-tests.md), [ADR-0059](../adr/0059-a-mixed-file-protects-the-section-that-configures-the-tests.md))
+
+A change that arrives already made is a patch on a base commit. The protected paths are the tests
+of the pack (`tests.paths`), the configuration of its tests (`tests.config`), the sections of its
+mixed files (`tests.sections`) and the directory of the harness, `.dokime/`, which holds the
+policy, the pack, the contract and the flow. The contract authorises some of them in
+`may_modify_tests`.
+
+- **VERIFY-020** When a change is checked, the gate `protected-paths` shall compare the tree of the base with the tree of the base with the patch applied, file by file.
+- **VERIFY-021** When the gate compares the two trees, the gate shall read their files without following links, comparing a file by its bytes and whether it is executable, and a link by its target.
+- **VERIFY-022** If the patch adds, changes or removes a path of the tests or of the configuration of the tests that the contract does not authorise, then the gate shall report a finding with the code `protected-path` that names the path and why it is protected.
+- **VERIFY-023** If the patch changes a mixed file of a section of the pack, then the gate shall report the finding of VERIFY-022 only when the section changed, by the rules of `packs`.
+- **VERIFY-024** If the patch adds, changes or removes a path under `.dokime/`, then the gate shall report the finding of VERIFY-022 whatever the contract authorises.
+- **VERIFY-025** When an entry of `may_modify_tests` names a path, the gate shall count as authorised only that path; for a mixed file, only its section.
+- **VERIFY-026** The gate shall give the verdict `FAIL` to each finding it reports.
+- **VERIFY-027** If the patch does not apply on the base, then the gate shall report a finding with the verdict `ERROR` and the code of the refusal of the repository.

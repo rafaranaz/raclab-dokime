@@ -1,7 +1,9 @@
 """The loop of the self-check of a pack, over the ports that the caller gives.
 
 The history is ordered by the rule of ADR-0044 and each candidate is run on two sides: the tree of
-its parent with the test paths taken from the commit, and the tree of the commit. The second
+its parent with the test paths and the configuration of the tests taken from the commit, and the
+tree of the commit. A commit that changed a section of a mixed file that the pack names is not a
+candidate (ADR-0060). The second
 witness ends the loop, and so does a finding with the verdict `ERROR`, which nothing found later
 could change. Each side is extracted into a temporary directory of its own, removed after it runs
 and on SIGINT or SIGTERM.
@@ -13,12 +15,13 @@ import tempfile
 import threading
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from types import FrameType
 
 from dokime.core.findings import Finding, summarise
 from dokime.core.outcomes import Report
 from dokime.core.repository import (
+    Change,
     CommitName,
     ProjectRepository,
     RefusalError,
@@ -29,6 +32,7 @@ from dokime.core.runtime import BaseImage, Digest, VerificationRuntime
 from dokime.core.verdicts import Verdict
 from dokime.packs.model import Pack
 from dokime.packs.order import order_history
+from dokime.packs.sections import section_changed
 from dokime.packs.selfcheck import (
     CANDIDATES_LOOKED_AT,
     WITNESSES_NEEDED,
@@ -141,6 +145,47 @@ def _side(
     return Side(tree=tree, image=run.build.image, base=run.build.base), run.report
 
 
+def _changes_a_section(pack: Pack, repository: ProjectRepository, change: Change) -> bool:
+    """Say whether a commit changed a section of a mixed file that the pack names (ADR-0060).
+
+    Only a commit that changed the file of a section is read: both trees are extracted into a
+    directory removed afterwards, and the file is read without following a link.
+    """
+    changed = {path.text for path in change.paths}
+    touched = [section for section in pack.sections if section.file in changed]
+    if not touched:
+        return False
+    with tempfile.TemporaryDirectory(prefix="dokime-sections-") as work:
+        sides = []
+        for name, commit in (("parent", change.parent), ("commit", change.commit)):
+            directory = Path(work) / name
+            directory.mkdir()
+            repository.extract(repository.compose_with_paths(commit, commit, _all), directory)
+            sides.append(directory)
+        return any(
+            section_changed(section, _read(sides[0], section.file), _read(sides[1], section.file))
+            for section in touched
+        )
+
+
+def _all(_: RepoPath) -> bool:
+    return True
+
+
+_LINK = b"\0link"
+"""What a file reached through a link is read as: never a valid text, so its section changed."""
+
+
+def _read(directory: Path, path: str) -> bytes | None:
+    """The bytes of a file of an extracted tree, `None` when absent; no link is followed."""
+    place = directory
+    for part in PurePosixPath(path).parts:
+        place = place / part
+        if place.is_symlink():
+            return _LINK
+    return place.read_bytes() if place.is_file() else None
+
+
 def _candidates(
     pack: Pack,
     dockerfile: Path,
@@ -148,14 +193,16 @@ def _candidates(
     repository: ProjectRepository,
     runtime: VerificationRuntime,
 ) -> Iterator[Candidate]:
-    def is_test(path: RepoPath) -> bool:
-        return pack.is_test(path.text)
+    def is_taken(path: RepoPath) -> bool:
+        return pack.is_test(path.text) or pack.is_config(path.text)
 
     for commit in order_history(repository.history(start)):
         change = repository.change(commit.name)
         if not is_candidate(pack, [path.text for path in change.paths]):
             continue
-        parent_tree = repository.compose_with_paths(change.parent, commit.name, is_test)
+        if _changes_a_section(pack, repository, change):
+            continue
+        parent_tree = repository.compose_with_paths(change.parent, commit.name, is_taken)
         commit_tree = repository.compose_with_paths(commit.name, commit.name, lambda _: True)
         parent_side, parent_report = _side(pack, dockerfile, parent_tree, repository, runtime)
         commit_side, commit_report = _side(pack, dockerfile, commit_tree, repository, runtime)

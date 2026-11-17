@@ -16,7 +16,20 @@ tests:
   command: [python, -m, pytest, --junitxml, /dokime/out/report.xml]
   report: report.xml            # in the output directory, in JUnit XML
   paths: ["tests/**"]           # which files of the project are tests
+  config: ["pytest.ini", ".pytest.ini"]   # what configures them, whether it exists or not
+  sections:                     # the part of a mixed file that configures them
+    - file: pyproject.toml
+      format: toml
+      section: tool.pytest.ini_options
 ```
+
+A path is a test when it matches a pattern of `paths`, and configuration of the tests when it
+matches one of `config` and is not a test; anything else is code. `config` and `sections` are
+optional for now (ADR-0056, ADR-0059). A section is compared between two versions of its file: an
+`ini` one by its raw text, every occurrence from its header to the next, since pytest reads INI
+with `iniconfig` and not with `configparser`; a `toml` one by the value that `tomllib` reads at its
+dotted path, since a dotted key in another table can define it. A version that cannot be read
+counts as changed.
 
 `check` reads the text of a pack with the strict reader of `core`, compares it with its table of
 fields and returns every finding at once, with the pack when there is none.
@@ -39,7 +52,8 @@ A pack proves itself with the history of its project
 ([ADR-0041](../../../docs/adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md)).
 The rules are decisions over results that something else obtains:
 
-- `is_candidate(pack, changed)`: a commit that changed a test and code that is not a test.
+- `is_candidate(pack, changed)`: a commit that changed a test and code that is not a test. The
+  configuration of the tests is neither (ADR-0060).
 - `is_witness(parent, commit)`: a test passes on the commit and did not pass on the parent, in a
   parent report where something failed. `turned_green(parent, commit)` names those tests.
 - `self_check(candidates)`: no finding with two witnesses among the first ten candidates;
@@ -59,8 +73,11 @@ result.programs  # the git and the podman that ran, as the caller names them
 - `order_history` orders the history by the rule of
   [ADR-0044](../../../docs/adr/0044-the-packs-module-drives-the-self-check-in-an-order-of-its-own.md)
   and leaves out the commits without exactly one parent.
-- Each candidate runs on two sides: the tree of its parent with the test paths of the commit, and
-  the tree of the commit. `run_tests` builds the image of a side from the Dockerfile read once
+- A commit that changed the file of a section that the pack names has both trees extracted first
+  and the section compared; if it changed, the commit is not a candidate. A link there is not
+  followed, and counts as a change.
+- Each candidate runs on two sides: the tree of its parent with the test paths and the
+  configuration of the tests of the commit, and the tree of the commit. `run_tests` builds the image of a side from the Dockerfile read once
   from the working copy, with the tree as the context, runs the test command and reads the report.
   `verify` reuses it in A3.
 - `on_candidate` receives each candidate as soon as both of its sides have run, so that a caller

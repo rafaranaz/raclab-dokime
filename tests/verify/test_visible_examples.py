@@ -1,9 +1,9 @@
-# SDD-EARS: VERIFY-040 VERIFY-041 VERIFY-042 VERIFY-080 VERIFY-081 VERIFY-082
+# SDD-EARS: VERIFY-040 VERIFY-041 VERIFY-042 VERIFY-044 VERIFY-080 VERIFY-081 VERIFY-082
 import pytest
 
 from dokime.core.repository import RefusalError
 from dokime.core.verdicts import Verdict
-from tests.verify.doubles import ObserverDouble, patch
+from tests.verify.doubles import Files, ObserverDouble, patch
 from tests.verify.gates import codes, contract, example, on_change
 
 
@@ -11,6 +11,33 @@ def test_the_examples_are_observed_on_the_base_with_the_patch() -> None:
     _, observer = on_change(contract(example("E-1", "R-new")), {"E-1": 2})
     ((files, _),) = observer.calls
     assert files == {"answers.json": '{"E-1": 2}', "src/p.py": "new"}
+
+
+def test_the_tests_and_their_configuration_are_those_of_the_base_unless_authorised() -> None:
+    base_files: Files = {
+        "answers.json": b'{"E-1": 2}',
+        "tests/test_p.py": b"base",
+        "conftest.py": b"base",
+    }
+    given = contract(example("E-1", "R-new"), authorised=("tests/test_q.py",))
+    changed = patch(
+        {
+            "src/p.py": "new",
+            "tests/test_p.py": "patched",
+            "tests/test_q.py": "authorised",
+            "tests/conftest.py": "added",
+            "conftest.py": "patched",
+        }
+    )
+    _, observer = on_change(given, {}, changed=changed, base_files=base_files)
+    ((files, _),) = observer.calls
+    assert files == {
+        "answers.json": '{"E-1": 2}',
+        "conftest.py": "base",
+        "src/p.py": "new",
+        "tests/test_p.py": "base",
+        "tests/test_q.py": "authorised",
+    }
 
 
 def test_an_example_that_holds_with_the_patch_passes() -> None:

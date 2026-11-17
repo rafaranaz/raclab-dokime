@@ -1,6 +1,6 @@
 # ADR-0064 · The evidence of A3 is an unsigned statement with a closed predicate
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

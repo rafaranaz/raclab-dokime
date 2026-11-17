@@ -302,7 +302,7 @@ self-check uses.
 - **CORE-162** The observation of an example shall carry the identifier of the example and an observation for each step that ran, in the order of the steps.
 - **CORE-163** The observation of a step at the boundary `function` shall be one of the three of the table.
 - **CORE-164** The observation of a step at the boundary `cli` shall carry the four parts of the table.
-- **CORE-165** When an example ends, the observation of the example shall say how it ended: it completed every step, it reached its limit of time, or its process crashed.
+- **CORE-165** When an example ends, the observation of the example shall say how it ended: it completed every step, it reached its limit of time, it reached its limit of output, or its process crashed.
 - **CORE-166** The limits of observation shall carry the time of one example in seconds and the size of the observations in bytes, with the limits of a run for the whole.
 - **CORE-167** The limits of observation shall default to 60 seconds for one example and 32 MiB of observations.
 - **CORE-168** If the time of one example or the size of the observations is not a whole number greater than zero, then the limits of observation shall be rejected with an error that names the limit.

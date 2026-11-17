@@ -46,6 +46,7 @@ are mandatory and what each holds.
 - **CONTRACT-031** If the boundary of an example is `http`, then the checker shall report a finding with the code `not-supported-yet` and the verdict `ERROR`, with its line.
 - **CONTRACT-032** If a step at the `function` boundary expects both `returns` and `raises`, then the checker shall report a finding with the code `two-expectations`, with the line of the expectation.
 - **CONTRACT-033** If a step expects nothing, then the checker shall report a finding with the code `no-expectation`, with the line of the expectation.
+- **CONTRACT-034** If the `type` of an expected exception is not an identifier of Python, nor identifiers joined by single dots, then the checker shall report a finding with the code `wrong-type`, with the line of the expectation.
 
 ## Directives
 
@@ -128,7 +129,7 @@ the directives allowed where it is.
 | Input at `function` | `args` | No | A list of values |
 | Input at `function` | `kwargs` | No | A mapping of values |
 | Expectation at `function` | `returns` | No | A value |
-| Expectation at `function` | `raises` | No | A mapping with `type`, a name, and optionally `message`, a text or a matcher |
+| Expectation at `function` | `raises` | No | A mapping with `type`, the name of the class of the exception, and optionally `message`, a text or a matcher. The name is an identifier of Python, or the identifiers of its module and of its class joined by single dots |
 | Input at `cli` | `args` | No | A list of texts |
 | Input at `cli` | `stdin` | No | A text |
 | Input at `cli` | `files` | No | A mapping from a file name to a text |

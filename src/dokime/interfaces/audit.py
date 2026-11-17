@@ -2,7 +2,9 @@
 ledger and the evidence.
 
 The inputs come from the tree of the base commit, or from files given from outside the patch,
-never from the patch. The run goes through the states of the audit flow of A3 in their order and
+never from the patch. The examples of each side are observed in an image built with the tree of
+that side as the context: the base for `baseline`, the tree of the change of ADR-0058 for
+`visible-examples`. The run goes through the states of the audit flow of A3 in their order and
 stops at the first one whose verdict is not `PASS`, with the gates after it not reached. The
 aggregation's own findings are a fault of the harness: they stop the run with no evidence and an
 event that says so. A patch that does not apply, a policy that does not read and a story that is
@@ -38,7 +40,7 @@ from dokime.verify.examples import baseline, visible_examples
 from dokime.verify.existing import existing_tests
 from dokime.verify.protected import protected_paths
 from dokime.verify.result import GateResult
-from dokime.verify.trees import base_tree
+from dokime.verify.trees import base_tree, change_tree
 
 STATES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("checking-contract", ("contract",)),
@@ -170,6 +172,7 @@ class _Run:
         self.built: Build | None = None
         self.dockerfile: Path | None = None
         self.observed = False
+        self.change_image: Digest | None = None
 
     def go(self, story: str, tree: TreeName) -> Audited:
         self.ledger.record("run.started", {"base": self.request.base.text, "story": story})
@@ -204,7 +207,10 @@ class _Run:
     def _gate(self, name: str) -> GateResult:
         self.ledger.record("gate.started", {"gate": name})
         result = self._result(name)
-        self.ledger.record("gate.finished", {"gate": name, "verdict": result.verdict.value})
+        finished: dict[str, object] = {"gate": name, "verdict": result.verdict.value}
+        if name == "visible-examples" and self.change_image is not None:
+            finished["image"] = self.change_image.text
+        self.ledger.record("gate.finished", finished)
         if result.unstable:
             kind = "tests" if name == _UNSTABLE_TESTS else "examples"
             self.ledger.record("baseline.unstable", {"gate": name, kind: list(result.unstable)})
@@ -240,10 +246,24 @@ class _Run:
                 self.ports.runtime,
             )
         if name == "visible-examples":
+            try:
+                changed = self._image_of_the_change(pack, contract, dockerfile)
+            except RefusalError as refusal:
+                return GateResult(gate=name, findings=(refusal.finding,))
             return visible_examples(
-                pack, contract, base, patch, image, repository, self.ports.observer, limits
+                pack, contract, base, patch, changed, repository, self.ports.observer, limits
             )
         raise ValueError(f"the gate {name!r} is not one that this version runs")
+
+    def _image_of_the_change(self, pack: Pack, contract: Contract, dockerfile: Path) -> Digest:
+        """The image built with the tree of the change of ADR-0058 as the context."""
+        repository = self.ports.repository
+        tree = change_tree(pack, contract, self.request.base, self.request.patch, repository)
+        directory = self.work / "change"
+        directory.mkdir()
+        repository.extract(tree, directory)
+        self.change_image = self.ports.runtime.build(dockerfile, directory, BuildLimits()).image
+        return self.change_image
 
     def _environment(self) -> GateResult:
         self.pack = read_pack(self.root, self.request.pack)

@@ -47,7 +47,7 @@ def test_the_image_is_built_from_the_dockerfile_of_the_base_copied_out_of_the_tr
     done = audit()
     dockerfile, data, directory, context = done.runtime.builds[0]
     assert data == DOCKERFILE
-    assert {"src/p.py", ".dokime/Dockerfile"} <= context
+    assert {"src/p.py", ".dokime/Dockerfile"} <= context.keys()
     assert not dockerfile.is_relative_to(directory)
     environment = done.gates()[1]
     assert (environment["gate"], environment["verdict"]) == ("environment", "PASS")

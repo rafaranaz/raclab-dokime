@@ -80,6 +80,7 @@ class Ending(StrEnum):
 
     COMPLETED = "completed"
     TIME_LIMIT = "time-limit"
+    OUTPUT_LIMIT = "output-limit"
     CRASHED = "crashed"
 
 

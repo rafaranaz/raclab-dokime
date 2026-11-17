@@ -89,3 +89,21 @@ and the regular files of the working directory are observed, decoded as UTF-8 wi
 replacement; no file reached through a link is observed. The code under test runs in the process
 that observes it, so it can rewrite its observation: the expected value never enters the zone,
 which is the limit of T1 and part of T2 of ADR-0010.
+
+## The adapter that observes
+
+`PodmanRuntime.observe(image, project, requests, limits)` implements the port that observes of
+`core`. It copies the program into a directory of its own with `requests.json`, mounts it read-only
+at `/dokime/probe`, and runs `python -I -S` on it in a container with the guarantees of a run. Each
+example gets the time of one example and, as its bytes, its share of the bytes of the observations.
+A container that ends at a limit, or a program that ends with an error, is refused with
+`observation-failed`, quoting what the program wrote on its error output; otherwise
+`observations.json` is read with bounds (`observations-missing`, `observations-too-large`,
+`observations-unreadable`) into the types of `core`, decimals kept. `observe_program_digest` is the
+digest of the program, for the evidence.
+
+Every run, of the tests and of the examples, has its `/tmp` within a quarter of the memory of the
+run, so that filling it fails on its size and not on the memory limit, and every file it writes
+within 64 MiB (`--ulimit fsize`), in the mounts of the disk too. Known limit: the output directory
+is a mount of the disk, whose total podman cannot bound; many files, each within 64 MiB, are bounded
+only by the time of the run.

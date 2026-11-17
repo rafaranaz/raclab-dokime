@@ -10,6 +10,13 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
+from dokime.core.observation import (
+    ExampleObservation,
+    ExampleRequest,
+    ObservationLimits,
+    Raised,
+    Returned,
+)
 from dokime.core.repository import (
     Change,
     CommitName,
@@ -18,6 +25,7 @@ from dokime.core.repository import (
     RepoPath,
     TreeName,
 )
+from dokime.core.runtime import Digest
 
 Entry = bytes | tuple[str, bytes] | tuple[str, str]
 Files = dict[str, Entry]
@@ -47,6 +55,10 @@ class AuditedDouble:
         self.commits[name] = dict(files)
         return name
 
+    def _known(self, commit: CommitName) -> None:
+        if commit not in self.commits:
+            raise RefusalError("commit-missing", f"the commit {commit} is not in the repository")
+
     def _tree(self, files: Files) -> TreeName:
         name = TreeName(_name({**files, "\0tree": b""}))
         self.trees[name] = dict(files)
@@ -61,11 +73,14 @@ class AuditedDouble:
     def compose_with_paths(
         self, base: CommitName, source: CommitName, take: Callable[[RepoPath], bool]
     ) -> TreeName:
+        self._known(base)
+        self._known(source)
         kept = {p: e for p, e in self.commits[base].items() if not take(RepoPath(p))}
         taken = {p: e for p, e in self.commits[source].items() if take(RepoPath(p))}
         return self._tree(kept | taken)
 
     def compose_with_patch(self, base: CommitName, patch: bytes) -> TreeName:
+        self._known(base)
         given = json.loads(patch)
         files = dict(self.commits[base])
         for path in given["remove"]:
@@ -94,3 +109,46 @@ class AuditedDouble:
                 target.chmod(0o755)
             else:
                 target.write_bytes(entry)
+
+
+@dataclass
+class ObserverDouble:
+    """The port that observes, in memory: each example returns what `answers.json` of the project
+    says, a mapping from the example to the value; an example it does not name raises."""
+
+    calls: list[tuple[dict[str, str], tuple[ExampleRequest, ...]]] = field(default_factory=list)
+    refusal: RefusalError | None = None
+
+    def observe(
+        self,
+        image: Digest,
+        project: Path,
+        requests: tuple[ExampleRequest, ...],
+        limits: ObservationLimits,
+    ) -> tuple[ExampleObservation, ...]:
+        files = {
+            p.relative_to(project).as_posix(): p.read_text()
+            for p in sorted(project.rglob("*"))
+            if p.is_file()
+        }
+        self.calls.append((files, requests))
+        if self.refusal is not None:
+            raise self.refusal
+        answers = json.loads(files.get("answers.json", "{}"))
+        return tuple(
+            ExampleObservation(
+                example=request.example,
+                steps=tuple(
+                    Returned(value=answers[request.example])
+                    if request.example in answers
+                    else Raised(
+                        type="KeyError",
+                        qualified="builtins.KeyError",
+                        classes=("builtins.KeyError", "builtins.Exception", "builtins.object"),
+                        message=request.example,
+                    )
+                    for _ in request.inputs
+                ),
+            )
+            for request in requests
+        )

@@ -7,8 +7,8 @@ that observes. It imports `core`, `contract`, `oracle` and `packs`, and talks to
 agent. Each requirement follows an EARS template and has at least one test that declares it in its
 `SDD-EARS:` marker.
 
-This increment has the result of a gate and the gate `protected-paths`; `baseline`,
-`existing-tests`, `visible-examples` and the aggregation come in the next ones.
+The result of a gate, and the gates `protected-paths`, `baseline` and `visible-examples`, are
+built; `existing-tests` and the aggregation come in the next increments.
 
 ## The result of a gate
 
@@ -31,3 +31,25 @@ policy, the pack, the contract and the flow. The contract authorises some of the
 - **VERIFY-025** When an entry of `may_modify_tests` names a path, the gate shall count as authorised only that path; for a mixed file, only its section.
 - **VERIFY-026** The gate shall give the verdict `FAIL` to each finding it reports.
 - **VERIFY-027** If the patch does not apply on the base, then the gate shall report a finding with the verdict `ERROR` and the code of the refusal of the repository.
+
+## The examples observed on a tree ([ADR-0012](../adr/0012-examples-are-observations-at-a-boundary.md), [ADR-0063](../adr/0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md))
+
+The gates `baseline` and `visible-examples` observe the examples of the contract on a tree, through
+the port that observes, in the image that the pack built, and compare each one with the oracle.
+
+- **VERIFY-040** When the examples of a contract are observed on a tree, the gate shall extract the tree into a directory of its own and ask the port that observes for every example of the contract, in its order, with the inputs of its steps and nothing of what they expect.
+- **VERIFY-041** If the repository or the port that observes refuses, then the gate shall report the finding of the refusal, with the verdict `ERROR`.
+- **VERIFY-042** When the gate reports a finding on an example, the gate shall give the line of the example and name the example, its requirement and the parts of its steps that did not hold, quoting each value within 200 characters.
+- **VERIFY-043** If the contract has no example, then the gate shall pass without asking the port that observes.
+
+## The gate `baseline` ([ADR-0016](../adr/0016-verification-in-a-container-on-base-plus-patch.md))
+
+- **VERIFY-060** When a change is checked, the gate `baseline` shall observe the examples of the contract on the tree of the base commit.
+- **VERIFY-061** If an example of a requirement of kind `preserve` does not hold on the base, then the gate `baseline` shall report a finding with the code `preserved-example-fails-on-base` and the verdict `FAIL`.
+- **VERIFY-062** If an example of a requirement of kind `new` or `change` holds on the base, then the gate `baseline` shall report a finding with the code `example-holds-on-base` and the verdict `ASK`.
+
+## The gate `visible-examples` ([ADR-0013](../adr/0013-provenance-decides-what-a-check-can-do.md))
+
+- **VERIFY-080** When a change is checked, the gate `visible-examples` shall observe the examples of the contract on the tree of the base with the patch applied.
+- **VERIFY-081** If an example whose origin is not `model` does not hold, then the gate `visible-examples` shall report a finding with the code `example-fails` and the verdict `FAIL`.
+- **VERIFY-082** If an example of origin `model` does not hold, then the gate `visible-examples` shall report a finding with the code `model-example-fails` and the verdict `ASK`.

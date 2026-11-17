@@ -6,3 +6,14 @@ tests:
   command: [python, -m, pytest, -p, no:cacheprovider, -q, --junitxml, /dokime/out/report.xml]
   report: report.xml
   paths: ["tests/**", "docs/**/*.rst"]
+  config: ["pytest.ini", ".pytest.ini", "**/conftest.py"]
+  sections:
+    - file: pyproject.toml
+      format: toml
+      section: tool.pytest.ini_options
+    - file: tox.ini
+      format: ini
+      section: pytest
+    - file: setup.cfg
+      format: ini
+      section: "tool:pytest"

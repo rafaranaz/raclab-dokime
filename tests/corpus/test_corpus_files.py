@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-001 CORPUS-002 CORPUS-003 CORPUS-004 CORPUS-005
+# SDD-EARS: CORPUS-001 CORPUS-002 CORPUS-003 CORPUS-004 CORPUS-005 CORPUS-006
 import re
 import shlex
 
@@ -71,3 +71,19 @@ def test_every_package_is_installed_at_an_exact_version_without_resolving_depend
         packages = [word for word in words[2:] if not word.startswith("-")]
         assert packages, run
         assert all(EXACT.fullmatch(package) for package in packages), packages
+
+
+CONFIG = ("pytest.ini", ".pytest.ini", "**/conftest.py")
+SECTIONS = (
+    ("pyproject.toml", "toml", "tool.pytest.ini_options"),
+    ("tox.ini", "ini", "pytest"),
+    ("setup.cfg", "ini", "tool:pytest"),
+)
+
+
+@pytest.mark.parametrize("project", PROJECTS, ids=lambda p: p.name)
+def test_the_pack_names_the_configuration_of_its_tests_and_its_sections(project: Project) -> None:
+    pack = check(project.pack.read_text(encoding="utf-8")).pack
+    assert pack is not None
+    assert pack.config_paths == CONFIG
+    assert tuple((s.file, s.format, s.name) for s in pack.sections) == SECTIONS

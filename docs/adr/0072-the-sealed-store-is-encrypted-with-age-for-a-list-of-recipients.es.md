@@ -1,7 +1,7 @@
-<!-- translation-of: 0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md sha256:827ba684736c6e07 -->
+<!-- translation-of: 0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md sha256:ce24498e9765e536 -->
 # ADR-0072 · El almacén sellado se cifra con age para una lista de destinatarios
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

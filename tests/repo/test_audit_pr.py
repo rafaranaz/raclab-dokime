@@ -1,4 +1,4 @@
-# SDD-EARS: REPO-150 REPO-151 REPO-152 REPO-153 REPO-154
+# SDD-EARS: REPO-150 REPO-151 REPO-152 REPO-153 REPO-154 REPO-155 REPO-156 REPO-157
 import json
 import subprocess
 import sys
@@ -231,3 +231,60 @@ def test_the_contract_is_checked_by_the_real_command(project: Path, tmp_path: Pa
     written = summary.read_text()
     assert "| add-one | FAIL |" in written
     assert code == 1
+
+
+def test_a_contract_brought_with_the_change_and_absent_in_the_base_is_an_error(
+    project: Path, tmp_path: Path
+) -> None:
+    base = git(project, "rev-parse", "HEAD")
+    head = commit(
+        project, {".dokime/changes/add-one/contract.yaml": CONTRACT, "src/p.py": "x = 2\n"}
+    )
+    runs = Runs()
+    assert audit(project, base, head, "feat/repo-add-one", tmp_path, runs) == 2
+    assert runs.calls == []
+    summary = (tmp_path / "summary.md").read_text()
+    assert "`contract-with-the-change`" in summary
+    assert "not audited" in summary
+
+
+def test_a_contract_changed_with_the_change_is_audited_when_the_base_has_one(
+    project: Path, tmp_path: Path
+) -> None:
+    base = commit(project, {".dokime/changes/add-one/contract.yaml": CONTRACT})
+    head = commit(
+        project,
+        {".dokime/changes/add-one/contract.yaml": CONTRACT + "# more\n", "src/p.py": "x = 2\n"},
+    )
+    runs = Runs(code=1)
+    assert audit(project, base, head, "feat/repo-add-one", tmp_path, runs) == 1
+    ((command),) = runs.calls
+    assert command[3] == "audit"
+
+
+def test_a_branch_behind_its_base_is_not_audited(project: Path, tmp_path: Path) -> None:
+    start = commit(project, {".dokime/changes/add-one/contract.yaml": CONTRACT})
+    git(project, "checkout", "--quiet", "-b", "change")
+    head = commit(project, {"src/p.py": "x = 2\n"})
+    git(project, "checkout", "--quiet", "main")
+    base = commit(project, {"src/other.py": "y = 1\n"})
+    runs = Runs()
+    assert git(project, "merge-base", base, head) == start
+    assert audit(project, base, head, "feat/repo-add-one", tmp_path, runs) == 2
+    assert runs.calls == []
+    summary = (tmp_path / "summary.md").read_text()
+    assert "`branch-not-up-to-date`" in summary
+    assert "the branch is not up to date with its base" in summary
+
+
+def test_the_attributes_of_the_pull_request_play_no_part_in_its_patch(
+    project: Path, tmp_path: Path
+) -> None:
+    base = commit(project, {".dokime/changes/add-one/contract.yaml": CONTRACT})
+    head = commit(project, {".gitattributes": "*.py -diff\n", "src/p.py": "x = 2\n"})
+    runs = Runs()
+    audit(project, base, head, "feat/repo-add-one", tmp_path, runs)
+    ((command),) = runs.calls
+    patch = runs.files[command[command.index("--patch") + 1]]
+    assert "+x = 2" in patch
+    assert "GIT binary patch" not in patch

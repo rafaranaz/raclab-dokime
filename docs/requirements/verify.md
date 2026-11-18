@@ -7,8 +7,8 @@ that observes. It imports `core`, `contract`, `oracle` and `packs`, and talks to
 agent. Each requirement follows an EARS template and has at least one test that declares it in its
 `SDD-EARS:` marker.
 
-The result of a gate, the gates `protected-paths`, `baseline`, `visible-examples` and
-`existing-tests`, and the aggregation of the gates of a state are built.
+The result of a gate, the gates `protected-paths`, `baseline`, `visible-examples`,
+`existing-tests` and `repeatability`, and the aggregation of the gates of a state are built.
 
 ## The result of a gate
 

@@ -45,7 +45,6 @@ The gates of a change that arrives already made, and their aggregation. The requ
   each run; a gate whose verdict differs between two runs asks (`verdict-varies`), naming its
   verdict in each run, and runs that do not hold the same gates once each are `runs-differ`, an
   error. Fewer than two runs are refused. The findings follow the gates in the order of the runs.
-  Until `interfaces` runs it, the aggregation still lists the gate as not applicable.
 - `aggregate_state(gates, results)`: the aggregation of the gates of a state (ADR-0015,
   ADR-0034). It lists every gate of the state in its order, run with its result or not applicable
   with where it is built, and gives the verdict by precedence: `ERROR`, then `FAIL`, which drops the

@@ -17,12 +17,19 @@ from dokime.core.verdicts import Verdict
 from dokime.verify.result import GateResult
 
 BUILT = frozenset(
-    {"contract", "environment", "baseline", "protected-paths", "existing-tests", "visible-examples"}
+    {
+        "contract",
+        "environment",
+        "baseline",
+        "protected-paths",
+        "existing-tests",
+        "visible-examples",
+        "repeatability",
+    }
 )
 """The gates of the table of the architecture that this version runs."""
 
 NOT_BUILT: Mapping[str, str] = {
-    "repeatability": "the gate is not built in A3; where it is built is decided before A4",
     "relations": "the gate is built in block B",
     "sealed-examples": "the gate is built in block B",
     "agent-run": "the gate is built in block C",

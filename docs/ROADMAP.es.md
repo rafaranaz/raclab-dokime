@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:2184186eba51a4da -->
+<!-- translation-of: ROADMAP.md sha256:fae79ab1ecb77200 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -77,8 +77,9 @@ se publica. Un resultado malo también se publica.
 Los hitos de un bloque se escriben aquí cuando el bloque se abre, y sus números medidos cuando se
 cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
 
-**El bloque A está abierto.** Su primer hito, A0, no tiene código: prueba a mano los formatos de los
-que depende el resto del bloque.
+**El bloque A se cerró el 2026-11-19**, con la versión 0.1.0; su
+[nota de cierre](#bloque-a--nota-de-cierre) está tras sus hitos. Su primer hito, A0, no tuvo código:
+probó a mano los formatos de los que depende el resto del bloque.
 
 **A0 está hecho.** Se hicieron tres contratos a mano sobre cambios que proyectos públicos ya habían
 hecho (un limpiador de descripciones de pull request, `humanize.naturalsize` y el escapado de
@@ -126,7 +127,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 
 | Hipótesis | Prueba | Si falla |
 |---|---|---|
-| La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | A mano, antes de cualquier código del bloque A | Se revisa el formato del contrato antes de construir |
+| La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | A mano, antes de cualquier código del bloque A. **Medida** al cerrar el bloque A: se cumple en los cambios elegidos a mano de A0, 9 de 9 requisitos; en los arreglos sacados de la historia, son expresables entre 15 y 20 de 41 ([nota de cierre](#bloque-a--nota-de-cierre)) | Se revisa el formato del contrato antes de construir; si se amplía la frontera `function` va a la revisión estratégica |
 | Aprobar dos o más ejemplos por caso cuesta un tiempo aceptable | A mano, junto con la anterior | Se revisa la regla de reserva |
 | ~~Un pack se puede proponer a partir de la configuración de CI de un proyecto~~ | **Descartada** por la [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md): el arnés no deduce un pack, lo escribe una persona | Aplicado: los packs se escriben a mano por proyecto, un coste de adopción |
 | La reserva por caso detecta soluciones sobreajustadas | La métrica "valor de la reserva" al cerrar el bloque B | La reserva pasa a ser opcional y el peso va a las relaciones y al bloque D |
@@ -327,12 +328,8 @@ Razonado, no medido:
 
 A3 no resolvió ninguna hipótesis de la tabla de arriba; ninguna tenía su prueba en A3.
 
-Para la nota que cierra el bloque A, al final de A4: la proporción de arreglos reales que no caben en
-el formato del contrato, como pide la ADR-0057, con la hipótesis de A0 medida tanto en cambios
-elegidos a mano como en cambios sacados de la historia. Lo leído, no ejecutado: en python-semver unos
-12 de los 18 testigos entre sus 25 primeros candidatos, una cuenta que dio la sesión que revisa el
-trabajo; en cachetools casi ninguno, porque casi todos son decoradores y métodos de clases; en
-mdformat al menos 2 de sus 7 testigos.
+La proporción de arreglos reales que no caben en el formato del contrato, que pide la ADR-0057, se
+mide en la [nota de cierre del bloque A](#bloque-a--nota-de-cierre).
 
 Apuntado como deuda, que no bloquea ningún hito:
 
@@ -356,35 +353,99 @@ Apuntado mientras se construye A4:
   todos los tests de un lado. Ninguno de los diez parches rompe una importación, así que sus
   resultados no cambian.
 
-Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2 ni en A3:
+### Bloque A · Nota de cierre
 
-- **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
-  GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
-  `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia
-  completa. Y cómo encaja con la regla de A3 auditar una pull request que trae su propio
-  contrato: en A3 el contrato se toma de la base, o se le pasa a `audit` desde fuera del parche, y
-  nunca del parche, con `.dokime/` protegido sin excepción; un contrato que trae el parche no se
-  distingue de uno que haya escrito su agente hasta que las aprobaciones se firmen (bloque E). La
-  candidata: que el parche solo pueda traer el contrato cuya huella coincida con una aprobación,
-  cuando existan las aprobaciones.
-  Y el gate `repeatability` (ADR-0017): la tabla de los gates lo pone en el bloque A, y pregunta
-  cuando dos ejecuciones de la verificación dan veredictos distintos, tantas como diga
-  `verification.runs` de la política, pero ningún hito de A3 lo construye, así que A3 ejecuta la
-  verificación una vez y su evidencia muestra el gate como no aplicable. La candidata: un
-  incremento de `verify` en A4, antes de la versión 0.1, ya que el bloque A se cierra con A4.
-  Y la separación fina de los mensajes de los hallazgos
-  ([ADR-0064](adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md)):
-  en A3 el mensaje entero de un hallazgo va a `untrusted`, porque los módulos mezclan las palabras
-  de dokime con texto citado del contrato, del árbol, del parche o de la zona. El paso: un
-  `message` con solo las palabras de dokime, y cada módulo que cita pasando ese texto a
-  `untrusted`, un cambio de `Finding` en `core` y uno por cada uno de `contract`, `packs`,
-  `oracle`, `sandbox`, `platform`, `verify` e `interfaces`. Se hace en A4, cuando la evidencia se
-  muestre en las pull requests, o en cada módulo cuando se toque por otro motivo.
-  Y la imagen del cambio: `visible-examples` observa en una imagen construida con el árbol del
-  cambio, cuya huella A3 guarda en el registro, en el `gate.finished` de esa puerta, y la
-  evidencia la liga a través de la cabeza del registro. La próxima versión del predicado añade un
-  campo para ella, junto con lo que las dos notas anteriores llevan al predicado, el `repeated` de
-  `repeatability` y el `message` de la separación fina, para que su versión cambie una sola vez.
+**A4 se cerró el 2026-11-19, y con él el bloque A**, con la versión 0.1.0 y la etiqueta `v0.1.0`
+([ADR-0068](adr/0068-the-harness-is-named-by-its-version-and-its-commit.es.md)).
+
+**El criterio de salida de A4 lo cumple
+[#146](https://github.com/rafaranaz/raclab-dokime/pull/146)**, la primera pull request de este
+repositorio auditada en CI con el arnés de su base
+([ADR-0071](adr/0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.es.md)):
+
+- Su contrato, el de la historia `show-the-version`, fue antes en una pull request propia,
+  [#145](https://github.com/rafaranaz/raclab-dokime/pull/145), cuya fusión por el mantenedor fue su
+  aprobación ([ADR-0067](adr/0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md)).
+- La auditoría dio `PASS`, con las seis puertas de A3 y `repeatability` ejecutadas, `repeated` de 2
+  ejecuciones y coherente, el commit del arnés el de la base, `b7b87e0`, y la evidencia
+  `sha256:e9cb2094…` en el artefacto del job. El paso de la auditoría tardó 136 s en CI, y la misma
+  auditoría 358 s en la máquina de desarrollo.
+- La sesión que revisa el trabajo comprobó la evidencia de punta a punta contra git: su huella es
+  la del registro del job, `read_back` no da hallazgos, las huellas del contrato, del parche y del
+  árbol son las de la base, las de `git diff --binary` de la base a la cabeza y las de la cabeza, y
+  la cadena del registro es íntegra, con la cabeza que cita la anterior a `evidence.built`, que
+  registra la misma huella.
+- En #146 el agente no tocó cinco tests que el contrato no autorizaba, que sustituyen la lectura de
+  la versión, porque `protected-paths` habría rechazado el cambio: el contrato actuó antes de la
+  auditoría, mientras se escribía el cambio.
+
+**El criterio de salida del bloque A**, ningún falso aceptado en parches que fallan ejemplos
+visibles, editan tests o rompen tests existentes, se midió en A3 sobre los diez casos del corpus, y
+se cumple.
+
+**La medida de la ADR-0057, la proporción de arreglos reales que caben en el contrato**
+([#147](https://github.com/rafaranaz/raclab-dokime/pull/147), `tests/corpus/witnesses.toml`):
+
+- **Los testigos**: 41, con los candidatos de la autocomprobación en podman desde el commit de cada
+  proyecto: 14 de 25 candidatos en cachetools, 20 de 25 en python-semver y 7 de 16 en mdformat. La
+  medida del 2026-11-15, en un entorno local, había encontrado 18 en python-semver en lugar de 20, y
+  no apuntó los commits; la diferencia no se reconcilió.
+- **Dos lecturas de cada testigo**, con los dos filtros de la ADR-0057, aislado y expresable en una
+  frontera de la ADR-0039: la de la sesión que construye, y la de la sesión que revisa el trabajo,
+  que los leyó antes de ver las primeras etiquetas. Coinciden en 33 de 41 en aislado (κ 0,57), 36
+  en expresable (κ 0,75) y 38 en si caben, aislados y expresables (κ 0,84). Caben 12 de 41 en la
+  primera lectura y 15 en la segunda; las tres diferencias van en el mismo sentido.
+- **Una muestra ejecutada**: un testigo expresable y uno que no en cada proyecto, sorteados con la
+  semilla 20261118 y ejecutados en la imagen del pack de su proyecto a los dos lados del cambio. Los
+  seis confirman la lectura; en cachetools el único expresable salió por fuerza.
+- **Lo que no cabe**: entre 26 y 29 de los 41 testigos, del 63 % al 71 %. El motivo principal es el
+  mismo en los tres proyectos: el arreglo necesita un objeto, una clase, un método o un plugin
+  instalado, a los que no llegan una función llamada con valores JSON ni una línea de órdenes.
+  cachetools, cuyos arreglos son decoradores y métodos, da 0 o 1 de 14.
+- **Expresables sin el filtro de aislado**: entre 15 y 20 de 41, porque la hipótesis de A0 habla de
+  requisitos, y una funcionalidad nueva también lo es.
+- **A0, en su unidad**: caben como ejemplos 9 de 9 requisitos, en tres cambios elegidos a mano.
+  Midió requisitos en cambios elegidos; la ADR-0057 mide arreglos sacados de la historia. No se
+  restan ni se comparan como si fueran lo mismo.
+- **Un hallazgo: "aislado" no está bien definido en la ADR-0057.** La primera lectura lo tomó como
+  "el cambio es un arreglo", así que una funcionalidad nueva o una deprecación no cuentan; la
+  segunda, como "el cambio es solo el comportamiento buscado, sin refactorización ni herramientas".
+  Esa es la causa de la mayoría de las diferencias en aislado.
+- **Comparada con SWE-bench Verified solo como orden de magnitud**, porque son medidas distintas de
+  cosas distintas. Allí, según leyó la sesión que revisa el trabajo en
+  [el relato de OpenAI](https://openai.com/index/introducing-swe-bench-verified/), cada muestra la
+  etiquetaron tres anotadores distintos que superaron unas pruebas de entrada, con una escala de
+  gravedad de 0 a 3 para cada criterio; un 38,3 % de las muestras se marcaron por enunciados
+  subespecificados y un 61,1 % por tests que podían rechazar soluciones válidas; se excluyó el
+  68,3 %, y quedaron 500 muestras. Nuestra lectura usó dos lectores en lugar de tres, sin pruebas
+  de entrada, con la muestra ejecutada como calibración.
+
+**Lo que A3 dejó abierto, y una corrección:**
+
+- El tiempo de la revisión sin la ayuda de otro modelo no se estima: el mantenedor decide que una
+  estimación de memoria valdría poco. Si importa para la adopción, se mide con casos nuevos en el
+  bloque B.
+- La separación fina de los mensajes de los hallazgos no se hizo en A4, aunque la lista de lo que
+  quedaba por decidir decía que sí:
+  la [ADR-0069](adr/0069-the-predicate-v0-2-adds-what-a4-records.es.md) la dejó fuera, así que
+  `message` está en el predicado v0.2 pero ningún módulo lo rellena, y el mensaje entero de un
+  hallazgo sigue en `untrusted`. Se hace en cada módulo cuando se toque por otro motivo.
+
+**Para la revisión estratégica del mantenedor**, que vive fuera del repositorio, al cerrar el
+bloque A:
+
+- Si el "aislado" de la ADR-0057 cuenta las funcionalidades nuevas.
+- Si la frontera `function` se amplía a objetos y métodos, a la vista de que cachetools da 0 o 1
+  de 14.
+- Una regla que proteja las etiquetas `v*` de borrarse o moverse.
+- La forma de trabajar y la autonomía de las sesiones, aparcadas hasta terminar el arnés.
+- El orden de los bloques B y C, que se confirma al cerrar el bloque A.
+
+### Queda por decidir
+
+Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
+encuentra:
+
 - **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
   lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in

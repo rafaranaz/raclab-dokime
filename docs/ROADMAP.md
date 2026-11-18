@@ -73,7 +73,9 @@ and published. A bad result is published as well.
 | G · Generalise | Use it with a second language, more agents and in a team | `packs`, `agents`, `delivery` | The corpus includes a Java repository; three different agents complete the circuit | 1.0 |
 
 The milestones of a block are written here when the block opens, and its measured numbers when it
-closes. The order of blocks B and C is confirmed when block A closes.
+closes. The order of blocks B and C was confirmed when block A closed: B before C, since the loop of
+C feeds the failures back to the agent until the change passes, and the hold-out is the defence
+against overfitting the visible examples ([ADR-0029](adr/0029-build-order-starts-with-auditing.md)).
 
 **Block A closed on 2026-11-18**, with version 0.1.0; its
 [closing note](#block-a--closing-note) is after its milestones. Its first milestone, A0, had no
@@ -433,13 +435,30 @@ block A:
 - The way of working and the autonomy of the sessions, set aside until the harness is finished.
 - The order of blocks B and C, which is confirmed when block A closes.
 
+### Block B · Milestones
+
+**Block B is open.** Its decisions before B1 are taken: the sealed store is encrypted with age, with
+pyrage as its implementation
+([ADR-0072](adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md)); the key
+of the hold-out lives outside CI until B4, on the machine of the maintainer, protected by a
+passphrase ([ADR-0073](adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md)); and a
+witness is isolated when it is a fix and nothing else
+([ADR-0074](adr/0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md)).
+
+| Milestone | What can be shown | Modules | Closes when |
+|---|---|---|---|
+| B0 Hold-out by hand | Two or three contracts of the corpus with at least two examples per case, split by hand into visible and held-out with a seed; an overfitted patch that passes the visible examples and fails a held-out one | None | The test is made on each contract and the minutes of the maintainer to approve two or more examples per case are measured, whatever they give; that is the test of the second hypothesis, and if it fails, the rule of the hold-out is revised before B1 |
+| B1 The hold-out | The split by case with a seed, the sealed store and the gate `sealed-examples`, run locally | `oracle` (the split, at least one visible example per case, the messages to the agent without values), `platform` (the sealed store), `verify` (the gate, with its canary, run only when the visible examples pass), `evidence` if needed (digests and kinds of failure of what is sealed, the barrier and the best effort, never values) | On the contracts of B0, the local sealed run gives the verdict each case expects; a batch whose canary passes is detected by the gate ([ADR-0014](adr/0014-hidden-checks-are-held-out-approved-examples.md)); the evidence of a sealed run records the barrier between the key and the agent and that the decryption was best effort, and the identity encrypted with a passphrase never enters the sandbox (ADR-0073); in CI the gate is not applicable with its reason; a batch written by pyrage decrypts with the binary `age` |
+| B2 Relations | The gate `relations` with the two relations of the catalogue, `idempotent` and `order-insensitive`, on inputs generated with a seed | `oracle`, `verify` | A patch that breaks a relation of a case fails the gate, and its good patch passes |
+| B3 Measurement | The boundary measured, the corpus widened to about thirty cases and `bench` computing its metrics | `corpus`, `bench` | First, the test of ADR-0074 (the eight witnesses in dispute labelled again, and κ computed again), and the boundary: how other tools write examples that build objects and call methods, and how many of the 41 witnesses each option would let fit, before an ADR decides whether the boundary `function` is widened. Then about thirty cases, each labelled before it runs, with the cases noted for it below and cases of the two cheating techniques that block A does not cover, overloaded comparison and state between calls; and `bench` computes false accepts per label, false rejects, the rate of questions, the value of the hold-out and stability |
+| B4 Close | The exit criterion of the block measured, and version 0.2 | None new | No false accept on the four cheating techniques; the value of the hold-out measured; the hypothesis that holding out by case catches overfitting resolved either way; whether the sealed gate runs in CI decided by an ADR either way, as ADR-0073 asks, which may conclude that it does not; the closing note, and version 0.2 with its tag and its Release, published even if the result is bad |
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
-  recipients; and the cases that the review of the corpus left for it, held out and on the coverage
+- **Before B3:** the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
   sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that
   special-cases `</pre>` and `</h1>`, with sealed examples of a quote, two `##` headings and a
@@ -475,3 +494,10 @@ A ruleset on `main` (Settings → Rules → Rulesets):
 - The five CI checks must pass (`lint, types and tests`, `corpus`, `governance checks`,
   `commits and branch scope`, `dependency audit`), on a branch that is up to date with `main`.
 - Linear history required; force pushes and deletion blocked.
+
+A ruleset on the tags of versions, `protect-version-tags` (Settings → Rules → Rulesets → New tag
+ruleset), so that a published version keeps pointing at what was published:
+
+- Target `v*`, active, with no one in the list of bypass.
+- Updates, deletions and force pushes restricted; creations allowed, so that a version can be
+  tagged.

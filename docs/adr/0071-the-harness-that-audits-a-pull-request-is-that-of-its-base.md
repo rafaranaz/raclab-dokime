@@ -28,13 +28,15 @@ pull request is that of its base, as its contract and its pack are.
   a checkout of the project.
 - **The commit of the harness in the evidence is that of the base**
   ([ADR-0068](0068-the-harness-is-named-by-its-version-and-its-commit.md)), and the summary of the job
-  shows it, so the maintainer can see that it is the base of the pull request.
+  shows it.
 
 **The limit.** The workflow file still comes from the pull request, since the event is
-`pull_request`: a pull request could change it so that it runs its own dokime, or none. Without
-`pull_request_target`, which ADR-0070 refused, this has no mechanism; it holds by discipline, since
-the pull requests are opened with the account of the maintainer, and the maintainer checks in the
-summary that the commit of the harness is the base before merging.
+`pull_request`: a pull request could change it so that it runs its own dokime, or none, and a
+workflow it changed can write in the summary of the job whatever it wants, a commit of the base and
+`PASS` included. So the summary cannot show that the workflow was not changed. What the maintainer
+checks before merging is that the pull request changes nothing under `.github/workflows/`; only
+then is the summary to be trusted. Without `pull_request_target` this has no mechanism; it holds by
+discipline, since the pull requests are opened with the account of the maintainer.
 
 ## Basis
 
@@ -54,8 +56,23 @@ change:
 - [electrum, pull request #11076](https://github.com/spesmilo/electrum/pull/11076), closed without merging: the security review checks out the trusted
   source from `pull_request.base.sha` and takes the pull request only as data of git.
 
-Reasoning, without a test: that the harness of the base, named by its commit in the summary, lets
-the maintainer see before merging that the change did not judge itself. The test is the first pull
+Read in the same page of GitHub, and in the account of an incident by SafeDep, on why the workflow
+does not run on `pull_request_target`:
+
+- The job "receives the base repository's GITHUB_TOKEN and access to repository and organization
+  secrets".
+- The cache is outside the permissions of the token. In the incident of TanStack, on May 11, 2026,
+  a workflow on `pull_request_target` wrote a poisoned cache into the scope of the default branch,
+  and "the job's `permissions` block controlled API access but had no effect on cache writes"
+  ([SafeDep](https://safedep.io/tanstack-github-actions-cache-poisoning/)). The page of GitHub now says that such a workflow has read-only access
+  to the cache of the default branch, unless it declares a `cache-mode` that writes, which
+  "reintroduces the cache-poisoning risk this restriction is designed to prevent": the protection is a default that a workflow can turn off.
+- GitHub "provides a default event policy that blocks the `pull_request_target` event in public
+  repositories", in evaluation now and enforced from December 2, 2026; and `actions/checkout` refuses
+  the head of a pull request from a fork on that event unless `allow-unsafe-pr-checkout` is set.
+
+Reasoning, without a test: that the harness of the base, with a pull request that changes no
+workflow, lets the maintainer see before merging that the change did not judge itself. The test is the first pull
 request of A4 that changes dokime and carries its evidence.
 
 ## Alternatives considered
@@ -63,7 +80,10 @@ request of A4 that changes dokime and carries its evidence.
 - **Run the harness of the pull request itself.** It is simpler, but the self-audit loses its sense
   exactly in the pull requests that change dokime.
 - **`pull_request_target`, with the workflow from the base.** It would close the limit, but the job
-  would get a token that can write while it runs the code of the change, which ADR-0070 refused.
+  would run the code of the change with the secrets of the repository, and with the cache of the
+  default branch, which the permissions of the token do not bound and whose protection a workflow
+  can turn off; GitHub blocks the event by default in public repositories, and `actions/checkout`
+  refuses there the code of a pull request from a fork (see the basis).
 - **Install a published version of dokime.** Nothing is published until someone outside uses it
   (ADR-0068).
 
@@ -73,5 +93,6 @@ request of A4 that changes dokime and carries its evidence.
   from the next pull request after its merge, the cost that microsoft-365-agents-toolkit states too:
   "Evaluation harness changes take effect after they are merged into the base branch".
 - The workflow checks out twice: the base, for the harness, and the project with the pull request.
-- In A4 the rule holds for the workflow file by discipline, and the summary of the job is what the
-  maintainer checks.
+- In A4 the rule holds for the workflow file by discipline: before merging, the maintainer checks that
+  the pull request changes nothing under `.github/workflows/`, and only then reads the summary of
+  the job as trustworthy.

@@ -1,4 +1,4 @@
-<!-- translation-of: 0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md sha256:65e241d08f78468e -->
+<!-- translation-of: 0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md sha256:d4a88c13443c5556 -->
 # ADR-0071 · El arnés que audita una pull request es el de su base
 
 **Estado:** propuesta
@@ -29,13 +29,15 @@ request es el de su base, como lo son su contrato y su pack.
   checkout del proyecto.
 - **El commit del arnés en la evidencia es el de la base**
   ([ADR-0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md)), y el resumen del job lo
-  muestra, para que el mantenedor vea que es la base de la pull request.
+  muestra.
 
 **El límite.** El fichero del workflow sigue viniendo de la pull request, porque el evento es
-`pull_request`: una pull request podría cambiarlo para que ejecute su propio dokime, o ninguno. Sin
-`pull_request_target`, que la ADR-0070 rechazó, esto no tiene mecanismo; se cumple por disciplina,
-porque las pull requests se abren con la cuenta del mantenedor, y el mantenedor comprueba en el
-resumen que el commit del arnés es la base antes de fusionar.
+`pull_request`: una pull request podría cambiarlo para que ejecute su propio dokime, o ninguno, y un
+workflow que ella cambió puede escribir en el resumen del job lo que quiera, también un commit de la
+base y `PASS`. Así que el resumen no puede mostrar que el workflow no se cambió. Lo que el mantenedor
+comprueba antes de fusionar es que la pull request no cambia nada bajo `.github/workflows/`; solo
+entonces el resumen es fiable. Sin `pull_request_target` esto no tiene mecanismo; se cumple por
+disciplina, porque las pull requests se abren con la cuenta del mantenedor.
 
 ## Base
 
@@ -55,16 +57,36 @@ podría cambiar:
 - [electrum, pull request #11076](https://github.com/spesmilo/electrum/pull/11076), cerrada sin fusionar: la revisión de seguridad extrae el código de
   confianza de `pull_request.base.sha` y toma la pull request solo como datos de git.
 
-Razonamiento, sin prueba: que el arnés de la base, nombrado por su commit en el resumen, deja ver al
-mantenedor antes de fusionar que el cambio no se juzgó a sí mismo. La prueba es la primera pull
+Leído en la misma página de GitHub, y en el relato de un incidente de SafeDep, sobre por qué el
+workflow no se ejecuta en `pull_request_target`:
+
+- El job "receives the base repository's GITHUB_TOKEN and access to repository and organization
+  secrets".
+- La caché está fuera de los permisos del token. En el incidente de TanStack, el 11 de mayo de 2026,
+  un workflow en `pull_request_target` escribió una caché envenenada en el ámbito de la rama por
+  defecto, y "the job's `permissions` block controlled API access but had no effect on cache
+  writes" ([SafeDep](https://safedep.io/tanstack-github-actions-cache-poisoning/)). La página de GitHub dice ahora que un workflow así tiene acceso
+  de solo lectura a la caché de la rama por defecto, salvo que declare un `cache-mode` que escriba,
+  lo que "reintroduces the cache-poisoning risk this restriction is designed to prevent": la protección es un valor por defecto que un
+  workflow puede desactivar.
+- GitHub "provides a default event policy that blocks the `pull_request_target` event in public
+  repositories", en evaluación ahora y aplicada desde el 2 de diciembre de 2026; y `actions/checkout`
+  rechaza en ese evento la cabeza de una pull request de un fork salvo que se active
+  `allow-unsafe-pr-checkout`.
+
+Razonamiento, sin prueba: que el arnés de la base, con una pull request que no cambia ningún
+workflow, deja ver al mantenedor antes de fusionar que el cambio no se juzgó a sí mismo. La prueba es la primera pull
 request de A4 que cambie dokime y lleve su evidencia.
 
 ## Alternativas consideradas
 
 - **Ejecutar el arnés de la propia pull request.** Es más sencillo, pero la autoauditoría pierde el
   sentido justo en las pull requests que cambian dokime.
-- **`pull_request_target`, con el workflow de la base.** Cerraría el límite, pero el job recibiría un
-  token que puede escribir mientras ejecuta el código del cambio, lo que rechazó la ADR-0070.
+- **`pull_request_target`, con el workflow de la base.** Cerraría el límite, pero el job ejecutaría el
+  código del cambio con los secretos del repositorio, y con la caché de la rama por defecto, que los
+  permisos del token no acotan y cuya protección un workflow puede desactivar; GitHub bloquea el
+  evento por defecto en los repositorios públicos, y `actions/checkout` rechaza ahí el código de una
+  pull request de un fork (ver la base).
 - **Instalar una versión publicada de dokime.** No se publica nada hasta que alguien de fuera lo use
   (ADR-0068).
 
@@ -75,5 +97,6 @@ request de A4 que cambie dokime y lleve su evidencia.
   microsoft-365-agents-toolkit: "Evaluation harness changes take effect after they are merged into
   the base branch".
 - El workflow extrae dos veces: la base, para el arnés, y el proyecto con la pull request.
-- En A4 la regla se cumple para el fichero del workflow por disciplina, y el resumen del job es lo
-  que comprueba el mantenedor.
+- En A4 la regla se cumple para el fichero del workflow por disciplina: antes de fusionar, el
+  mantenedor comprueba que la pull request no cambia nada bajo `.github/workflows/`, y solo entonces
+  lee el resumen del job como fiable.

@@ -80,3 +80,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md) | A person approves the contract before a change is audited against it | Proposed |
 | [0068](0068-the-harness-is-named-by-its-version-and-its-commit.md) | The harness is named by its version and its commit | Proposed |
 | [0069](0069-the-predicate-v0-2-adds-what-a4-records.md) | The predicate v0.2 adds what A4 records | Proposed |
+| [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Proposed |

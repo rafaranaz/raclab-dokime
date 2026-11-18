@@ -1,0 +1,13 @@
+format: 1
+name: raclab-dokime
+environment:
+  dockerfile: Dockerfile
+tests:
+  command: [python, -m, pytest, -p, no:cacheprovider, -q, --continue-on-collection-errors, --junitxml, /dokime/out/report.xml]
+  report: report.xml
+  paths: ["tests/**"]
+  config: ["pytest.ini", ".pytest.ini", "**/conftest.py"]
+  sections:
+    - file: pyproject.toml
+      format: toml
+      section: tool.pytest.ini_options

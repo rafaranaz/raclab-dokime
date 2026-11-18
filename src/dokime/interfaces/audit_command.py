@@ -258,6 +258,11 @@ def _finding_line(gate: str, finding: Finding) -> str:
     return f"{gate}: {finding.verdict.value} {finding.code}: {finding.message}{lines}"
 
 
+def harness_version() -> str:
+    """The version of the installed harness, or `unversioned` when it is not installed."""
+    return _version()
+
+
 def _version() -> str:
     try:
         return importlib.metadata.version(DISTRIBUTION)

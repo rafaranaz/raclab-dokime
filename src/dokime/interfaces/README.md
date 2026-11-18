@@ -4,6 +4,17 @@ The commands a person or a pipeline runs. A command reads its input, calls the m
 the work and shows the result; it holds no logic of its own about contracts or packs. It is also
 the composition root: the only module that builds the adapters of `platform` and `sandbox`.
 
+## `--version`
+
+Prints the version of the installed harness, the same one the evidence records, and exits with 0.
+
+```console
+$ python -m dokime.interfaces --version
+dokime 0.0.0
+```
+
+When the harness is not installed as a distribution it prints `dokime unversioned`.
+
 ## `contract check`
 
 Validates a contract file and says what it lacks.

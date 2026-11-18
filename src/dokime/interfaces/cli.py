@@ -13,7 +13,7 @@ from dokime.contract.check import check
 from dokime.contract.model import Checked
 from dokime.core.findings import Finding
 from dokime.core.verdicts import Verdict
-from dokime.interfaces.audit_command import audit_command
+from dokime.interfaces.audit_command import audit_command, harness_version
 from dokime.interfaces.env import env_check
 from dokime.interfaces.text import EXIT_CODES, finding_line, summary
 
@@ -34,6 +34,12 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="dokime", description="Verification and evidence around coding agents."
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"dokime {harness_version()}",
+        help="print the version of the installed harness",
     )
     areas = parser.add_subparsers(dest="area", required=True, metavar="AREA")
     contract = areas.add_parser("contract", help="work with a contract")

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:1ff9ceeee8bdc93c -->
+<!-- translation-of: ROADMAP.md sha256:4be10f71ce3085ad -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -326,6 +326,13 @@ Razonado, no medido:
   mantenedor, porque es el coste de adopción que pagaría una persona sin esa ayuda.
 
 A3 no resolvió ninguna hipótesis de la tabla de arriba; ninguna tenía su prueba en A3.
+
+Para la nota que cierra el bloque A, al final de A4: la proporción de arreglos reales que no caben en
+el formato del contrato, como pide la ADR-0057, con la hipótesis de A0 medida tanto en cambios
+elegidos a mano como en cambios sacados de la historia. Lo leído, no ejecutado: en python-semver unos
+12 de 25, una cuenta que dio la sesión que revisa el trabajo y cuya base, los 25 candidatos o los 18
+testigos entre ellos de la tabla de la ADR-0057, se fija cuando se mida; en cachetools casi ninguno,
+porque casi todos son decoradores y métodos de clases; en mdformat al menos 2 de sus 7 testigos.
 
 Apuntado como deuda, que no bloquea ningún hito:
 

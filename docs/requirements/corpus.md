@@ -89,6 +89,8 @@ them drawn at random and run, which says how often the reading is right.
 - **CORPUS-057** The fixture shall classify each witness once, and classify the witness of each good case as isolated and expressible.
 - **CORPUS-058** The sample of the fixture shall be the one that its written seed draws: in each project, in the order of the fixture, one witness among those that are expressible and one among those that are not.
 - **CORPUS-059** The fixture shall give, for each witness of the sample, the example tried at its boundary, what it gave before and after the change, and whether that confirms the reading, and for one that is not expressible, why the example cannot be written.
+- **CORPUS-060** The fixture shall keep a second reading of every witness it classifies, made without seeing the first, with whether it is isolated and whether it is expressible and its reason.
+- **CORPUS-061** The fixture shall give, for each filter and for both together, how many witnesses the two readings label alike, as the two readings give it.
 
 ### The audit of the cases
 

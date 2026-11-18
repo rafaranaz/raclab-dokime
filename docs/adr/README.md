@@ -77,3 +77,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Accepted, amended by 0065 and 0066 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md) | The evidence of A3 lists every gate of the audit flow, reached or not | Accepted |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md) | The untrusted texts of the evidence are bounded | Accepted |
+| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md) | A person approves the contract before a change is audited against it | Proposed |

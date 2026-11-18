@@ -94,3 +94,17 @@ not applicable, each with the block that builds it.
 - **VERIFY-125** If a result is of a gate that is not of the state, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-not-of-the-state`, naming the gate.
 - **VERIFY-124** If a gate of the state is not in the table of the gates, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-unknown`, naming the gate.
 - **VERIFY-126** If two results are of the same gate, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-repeated`, naming the gate.
+
+## The gate `repeatability` ([ADR-0017](../adr/0017-damage-outside-the-change-against-a-baseline.md), [ADR-0054](../adr/0054-the-policy-is-an-optional-file-of-values.md))
+
+The verification runs as many times as `verification.runs` of the policy says, and the gate asks
+when two runs give different verdicts, as the table of the gates says
+([`04-states-and-flows.md`](../architecture/04-states-and-flows.md#the-gates)). `interfaces` runs
+the gates of the state `verifying` that many times and gives this gate their results; `verify`
+compares them.
+
+- **VERIFY-140** When the results of the runs of the verification are given, the gate `repeatability` shall compare, for each gate, the verdicts it gave in the runs.
+- **VERIFY-141** If a gate gave different verdicts in two runs, then the gate `repeatability` shall report a finding with the code `verdict-varies` and the verdict `ASK` that names the gate and its verdict in each run, in the order of the runs.
+- **VERIFY-142** If a gate has a result in some runs and not in others, or twice in one run, then the gate `repeatability` shall report a finding with the code `runs-differ` and the verdict `ERROR` that names the gate.
+- **VERIFY-143** If fewer than two runs are given, then the gate `repeatability` shall refuse them with an error that names how many were given.
+- **VERIFY-144** When every gate gave the same verdict in every run, the gate `repeatability` shall pass with no finding.

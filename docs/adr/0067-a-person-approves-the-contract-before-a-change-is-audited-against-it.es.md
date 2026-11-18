@@ -1,4 +1,4 @@
-<!-- translation-of: 0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md sha256:a827bb8efb53a40a -->
+<!-- translation-of: 0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md sha256:b5f16963a770a2a2 -->
 # ADR-0067 · Una persona aprueba el contrato antes de que se audite un cambio contra él
 
 **Estado:** propuesta
@@ -31,11 +31,17 @@ de uso; lo que cambia de un modo a otro es el mecanismo que la cumple.
   descripción. No se toma de la descripción de la pull request, que escribe quien la abre.
 - **El resumen del job muestra el story y la huella del contrato** que usó la auditoría, y el
   mantenedor los comprueba antes de fusionar la pull request del cambio.
+- **Una pull request que solo añade o cambia ficheros bajo `.dokime/changes/` es una pull request de
+  contrato.** No se audita, porque `protected-paths` la rechazaría siempre: su contrato se comprueba
+  con `contract check`, y el resumen del job dice `contract pull request: checked, not audited`. Una
+  pull request que mezcla `.dokime/` con código se audita, y `protected-paths` la rechaza, como debe.
 
 **El límite.** En A4 las pull requests se abren con la cuenta del mantenedor, así que la fusión
 como aprobación y el story de la rama se cumplen por disciplina, no porque GitHub impida otra cosa:
 un agente con esa cuenta podría fusionar un contrato o nombrar otra rama. La protección es que el
-mantenedor compruebe el story y la huella del contrato antes de fusionar el código. Cuando el agente
+mantenedor compruebe el story y la huella del contrato antes de fusionar el código. Ni siquiera una
+revisión obligatoria lo impediría en A4: los propietarios y los administradores de un repositorio
+pueden fusionar sin una revisión aprobada. Cuando el agente
 tenga una identidad propia, la misma regla la cumplirá un mecanismo, no la disciplina.
 
 **Mecanismos que la regla admite más adelante**, sin reescribirla:
@@ -59,10 +65,11 @@ Comprobado en la documentación de GitHub:
   ejecutado por `pull_request_target` recibe uno que puede escribir
   ([el token de GitHub](https://docs.github.com/fr/enterprise-server@3.13/actions/reference/github_token-reference)).
 
-Buscado y no encontrado: la página de GitHub que dice que el autor de una pull request no puede
-aprobarla. Lo dicen guías de terceros
-([Graphite](https://graphite.com/guides/pull-request-approval-permissions-rules-github)); no importa
-en A4, donde una sola cuenta abre y fusiona.
+- La sesión que revisa el trabajo leyó en la documentación de GitHub, "Approving a pull request with
+  required reviews", que "Pull request authors cannot approve their own pull requests", y que los
+  propietarios y los administradores de un repositorio pueden fusionar sin una revisión aprobada. Con
+  la cuenta del mantenedor, por tanto, ni una revisión obligatoria impediría una fusión, que es el
+  límite de arriba.
 
 Razonamiento, sin prueba: que un story sacado de la rama, mostrado con la huella de su contrato en el
 resumen del job, basta para que el mantenedor vea que el cambio se auditó contra el contrato que

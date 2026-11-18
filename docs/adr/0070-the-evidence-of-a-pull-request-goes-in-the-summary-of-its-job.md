@@ -35,7 +35,8 @@ that can only read, and one run by `pull_request_target` gets a token that can w
 The writings on its risk advise running the code of a fork only on `pull_request`
 ([SonarSource](https://rules.sonarsource.com/githubactions/RSPEC-7631)).
 
-Looked for and not found: how long GitHub keeps an artifact by default.
+The session that reviews the work read in the documentation of GitHub that an artifact is kept 90
+days by default.
 
 Reasoning, without a test: the fields of the summary are names, verdicts, codes and digests that the
 reader of the evidence checks against their patterns, so they need no escaping, and a message that
@@ -54,6 +55,7 @@ carries its evidence.
 ## Consequences
 
 - The maintainer opens the job to see the result, and the artifact to read the whole evidence.
-- The artifact is kept only as long as GitHub keeps it. Keeping evidence for longer is the evidence
-  store of the architecture, which A4 does not build.
+- **The limit: the artifacts expire**, after 90 days by default in GitHub, so the evidence of a pull
+  request is not permanent in A4. Keeping it for good is the evidence store of the architecture,
+  which comes with block E.
 - No job of this repository that runs the code of a change can write in it.

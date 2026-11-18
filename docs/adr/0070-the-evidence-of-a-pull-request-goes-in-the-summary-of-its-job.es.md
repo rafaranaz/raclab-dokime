@@ -1,4 +1,4 @@
-<!-- translation-of: 0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md sha256:c85a427071457d97 -->
+<!-- translation-of: 0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md sha256:19eb99af702b1bc7 -->
 # ADR-0070 · La evidencia de una pull request va en el resumen de su job y en un artefacto
 
 **Estado:** propuesta
@@ -36,7 +36,8 @@ puede escribir, incluso para un fork
 Lo escrito sobre su riesgo aconseja ejecutar el código de un fork solo en `pull_request`
 ([SonarSource](https://rules.sonarsource.com/githubactions/RSPEC-7631)).
 
-Buscado y no encontrado: cuánto tiempo guarda GitHub un artefacto por defecto.
+La sesión que revisa el trabajo leyó en la documentación de GitHub que un artefacto se guarda 90 días
+por defecto.
 
 Razonamiento, sin prueba: los campos del resumen son nombres, veredictos, códigos y huellas que el
 lector de la evidencia comprueba contra sus patrones, así que no necesitan escaparse, y un mensaje
@@ -54,6 +55,7 @@ que lleve su evidencia.
 ## Consecuencias
 
 - El mantenedor abre el job para ver el resultado, y el artefacto para leer la evidencia entera.
-- El artefacto se guarda solo mientras GitHub lo guarde. Guardar la evidencia más tiempo es el
-  almacén de evidencias de la arquitectura, que A4 no construye.
+- **El límite: los artefactos caducan**, a los 90 días por defecto en GitHub, así que la evidencia de
+  una pull request no es permanente en A4. Guardarla para siempre es el almacén de evidencias de la
+  arquitectura, que llega con el bloque E.
 - Ningún job de este repositorio que ejecute el código de un cambio puede escribir en él.

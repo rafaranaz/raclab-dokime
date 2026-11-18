@@ -1,6 +1,6 @@
 # ADR-0068 · The harness is named by its version and its commit
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

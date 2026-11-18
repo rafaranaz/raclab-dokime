@@ -1,6 +1,6 @@
 # ADR-0067 · A person approves the contract before a change is audited against it
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

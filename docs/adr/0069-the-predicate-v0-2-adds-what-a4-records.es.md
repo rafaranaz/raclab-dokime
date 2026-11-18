@@ -1,7 +1,7 @@
-<!-- translation-of: 0069-the-predicate-v0-2-adds-what-a4-records.md sha256:0d115334a2a06d1b -->
+<!-- translation-of: 0069-the-predicate-v0-2-adds-what-a4-records.md sha256:21ca2ee42a4e1716 -->
 # ADR-0069 · El predicado v0.2 añade lo que registra A4
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

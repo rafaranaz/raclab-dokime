@@ -1,7 +1,7 @@
-<!-- translation-of: 0068-the-harness-is-named-by-its-version-and-its-commit.md sha256:3fe694e77edd22ee -->
+<!-- translation-of: 0068-the-harness-is-named-by-its-version-and-its-commit.md sha256:266a28edc199a21e -->
 # ADR-0068 · El arnés se nombra por su versión y su commit
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

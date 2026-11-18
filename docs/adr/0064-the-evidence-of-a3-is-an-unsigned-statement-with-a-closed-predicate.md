@@ -1,6 +1,6 @@
 # ADR-0064 · The evidence of A3 is an unsigned statement with a closed predicate
 
-**Status:** accepted, amended by [ADR-0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md) and [ADR-0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md)
+**Status:** accepted, amended by [ADR-0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md), [ADR-0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md) and [ADR-0069](0069-the-predicate-v0-2-adds-what-a4-records.md)
 
 ## Context
 

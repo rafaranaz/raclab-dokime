@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:51c90eaea523afc8 -->
+<!-- translation-of: README.md sha256:9ac0b151917ebc09 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -75,10 +75,10 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Aceptada |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.es.md) | Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él | Aceptada |
 | [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Aceptada |
-| [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md) | La evidencia de A3 es un statement sin firmar con un predicado cerrado | Aceptada, enmendada por el 0065 y el 0066 |
+| [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md) | La evidencia de A3 es un statement sin firmar con un predicado cerrado | Aceptada, enmendada por el 0065, el 0066 y el 0069 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) | La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no | Aceptada |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Aceptada |
-| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md) | Una persona aprueba el contrato antes de que se audite un cambio contra él | Propuesta |
-| [0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md) | El arnés se nombra por su versión y su commit | Propuesta |
-| [0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md) | El predicado v0.2 añade lo que registra A4 | Propuesta |
-| [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.es.md) | La evidencia de una pull request va en el resumen de su job y en un artefacto | Propuesta |
+| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md) | Una persona aprueba el contrato antes de que se audite un cambio contra él | Aceptada |
+| [0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md) | El arnés se nombra por su versión y su commit | Aceptada |
+| [0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md) | El predicado v0.2 añade lo que registra A4 | Aceptada |
+| [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.es.md) | La evidencia de una pull request va en el resumen de su job y en un artefacto | Aceptada |

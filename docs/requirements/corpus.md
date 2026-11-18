@@ -77,12 +77,18 @@ in `tests/corpus/withdrawn.toml` without touching its files.
 
 The good patch of each case comes from a witness of the history of its project. The search past the
 second witness is `tests/corpus/witnesses.py`, run by hand; its measurement of ADR-0057 and the
-witnesses of the good cases are the fixture `tests/corpus/witnesses.toml`.
+witnesses of the good cases are the fixture `tests/corpus/witnesses.toml`. The same fixture keeps
+the two filters of ADR-0057 for each witness of the measurement, read from its diff, and a sample of
+them drawn at random and run, which says how often the reading is right.
 
 - **CORPUS-045** When the tests of the corpus are asked for, the test of each witness of the fixture shall look at its commit with the candidates of the self-check on the git and the podman adapters, and demand that it is a witness that turns green the tests the fixture names.
 - **CORPUS-046** The fixture shall name, for each good case, the witness it comes from, whose parent is the base of the case.
-- **CORPUS-047** The table of the measurement in the fixture shall be the table of the basis of ADR-0057, row by row.
+- **CORPUS-047** The table of the measurement in the fixture shall give, for each project of the corpus, as many witnesses as the fixture classifies for it.
 - **CORPUS-048** The witnesses of each project in the table of the measurement shall be no more than its candidates looked at.
+- **CORPUS-056** The fixture shall give, for each witness it classifies, whether it is isolated and whether it is expressible, each with its reason, and a boundary, `function` or `cli`, with its target exactly when it is expressible.
+- **CORPUS-057** The fixture shall classify each witness once, and classify the witness of each good case as isolated and expressible.
+- **CORPUS-058** The sample of the fixture shall be the one that its written seed draws: in each project, in the order of the fixture, one witness among those that are expressible and one among those that are not.
+- **CORPUS-059** The fixture shall give, for each witness of the sample, the example tried at its boundary, what it gave before and after the change, and whether that confirms the reading, and for one that is not expressible, why the example cannot be written.
 
 ### The audit of the cases
 

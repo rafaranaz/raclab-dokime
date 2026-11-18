@@ -14,6 +14,7 @@ shared = ["docs/adr/**", "docs/ROADMAP.md", "docs/ROADMAP.es.md", "tools/scopes.
 description = "Repository governance: tooling, CI, working agreement, development skills."
 paths = [
     ".claude/**",
+    ".dokime/**",
     ".github/**",
     ".gitignore",
     ".python-version",

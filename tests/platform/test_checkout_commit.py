@@ -1,4 +1,4 @@
-# SDD-EARS: PLATFORM-080 PLATFORM-081 PLATFORM-082 PLATFORM-083
+# SDD-EARS: PLATFORM-080 PLATFORM-081 PLATFORM-082 PLATFORM-083 PLATFORM-084
 import os
 import subprocess
 from pathlib import Path
@@ -89,3 +89,30 @@ def test_no_program_named_by_the_configuration_runs(checkout: Path, tmp_path: Pa
         (hooks / name).chmod(0o755)
     assert checkout_commit(checkout) == CommitName(git(checkout, "rev-parse", "HEAD"))
     assert not marker.exists()
+
+
+def test_no_filter_that_the_attributes_name_runs(checkout: Path, tmp_path: Path) -> None:
+    marker = tmp_path / "cleaned"
+    program = tmp_path / "clean.sh"
+    program.write_text(f"#!/bin/sh\ntouch {marker}\ncat\n")
+    program.chmod(0o755)
+    (checkout / ".gitattributes").write_text("*.py filter=x\n")
+    git(checkout, "add", ".gitattributes")
+    git(checkout, "commit", "--quiet", "--message", "attributes")
+    git(checkout, "config", "filter.x.clean", str(program))
+    code = checkout / "src" / "dokime" / "code.py"
+    os.utime(code, (2_000_000_000, 2_000_000_000))
+    marker.unlink(missing_ok=True)
+    assert checkout_commit(checkout) == CommitName(git(checkout, "rev-parse", "HEAD"))
+    assert not marker.exists()
+
+
+def test_a_directory_the_checkout_does_not_follow_has_no_commit(checkout: Path) -> None:
+    (checkout / ".gitignore").write_text("__pycache__/\n.venv/\n")
+    git(checkout, "add", ".gitignore")
+    git(checkout, "commit", "--quiet", "--message", "ignore the environment")
+    installed = checkout / ".venv" / "lib" / "site-packages" / "dokime"
+    installed.mkdir(parents=True)
+    (installed / "code.py").write_text("x = 1\n")
+    assert checkout_commit(checkout) == CommitName(git(checkout, "rev-parse", "HEAD"))
+    assert checkout_commit(installed) is None

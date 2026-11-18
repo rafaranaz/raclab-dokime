@@ -66,7 +66,9 @@ ledger.record("run.started", {})
 `checkout_commit(directory)` gives the commit of `HEAD` of the checkout of git that holds the
 directory, which `interfaces` asks for the directory of the harness, so that the evidence names it
 by its version and its commit (ADR-0068). It gives none when the directory is not in a checkout,
-the checkout has no commit, git is not found, or the checkout has a change to a file git follows or
-a file it neither follows nor ignores: the commit would not name the code that runs. git runs with
-the environment of the adapter and with `core.fsmonitor` and the hooks turned off, so no program
-that the configuration names runs (PLATFORM-083).
+the checkout follows no file under it (a harness installed in an ignored environment of another
+project), the checkout has no commit, git is not found, or the checkout has a change to a file git
+follows or a file it neither follows nor ignores: the commit would not name the code that runs. git
+runs with the environment of the adapter, with `core.fsmonitor` and the hooks turned off, and with
+`GIT_ATTR_SOURCE` on the empty tree, so that no program that the configuration, the hooks or the
+attributes name runs, not even a filter that cleans a file to compare it (PLATFORM-083).

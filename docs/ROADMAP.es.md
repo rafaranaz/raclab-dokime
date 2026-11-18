@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:0080dbf4062cf7ba -->
+<!-- translation-of: ROADMAP.md sha256:88708ca5cce096f4 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -75,7 +75,10 @@ se publica. Un resultado malo también se publica.
 | G · Generalizar | Usarlo con un segundo lenguaje, con más agentes y en equipo | `packs`, `agents`, `delivery` | El conjunto de casos incluye un repositorio Java; tres agentes distintos completan el circuito | 1.0 |
 
 Los hitos de un bloque se escriben aquí cuando el bloque se abre, y sus números medidos cuando se
-cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
+cierra. El orden de los bloques B y C se confirmó al cerrar el bloque A: B antes que C, porque el
+bucle de C devuelve los fallos al agente hasta que el cambio pasa, y la reserva es la defensa contra
+el sobreajuste a los ejemplos visibles
+([ADR-0029](adr/0029-build-order-starts-with-auditing.es.md)).
 
 **El bloque A se cerró el 2026-11-18**, con la versión 0.1.0; su
 [nota de cierre](#bloque-a--nota-de-cierre) está tras sus hitos. Su primer hito, A0, no tuvo código:
@@ -445,13 +448,30 @@ bloque A:
 - La forma de trabajar y la autonomía de las sesiones, aparcadas hasta terminar el arnés.
 - El orden de los bloques B y C, que se confirma al cerrar el bloque A.
 
+### Bloque B · Hitos
+
+**El bloque B está abierto.** Sus decisiones previas a B1 están tomadas: el almacén sellado se cifra
+con age, con pyrage como implementación
+([ADR-0072](adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.es.md)); la
+clave de la reserva vive fuera de CI hasta B4, en la máquina del mantenedor, protegida con una
+contraseña ([ADR-0073](adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md)); y un
+testigo está aislado cuando es un arreglo y nada más
+([ADR-0074](adr/0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md)).
+
+| Hito | Qué se puede enseñar | Módulos | Se cierra cuando |
+|---|---|---|---|
+| B0 Reserva a mano | Dos o tres contratos del corpus con al menos dos ejemplos por caso, divididos a mano en visibles y reservados con una semilla; un parche sobreajustado que pasa los ejemplos visibles y falla uno reservado | Ninguno | La prueba está hecha en cada contrato y los minutos del mantenedor para aprobar dos o más ejemplos por caso están medidos, den lo que den; es la prueba de la segunda hipótesis, y si no se cumple, se revisa la regla de la reserva antes de B1 |
+| B1 La reserva | La división por caso con una semilla, el almacén sellado y la puerta `sealed-examples`, ejecutados en local | `oracle` (la división, al menos un ejemplo visible por caso, los mensajes al agente sin valores), `platform` (el almacén sellado), `verify` (la puerta, con su canario, ejecutada solo cuando pasan los ejemplos visibles), `evidence` si hace falta (huellas y tipos de fallo de lo sellado, la barrera y el mejor esfuerzo, nunca valores) | En los contratos de B0, el run sellado en local da el veredicto que espera cada caso; un lote cuyo canario pasa lo detecta la puerta ([ADR-0014](adr/0014-hidden-checks-are-held-out-approved-examples.es.md)); la evidencia de un run sellado registra la barrera entre la clave y el agente y que el descifrado fue de mejor esfuerzo, y la identidad cifrada con contraseña nunca entra en el sandbox (ADR-0073); en CI la puerta no es aplicable, con su motivo; un lote escrito por pyrage se descifra con el binario `age` |
+| B2 Relaciones | La puerta `relations` con las dos relaciones del catálogo, `idempotent` y `order-insensitive`, sobre entradas generadas con una semilla | `oracle`, `verify` | Un parche que rompe una relación de un caso falla la puerta, y su parche bueno la pasa |
+| B3 Medida | La frontera medida, el corpus ampliado a unos treinta casos y `bench` calculando sus métricas | `corpus`, `bench` | Primero, la prueba de la ADR-0074 (los ocho testigos en disputa etiquetados de nuevo, y κ recalculado), y la frontera: cómo escriben otras herramientas ejemplos que construyen objetos y llaman métodos, y cuántos de los 41 testigos cabrían con cada opción, antes de que una ADR decida si se amplía la frontera `function`. Después, unos treinta casos, cada uno etiquetado antes de ejecutarse, con los casos apuntados para él más abajo y casos de las dos técnicas de trampa que el bloque A no cubre, la comparación sobrecargada y el estado entre llamadas; y `bench` calcula los falsos aceptados por etiqueta, los falsos rechazados, la tasa de preguntas, el valor de la reserva y la estabilidad |
+| B4 Cierre | El criterio de salida del bloque medido, y la versión 0.2 | Ninguno nuevo | Ningún falso aceptado en las cuatro técnicas de trampa; el valor de la reserva medido; la hipótesis de que la reserva por caso caza el sobreajuste resuelta en un sentido u otro; si la puerta sellada corre en CI, decidido por una ADR en un sentido u otro, como pide la ADR-0073, que puede concluir que no; la nota de cierre, y la versión 0.2 con su etiqueta y su Release, publicadas aunque el resultado sea malo |
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Antes de B1:** la herramienta que cifra el contenido reservado del almacén sellado para una
-  lista de destinatarios; y los casos que la revisión del conjunto dejó para él, reservados y sobre
+- **Antes de B3:** los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
   parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de
   `fixes-only-a-code-block-before-the-blank` que trata aparte `</pre>` y `</h1>`, con ejemplos
@@ -488,3 +508,10 @@ Un ruleset sobre `main` (Settings → Rules → Rulesets):
 - Los cinco checks de CI tienen que pasar (`lint, types and tests`, `corpus`, `governance checks`,
   `commits and branch scope`, `dependency audit`), sobre una rama al día con `main`.
 - Historial lineal obligatorio; push forzado y borrado bloqueados.
+
+Un ruleset sobre las etiquetas de versión, `protect-version-tags` (Settings → Rules → Rulesets → New
+tag ruleset), para que una versión publicada siga apuntando a lo que se publicó:
+
+- Objetivo `v*`, activo, sin nadie en la lista de excepciones.
+- Actualizaciones, borrados y push forzado restringidos; creaciones permitidas, para que se pueda
+  etiquetar una versión.

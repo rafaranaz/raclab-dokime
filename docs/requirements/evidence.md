@@ -3,7 +3,10 @@
 The evidence of a run
 ([`03-data-and-evidence.md`](../architecture/03-data-and-evidence.md#the-evidence)). In A3 it is the
 in-toto statement alone, without an envelope, with the predicate v0.1 of
-[ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md).
+[ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md);
+from A4 it writes the predicate v0.2 of
+[ADR-0069](../adr/0069-the-predicate-v0-2-adds-what-a4-records.md), and reads a file of each version
+with the schema of its version.
 `evidence` imports nothing but `core` and decides no verdict: it records the verdicts it is given.
 `interfaces` gives it the run and writes its bytes outside the tree they describe. Each requirement
 follows an EARS template and has at least one test that declares it in its `SDD-EARS:` marker.
@@ -13,7 +16,7 @@ schema of the predicate are built; signing and verifying come with block E.
 
 ## The statement
 
-- **EVIDENCE-001** When a run is built into evidence, the builder shall give an in-toto Statement v1 with the `_type` `https://in-toto.io/Statement/v1`, the `predicateType` `https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1` and the subjects `tree`, with the `gitTree` of the tree of the base with the whole patch, and `change.patch`, with the `sha256` of the bytes of the patch.
+- **EVIDENCE-001** When a run is built into evidence, the builder shall give an in-toto Statement v1 with the `_type` `https://in-toto.io/Statement/v1`, the `predicateType` `https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2` ([ADR-0069](../adr/0069-the-predicate-v0-2-adds-what-a4-records.md)) and the subjects `tree`, with the `gitTree` of the tree of the base with the whole patch, and `change.patch`, with the `sha256` of the bytes of the patch.
 - **EVIDENCE-002** When a run is built into evidence, the builder shall give its bytes as the canonical form of [ADR-0062](../adr/0062-a-digest-is-taken-over-a-restricted-canonical-json.md) of the statement in UTF-8.
 - **EVIDENCE-003** When a run is built into evidence, the builder shall give its digest as `sha256:` and the hexadecimal SHA-256 of its bytes, which the event `evidence.built` records.
 - **EVIDENCE-004** When a run is built into evidence, the builder shall name its file `<story>.statement.json` after the story of the run.
@@ -27,6 +30,10 @@ schema of the predicate are built; signing and verifying come with block E.
 - **EVIDENCE-023** Where the run reached them, the predicate shall carry in `inputs` the `image` with its `digest` and the `platform` of its base image when it has one, the `pack` with the `digest` as `sha256:` and the SHA-256 of the bytes of its file, and the `probe` with the digest of the program that observes.
 - **EVIDENCE-024** The predicate shall carry `human_decisions` as an empty list, and `ledger` with the `head`, the hash of the last event of the ledger given, and the number of its `events`.
 - **EVIDENCE-025** If the run does not fill a field, then the builder shall leave the field out, never writing it as `null`.
+- **EVIDENCE-026** Where the run gives the commit of the harness, the predicate shall carry it in `verifier` as `commit`.
+- **EVIDENCE-027** Where the run gives the image of the change, the predicate shall carry in `inputs` the `change_image` with its `digest` and the `platform` of its base image when it has one.
+- **EVIDENCE-028** Where the run gives its repetitions, the predicate shall carry `repeated` with the number of `runs` of the verification and whether they were `consistent`.
+- **EVIDENCE-029** The builder shall write no `message` in a finding, since no module gives a message with only the words of dokime yet.
 
 ## The gates
 
@@ -63,3 +70,5 @@ schema of the predicate are built; signing and verifying come with block E.
 - **EVIDENCE-087** If the gates of the predicate are not, by name, `contract`, `environment`, `baseline`, `protected-paths`, `existing-tests`, `visible-examples`, `relations`, `changed-line-coverage`, `behaviour-differences`, `repeatability` and `sealed-examples`, in that order, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names `predicate/gates` ([ADR-0065](../adr/0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md)).
 - **EVIDENCE-088** If a gate is `not-reached` and no earlier gate ran with a verdict other than `PASS`, or a gate ran after a `not-reached` gate, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names the place of the gate.
 - **EVIDENCE-089** If a text of `untrusted` with the label `message` has more than 4096 characters, or another text of `untrusted` has more than 200, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names its place ([ADR-0066](../adr/0066-the-untrusted-texts-of-the-evidence-are-bounded.md)).
+- **EVIDENCE-090** When the reader reads bytes whose `predicateType` is that of v0.1, the reader shall read them with the schema of v0.1, which has none of the fields that v0.2 adds.
+- **EVIDENCE-091** When the reader reads bytes of v0.2, the reader shall accept in a finding an optional `message` of 1 to 4096 characters, as trusted text.

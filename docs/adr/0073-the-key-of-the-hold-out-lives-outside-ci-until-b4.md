@@ -1,6 +1,6 @@
 # ADR-0073 · The key of the hold-out lives outside CI until B4
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

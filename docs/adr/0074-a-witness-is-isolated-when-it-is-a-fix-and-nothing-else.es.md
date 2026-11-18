@@ -1,7 +1,7 @@
-<!-- translation-of: 0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md sha256:9a0afc42f71434cf -->
+<!-- translation-of: 0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md sha256:44c13f5d3b1b8694 -->
 # ADR-0074 · Un testigo está aislado cuando es un arreglo y nada más
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

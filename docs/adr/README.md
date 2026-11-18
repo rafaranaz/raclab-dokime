@@ -84,4 +84,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md) | The harness that audits a pull request is that of its base | Accepted |
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md) | The sealed store is encrypted with age for a list of recipients | Accepted |
 | [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md) | The key of the hold-out lives outside CI until B4 | Accepted |
-| [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Proposed |
+| [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Accepted |

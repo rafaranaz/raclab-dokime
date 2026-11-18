@@ -163,3 +163,8 @@ only what dokime fixes, so that it needs no escaping.
 - **INTERFACES-151** The command shall write in the summary only names, statuses, verdicts, codes, versions and digests that match their patterns, and no message, reason or other text that dokime did not fix.
 - **INTERFACES-152** When the audit ends without evidence, the command shall write in the summary its verdict and the codes of the findings that ended it.
 - **INTERFACES-153** If the file of the summary cannot be written, then the command shall say so on the standard error and exit with the code of `ERROR`.
+
+## The version of the harness
+
+- **INTERFACES-154** When dokime is run with the option `--version`, the command shall print `dokime` and the version of the installed harness on one line of the standard output and exit with status 0.
+- **INTERFACES-155** If the harness is not installed as a distribution, then the command shall print `dokime unversioned` for `--version` and exit with status 0.

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:25a1ece9be2d4b32 -->
+<!-- translation-of: ROADMAP.md sha256:1ff9ceeee8bdc93c -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -280,24 +280,63 @@ Apuntado como deuda, que no bloquea ningún hito:
   del corpus trae `su`, `passwd` y otros, y `passwd -S tester`, ejecutado por un usuario que no es
   root, muestra las fechas de `/etc/shadow` sin la opción y no las muestra con ella.
 
-Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2:
+**A3 se cerró el 2026-11-18**, con su criterio de salida: `dokime audit` sobre los diez casos del
+corpus, etiquetados y confirmados antes de que el arnés los ejecutara (ADR-0055), no da ningún falso
+acepto.
 
-- **Antes de A3:** la configuración del proyecto: el adaptador de git lee los hechos del proyecto
-  con `rev-parse`, que pasa por su `.git/config`. En A2 el proyecto es de quien ejecuta el arnés; en
-  A3 el cambio de un agente no debe llegar a `.git/config`. El adaptador no ejecuta ningún programa
-  que nombren la configuración de git en cualquier nivel, los hooks del proyecto o los atributos de
-  los árboles que lee (PLATFORM-047); cuando se construya `compose_with_patch` en A3, rechaza un
-  parche con una ruta que tenga una parte `.git`, que git 2.47.3 ya rechaza como ruta inválida. El
-  código que se comprueba pasa a ser hostil en A3, así que el endurecimiento de A2 va antes; ya
-  están construidos el lector del informe en un proceso propio, con su ruta abierta sin enlaces
-  (ADR-0045), y una ejecución con `--cap-drop=ALL` y `--security-opt no-new-privileges`. El formato
-  de la política, cómo se etiquetan los casos del corpus y la configuración de los tests en el pack
-  los deciden la ADR-0054, la ADR-0055 y la ADR-0056. La ADR-0056 deja dos puntos para cuando se
-  abra A3, antes de construir el gate `protected-paths`: los ficheros que guardan la configuración
-  de los tests junto con la del proyecto, como hace mdformat en `pyproject.toml`; y cómo cuenta la
-  autocomprobación un commit que cambia solo configuración y código. Y los doctests: pytest ejecuta
-  los `docs/*.rst` de python-semver como doctests, pero su pack solo cuenta como tests `tests/**`,
-  así que un parche que edite un doctest para que encaje no se vería como uno que edita tests.
+Medido, con git 2.47.3 y podman 5.4.2, sobre los clones de los tres proyectos:
+
+| Caso | Etiqueta | Veredicto | `expected` | Primera puerta con `FAIL` | `failing_gate` |
+|---|---|---|---|---|---|
+| mdformat/format-a-blank-paragraph-between-blocks | bueno | PASS | PASS | — | — |
+| mdformat/fixes-only-a-code-block-before-the-blank | falla un ejemplo visible | FAIL | FAIL | visible-examples | visible-examples |
+| mdformat/skips-the-html-check-and-edits-its-test | edita tests | FAIL | FAIL | protected-paths | protected-paths |
+| mdformat/fix-with-a-regression-in-loose-lists | rompe tests existentes | FAIL | FAIL | existing-tests | existing-tests |
+| python-semver/replace-keeps-the-constructor-error | bueno | PASS | PASS | — | — |
+| python-semver/replace-fixes-only-major | falla un ejemplo visible | FAIL | FAIL | visible-examples | visible-examples |
+| python-semver/replace-with-a-regression-in-bump-minor | rompe tests existentes | FAIL | FAIL | existing-tests | existing-tests |
+| python-semver/nextver-bumps-build-only-versions | bueno | PASS | PASS | — | — |
+| python-semver/nextver-fixes-only-patch | falla un ejemplo visible | FAIL | FAIL | visible-examples | visible-examples |
+| python-semver/nextver-changes-the-tests-to-fit | edita tests | FAIL | FAIL | protected-paths | protected-paths |
+
+- **Ningún falso acepto**: los siete parches malos fallan, cada uno primero en la puerta que nombra
+  su etiqueta, y los tres buenos pasan ([#128](https://github.com/rafaranaz/raclab-dokime/pull/128)).
+- **Los dos casos que editan tests los caza también `existing-tests`**, como midió a mano la
+  ADR-0058 cuando eligió los tests de la base: con el cambio fallan tres tests de python-semver y uno
+  de mdformat, además de `protected-paths`. Las dos puertas están en el estado `verifying`, que se
+  ejecuta entero. La auditoría lo midió; ningún test lo exige todavía, aunque la ADR-0058 decía que
+  su test llega con `corpus`.
+- **El tiempo de las auditorías de los diez casos**: 361 s en la máquina de desarrollo, con las
+  imágenes en el almacén; 275 s y 321 s para el mismo test en dos ejecuciones del job `corpus` de
+  CI, donde el job ejecuta 135 tests, ninguno saltado, en unos cinco minutos.
+- **La revisión de los casos** llevó 37 minutos de reloj, del mantenedor con la ayuda de otro modelo
+  cuyas afirmaciones se comprobaron ejecutando el código (`tests/corpus/review.toml`, 2026-11-16).
+- **Antes de ejecutar los casos**, cada parche se aplicó sobre su base con `git apply --check`, y
+  los tres commits de los que salen los casos buenos fueron testigos con la regla del arnés sobre
+  podman, poniendo en verde los tests de `tests/corpus/witnesses.toml`
+  ([#127](https://github.com/rafaranaz/raclab-dokime/pull/127)).
+
+Razonado, no medido:
+
+- Diez casos muestran que las puertas de A3 cazan las tres formas de fallar que nombra el criterio
+  de salida, en estos diez. No dicen cuántos otros parches pasarían; esa es la métrica del bloque B.
+- Ningún caso del corpus acaba en `ASK`, así que la parada de la ejecución en un estado que pregunta
+  solo se prueba con dobles.
+- No se midió el tiempo de la revisión sin la ayuda de otro modelo; falta la estimación del
+  mantenedor, porque es el coste de adopción que pagaría una persona sin esa ayuda.
+
+A3 no resolvió ninguna hipótesis de la tabla de arriba; ninguna tenía su prueba en A3.
+
+Apuntado como deuda, que no bloquea ningún hito:
+
+- Un test del corpus que exija que `existing-tests` falle en los dos casos que editan tests, la
+  medida de la ADR-0058.
+- Dos `raise` defensivos de `interfaces/audit.py` a los que no llega ningún camino público, y la
+  orden `audit`, medida por la cobertura solo en el proceso: sus tests con los motores reales la
+  ejecutan en un proceso propio, como los de `env check`.
+
+Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2 ni en A3:
+
 - **Antes de A4:** cómo se versiona y se publica el arnés; y la historia en CI: el checkout de
   GitHub Actions es superficial por defecto, y el adaptador de git rechaza un clon superficial con
   `shallow-clone`, así que un workflow que autocompruebe un pack tiene que traer la historia

@@ -1,7 +1,7 @@
-<!-- translation-of: 0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md sha256:5f5aa9cd6dbd6928 -->
+<!-- translation-of: 0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.md sha256:c5946a8e3010da6f -->
 # ADR-0057 · Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera
 
-**Estado:** aceptada, enmendada por el [ADR-0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md)
+**Estado:** aceptada, enmendada por el [ADR-0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) y el [ADR-0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md)
 
 ## Contexto
 

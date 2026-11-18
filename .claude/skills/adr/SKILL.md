@@ -41,7 +41,8 @@ File `docs/adr/NNNN-title-in-lower-case.md`, with the next free number, its Span
 The forces at play: real constraints and evidence, not wishes.
 
 ## Decision
-What is chosen, in the present tense and active voice ("We use X").
+What is chosen, in the present tense and active voice ("We use X"). The rule first, then the
+mechanism that meets it today, and the mode of use when it matters (see "Writing the decision").
 
 ## Basis
 What the decision rests on: published evidence, a measurement of ours, or reasoning. Reasoning
@@ -57,6 +58,25 @@ At least one, each with the concrete reason it was discarded.
 The good and the bad. Every decision has a cost; if you cannot find it, you have not understood
 the decision.
 ```
+
+## Writing the decision
+
+- **Keep the rule apart from the mechanism.** The rule is what always holds, written so that it has
+  one reading. The mechanism is how it is met today, with the alternatives the rule admits. A change
+  of mechanism must not force the rule to be rewritten.
+- **When it matters, say which mode of use it applies to**: attended, semi-attended or unattended.
+  dokime could be used with nobody in front of it, and that is not decided; a change of mode must
+  not force the rule to be rewritten either.
+
+For instance, for the contract of a pull request. The rule: a contract is approved by a person
+before a change is audited against it, and the agent that makes the change can neither touch it
+nor approve it. The mechanism in A4: the merge by the maintainer. Mechanisms the rule admits later:
+a required review by CODEOWNERS when the pull requests are opened by another identity; the signed
+approval of block E; or a reviewing agent other than the one that made the change, without the
+context of its development and preferably of another family of models, under a policy approved by
+a person.
+
+The ADRs written before this guidance are not rewritten for it.
 
 ## Rules
 

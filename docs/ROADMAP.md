@@ -318,6 +318,14 @@ Reasoned, not measured:
 
 A3 resolved no hypothesis of the table above; none had its test in A3.
 
+For the note that closes block A, at the end of A4: the share of real fixes that do not fit the
+format of the contract, as ADR-0057 asks, with the hypothesis of A0 measured both on changes chosen
+by hand and on changes taken from the history. What was read, not run: in python-semver about 12 of
+25, a count that the session that reviews the work gave and whose base, the 25 candidates or the 18
+witnesses among them of the table of ADR-0057, is fixed when it is measured; in cachetools almost
+none, since nearly all are decorators and methods of classes; in mdformat at least 2 of its 7
+witnesses.
+
 Noted as debt, which blocks no milestone:
 
 - A test of the corpus that demands that `existing-tests` fails in the two cases that edit tests,

@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:8e044afc35ba5491 -->
+<!-- translation-of: README.md sha256:5a1b0e2e175c99b4 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -83,3 +83,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md) | El predicado v0.2 añade lo que registra A4 | Aceptada |
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.es.md) | La evidencia de una pull request va en el resumen de su job y en un artefacto | Aceptada |
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.es.md) | El arnés que audita una pull request es el de su base | Aceptada |
+| [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.es.md) | El almacén sellado se cifra con age para una lista de destinatarios | Propuesta |

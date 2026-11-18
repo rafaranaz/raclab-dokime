@@ -32,3 +32,21 @@ Every EARS requirement is built with the same cycle. Red is demonstrated, never 
   behaviour breaks the test, the test was badly framed.
 - **Error cases are requirements too.** Every `If ... then` has its negative test.
 - **A failure found while using the code** first becomes a test that reproduces it, then a fix.
+
+## Test doubles
+
+- **Use the real implementation when it is fast and deterministic.** A double is for what is slow,
+  depends on the network or on an engine, or cannot be made to fail on purpose.
+- **A double checks what it receives.** It answers only the call it expects, for instance only the
+  name it was given, and raises with anything else. A double that ignores its arguments is only for
+  injecting a failure on purpose: it would also pass when the code asks for the wrong thing.
+- **Each double of an external boundary (metadata, git, podman, the clock) goes with at least one
+  test against the real implementation**, so that the double and what it stands for cannot drift
+  apart. #131 is the case that made this a rule: a double of `importlib.metadata.version` that
+  answered any name hid that the harness asked for a distribution that does not exist.
+
+The session that reviews the work found the source: *Software Engineering at Google*, chapter 13,
+"Test Doubles" (https://abseil.io/resources/swe-book/html/ch13.html), which says that "a real
+implementation is preferred if it is fast, deterministic, and has simple dependencies" and that "a
+fake must have its own tests to ensure that it conforms to the API of its corresponding real
+implementation".

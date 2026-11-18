@@ -60,3 +60,13 @@ from dokime.platform.ledger_file import LedgerFile
 ledger = Ledger(LedgerFile(state / "ledger.jsonl"), SystemClock())
 ledger.record("run.started", {})
 ```
+
+## The commit of the harness
+
+`checkout_commit(directory)` gives the commit of `HEAD` of the checkout of git that holds the
+directory, which `interfaces` asks for the directory of the harness, so that the evidence names it
+by its version and its commit (ADR-0068). It gives none when the directory is not in a checkout,
+the checkout has no commit, git is not found, or the checkout has a change to a file git follows or
+a file it neither follows nor ignores: the commit would not name the code that runs. git runs with
+the environment of the adapter and with `core.fsmonitor` and the hooks turned off, so no program
+that the configuration names runs (PLATFORM-083).

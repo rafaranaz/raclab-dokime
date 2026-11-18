@@ -1,10 +1,12 @@
 """The commit of the checkout of git that holds a directory, such as that of the harness.
 
 The evidence names the harness by its version and its commit (ADR-0068). A commit names the code
-only when the checkout has no change: none to the files git follows, and no file it neither
-follows nor ignores. git runs with the environment of the adapter, which reads no configuration
-but that of the checkout, and with the monitor of the file system and the hooks turned off, so that
-no program the configuration names runs.
+only when the directory is part of the checkout, which follows some file under it, and when the
+checkout has no change: none to the files git follows, and no file it neither follows nor ignores.
+git runs with the environment of the adapter, which reads no configuration but that of the
+checkout; with the monitor of the file system and the hooks turned off; and with the attributes
+read from the empty tree, so that no filter they name cleans a file to compare it. The variable of
+the attributes passes to every git that this one starts, those of the submodules included.
 """
 
 import shutil
@@ -12,7 +14,7 @@ import subprocess
 from pathlib import Path
 
 from dokime.core.repository import CommitName
-from dokime.platform.git import _environment
+from dokime.platform.git import _EMPTY_TREE, _environment
 
 _QUIET = ("-c", "core.fsmonitor=false", "-c", "core.hooksPath=/dev/null")
 
@@ -28,13 +30,15 @@ def checkout_commit(directory: Path, *, git: str = "git") -> CommitName | None:
             [found, *_QUIET, "-C", str(directory), *args],
             capture_output=True,
             text=True,
-            env=_environment({}),
+            env=_environment({"GIT_ATTR_SOURCE": _EMPTY_TREE}),
             check=False,
         )
         return done.stdout.strip() if done.returncode == 0 else None
 
     head = ask("rev-parse", "--verify", "--quiet", "HEAD^{commit}")
     if not head:
+        return None
+    if not ask("ls-files", "--", "."):
         return None
     changes = ask("status", "--porcelain", "--untracked-files=normal", "--ignore-submodules=none")
     if changes is None or changes:

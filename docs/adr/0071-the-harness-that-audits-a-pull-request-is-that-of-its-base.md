@@ -1,6 +1,6 @@
 # ADR-0071 · The harness that audits a pull request is that of its base
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

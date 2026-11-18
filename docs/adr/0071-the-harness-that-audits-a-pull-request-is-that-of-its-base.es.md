@@ -1,7 +1,7 @@
-<!-- translation-of: 0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md sha256:d4a88c13443c5556 -->
+<!-- translation-of: 0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md sha256:27a48a4a423a96df -->
 # ADR-0071 · El arnés que audita una pull request es el de su base
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

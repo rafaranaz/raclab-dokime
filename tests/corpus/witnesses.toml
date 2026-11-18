@@ -1,22 +1,27 @@
-# The measurement of ADR-0057 and the witnesses of the good cases (CORPUS-045 to CORPUS-048).
+# The measurement of ADR-0057, the witnesses of the good cases, the two filters of ADR-0057 for each
+# witness and a sample of them run (CORPUS-045 to CORPUS-048, CORPUS-056 to CORPUS-059).
 # The witnesses were looked at on 2026-11-18 with the candidates of the self-check on podman.
 
 [measurement]
-date = "2026-11-15"
-how = "the order, the candidates and the rule of a witness of the harness over the first 25 candidates of each project, with pytest 8.3.4 in a local environment instead of a container"
+date = "2026-11-18"
+how = "the order, the candidates and the rule of a witness of the self-check, on the git and the podman adapters, over the first candidates of each project from the commit of its source.toml, with python -m tests.corpus.witnesses"
+earlier = "the measurement of the basis of ADR-0057, on 2026-11-15 with pytest 8.3.4 in a local environment, found 18 witnesses in python-semver instead of 20, and listed no commits; the difference of 2 was not reconciled"
 
 [[measurement.project]]
 name = "cachetools"
+start = "1ce79efa552d1bdda70d144d401ef9105d999184"
 looked_at = 25
 witnesses = 14
 
 [[measurement.project]]
 name = "python-semver"
+start = "b6e83e3e40d3a7570386e8d694ae8011477a55c1"
 looked_at = 25
-witnesses = 18
+witnesses = 20
 
 [[measurement.project]]
 name = "mdformat"
+start = "56b24ef0c6cfdab501844925971204f858185547"
 looked_at = 16
 witnesses = 7
 
@@ -53,3 +58,519 @@ case = "format-a-blank-paragraph-between-blocks"
 turned_green = [
     'tests.test_api::test_output_is_equal[```\na\n```\n\u2003\n# A\n]',
 ]
+
+# The two filters of ADR-0057 for each witness of the measurement, read from its diff and the
+# tests it turned green, with the boundaries of ADR-0039.
+
+[[label]]
+project = "cachetools"
+commit = "4ec4a6734e09362138a7b2a7c3257133908a62db"
+isolated = false
+isolated_reason = "A large refactor of the decorators into a new _decorator module that adds repr output along the way; the code change is not just a fix."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests check repr() of a decorated function and of a cachedmethod wrapper bound to an instance, which needs a callable and an instance."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "8a85ef71f2bcb48efe2b1cdf0a72e415f91ee6da"
+isolated = false
+isolated_reason = "Changes the contract so custom caches must support __len__ (cache_info reports len(cache) instead of 0, cachedmethod no longer raises for non-mappings), replacing behaviour the old test asserted on purpose."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test needs a custom duck-typed cache class instance and a decorated function to read cache_info()."
+doubtful = true
+
+[[label]]
+project = "cachetools"
+commit = "a6f073a71633373bdec6d40d39bbef3383ce022a"
+isolated = false
+isolated_reason = "Drops the deprecated @cached(cache=None) support, removing the _uncached wrappers and the DeprecationWarning."
+expressible = true
+boundary = "function"
+target = "cachetools:cached"
+expressible_reason = "cachetools:cached(null) and cachetools:cached(null, info=true) raise TypeError with message containing \"None\" after, return a decorator function (no raise) before."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "d0efb773252f2f94d450bc7747e3fc3faaa42f9a"
+isolated = false
+isolated_reason = "Drops deprecated @cachedmethod features (classmethod use, instances without a mutable __dict__) and deletes their tests."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests need classes with decorated methods, __slots__, classmethod and descriptors without __set_name__."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "fa8148536763cbe487bf41732296d120c10c5126"
+isolated = true
+isolated_reason = "Removes the single line that set wrapper.cache_info = None when info is false, so the attribute is absent as intended."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The behaviour is hasattr(wrapper, 'cache_info') on a decorated function, which needs a callable and the returned wrapper object."
+doubtful = true
+
+[[label]]
+project = "cachetools"
+commit = "e96310286ed0f5a8bcb5a2f52adc1bab7ebe8634"
+isolated = false
+isolated_reason = "Replaces the set of keys with an OrderedDict to define a tie-breaking order that the docs previously stated was arbitrary (versionchanged 7.3), a new guarantee and speed-up rather than a fix of wrong behaviour."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests insert and read items of an LFUCache instance and check membership, which needs an instance."
+doubtful = true
+
+[[label]]
+project = "cachetools"
+commit = "c8b4ee2f6ce9237e2c6e50ebf61e1f4b3bd88780"
+isolated = true
+isolated_reason = "Makes the self parameter positional-only in methodkey, typedmethodkey and the cachedmethod wrappers so a keyword argument named self no longer collides."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "cachetools.keys:methodkey(\"x\", self=1) raises TypeError before but returns a _HashedTuple containing the _HashedTuple class as kwargs marker after, which is not a JSON value, so the fixed result cannot be expected."
+doubtful = true
+
+[[label]]
+project = "cachetools"
+commit = "f6066ebe4394766a4ca8aca3ff528a45209998fa"
+isolated = false
+isolated_reason = "A performance change replacing cond.wait_for(...) by a while loop around cond.wait()."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests count wait() calls on a mock condition passed to a decorated function or method."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "2609f068f909197d46c1ad84083fb3b1226db3de"
+isolated = true
+isolated_reason = "Adds __reduce__ to the method descriptor, wrappers and unbound callable (plus __get__ for aliasing) so objects with cached methods can be pickled and deep-copied again."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests pickle and deep-copy instances of classes with @cachedmethod methods, which needs classes, instances and pickling."
+doubtful = true
+
+[[label]]
+project = "cachetools"
+commit = "b34643f37174751df37016899f4e7f5f6b189012"
+isolated = true
+isolated_reason = "Lets the unbound class-access callable take the receiver from a keyword argument named like the method's first parameter instead of raising TypeError."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test calls Cached.get(self=instance, value=1) on a class with a decorated method, which needs a class and an instance."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "36d4e87f3fd6ec557323e150dcb40123312f2730"
+isolated = true
+isolated_reason = "Makes the internal pending parameter positional-only so a method argument named pending is forwarded instead of raising TypeError."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test needs a class with a @cachedmethod method using a condition and an instance to call it with pending=0."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "95e6addbd82afd75f81cb5650f32f6d74af2f1f9"
+isolated = true
+isolated_reason = "Returns a callable _Unbound object instead of a plain function on class access, so calls on create_autospec mocks work again."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test builds a unittest.mock autospec of a class with a decorated method, which needs a class and a mock."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "41e4b1616a292e26ebac3c5f68a8c5d5e43edc68"
+isolated = true
+isolated_reason = "Calls functools.update_wrapper before setting wrapper attributes so a stacked inner wrapper's __dict__ no longer overrides the outer wrapper's cache_clear and cache_info."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests stack two cache decorators on a function and inspect the outer wrapper, which needs callables and decorators."
+doubtful = false
+
+[[label]]
+project = "cachetools"
+commit = "73883976431e8e8592b25d1d35c1fe926f973d1b"
+isolated = false
+isolated_reason = "A refactor moving the method descriptor into a new _descriptor module, which also caches the class-access callable; the code change is not just a fix."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test checks object identity of Cached.get across class accesses, which needs a class and object identity."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "b6e83e3e40d3a7570386e8d694ae8011477a55c1"
+isolated = false
+isolated_reason = "A release commit: bumps __version__ from 3.1.0 to 3.1.1, collects changelog fragments and changes license metadata and the setuptools requirement in pyproject.toml."
+expressible = true
+boundary = "cli"
+target = "pysemver --version"
+expressible_reason = "The turned-green doctest checks semver.__version__, which the CLI prints: `pysemver --version` writes 'semver 3.1.1' to stdout after and 'semver 3.1.0' before, exit 0."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "9f6894daaf62d55fc37cece10948e7e1cc3dc369"
+isolated = true
+isolated_reason = "Only Version.__getitem__ changes, using operator.index for keys and slice bounds so __index__ objects work and invalid key types such as None raise TypeError."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The behaviour is subscripting a Version object (version[Index(1)], version[None]); no module-level function or CLI command indexes a Version."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "0bd62d4547c808233f6e033059a98218c9b637c1"
+isolated = true
+isolated_reason = "Two added lines in Version.replace re-raise the constructor TypeError when there are no unknown keys instead of reporting zero unexpected keyword arguments."
+expressible = true
+boundary = "function"
+target = "semver:replace"
+expressible_reason = "semver:replace(args=[\"1.2.3\"], kwargs={\"major\": null}) raises TypeError with the int() message (e.g. 'int() argument must be') after, and TypeError 'replace() got 0 unexpected keyword argument(s)' before."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "9ef41316dbe85f7d0fae6e396c45a1bbf69ebb29"
+isolated = true
+isolated_reason = "In next_version the old-style counter branch now bumps the patch when the incremented counter (rc9 -> rc10) would sort lower than the original."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "`pysemver nextver 1.2.3-rc9 prerelease` prints '1.2.4-rc10' after and '1.2.3-rc10' before (cmd_nextver calls next_version with the default token 'rc')."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "bcd151fa63df3053b9f30e698e9ae1020187be1a"
+isolated = true
+isolated_reason = "In next_version the token-switch branch now bumps the patch when the new '<token>.1' prerelease would sort lower than the original; the rest is docs and changelog."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "The CLI only passes the default token 'rc', so a prerelease sorting after 'rc' shows it: `pysemver nextver 1.2.3-zeta.1 prerelease` prints '1.2.4-rc.1' after and '1.2.3-rc.1' before; the tests' own tokens (alpha, dev) cannot be passed."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "37ae009c7cacab8f1a87157ca2b484b8e18a0a78"
+isolated = true
+isolated_reason = "next_version now validates the prerelease token, escapes it in the old-style regex and matches token families by equality or '<token>.' prefix instead of the first dot segment."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The fix depends on a custom prerelease_token (invalid tokens, dotted tokens like 'alpha.beta'), which only Version.next_version accepts; the CLI nextver always uses 'rc', for which old and new matching give the same result, and no module function wraps next_version."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "1d515915d50b31f23fd1fb0f572ef608453e80e3"
+isolated = true
+isolated_reason = "Version._nat_cmp compares numeric prerelease identifiers by normalized digit count and text instead of int(), avoiding the integer string conversion limit."
+expressible = true
+boundary = "function"
+target = "semver:compare"
+expressible_reason = "semver:compare(args=[\"0.0.0-\" + \"1\"*5000, \"0.0.0-2\"]) returns 1 after and raises ValueError (integer string conversion limit) before, on Python versions with that limit."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "887d057e66b7fdfe0adf5a206ac810766b5af938"
+isolated = true
+isolated_reason = "The old-style prerelease branch of next_version now passes build=None to replace, dropping build metadata as the other branches do."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "`pysemver nextver 1.2.3-rc1+build.5 prerelease` prints '1.2.3-rc2' after and '1.2.3-rc2+build.5' before."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "8c0a3f7d80b98962b9db2861a02a035af831b2ac"
+isolated = true
+isolated_reason = "next_version gains a branch that increments old-style prereleases like 'rc3' instead of resetting them to '<token>.1'."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "`pysemver nextver 0.1.2-rc3 prerelease` prints '0.1.2-rc4' after and '0.1.2-rc.1' before; the custom-token test case (beta) is not reachable from the CLI."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "f53d13d13814a180a464763d6363bacb8a9f6c7f"
+isolated = true
+isolated_reason = "bump_prerelease and bump_build now validate the token and raise ValueError; the identifier regexes are extracted into class patterns so the parser and the validation share them."
+expressible = true
+boundary = "function"
+target = "semver:bump_build"
+expressible_reason = "semver:bump_build(args=[\"1.0.0\", \"bu/ild\"]) raises ValueError 'is not a valid build token' after and returns '1.0.0+bu/ild.1' before; likewise semver:bump_prerelease(args=[\"1.0.0\", \"rc+build\"])."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "0aa17a3447958cfe13634b0c3917e7aa4eee3334"
+isolated = true
+isolated_reason = "The _comparator wrapper now converts dict/tuple/list operands up front and returns NotImplemented when that construction fails, instead of leaking constructor errors."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The changed code is the wrapper of the comparison operators (==, <) between a Version and a collection; semver:compare calls Version.compare, which does not go through _comparator, and the CLI compare passes strings."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "ea2524a51767cefab58a9b3bb6bcf38e5cdc7d54"
+isolated = true
+isolated_reason = "bump_build appends '.0' when incrementing leaves a digitless build unchanged."
+expressible = true
+boundary = "function"
+target = "semver:bump_build"
+expressible_reason = "semver:bump_build(args=[\"1.2.3+alpha\"]) returns '1.2.3+alpha.0' after and '1.2.3+alpha' before; also `pysemver bump build 1.2.3+alpha`."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "1e8757912f633684e1a65d9d7c7e2270c3c79928"
+isolated = true
+isolated_reason = "The version regexes end in \\Z instead of $ and are compiled with re.ASCII, rejecting trailing newlines and non-ASCII digits."
+expressible = true
+boundary = "function"
+target = "semver:parse"
+expressible_reason = "semver:parse(args=[\"1.2.3\\n\"]) raises ValueError after and returns {\"major\": 1, \"minor\": 2, \"patch\": 3, \"prerelease\": null, \"build\": null} before; also `pysemver check` with '1.2.3\\n' exits 2 after and 0 before."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "fdec4ae1e5e296e890a5da0fb582b54f1af0da34"
+isolated = true
+isolated_reason = "next_version replaces the prerelease with '<token>.1' when the existing token differs, instead of incrementing the foreign counter; the doc example is updated to match."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "`pysemver nextver 3.4.5-pre.2+build.4 prerelease` prints '3.4.5-rc.1' after and '3.4.5-pre.3' before."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "4e09ef0e4c94314731f960d4ce763a2da2e096f1"
+isolated = true
+isolated_reason = "next_version takes the finalization path only when there is a prerelease, not when there is only build metadata."
+expressible = true
+boundary = "cli"
+target = "pysemver nextver"
+expressible_reason = "`pysemver nextver 1.2.3+build.5 patch` prints '1.2.4' after and '1.2.3' before."
+doubtful = false
+
+[[label]]
+project = "python-semver"
+commit = "9c191564b58bfa7140a7c01f0ed7141506b5ce3b"
+isolated = false
+isolated_reason = "Drops Python 3.7-3.9 support: requires-python, classifiers, CI matrix, tox, pinned dev dependencies, uv.lock and the version bump to 3.1.0."
+expressible = true
+boundary = "cli"
+target = "pysemver --version"
+expressible_reason = "The turned-green doctest checks semver.__version__: `pysemver --version` prints 'semver 3.1.0' after and 'semver 3.0.4' before."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "d8813b67a2ec5d579365f51a6d8f96d02f3fcbc3"
+isolated = false
+isolated_reason = "The bump_prerelease fix (append '.0' to a non-numeric last part) comes with a new bump_when_empty parameter, a rewrite of next_version's prerelease path onto it and a tox.ini setting."
+expressible = true
+boundary = "function"
+target = "semver:bump_prerelease"
+expressible_reason = "semver:bump_prerelease(args=[\"3.4.5-rc1\"]) returns '3.4.5-rc1.0' after and '3.4.5-rc2' before; also `pysemver bump prerelease 1.2.3-rc1` prints '1.2.3-rc1.0' after, '1.2.3-rc2' before (the bump_when_empty tests are not reachable)."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "bae0b7ca7ce3f2a3268290ff9b4b379e7ed3a779"
+isolated = false
+isolated_reason = "A release fix-up: bumps __version__ to 3.0.4, extends MANIFEST.in, restores a classifier and adds changelog text."
+expressible = true
+boundary = "cli"
+target = "pysemver --version"
+expressible_reason = "The turned-green doctest checks semver.__version__: `pysemver --version` prints 'semver 3.0.4' after and 'semver 3.0.3' before."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "cc4ae0755098dfd52e0ee197c2099ef207079fbe"
+isolated = false
+isolated_reason = "A release commit: bumps __version__ from 3.0.3-alpha.1 to 3.0.3 and changes readthedocs, tox, uv.lock, pyproject metadata, changelog and release docs."
+expressible = true
+boundary = "cli"
+target = "pysemver --version"
+expressible_reason = "The turned-green doctest checks semver.__version__: `pysemver --version` prints 'semver 3.0.3' after and 'semver 3.0.3-alpha.1' before."
+doubtful = true
+
+[[label]]
+project = "python-semver"
+commit = "bc41390f388d88114e8529b17fe145c5af390cbb"
+isolated = true
+isolated_reason = "The _comparator wrapper accepts type(self) instead of Version, so a subclass refuses a plain Version operand and the reflected comparison is used."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The behaviour needs a Version subclass and comparison between objects of different classes; module functions and the CLI only build plain Version objects."
+doubtful = false
+
+[[label]]
+project = "mdformat"
+commit = "56e221da358612cbae25c7dde371f30607ded566"
+isolated = false
+isolated_reason = "Adds a DeprecationWarning in make_arg_parser for plugin CLI arguments whose default is not None or SUPPRESS; it warns plugin authors and does not change how TOML and CLI values are merged, so it is a deprecation, not a fix."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The behaviour only appears when a parser-extension plugin with add_cli_argument_group is installed (the test monkeypatches PARSER_EXTENSIONS and patches MDRenderer.render), and it is checked as a Python DeprecationWarning object."
+doubtful = true
+
+[[label]]
+project = "mdformat"
+commit = "e05f2cfa44ccd77f39f3ce8394412b58465b1fa7"
+isolated = false
+isolated_reason = "Adds a cache_toml keyword to mdformat._cli.run so tests can bypass the lru_cache of read_toml_opts and removes the run_with_clear_cache test helper; a change of test tooling."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The tests turn green only because they call the new test-only kwarg run(..., cache_toml=False); the TOML cache is per-process and has no observable effect at a fresh python -m mdformat call."
+doubtful = false
+
+[[label]]
+project = "mdformat"
+commit = "062ad6d0e00b18942944c50857b949f2e19a07c1"
+isolated = false
+isolated_reason = "Adds a new --no-validate CLI flag and a validate TOML key that skip the is_md_equal safety check; a feature, not a fix."
+expressible = true
+boundary = "cli"
+target = "python -m mdformat"
+expressible_reason = "python -m mdformat --no-validate - with stdin \"a\\n\": exit 0 stdout \"a\\n\" after, exit 2 (unrecognized argument) before; and file .mdformat.toml \"validate = 'off'\" with args [\"a.md\"]: stderr contains \"Invalid 'validate' value\" after, an invalid-key error before; skipping validation itself needs a patched renderer and is not expressible."
+doubtful = true
+
+[[label]]
+project = "mdformat"
+commit = "f568716143bde1259fa171f806919886e8565fcc"
+isolated = true
+isolated_reason = "Replaces the greedy DOTALL regex that removed code blocks of formatted languages in is_md_equal with one that cannot span past </code>, so content between two code blocks is no longer ignored."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The fixed function is mdformat._util.is_md_equal, a private module, and at the CLI the code-block removal only runs when a code formatter plugin is installed, so neither boundary reaches it."
+doubtful = false
+
+[[label]]
+project = "mdformat"
+commit = "c22a0b845fd833e22ecb500a6f11020c299993fe"
+isolated = false
+isolated_reason = "Deprecates mdformat.codepoints.ASCII_WHITESPACE through a module __getattr__ that emits a DeprecationWarning, and stops using it in maybe_add_link_brackets; a deprecation."
+expressible = false
+boundary = "none"
+target = ""
+expressible_reason = "The test checks a DeprecationWarning on attribute access of a module constant, which is neither a callable with JSON arguments nor visible at the CLI."
+doubtful = false
+
+[[label]]
+project = "mdformat"
+commit = "47e0452da9a0dff6d59873abe5bb12c239d31286"
+isolated = false
+isolated_reason = "Adds --extensions/--no-extensions and --codeformatters/--no-codeformatters CLI options and TOML keys to select required plugins, plus test helper moves; a feature, not a fix."
+expressible = true
+boundary = "cli"
+target = "python -m mdformat"
+expressible_reason = "python -m mdformat a.md --extensions no-exists with files a.md \"\": exit 1 stderr contains \"Error: Invalid extension required\" after, exit 2 (unrecognized arguments) before; likewise --codeformatters no-exists gives \"Error: Invalid code formatter required\"."
+doubtful = false
+
+[[label]]
+project = "mdformat"
+commit = "27e2ba3e10dad83625662186f2dd3b295fd82079"
+isolated = true
+isolated_reason = "Changes whitespace normalisation in is_md_equal (strip after removing empty paragraphs, drop spaces before opening and after closing tags) so an empty Unicode-space paragraph between non-paragraph elements no longer makes the formatted output compare unequal."
+expressible = true
+boundary = "cli"
+target = "python -m mdformat"
+expressible_reason = "python -m mdformat - with stdin \"```\\na\\n```\\n\\u2003\\n# A\\n\": exit 0 with the formatted text on stdout after, exit 1 with stderr containing \"Could not format\" before (the CLI runs is_md_equal on its output; the direct function is in private mdformat._util)."
+doubtful = true
+
+# The sample of the reading: in each project, one witness drawn among those that are expressible and
+# one among those that are not, with random.Random(seed).choice over the commits in the order of the
+# labels above, and run in the image of the pack of its project on both sides of the change.
+
+[sample]
+seed = 20261118
+date = "2026-11-18"
+
+[[sample.run]]
+project = "cachetools"
+commit = "a6f073a71633373bdec6d40d39bbef3383ce022a"
+example = "function cachetools:cached, args [null] and kwargs {} and {info: true}"
+before = "returns a decorator function, not a JSON value"
+after = "raises TypeError: cache must not be None"
+confirmed = true
+why_not = ""
+
+[[sample.run]]
+project = "cachetools"
+commit = "c8b4ee2f6ce9237e2c6e50ebf61e1f4b3bd88780"
+example = "function cachetools.keys:methodkey, args [\"x\"], kwargs {self: 1}"
+before = "raises TypeError: methodkey() got multiple values for argument 'self'"
+after = "returns (<class 'cachetools.keys._HashedTuple'>, ('self', 1)), not a JSON value"
+confirmed = true
+why_not = "what the fix gives is a tuple holding a class, which an expectation at the boundary function cannot name, so only the failure before the change can be written"
+
+[[sample.run]]
+project = "python-semver"
+commit = "9ef41316dbe85f7d0fae6e396c45a1bbf69ebb29"
+example = "cli python -m semver nextver 1.2.3-rc9 prerelease"
+before = "exit 0, stdout 1.2.3-rc10"
+after = "exit 0, stdout 1.2.4-rc10"
+confirmed = true
+why_not = ""
+
+[[sample.run]]
+project = "python-semver"
+commit = "9f6894daaf62d55fc37cece10948e7e1cc3dc369"
+example = "function semver:parse, args [\"1.2.3\"]"
+before = "returns {major: 1, minor: 2, patch: 3, prerelease: null, build: null}"
+after = "returns the same"
+confirmed = true
+why_not = "the fix is in Version.__getitem__, and no module function nor the command line indexes a Version: the only matches of indexing in the module functions are in the docstring of parse, on the dict it returns"
+
+[[sample.run]]
+project = "mdformat"
+commit = "062ad6d0e00b18942944c50857b949f2e19a07c1"
+example = "cli python -m mdformat --no-validate -, stdin \"a\\n\""
+before = "exit 2, stderr: unrecognized arguments: --no-validate"
+after = "exit 0, stdout a"
+confirmed = true
+why_not = ""
+
+[[sample.run]]
+project = "mdformat"
+commit = "e05f2cfa44ccd77f39f3ce8394412b58465b1fa7"
+example = "cli python -m mdformat a.md, files .mdformat.toml with wrap = 10 and a.md \"one two three four five six\\n\""
+before = "exit 0, a.md wrapped at 10"
+after = "exit 0, a.md wrapped at 10, the same"
+confirmed = true
+why_not = "the change is a keyword of mdformat._cli.run for the tests and the removal of a helper of the tests; a command line starts a new process, whose cache of TOML is empty on both sides"

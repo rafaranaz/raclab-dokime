@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:2bc2ba1fd6c76ce6 -->
+<!-- translation-of: README.md sha256:27c036a0995c6197 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -31,7 +31,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0017](0017-damage-outside-the-change-against-a-baseline.es.md) | El daño fuera del cambio se encuentra comparando con una línea base | Aceptada |
 | [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.es.md) | El flujo es una máquina de estados declarada en un fichero YAML | Aceptada |
 | [0019](0019-the-harness-launches-the-installed-agent-through-files.es.md) | El arnés lanza el agente instalado y se comunica con él por ficheros | Aceptada |
-| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md) | Aislar al agente es opcional; la adopción es una escalera | Aceptada |
+| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md) | Aislar al agente es opcional; la adopción es una escalera | Aceptada, enmendada por el 0073 |
 | [0021](0021-the-agent-disputes-a-check-instead-of-editing-it.es.md) | El agente impugna una comprobación en vez de modificarla | Aceptada |
 | [0022](0022-model-calls-of-the-harness-go-through-a-port.es.md) | Las llamadas del arnés a un modelo pasan por un puerto con tres vías | Aceptada |
 | [0023](0023-evidence-is-an-attestation-bound-to-the-tree.es.md) | La evidencia es una atestación in-toto atada al árbol resultante | Aceptada |

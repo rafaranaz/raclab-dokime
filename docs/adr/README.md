@@ -82,3 +82,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0069](0069-the-predicate-v0-2-adds-what-a4-records.md) | The predicate v0.2 adds what A4 records | Accepted |
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Accepted |
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md) | The harness that audits a pull request is that of its base | Accepted |
+| [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md) | The sealed store is encrypted with age for a list of recipients | Proposed |

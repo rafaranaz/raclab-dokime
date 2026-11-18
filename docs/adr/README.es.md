@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:3418e873f82054a8 -->
+<!-- translation-of: README.md sha256:139f179e64eb0ed3 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -80,3 +80,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Aceptada |
 | [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md) | Una persona aprueba el contrato antes de que se audite un cambio contra él | Propuesta |
 | [0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md) | El arnés se nombra por su versión y su commit | Propuesta |
+| [0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md) | El predicado v0.2 añade lo que registra A4 | Propuesta |

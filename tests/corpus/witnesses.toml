@@ -574,3 +574,342 @@ before = "exit 0, a.md wrapped at 10"
 after = "exit 0, a.md wrapped at 10, the same"
 confirmed = true
 why_not = "the change is a keyword of mdformat._cli.run for the tests and the removal of a helper of the tests; a command line starts a new process, whose cache of TOML is empty on both sides"
+
+# The second reading of the same witnesses, made by the session that reviews the work from the diffs
+# in local clones, before it saw the labels above, and not run. Its isolated reads "the change of
+# code is the fix or the intended change of behaviour", so a new feature can count; the labels above
+# read "the change is a fix". Before it, that session had estimated about 12 of 18 for python-semver,
+# which may have anchored it. alike counts the witnesses the two readings label alike.
+
+[second_reading]
+date = "2026-11-18"
+by = "the session that reviews the work"
+alike = { isolated = 33, expressible = 36, fits = 38 }
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "4ec4a6734e09362138a7b2a7c3257133908a62db"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Refactor of 490 lines of the decorators"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "8a85ef71f2bcb48efe2b1cdf0a72e415f91ee6da"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Custom cache class given to a decorator; needs an object"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "a6f073a71633373bdec6d40d39bbef3383ce022a"
+isolated = true
+expressible = true
+doubtful = true
+reason = "cachetools:cached with [null] raises TypeError after; on the base it returns a function, so a raises example fails there. Whether removing a deprecated feature counts as a \"fix\" is the doubt"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "d0efb773252f2f94d450bc7747e3fc3faaa42f9a"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Removal of deprecated features of @cachedmethod, 424 lines deleted; methods of classes"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "fa8148536763cbe487bf41732296d120c10c5126"
+isolated = true
+expressible = false
+doubtful = false
+reason = "An attribute of a decorated function"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "e96310286ed0f5a8bcb5a2f52adc1bab7ebe8634"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Eviction order of LFUCache; needs an instance"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "c8b4ee2f6ce9237e2c6e50ebf61e1f4b3bd88780"
+isolated = true
+expressible = false
+doubtful = true
+reason = "cachetools.keys:methodkey(\"x\", self=1) raises on the base, but the value it returns after holds a class (_HashedTuple as marker), which is not JSON"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "f6066ebe4394766a4ca8aca3ff528a45209998fa"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Performance of the condition variant; threads"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "2609f068f909197d46c1ad84083fb3b1226db3de"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Pickling objects with cached methods"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "b34643f37174751df37016899f4e7f5f6b189012"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Class access with the receiver as a keyword; methods"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "36d4e87f3fd6ec557323e150dcb40123312f2730"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Keyword pending in cached methods"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "95e6addbd82afd75f81cb5650f32f6d74af2f1f9"
+isolated = true
+expressible = false
+doubtful = false
+reason = "create_autospec on decorated methods"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "41e4b1616a292e26ebac3c5f68a8c5d5e43edc68"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Stacking decorators"
+
+[[second_reading.label]]
+project = "cachetools"
+commit = "73883976431e8e8592b25d1d35c1fe926f973d1b"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Refactor of the method descriptor"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "b6e83e3e40d3a7570386e8d694ae8011477a55c1"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Release 3.1.0 -> 3.1.1"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "9f6894daaf62d55fc37cece10948e7e1cc3dc369"
+isolated = true
+expressible = false
+doubtful = false
+reason = "An object with __index__ as a subscript"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "0bd62d4547c808233f6e033059a98218c9b637c1"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:replace keeps the constructor TypeError (case of the corpus)"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "9ef41316dbe85f7d0fae6e396c45a1bbf69ebb29"
+isolated = true
+expressible = true
+doubtful = false
+reason = "nextver 1.2.3-rc9 prerelease: 1.2.3-rc10 on the base, 1.2.4-rc10 after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "bcd151fa63df3053b9f30e698e9ae1020187be1a"
+isolated = true
+expressible = true
+doubtful = false
+reason = "With the default token rc: nextver 1.2.3-zeta.1 prerelease moved backwards to 1.2.3-rc.1 on the base, 1.2.4-rc.1 after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "37ae009c7cacab8f1a87157ca2b484b8e18a0a78"
+isolated = true
+expressible = false
+doubtful = true
+reason = "The fix is in next_version with a token other than the default; the CLI passes no token and no module function reaches it"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "1d515915d50b31f23fd1fb0f572ef608453e80e3"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:compare or compare with long numeric prerelease identifiers"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "887d057e66b7fdfe0adf5a206ac810766b5af938"
+isolated = true
+expressible = true
+doubtful = false
+reason = "nextver 1.2.3-rc3+build.5 prerelease keeps the build on the base, drops it after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "8c0a3f7d80b98962b9db2861a02a035af831b2ac"
+isolated = true
+expressible = true
+doubtful = false
+reason = "nextver 1.2.3-rc3 prerelease gives 1.2.3-rc4 after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "f53d13d13814a180a464763d6363bacb8a9f6c7f"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:bump_prerelease with an invalid token raises after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "0aa17a3447958cfe13634b0c3917e7aa4eee3334"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Comparison operators with a malformed collection; semver:compare does not use the operators"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "ea2524a51767cefab58a9b3bb6bcf38e5cdc7d54"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:bump_build(\"3.4.5-rc.1+alpha\") gives ...+alpha.0 after"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "1e8757912f633684e1a65d9d7c7e2270c3c79928"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:parse(\"1.2.3\\n\") or non-ASCII digits raise after; parse returns a mapping"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "fdec4ae1e5e296e890a5da0fb582b54f1af0da34"
+isolated = true
+expressible = true
+doubtful = false
+reason = "nextver 1.2.3-alpha.1 prerelease switches to the token rc after; witness through a doctest in docs/"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "4e09ef0e4c94314731f960d4ce763a2da2e096f1"
+isolated = true
+expressible = true
+doubtful = false
+reason = "nextver with build-only versions (case of the corpus)"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "9c191564b58bfa7140a7c01f0ed7141506b5ce3b"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Drops Python 3.7-3.9: tooling, lock and release"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "d8813b67a2ec5d579365f51a6d8f96d02f3fcbc3"
+isolated = true
+expressible = true
+doubtful = false
+reason = "semver:bump_prerelease always gives a newer version"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "bae0b7ca7ce3f2a3268290ff9b4b379e7ed3a779"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Release 3.0.3 -> 3.0.4 and the manifest"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "cc4ae0755098dfd52e0ee197c2099ef207079fbe"
+isolated = false
+expressible = false
+doubtful = false
+reason = "Release 3.0.3-alpha.1 -> 3.0.3"
+
+[[second_reading.label]]
+project = "python-semver"
+commit = "bc41390f388d88114e8529b17fe145c5af390cbb"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Comparison with a subclass; needs a class"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "56e221da358612cbae25c7dde371f30607ded566"
+isolated = true
+expressible = false
+doubtful = false
+reason = "A warning about the defaults of an installed plugin"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "e05f2cfa44ccd77f39f3ce8394412b58465b1fa7"
+isolated = false
+expressible = false
+doubtful = false
+reason = "A keyword for the tests (cache_toml): tooling of the tests"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "062ad6d0e00b18942944c50857b949f2e19a07c1"
+isolated = true
+expressible = true
+doubtful = false
+reason = "--no-validate is refused by argparse on the base and accepted after"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "f568716143bde1259fa171f806919886e8565fcc"
+isolated = true
+expressible = false
+doubtful = true
+reason = "The regex applies to the languages of code formatters, which need a plugin or callables"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "c22a0b845fd833e22ecb500a6f11020c299993fe"
+isolated = true
+expressible = false
+doubtful = false
+reason = "Deprecation warning on access to a module attribute"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "47e0452da9a0dff6d59873abe5bb12c239d31286"
+isolated = true
+expressible = false
+doubtful = true
+reason = "Options to select extensions and code formatters; the behaviour that matters needs plugins installed"
+
+[[second_reading.label]]
+project = "mdformat"
+commit = "27e2ba3e10dad83625662186f2dd3b295fd82079"
+isolated = true
+expressible = true
+doubtful = false
+reason = "Empty paragraph between non-paragraphs (case of the corpus)"

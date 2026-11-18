@@ -1,6 +1,7 @@
-# SDD-EARS: CORPUS-045 CORPUS-046 CORPUS-047 CORPUS-048
-"""The witnesses that the good cases come from, and the measurement of ADR-0057."""
+# SDD-EARS: CORPUS-045 CORPUS-046 CORPUS-047 CORPUS-048 CORPUS-056 CORPUS-057 CORPUS-058 CORPUS-059
+"""The witnesses that the good cases come from, and the measurement of ADR-0057 with its sample."""
 
+import random
 import re
 import subprocess
 import tomllib
@@ -19,8 +20,9 @@ from tests.sandbox.engines import ENGINES, require
 HERE = Path(__file__).parent
 FIXTURE: dict[str, Any] = tomllib.loads((HERE / "witnesses.toml").read_text())
 WITNESSES: list[dict[str, Any]] = FIXTURE["witness"]
-ADR = next((HERE.parents[1] / "docs" / "adr").glob("0057-*[!s].md"))
-ROW = re.compile(r"\| (?P<name>[a-z-]+) \| (?P<looked>\d+) \| (?P<found>\d+) \|")
+LABELS: list[dict[str, Any]] = FIXTURE.get("label", [])
+SAMPLE: dict[str, Any] = FIXTURE.get("sample", {})
+BOUNDARIES = {"function", "cli"}
 
 
 @pytest.mark.parametrize("witness", WITNESSES, ids=lambda w: w["case"])
@@ -53,15 +55,81 @@ def test_every_good_case_names_the_witness_it_comes_from() -> None:
     assert all(re.fullmatch(r"[0-9a-f]{40}", w["commit"]) for w in WITNESSES)
 
 
-def test_the_measurement_is_the_table_of_the_basis_of_adr_0057() -> None:
-    rows = [(m["name"], int(m["looked"]), int(m["found"])) for m in ROW.finditer(ADR.read_text())]
-    fixture = [
-        (p["name"], p["looked_at"], p["witnesses"]) for p in FIXTURE["measurement"]["project"]
-    ]
-    assert fixture == rows
-    assert {name for name, _, _ in rows} == {p.name for p in PROJECTS}
+def test_the_table_counts_the_witnesses_the_fixture_classifies() -> None:
+    table = {p["name"]: p["witnesses"] for p in FIXTURE["measurement"]["project"]}
+    assert set(table) == {p.name for p in PROJECTS}
+    for name, witnesses in table.items():
+        assert sum(label["project"] == name for label in LABELS) == witnesses, name
 
 
 def test_no_project_has_more_witnesses_than_candidates_looked_at() -> None:
     for project in FIXTURE["measurement"]["project"]:
         assert 0 <= project["witnesses"] <= project["looked_at"], project["name"]
+
+
+@pytest.mark.parametrize("label", LABELS, ids=lambda label: label["commit"][:12])
+def test_each_witness_has_both_filters_with_their_reasons(label: dict[str, Any]) -> None:
+    assert re.fullmatch(r"[0-9a-f]{40}", label["commit"])
+    assert isinstance(label["isolated"], bool)
+    assert isinstance(label["expressible"], bool)
+    assert label["isolated_reason"].strip()
+    assert label["expressible_reason"].strip()
+    if label["expressible"]:
+        assert label["boundary"] in BOUNDARIES
+        assert label["target"].strip()
+    else:
+        assert label["boundary"] == "none"
+        assert label["target"] == ""
+
+
+def test_the_fixture_classifies_some_witnesses() -> None:
+    assert LABELS
+
+
+def test_each_witness_is_classified_once() -> None:
+    commits = [(label["project"], label["commit"]) for label in LABELS]
+    assert len(commits) == len(set(commits))
+
+
+def test_the_witness_of_each_good_case_is_isolated_and_expressible() -> None:
+    labels = {(label["project"], label["commit"]): label for label in LABELS}
+    for witness in WITNESSES:
+        label = labels.get((witness["project"], witness["commit"]))
+        assert label is not None, witness["case"]
+        assert label["isolated"], witness["case"]
+        assert label["expressible"], witness["case"]
+
+
+def _drawn(seed: int) -> list[tuple[str, str]]:
+    """The sample that a seed draws, project by project in the order of the fixture."""
+    chance = random.Random(seed)  # noqa: S311 - a draw anyone can repeat, not a secret
+    order = list(dict.fromkeys(label["project"] for label in LABELS))
+    drawn: list[tuple[str, str]] = []
+    for project in order:
+        for expressible in (True, False):
+            pool = [
+                label["commit"]
+                for label in LABELS
+                if label["project"] == project and label["expressible"] is expressible
+            ]
+            if pool:
+                drawn.append((project, chance.choice(pool)))
+    return drawn
+
+
+def test_the_sample_is_the_one_its_seed_draws() -> None:
+    runs = SAMPLE.get("run", [])
+    assert runs
+    assert [(run["project"], run["commit"]) for run in runs] == _drawn(SAMPLE["seed"])
+
+
+def test_each_witness_of_the_sample_has_its_run() -> None:
+    labels = {(label["project"], label["commit"]): label for label in LABELS}
+    for run in SAMPLE.get("run", []):
+        label = labels[(run["project"], run["commit"])]
+        assert run["example"].strip(), run["commit"]
+        assert run["before"].strip(), run["commit"]
+        assert run["after"].strip(), run["commit"]
+        assert isinstance(run["confirmed"], bool), run["commit"]
+        if not label["expressible"]:
+            assert run["why_not"].strip(), run["commit"]

@@ -48,8 +48,14 @@ it once, or from its address when there is none.
 The good patch of each case comes from a witness of the history of its project (ADR-0057).
 `witnesses.toml` names, for each good case, the commit it comes from and the tests it turned green;
 a test looks at each of those commits with the candidates of the self-check on podman and demands
-the same. The same file keeps the measurement of ADR-0057, which a test compares with the table of
-its basis. The search past the second witness is `witnesses.py`, run by hand:
+the same. The same file keeps the measurement of ADR-0057: for each project, the commit it started
+from and how many candidates and witnesses it found; for each witness, whether it is isolated and
+whether it is expressible at a boundary of ADR-0039, each with its reason; and a sample of the
+witnesses drawn with a written seed, one expressible and one not in each project, whose examples
+were run on both sides of the change to check the reading. The tests demand that the table counts
+the witnesses classified, that the witness of each good case is isolated and expressible, and that
+the sample is the one its seed draws. The search past the second witness is `witnesses.py`, run by
+hand:
 
 ```console
 $ python -m tests.corpus.witnesses python-semver ../python-semver 25

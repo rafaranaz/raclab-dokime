@@ -1,0 +1,63 @@
+name: audit
+
+# The audit of each pull request with dokime (A4). The harness runs from the base of the pull
+# request, never from the change (ADR-0071); the evidence goes in the summary of the job and in an
+# artifact, and nothing is written in the pull request (ADR-0070). This file still comes from the
+# pull request, so the maintainer checks before merging that a pull request changes nothing under
+# .github/workflows/ before trusting the summary.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: audit of the change
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the pull request with its whole history
+        uses: actions/checkout@v7
+        with:
+          path: project
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out the harness at the base of the pull request
+        uses: actions/checkout@v7
+        with:
+          path: harness
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v7
+      - name: Install the harness of the base
+        working-directory: harness
+        run: uv sync --locked
+      - name: Audit the change with the harness of the base
+        working-directory: harness
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          if [ ! -f tools/audit_pr.py ]; then
+            printf '## dokime audit: not audited\n\n- The base has no tool to audit a pull request yet.\n' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          uv run python -m tools.audit_pr --project "$GITHUB_WORKSPACE/project" \
+            --base "$BASE" --head "$HEAD" --branch "$BRANCH" \
+            --out "$RUNNER_TEMP/audit" --summary "$GITHUB_STEP_SUMMARY"
+      - name: Keep the evidence and the ledger
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: evidence
+          path: ${{ runner.temp }}/audit
+          if-no-files-found: ignore

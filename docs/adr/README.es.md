@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:c91aa71c20884fac -->
+<!-- translation-of: README.md sha256:66127c991d62af3e -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -78,3 +78,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md) | La evidencia de A3 es un statement sin firmar con un predicado cerrado | Aceptada, enmendada por el 0065 y el 0066 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) | La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no | Aceptada |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Aceptada |
+| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md) | Una persona aprueba el contrato antes de que se audite un cambio contra él | Propuesta |

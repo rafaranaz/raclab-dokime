@@ -83,3 +83,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Accepted |
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md) | The harness that audits a pull request is that of its base | Accepted |
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md) | The sealed store is encrypted with age for a list of recipients | Accepted |
+| [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md) | The key of the hold-out lives outside CI until B4 | Proposed |

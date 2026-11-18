@@ -13,6 +13,7 @@ import signal
 import subprocess
 import sys
 import time
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -262,13 +263,21 @@ def test_an_interruption_in_the_middle_of_an_audit_leaves_no_container_and_no_di
     assert list(temporary.iterdir()) == []
 
 
-def test_the_version_is_that_of_the_package_or_unversioned(
+def test_the_version_is_that_of_the_installed_distribution() -> None:
+    installed = importlib.metadata.version("raclab-dokime")
+    assert audit_command._version() == installed != audit_command.UNVERSIONED
+
+
+def test_the_distribution_is_the_name_of_the_project() -> None:
+    project = tomllib.loads((Path(__file__).parents[2] / "pyproject.toml").read_text())
+    assert project["project"]["name"] == audit_command.DISTRIBUTION
+
+
+def test_a_distribution_that_is_not_installed_is_unversioned(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def missing(name: str) -> str:
         raise importlib.metadata.PackageNotFoundError(name)
 
-    monkeypatch.setattr(importlib.metadata, "version", lambda name: "1.2.3")
-    assert audit_command._version() == "1.2.3"
     monkeypatch.setattr(importlib.metadata, "version", missing)
     assert audit_command._version() == audit_command.UNVERSIONED == "unversioned"

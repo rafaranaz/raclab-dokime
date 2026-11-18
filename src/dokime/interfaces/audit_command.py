@@ -29,6 +29,8 @@ from dokime.sandbox.podman import PodmanRuntime
 
 LEDGER = "ledger.jsonl"
 """The file of the ledger in the directory `--out`."""
+DISTRIBUTION = "raclab-dokime"
+"""The distribution of the harness, the name of the project in `pyproject.toml`."""
 UNVERSIONED = "unversioned"
 """The version of a harness whose package is not installed."""
 _FULL_NAME = re.compile(r"[0-9a-f]{40}")
@@ -164,7 +166,7 @@ def _finding_line(gate: str, finding: Finding) -> str:
 
 def _version() -> str:
     try:
-        return importlib.metadata.version("dokime")
+        return importlib.metadata.version(DISTRIBUTION)
     except importlib.metadata.PackageNotFoundError:
         return UNVERSIONED
 

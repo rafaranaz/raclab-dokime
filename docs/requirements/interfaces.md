@@ -153,3 +153,13 @@ it is given, runs the gates of `verify` and builds the evidence with `evidence`
 - **INTERFACES-145** When `audit` runs, the command shall give the evidence the commit that `platform` gives for the directory of the package of the harness, asked after the git adapter has checked its version and before the command writes anything.
 - **INTERFACES-146** When `audit` writes its result, the command shall write the version of the harness and its commit, or that it has no commit, as the line `harness <version> <commit>` or `harness <version> without a commit` in the text, and as `harness` in the JSON document.
 - **INTERFACES-147** If the audit ends before the git adapter has checked its version, then the command shall write `harness <version> commit not asked` in the text and `commit_asked` as `false` in the JSON document, so that a commit not asked is not told as a checkout without a commit.
+
+## `audit`: the summary of a job ([ADR-0070](../adr/0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md))
+
+The summary is for the person who merges: it is read in the job of CI before the merge, and holds
+only what dokime fixes, so that it needs no escaping.
+
+- **INTERFACES-150** Where `--summary` names a file, the command shall append to it, in Markdown, the verdict, the story, the digest of the contract, the version and the commit of the harness, the digest of the evidence, and a table with each gate, its status, its verdict and the codes of its findings.
+- **INTERFACES-151** The command shall write in the summary only names, statuses, verdicts, codes, versions and digests that match their patterns, and no message, reason or other text that dokime did not fix.
+- **INTERFACES-152** When the audit ends without evidence, the command shall write in the summary its verdict and the codes of the findings that ended it.
+- **INTERFACES-153** If the file of the summary cannot be written, then the command shall say so on the standard error and exit with the code of `ERROR`.

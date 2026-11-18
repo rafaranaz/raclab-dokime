@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:fae79ab1ecb77200 -->
+<!-- translation-of: ROADMAP.md sha256:0080dbf4062cf7ba -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -77,7 +77,7 @@ se publica. Un resultado malo también se publica.
 Los hitos de un bloque se escriben aquí cuando el bloque se abre, y sus números medidos cuando se
 cierra. El orden de los bloques B y C se confirma al cerrar el bloque A.
 
-**El bloque A se cerró el 2026-11-19**, con la versión 0.1.0; su
+**El bloque A se cerró el 2026-11-18**, con la versión 0.1.0; su
 [nota de cierre](#bloque-a--nota-de-cierre) está tras sus hitos. Su primer hito, A0, no tuvo código:
 probó a mano los formatos de los que depende el resto del bloque.
 
@@ -323,8 +323,9 @@ Razonado, no medido:
   de salida, en estos diez. No dicen cuántos otros parches pasarían; esa es la métrica del bloque B.
 - Ningún caso del corpus acaba en `ASK`, así que la parada de la ejecución en un estado que pregunta
   solo se prueba con dobles.
-- No se midió el tiempo de la revisión sin la ayuda de otro modelo; falta la estimación del
-  mantenedor, porque es el coste de adopción que pagaría una persona sin esa ayuda.
+- No se midió el tiempo de la revisión sin la ayuda de otro modelo; es el coste de adopción que
+  pagaría una persona sin esa ayuda. El mantenedor decidió, al cerrar el bloque A, no estimarlo
+  ([nota de cierre](#bloque-a--nota-de-cierre)).
 
 A3 no resolvió ninguna hipótesis de la tabla de arriba; ninguna tenía su prueba en A3.
 
@@ -355,7 +356,7 @@ Apuntado mientras se construye A4:
 
 ### Bloque A · Nota de cierre
 
-**A4 se cerró el 2026-11-19, y con él el bloque A**, con la versión 0.1.0 y la etiqueta `v0.1.0`
+**A4 se cerró el 2026-11-18, y con él el bloque A**, con la versión 0.1.0 y la etiqueta `v0.1.0`
 ([ADR-0068](adr/0068-the-harness-is-named-by-its-version-and-its-commit.es.md)).
 
 **El criterio de salida de A4 lo cumple
@@ -438,6 +439,9 @@ bloque A:
 - Si la frontera `function` se amplía a objetos y métodos, a la vista de que cachetools da 0 o 1
   de 14.
 - Una regla que proteja las etiquetas `v*` de borrarse o moverse.
+- Dónde vive la clave del almacén sellado: el fichero del workflow viene de la pull request
+  (ADR-0071), y las pull requests de ramas de este mismo repositorio reciben los secretos del
+  repositorio, así que un secreto de repositorio estaría al alcance de una pull request.
 - La forma de trabajar y la autonomía de las sesiones, aparcadas hasta terminar el arnés.
 - El orden de los bloques B y C, que se confirma al cerrar el bloque A.
 

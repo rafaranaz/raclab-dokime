@@ -39,6 +39,8 @@ from dokime.verify.aggregate import BUILT, NOT_BUILT, GateEntry, Status, aggrega
 from dokime.verify.examples import baseline, visible_examples
 from dokime.verify.existing import existing_tests
 from dokime.verify.protected import protected_paths
+from dokime.verify.repeatability import GATE as REPEATABILITY
+from dokime.verify.repeatability import repeatability
 from dokime.verify.result import GateResult
 from dokime.verify.trees import base_tree, change_tree
 
@@ -87,6 +89,8 @@ class Request:
     story: str | None = None
     contract: Path | None = None
     pack: Path | None = None
+    harness_commit: CommitName | None = None
+    """The commit of the checkout of the harness, when it names its code (ADR-0068)."""
 
 
 @dataclass(frozen=True)
@@ -173,6 +177,9 @@ class _Run:
         self.dockerfile: Path | None = None
         self.observed = False
         self.change_image: Digest | None = None
+        self.change_build: Build | None = None
+        self.change_refusal: RefusalError | None = None
+        self.repeated: evidence.Repeated | None = None
 
     def go(self, story: str, tree: TreeName) -> Audited:
         self.ledger.record("run.started", {"base": self.request.base.text, "story": story})
@@ -184,7 +191,7 @@ class _Run:
                 gates.extend(_unreached(name, *stopped) for name in names)
                 continue
             self.ledger.record("state.entered", {"state": state})
-            results = tuple(self._gate(name) for name in names if name in BUILT)
+            results = self._results(names)
             outcome = aggregate_state(names, results)
             if outcome.findings:
                 self.ledger.record(
@@ -204,10 +211,30 @@ class _Run:
         self.ledger.record("run.finished", {"verdict": verdict.value})
         return Audited(verdict=verdict, gates=tuple(gates), evidence=built)
 
-    def _gate(self, name: str) -> GateResult:
-        self.ledger.record("gate.started", {"gate": name})
+    def _results(self, names: tuple[str, ...]) -> tuple[GateResult, ...]:
+        """The results of the gates of a state; those of `verifying` as many times as the policy
+        says when `repeatability` is built, each with its worst run and with `repeatability`."""
+        if REPEATABILITY not in names or REPEATABILITY not in BUILT:
+            return tuple(self._gate(name) for name in names if name in BUILT)
+        repeated = [name for name in names if name in BUILT and name != REPEATABILITY]
+        count = self.policy.verification_runs
+        runs = [
+            tuple(self._gate(name, run=number) for name in repeated)
+            for number in range(1, count + 1)
+        ]
+        self.ledger.record("gate.started", {"gate": REPEATABILITY})
+        compared = repeatability(runs)
+        self.ledger.record(
+            "gate.finished", {"gate": REPEATABILITY, "verdict": compared.verdict.value}
+        )
+        self.repeated = evidence.Repeated(runs=count, consistent=not compared.findings)
+        return (*(_worst(name, runs) for name in repeated), compared)
+
+    def _gate(self, name: str, run: int | None = None) -> GateResult:
+        numbered: dict[str, object] = {} if run is None else {"run": run}
+        self.ledger.record("gate.started", {"gate": name, **numbered})
         result = self._result(name)
-        finished: dict[str, object] = {"gate": name, "verdict": result.verdict.value}
+        finished: dict[str, object] = {"gate": name, **numbered, "verdict": result.verdict.value}
         if name == "visible-examples" and self.change_image is not None:
             finished["image"] = self.change_image.text
         self.ledger.record("gate.finished", finished)
@@ -256,14 +283,23 @@ class _Run:
         raise ValueError(f"the gate {name!r} is not one that this version runs")
 
     def _image_of_the_change(self, pack: Pack, contract: Contract, dockerfile: Path) -> Digest:
-        """The image built with the tree of the change of ADR-0058 as the context."""
-        repository = self.ports.repository
-        tree = change_tree(pack, contract, self.request.base, self.request.patch, repository)
-        directory = self.work / "change"
-        directory.mkdir()
-        repository.extract(tree, directory)
-        self.change_image = self.ports.runtime.build(dockerfile, directory, BuildLimits()).image
-        return self.change_image
+        """The image built with the tree of the change of ADR-0058 as the context, built once
+        for the audit; a refusal of its build is kept and given again to every run."""
+        if self.change_refusal is not None:
+            raise self.change_refusal
+        if self.change_build is None:
+            repository = self.ports.repository
+            tree = change_tree(pack, contract, self.request.base, self.request.patch, repository)
+            directory = self.work / "change"
+            directory.mkdir()
+            try:
+                repository.extract(tree, directory)
+                self.change_build = self.ports.runtime.build(dockerfile, directory, BuildLimits())
+            except RefusalError as refusal:
+                self.change_refusal = refusal
+                raise
+            self.change_image = self.change_build.image
+        return self.change_build.image
 
     def _environment(self) -> GateResult:
         self.pack = read_pack(self.root, self.request.pack)
@@ -303,10 +339,8 @@ class _Run:
                     for r in read.requirements
                 ),
             )
-        image = None
-        if self.built is not None:
-            platform = self.built.base.platform if self.built.base else None
-            image = evidence.Image(self.built.image, platform)
+        image = None if self.built is None else _image(self.built)
+        change_image = None if self.change_build is None else _image(self.change_build)
         return evidence.Run(
             story=story,
             tree=tree,
@@ -319,11 +353,28 @@ class _Run:
                 image=image,
                 pack=self.pack.text if self.pack and self.pack.pack else None,
                 probe=self.ports.probe if self.observed else None,
+                change_image=change_image,
             ),
             gates=gates,
             ledger=head(self.store.lines()),
             contract=contract,
+            harness_commit=self.request.harness_commit,
+            repeated=self.repeated,
         )
+
+
+def _image(built: Build) -> evidence.Image:
+    return evidence.Image(built.image, built.base.platform if built.base else None)
+
+
+_RANK = {Verdict.PASS: 0, Verdict.ASK: 1, Verdict.FAIL: 2, Verdict.ERROR: 3}
+"""The precedence of ADR-0015, from the best verdict to the worst."""
+
+
+def _worst(name: str, runs: list[tuple[GateResult, ...]]) -> GateResult:
+    """The result of a gate in the run where its verdict was worst, the first on a tie."""
+    results = [result for run in runs for result in run if result.gate == name]
+    return max(results, key=lambda result: _RANK[result.verdict])
 
 
 def _unreached(name: str, state: str, verdict: Verdict) -> evidence.Gate:

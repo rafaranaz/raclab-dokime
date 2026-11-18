@@ -22,6 +22,7 @@ from dokime.evidence.run import Gate, GateNotReached, GateRan
 from dokime.interfaces.audit import Audited, Ports, Request, run_audit
 from dokime.interfaces.env import sigterm_raises
 from dokime.interfaces.text import EXIT_CODES, summary
+from dokime.platform.checkout import checkout_commit
 from dokime.platform.clock import SystemClock
 from dokime.platform.git import GitRepository
 from dokime.platform.ledger_file import LedgerFile
@@ -34,6 +35,8 @@ DISTRIBUTION = "raclab-dokime"
 UNVERSIONED = "unversioned"
 """The version of a harness whose package is not installed."""
 _FULL_NAME = re.compile(r"[0-9a-f]{40}")
+HARNESS = Path(__file__).resolve().parents[1]
+"""The directory of the package of the harness, whose checkout gives its commit (ADR-0068)."""
 
 
 def audit_command(arguments: argparse.Namespace) -> int:
@@ -43,20 +46,25 @@ def audit_command(arguments: argparse.Namespace) -> int:
         raise SystemExit(2)
     out: Path = arguments.out
     as_json = arguments.format == "json"
-    audited = _audit(arguments, as_json)
+    asked: list[CommitName | None] = []
+    audited = _audit(arguments, as_json, asked)
+    harness = (_version(), asked[0] if asked else None)
     evidence = None
     if audited.evidence is not None:
         evidence = out / audited.evidence.name
         with evidence.open("xb") as written:
             written.write(audited.evidence.data)
     if as_json:
-        sys.stdout.write(json_of(audited, evidence, out / LEDGER))
+        sys.stdout.write(json_of(audited, evidence, out / LEDGER, harness))
     else:
+        version, commit = harness
+        said = commit.text if commit is not None else "without a commit"
+        sys.stdout.write(f"harness {version} {said}\n")
         sys.stdout.write(text_of(audited, evidence))
     return EXIT_CODES[audited.verdict]
 
 
-def _audit(arguments: argparse.Namespace, as_json: bool) -> Audited:
+def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName | None]) -> Audited:
     if not _FULL_NAME.fullmatch(arguments.base):
         return _ended(
             "not-a-commit-name",
@@ -77,17 +85,19 @@ def _audit(arguments: argparse.Namespace, as_json: bool) -> Audited:
         )
     if out.exists() and (not out.is_dir() or any(out.iterdir())):
         return _ended("out-not-empty", f"the directory {arguments.out} is not an empty directory")
-    out.mkdir(parents=True, exist_ok=True)
-    request = Request(
-        base=CommitName(arguments.base),
-        patch=patch,
-        harness=_version(),
-        story=arguments.story,
-        contract=arguments.contract,
-        pack=arguments.pack,
-    )
     try:
         with sigterm_raises(), GitRepository(arguments.project) as repository:
+            asked.append(checkout_commit(HARNESS, git=str(repository.git_path)))
+            out.mkdir(parents=True, exist_ok=True)
+            request = Request(
+                base=CommitName(arguments.base),
+                patch=patch,
+                harness=_version(),
+                story=arguments.story,
+                contract=arguments.contract,
+                pack=arguments.pack,
+                harness_commit=asked[0],
+            )
             runtime = PodmanRuntime()
             if not as_json:
                 sys.stdout.write(f"program git {repository.git_path} {repository.git_version}\n")
@@ -109,9 +119,21 @@ def text_of(audited: Audited, evidence: Path | None) -> str:
     return "\n".join(lines) + "\n"
 
 
-def json_of(audited: Audited, evidence: Path | None, ledger: Path) -> str:
+def json_of(
+    audited: Audited,
+    evidence: Path | None,
+    ledger: Path,
+    harness: tuple[str, CommitName | None] | None = None,
+) -> str:
     """The output of `audit` as one JSON document."""
-    document = {
+    document: dict[str, object] = {}
+    if harness is not None:
+        version, commit = harness
+        document["harness"] = {
+            "version": version,
+            "commit": None if commit is None else commit.text,
+        }
+    document |= {
         "verdict": audited.verdict.value,
         "evidence": None
         if audited.evidence is None or evidence is None

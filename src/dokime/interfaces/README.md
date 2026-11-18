@@ -93,7 +93,9 @@ PASS: no findings
   document with the verdict, the evidence, the ledger, the gates and the findings. The exit code is
   that of the verdict, as for `contract check`.
 - The version of the harness in the evidence is that of the installed package, or `unversioned`
-  when it runs from a checkout that is not installed.
+  when it is not installed, and its commit is the one `platform` gives for the checkout of the
+  package, asked once the git adapter has checked its version and before anything is written. The
+  output says both, as `harness <version> <commit>` or `harness <version> without a commit`.
 - SIGINT and SIGTERM close every layer, from the inside out, as for `env check`.
 
 - The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,
@@ -124,6 +126,12 @@ the ledger store:
   context: `baseline` in the image of the environment, `visible-examples` in one built with the
   tree of the change of ADR-0058, whose digest goes in its `gate.finished`. So a pack that
   installs the project observes the code and the dependencies of the patch.
+- When the gate `repeatability` is built, the other gates of `verifying` run as many times as
+  `verification.runs` of the policy says, each `gate.started` and `gate.finished` with the number
+  of its run. Each gate enters the aggregation with the result of its worst run, by the precedence
+  of ADR-0015, the first on a tie, together with `repeatability` over every run, so the verdict does
+  not depend on the order of the runs; the evidence gets `repeated` only then. The image of the
+  change is built once for the audit, and goes to the evidence as `inputs.change_image`.
 - The ledger records `run.started`, `state.entered`, `gate.started` and `gate.finished`,
   `baseline.unstable`, `evidence.built` and `run.finished`. The evidence carries the head of the
   ledger before `evidence.built`.

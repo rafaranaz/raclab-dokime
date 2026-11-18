@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:66127c991d62af3e -->
+<!-- translation-of: README.md sha256:3418e873f82054a8 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -79,3 +79,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) | La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no | Aceptada |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Aceptada |
 | [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.es.md) | Una persona aprueba el contrato antes de que se audite un cambio contra él | Propuesta |
+| [0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md) | El arnés se nombra por su versión y su commit | Propuesta |

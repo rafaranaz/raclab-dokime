@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:4be10f71ce3085ad -->
+<!-- translation-of: ROADMAP.md sha256:3d4e39715ae12fc3 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -330,9 +330,9 @@ A3 no resolvió ninguna hipótesis de la tabla de arriba; ninguna tenía su prue
 Para la nota que cierra el bloque A, al final de A4: la proporción de arreglos reales que no caben en
 el formato del contrato, como pide la ADR-0057, con la hipótesis de A0 medida tanto en cambios
 elegidos a mano como en cambios sacados de la historia. Lo leído, no ejecutado: en python-semver unos
-12 de 25, una cuenta que dio la sesión que revisa el trabajo y cuya base, los 25 candidatos o los 18
-testigos entre ellos de la tabla de la ADR-0057, se fija cuando se mida; en cachetools casi ninguno,
-porque casi todos son decoradores y métodos de clases; en mdformat al menos 2 de sus 7 testigos.
+12 de los 18 testigos entre sus 25 primeros candidatos, una cuenta que dio la sesión que revisa el
+trabajo; en cachetools casi ninguno, porque casi todos son decoradores y métodos de clases; en
+mdformat al menos 2 de sus 7 testigos.
 
 Apuntado como deuda, que no bloquea ningún hito:
 

@@ -98,6 +98,13 @@ PASS: no findings
   output says both, as `harness <version> <commit>` or `harness <version> without a commit`, and
   `harness <version> commit not asked` when the audit ended before the git adapter opened; the JSON
   document says it in `commit_asked`.
+- `--summary FILE` appends the summary of the job to the file, in Markdown, as
+  `$GITHUB_STEP_SUMMARY` expects (ADR-0070): the verdict, the story, the digest of the contract, the
+  version and the commit of the harness, the digest of the evidence, and a table with each gate,
+  its status, its verdict and the codes of its findings; when there is no evidence, the codes of
+  the findings that ended the audit. It writes only names, statuses, verdicts, codes, versions and
+  digests that match their patterns, never a message or a reason, which may quote the code of the
+  change. A file that cannot be written ends the command with the code of `ERROR`.
 - SIGINT and SIGTERM close every layer, from the inside out, as for `env check`.
 
 - The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,

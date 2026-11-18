@@ -88,6 +88,12 @@ def _parser() -> argparse.ArgumentParser:
     audit.add_argument(
         "--format", choices=("text", "json"), default="text", help="how the result is written"
     )
+    audit.add_argument(
+        "--summary",
+        type=Path,
+        default=None,
+        help="a file to append the summary of the job to, such as $GITHUB_STEP_SUMMARY",
+    )
     return parser
 
 

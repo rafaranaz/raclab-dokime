@@ -24,7 +24,8 @@ def result(gate: str, *verdicts: Verdict) -> GateResult:
 
 def ran(*verdicts: tuple[Verdict, ...]) -> tuple[GateResult, ...]:
     built = ("protected-paths", "existing-tests", "visible-examples")
-    return tuple(result(gate, *found) for gate, found in zip(built, verdicts, strict=True))
+    gates = tuple(result(gate, *found) for gate, found in zip(built, verdicts, strict=True))
+    return (*gates, result("repeatability"))
 
 
 @pytest.mark.parametrize(
@@ -47,8 +48,9 @@ def test_every_gate_of_the_state_is_listed_in_its_order() -> None:
     outcome = aggregate_state(VERIFYING, tuple(reversed(results)))
     assert [entry.gate for entry in outcome.gates] == list(VERIFYING)
     assert outcome.gates[:3] == tuple(
-        GateEntry(gate=r.gate, status=Status.RUN, result=r) for r in results
+        GateEntry(gate=r.gate, status=Status.RUN, result=r) for r in results[:3]
     )
+    assert outcome.gates[6] == GateEntry(gate="repeatability", status=Status.RUN, result=results[3])
     assert outcome.findings == ()
 
 
@@ -61,7 +63,6 @@ def test_every_gate_of_the_state_is_listed_in_its_order() -> None:
         ("changed-line-coverage", "block D"),
         ("behaviour-differences", "block D"),
         ("delivery", "block E"),
-        ("repeatability", "A4"),
     ],
 )
 def test_a_gate_not_built_is_not_applicable_with_where_it_is_built(gate: str, where: str) -> None:
@@ -84,6 +85,7 @@ def test_a_state_whose_gates_are_all_not_applicable_passes() -> None:
         "protected-paths",
         "existing-tests",
         "visible-examples",
+        "repeatability",
     ],
 )
 def test_a_built_gate_without_a_result_is_an_error(gate: str) -> None:

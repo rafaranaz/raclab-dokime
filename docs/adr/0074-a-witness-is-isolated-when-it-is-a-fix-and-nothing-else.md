@@ -1,6 +1,6 @@
 # ADR-0074 · A witness is isolated when it is a fix and nothing else
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

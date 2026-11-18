@@ -19,8 +19,11 @@ fixes it for A3. The requirements are in
   `evidence.built`. It refuses a story, a requirement or an unstable example that is not a name, a
   gate listed twice, and a check of an unknown origin or of no checks.
 - `statement(run)`: the in-toto Statement v1 alone, without an envelope. The subjects are the tree,
-  by `gitTree`, and the patch, by `sha256`. The predicate v0.1 leaves out every field the run does
-  not fill. The whole message of a finding goes to `untrusted`, with the label `message`, cut at
+  by `gitTree`, and the patch, by `sha256`. The predicate v0.2 (ADR-0069) leaves out every field
+  the run does not fill; besides those of v0.1 it has `verifier.commit`, the commit of the harness,
+  `inputs.change_image`, the image in which `visible-examples` observed, and `repeated`, the runs of
+  the verification and whether they were consistent. It writes no trusted `message` in a finding:
+  no module gives one yet. The whole message of a finding goes to `untrusted`, with the label `message`, cut at
   4096 characters; the code, the verdict and the lines are what dokime fixes. A text the evidence
   quotes by itself, such as the name of a test, is cut at 200 (ADR-0066).
 - `not_checked(run)`: what was not checked, by code in the order of ADR-0064: `no-holdout` for each
@@ -40,6 +43,8 @@ fixes it for A3. The requirements are in
   at most 200 characters, or 4096 for a message. `build` reads its
   own bytes back and refuses a run whose bytes do not meet the schema, such as an empty version of
   the harness or an empty reason. The patterns of digests, commits, trees, verdicts and codes are
-  those of the types of `core`.
+  those of the types of `core`. A file is read with the schema of its version: one of v0.1 has none
+  of the fields of v0.2, and one of v0.2 may carry in a finding a trusted `message` of 1 to 4096
+  characters.
 
 Signing and verifying an evidence file come with block E.

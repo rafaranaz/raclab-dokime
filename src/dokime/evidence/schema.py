@@ -18,7 +18,10 @@ from dokime.core.runtime import Digest
 from dokime.core.verdicts import EmptyRoundError, Verdict, aggregate
 
 STATEMENT = "https://in-toto.io/Statement/v1"
-PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1"
+PREDICATE_V01 = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1"
+"""The predicate of A3 (ADR-0064), which the reader still reads."""
+PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2"
+"""The predicate that the builder writes (ADR-0069)."""
 ORIGINS = ("existing", "human", "derived", "model")
 """The origins of the checks of a gate, in the order a gate lists them."""
 NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
@@ -208,57 +211,72 @@ _UNTRUSTED = _fields(
         ),
     }
 )
-_FINDING = _fields(
-    {
-        "code": _matches("is not a code", _builds(_code)),
-        "verdict": _FOUND,
-        "lines": _list(_whole(1)),
-        "untrusted": _list(
-            _fields(
-                {
-                    "label": _is("message"),
-                    "text": _matches(
-                        f"is not a text of 1 to {MESSAGE} characters",
-                        lambda t: 0 < len(t) <= MESSAGE,
-                    ),
-                }
-            ),
-            at_least=1,
-        ),
-    }
+_MESSAGE_TEXT = _matches(
+    f"is not a text of 1 to {MESSAGE} characters", lambda t: 0 < len(t) <= MESSAGE
 )
-_RAN = _fields(
-    {"gate": _NAME, "status": _is("run"), "verdict": _VERDICT, "findings": _list(_FINDING)},
-    {
-        "checks": _list(
-            _fields(
-                {"origin": _matches("is not an origin", ORIGINS.__contains__), "total": _whole(1)}
-            ),
-            at_least=1,
-        )
-    },
-)
-_NOT_APPLICABLE = _fields({"gate": _NAME, "status": _is("not-applicable"), "reason": _TEXT})
-_NOT_REACHED = _fields({"gate": _NAME, "status": _is("not-reached"), "reason": _TEXT})
+_COMMIT = _matches("is not the name of a commit", _builds(CommitName))
+_IMAGE = _fields({"digest": _DIGEST}, {"platform": _DIGEST})
 
 
-def _gate(check: _Check, value: object, place: Place) -> None:
-    status = value.get("status") if isinstance(value, dict) else None
-    {"not-applicable": _NOT_APPLICABLE, "not-reached": _NOT_REACHED}.get(str(status), _RAN)(
-        check, value, place
+def _boolean(check: _Check, value: object, place: Place) -> None:
+    if type(value) is not bool:
+        check.bad(place, "is not true or false")
+
+
+def _optional(v02: bool, fields: Mapping[str, Rule]) -> dict[str, Rule]:
+    """The fields that the second version of the predicate adds, or none in the first."""
+    return dict(fields) if v02 else {}
+
+
+def _gates_rule(v02: bool) -> Rule:
+    finding = _fields(
+        {
+            "code": _matches("is not a code", _builds(_code)),
+            "verdict": _FOUND,
+            "lines": _list(_whole(1)),
+            "untrusted": _list(
+                _fields({"label": _is("message"), "text": _MESSAGE_TEXT}), at_least=1
+            ),
+        },
+        _optional(v02, {"message": _MESSAGE_TEXT}),
+    )
+    ran = _fields(
+        {"gate": _NAME, "status": _is("run"), "verdict": _VERDICT, "findings": _list(finding)},
+        {
+            "checks": _list(
+                _fields(
+                    {
+                        "origin": _matches("is not an origin", ORIGINS.__contains__),
+                        "total": _whole(1),
+                    }
+                ),
+                at_least=1,
+            )
+        },
     )
 
+    def gate(check: _Check, value: object, place: Place) -> None:
+        status = value.get("status") if isinstance(value, dict) else None
+        {"not-applicable": _NOT_APPLICABLE, "not-reached": _NOT_REACHED}.get(str(status), ran)(
+            check, value, place
+        )
 
-def _gates(check: _Check, value: object, place: Place) -> None:
-    _list(_gate)(check, value, place)
-    if isinstance(value, list):
-        names = [gate.get("gate") for gate in value if isinstance(gate, dict)]
-        counted = Counter(name for name in names if isinstance(name, str))
-        for name in sorted(name for name, count in counted.items() if count > 1):
-            check.bad(place, f"lists the gate {name!r} more than once")
-        if names != list(AUDIT_GATES):
-            check.bad(place, "are not the gates of the audit flow of A3 in its order")
-        _reached(check, value, place)
+    def gates(check: _Check, value: object, place: Place) -> None:
+        _list(gate)(check, value, place)
+        if isinstance(value, list):
+            names = [g.get("gate") for g in value if isinstance(g, dict)]
+            counted = Counter(name for name in names if isinstance(name, str))
+            for name in sorted(name for name, count in counted.items() if count > 1):
+                check.bad(place, f"lists the gate {name!r} more than once")
+            if names != list(AUDIT_GATES):
+                check.bad(place, "are not the gates of the audit flow of A3 in its order")
+            _reached(check, value, place)
+
+    return gates
+
+
+_NOT_APPLICABLE = _fields({"gate": _NAME, "status": _is("not-applicable"), "reason": _TEXT})
+_NOT_REACHED = _fields({"gate": _NAME, "status": _is("not-reached"), "reason": _TEXT})
 
 
 def _reached(check: _Check, gates: list[object], place: Place) -> None:
@@ -286,59 +304,68 @@ _NOT_CHECKED = _fields(
     },
     {"untrusted": _list(_UNTRUSTED, at_least=1)},
 )
-_PREDICATE_FIELDS = _fields(
-    {
-        "verdict": _VERDICT,
-        "delivered": _is(False),
-        "independence": _is("self-attested"),
-        "verifier": _fields({"harness": _TEXT, "ran_on": _is("developer")}),
-        "contract": _fields({"story": _NAME}, {"digest": _DIGEST}),
-        "inputs": _fields(
-            {
-                "base": _matches("is not the name of a commit", _builds(CommitName)),
-                "policy": _fields(
-                    {
-                        "digest": _DIGEST,
-                        "source": _matches(
-                            "is not file or defaults", {"file", "defaults"}.__contains__
-                        ),
-                    }
-                ),
-            },
-            {
-                "image": _fields({"digest": _DIGEST}, {"platform": _DIGEST}),
-                "pack": _fields({"digest": _DIGEST}),
-                "probe": _DIGEST,
-            },
-        ),
-        "gates": _gates,
-        "human_decisions": _is([]),
-        "not_checked": _list(_NOT_CHECKED),
-        "ledger": _fields({"events": _whole(0)}, {"head": _DIGEST}),
-    }
-)
 
 
-def _predicate(check: _Check, value: object, place: Place) -> None:
-    """The fields of the predicate, then whether its verdict is that of the gates that ran."""
-    _PREDICATE_FIELDS(check, value, place)
-    if not isinstance(value, dict) or not isinstance(value.get("gates"), list):
-        return
-    known = {verdict.value for verdict in Verdict}
-    ran = [g for g in value["gates"] if isinstance(g, dict) and g.get("status") == "run"]
-    given = [gate.get("verdict") for gate in ran]
-    if value.get("verdict") not in known or any(verdict not in known for verdict in given):
-        return
-    try:
-        expected = aggregate(Verdict(str(verdict)) for verdict in given)
-    except EmptyRoundError:
-        check.bad((*place, "verdict"), "has no gate that ran to be the verdict of")
-        return
-    if value["verdict"] != expected.value:
-        check.bad(
-            (*place, "verdict"),
-            f"is not {expected.value}, the precedence over the verdicts of the gates that ran",
-        )
+def _predicate_rule(v02: bool) -> Rule:
+    fields = _fields(
+        {
+            "verdict": _VERDICT,
+            "delivered": _is(False),
+            "independence": _is("self-attested"),
+            "verifier": _fields(
+                {"harness": _TEXT, "ran_on": _is("developer")},
+                _optional(v02, {"commit": _COMMIT}),
+            ),
+            "contract": _fields({"story": _NAME}, {"digest": _DIGEST}),
+            "inputs": _fields(
+                {
+                    "base": _COMMIT,
+                    "policy": _fields(
+                        {
+                            "digest": _DIGEST,
+                            "source": _matches(
+                                "is not file or defaults", {"file", "defaults"}.__contains__
+                            ),
+                        }
+                    ),
+                },
+                {
+                    "image": _IMAGE,
+                    "pack": _fields({"digest": _DIGEST}),
+                    "probe": _DIGEST,
+                    **_optional(v02, {"change_image": _IMAGE}),
+                },
+            ),
+            "gates": _gates_rule(v02),
+            "human_decisions": _is([]),
+            "not_checked": _list(_NOT_CHECKED),
+            "ledger": _fields({"events": _whole(0)}, {"head": _DIGEST}),
+        },
+        _optional(v02, {"repeated": _fields({"runs": _whole(2), "consistent": _boolean})}),
+    )
+
+    def predicate(check: _Check, value: object, place: Place) -> None:
+        """The fields of the predicate, then whether its verdict is that of the gates that ran."""
+        fields(check, value, place)
+        if not isinstance(value, dict) or not isinstance(value.get("gates"), list):
+            return
+        known = {verdict.value for verdict in Verdict}
+        ran = [g for g in value["gates"] if isinstance(g, dict) and g.get("status") == "run"]
+        given = [gate.get("verdict") for gate in ran]
+        if value.get("verdict") not in known or any(verdict not in known for verdict in given):
+            return
+        try:
+            expected = aggregate(Verdict(str(verdict)) for verdict in given)
+        except EmptyRoundError:
+            check.bad((*place, "verdict"), "has no gate that ran to be the verdict of")
+            return
+        if value["verdict"] != expected.value:
+            check.bad(
+                (*place, "verdict"),
+                f"is not {expected.value}, the precedence over the verdicts of the gates that ran",
+            )
+
+    return predicate
 
 
 _SUBJECT = _fields(
@@ -370,11 +397,25 @@ def _subject(check: _Check, value: object, place: Place) -> None:
         check.bad((*place, position), "is not a subject of the schema")
 
 
-_statement = _fields(
-    {
-        "_type": _is(STATEMENT),
-        "subject": _subject,
-        "predicateType": _is(PREDICATE),
-        "predicate": _predicate,
-    }
-)
+def _statement_rule(predicate_type: str, v02: bool) -> Rule:
+    return _fields(
+        {
+            "_type": _is(STATEMENT),
+            "subject": _subject,
+            "predicateType": _is(predicate_type),
+            "predicate": _predicate_rule(v02),
+        }
+    )
+
+
+_STATEMENTS = {
+    PREDICATE_V01: _statement_rule(PREDICATE_V01, False),
+    PREDICATE: _statement_rule(PREDICATE, True),
+}
+"""The schema of each version of the predicate, which a file is read with (ADR-0069)."""
+
+
+def _statement(check: _Check, value: object, place: Place) -> None:
+    """The schema of the version the file names, or that of the one the builder writes."""
+    named = value.get("predicateType") if isinstance(value, dict) else None
+    _STATEMENTS.get(str(named), _STATEMENTS[PREDICATE])(check, value, place)

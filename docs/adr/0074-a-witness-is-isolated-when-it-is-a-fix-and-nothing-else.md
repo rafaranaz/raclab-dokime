@@ -64,9 +64,9 @@ requirement too.
 ## Basis
 
 Verified in [Defects4J](https://homes.cs.washington.edu/~rjust/publ/defects4j_issta_2014.pdf) (Just,
-Jalali and Ernst, ISSTA 2014):
+Jalali and Ernst, ISSTA 2014) and in its [README](https://github.com/rjust/defects4j):
 
-- "The bug fix (i.e., the diff between Vbug and Vfix) does not include unrelated changes such as
+- Among the requirements of each bug, in section 2: "The bug fix (i.e., the diff between Vbug and Vfix) does not include unrelated changes such as
   features or refactorings."
 - Its candidates come from the link between a commit and the bug tracker: "the commit log references
   a bug id of the bug tracking system or 2) the bug tracking system references a commit id of the
@@ -74,7 +74,9 @@ Jalali and Ernst, ISSTA 2014):
 - That label is not enough: "we encountered several types of fixes not related to the source code,
   or features, which were classified as a 'bug fix' by developers."
 - Isolating is done by reading: "We manually reviewed the source code diffs of reproducible bugs to
-  verify that they did not include irrelevant changes."
+  verify that they did not include irrelevant changes."; and its README says that each bug is
+  "Minimized: the Defects4J maintainers manually pruned out irrelevant changes in the commit (e.g.,
+  refactorings or feature additions)."
 
 Measured at the close of block A (`tests/corpus/witnesses.toml`): the agreement of the two readings,
 33, 36 and 38 of 41 for isolated, expressible and both (κ 0.57, 0.75 and 0.84).
@@ -95,6 +97,10 @@ it knew the debate. κ is computed again on the eight.
   is labelled as a bug in its tracker. Many witnesses reference no issue, reading the tracker needs
   the network at each measurement, and Defects4J found features under that label; it supports the
   reading instead.
+- **Minimize the patch by hand, as Defects4J does**, pruning from the commit the changes that are
+  not the fix. The good patch of a case is the commit as it is, everything outside the tests
+  (ADR-0057), and editing it would bring back the choice by hand that taking the cases from the
+  witnesses removes.
 - **Drop the filter.** The measurement would stop telling fixes from features, and a tangled patch
   would confuse what each gate of a case catches.
 

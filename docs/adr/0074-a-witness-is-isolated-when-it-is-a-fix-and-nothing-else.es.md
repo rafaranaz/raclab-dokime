@@ -1,4 +1,4 @@
-<!-- translation-of: 0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md sha256:d8182490b5699540 -->
+<!-- translation-of: 0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md sha256:9a0afc42f71434cf -->
 # ADR-0074 · Un testigo está aislado cuando es un arreglo y nada más
 
 **Estado:** propuesta
@@ -64,9 +64,9 @@ también es un requisito.
 ## Base
 
 Comprobado en [Defects4J](https://homes.cs.washington.edu/~rjust/publ/defects4j_issta_2014.pdf)
-(Just, Jalali y Ernst, ISSTA 2014):
+(Just, Jalali y Ernst, ISSTA 2014) y en su [README](https://github.com/rjust/defects4j):
 
-- "The bug fix (i.e., the diff between Vbug and Vfix) does not include unrelated changes such as
+- Entre los requisitos de cada error, en la sección 2: "The bug fix (i.e., the diff between Vbug and Vfix) does not include unrelated changes such as
   features or refactorings."
 - Sus candidatos salen del enlace entre un commit y el gestor de incidencias: "the commit log
   references a bug id of the bug tracking system or 2) the bug tracking system references a commit
@@ -74,7 +74,9 @@ Comprobado en [Defects4J](https://homes.cs.washington.edu/~rjust/publ/defects4j_
 - Esa etiqueta no basta: "we encountered several types of fixes not related to the source code, or
   features, which were classified as a 'bug fix' by developers."
 - Aislar se hace leyendo: "We manually reviewed the source code diffs of reproducible bugs to verify
-  that they did not include irrelevant changes."
+  that they did not include irrelevant changes."; y su README dice que cada error está "Minimized:
+  the Defects4J maintainers manually pruned out irrelevant changes in the commit (e.g., refactorings
+  or feature additions)."
 
 Medido al cerrar el bloque A (`tests/corpus/witnesses.toml`): el acuerdo de las dos lecturas, 33,
 36 y 38 de 41 en aislado, expresable y ambos (κ 0,57, 0,75 y 0,84).
@@ -95,6 +97,9 @@ el trabajo, cuya nota dice que conocía el debate. Se recalcula κ sobre los och
   está etiquetado como error en su gestor. Muchos testigos no citan ninguna incidencia, leer el
   gestor necesita la red en cada medida, y Defects4J encontró funcionalidades con esa etiqueta; en
   lugar de decidir, apoya la lectura.
+- **Minimizar el parche a mano, como hace Defects4J**, quitando del commit los cambios que no son el
+  arreglo. El parche bueno de un caso es el commit tal cual, todo lo que queda fuera de los tests
+  (ADR-0057), y editarlo devolvería la elección a mano que quita tomar los casos de los testigos.
 - **Quitar el filtro.** La medida dejaría de distinguir arreglos de funcionalidades, y un parche
   enredado confundiría lo que detecta cada puerta de un caso.
 

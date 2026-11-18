@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:3d4e39715ae12fc3 -->
+<!-- translation-of: ROADMAP.md sha256:2184186eba51a4da -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -341,6 +341,20 @@ Apuntado como deuda, que no bloquea ningún hito:
 - Dos `raise` defensivos de `interfaces/audit.py` a los que no llega ningún camino público, y la
   orden `audit`, medida por la cobertura solo en el proceso: sus tests con los motores reales la
   ejecutan en un proceso propio, como los de `env check`.
+
+Apuntado mientras se construye A4:
+
+- **Un límite de A4: la evidencia de este repositorio no cubre los tests que necesitan git o
+  podman.** Su pack ejecuta los tests en una imagen sin ellos, que instala solo lo que fija
+  `uv.lock` (REPO-142); git por apt no se podría fijar así. De los 1883 tests, medido en la imagen
+  sobre la base el 2026-11-18: pasan 1662; 131 necesitan git (88 errores, 27 fallos, 16 saltos); 63
+  se saltan sin podman; 26 se saltan porque no se piden los tests del corpus; y 1 se salta porque
+  el contenedor corre como root. Esos tests se siguen ejecutando en el job "lint, types and tests"
+  de cada pull request: la auditoría se añade a esa CI, no la sustituye.
+- **Deuda: los packs del corpus no ejecutan pytest con `--continue-on-collection-errors`**, como sí
+  hace el de este repositorio (REPO-146). Sin ello, un módulo de tests que no se importa detiene
+  todos los tests de un lado. Ninguno de los diez parches rompe una importación, así que sus
+  resultados no cambian.
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en A2 ni en A3:
 

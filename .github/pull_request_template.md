@@ -18,6 +18,8 @@ review can judge:
 - [ ] The requirements express the agreed intent, not just a valid syntax
 - [ ] Every decision with consequences has its ADR, new or superseding another
 - [ ] If it closes a scope, it includes the closing report (see `.claude/skills/close-scope`)
+- [ ] Every claim about the environment or about code of others names the command that checked
+      it, or is marked as not checked
 
 ---
 

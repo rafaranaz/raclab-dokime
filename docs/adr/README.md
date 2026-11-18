@@ -30,7 +30,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0017](0017-damage-outside-the-change-against-a-baseline.md) | Damage outside the change is found by comparing against a baseline | Accepted |
 | [0018](0018-the-flow-is-a-state-machine-in-a-yaml-file.md) | The flow is a state machine declared in a YAML file | Accepted |
 | [0019](0019-the-harness-launches-the-installed-agent-through-files.md) | The harness launches the installed agent and talks to it through files | Accepted |
-| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.md) | Isolating the agent is optional; adoption climbs a ladder | Accepted |
+| [0020](0020-agent-isolation-is-optional-adoption-is-a-ladder.md) | Isolating the agent is optional; adoption climbs a ladder | Accepted, amended by 0073 |
 | [0021](0021-the-agent-disputes-a-check-instead-of-editing-it.md) | The agent disputes a check instead of editing it | Accepted |
 | [0022](0022-model-calls-of-the-harness-go-through-a-port.md) | The model calls of the harness go through a port with three routes | Accepted |
 | [0023](0023-evidence-is-an-attestation-bound-to-the-tree.md) | Evidence is an in-toto attestation bound to the resulting tree | Accepted |

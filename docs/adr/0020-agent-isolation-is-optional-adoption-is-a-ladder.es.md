@@ -1,7 +1,7 @@
-<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:1587d079166d1762 -->
+<!-- translation-of: 0020-agent-isolation-is-optional-adoption-is-a-ladder.md sha256:fcc6c461e40ebd21 -->
 # ADR-0020 · Aislar al agente es opcional; la adopción es una escalera
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md)
 
 ## Contexto
 

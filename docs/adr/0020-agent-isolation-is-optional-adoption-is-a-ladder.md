@@ -1,6 +1,6 @@
 # ADR-0020 · Isolating the agent is optional; adoption climbs a ladder
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md)
 
 ## Context
 

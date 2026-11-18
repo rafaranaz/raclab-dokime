@@ -94,3 +94,4 @@ examples, edit tests or break existing tests.
 - **CORPUS-052** When the audit of a bad case ends, the test shall demand that the first gate, in the order of the audit flow, whose verdict is `FAIL` is the `failing_gate` of the case.
 - **CORPUS-053** When the audit of a case ends with evidence, the test shall demand that the evidence reads back without a finding.
 - **CORPUS-054** When the audit of a case ends, the test shall write one line with the case, its verdict and its `expected`, and the first gate that failed and its `failing_gate`, so that the job shows the measurement of every case.
+- **CORPUS-055** When the gate `repeatability` ran in the audit of a case, the test shall demand that its evidence carries `repeated` with `runs` as `2`, as many as the policy of the case says by default, and `consistent` as `true`; and that it carries no `repeated` when the gate did not run.

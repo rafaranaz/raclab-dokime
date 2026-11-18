@@ -333,6 +333,19 @@ Noted as debt, which blocks no milestone:
   `audit`, measured by the coverage only in process: its tests with the real engines run it in a
   process of its own, as those of `env check` do.
 
+Noted while A4 is built:
+
+- **A limit of A4: the evidence of this repository does not cover the tests that need git or
+  podman.** Its pack runs the tests in an image without them, which installs only what `uv.lock`
+  pins (REPO-142); git from apt could not be pinned that way. Of the 1883 tests, measured in the
+  image on the base on 2026-11-18: 1662 pass; 131 need git (88 errors, 27 failures, 16 skips); 63
+  skip without podman; 26 skip since the tests of the corpus are not asked for; and 1 skips since
+  the container runs as root. Those tests still run in the job "lint, types and tests" of every
+  pull request: the audit is added to that CI, it does not replace it.
+- **Debt: the packs of the corpus do not run pytest with `--continue-on-collection-errors`**, as
+  that of this repository does (REPO-146). Without it a module of tests that does not import stops
+  every test of a side. None of the ten patches breaks an import, so their results do not change.
+
 Still to decide before a milestone opens. They are written down here and not decided in A2 or A3:
 
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout

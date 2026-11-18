@@ -1,6 +1,6 @@
 # ADR-0072 · The sealed store is encrypted with age for a list of recipients
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

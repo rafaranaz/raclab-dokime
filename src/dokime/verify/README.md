@@ -40,6 +40,12 @@ The gates of a change that arrives already made, and their aggregation. The requ
   or starts with that and a `.`. Known limit: beside a module `tests/test_a.py`, a test of a
   package `tests/test_a/` counts as of the module.
 
+- `repeatability(runs)`: the gate `repeatability`. `interfaces` runs the gates of the state
+  `verifying` as many times as `verification.runs` of the policy says, and gives it the results of
+  each run; a gate whose verdict differs between two runs asks (`verdict-varies`), naming its
+  verdict in each run, and runs that do not hold the same gates once each are `runs-differ`, an
+  error. Fewer than two runs are refused. The findings follow the gates in the order of the runs.
+  Until `interfaces` runs it, the aggregation still lists the gate as not applicable.
 - `aggregate_state(gates, results)`: the aggregation of the gates of a state (ADR-0015,
   ADR-0034). It lists every gate of the state in its order, run with its result or not applicable
   with where it is built, and gives the verdict by precedence: `ERROR`, then `FAIL`, which drops the

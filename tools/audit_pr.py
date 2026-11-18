@@ -5,8 +5,12 @@ checkout of the base, so that neither the tool nor the harness it runs comes fro
 story is the description of the name of the branch (ADR-0067). A pull request that only touches
 `.dokime/changes/` is a pull request of a contract: its contracts are checked, and it is not
 audited, since `protected-paths` would always refuse it. A pull request whose branch gives no story,
-or whose base has no contract for it, is not audited, and the summary says why. Otherwise `audit`
-runs on the patch of the pull request and writes the summary of the job (ADR-0070).
+or whose base has no contract for it, is not audited, and the summary says why; but one that also
+brings a contract with other changes, and has no contract in its base, is an error, since the
+contract goes first in a pull request of its own. A branch that is not up to date with its base is
+an error too, since its patch would hold the newer commits of the base reversed. Otherwise `audit`
+runs on the patch of the pull request and writes the summary of the job (ADR-0070). git reads the
+changes with the attributes of the empty tree.
 
 The summary holds only names that match their pattern, verdicts and codes: the name of a branch and
 the paths of a pull request are written by whoever opens it.
@@ -14,6 +18,7 @@ the paths of a pull request are written by whoever opens it.
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -27,6 +32,7 @@ _BRANCH = re.compile(r"[a-z]+/[a-z0-9]+-(?P<story>[A-Za-z][A-Za-z0-9]*(?:-[A-Za-
 _NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*")
 _COMMIT = re.compile(r"[0-9a-f]{40}")
 _CODE = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+_EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 CHANGES = ".dokime/changes/"
 CONTRACT = "contract.yaml"
 CODES = {"PASS": 0, "FAIL": 1, "ERROR": 2, "ASK": 3}
@@ -44,8 +50,14 @@ def _run(command: list[str], capture: bool) -> subprocess.CompletedProcess[str]:
 
 
 def _git(project: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    """A command of git on the checkout of the pull request, with the attributes of the empty
+    tree, so that the `.gitattributes` of the pull request plays no part in its own patch."""
     return subprocess.run(
-        ["git", "-C", str(project), *args], capture_output=True, text=True, check=False
+        ["git", "-C", str(project), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={**os.environ, "GIT_ATTR_SOURCE": _EMPTY_TREE},
     )
 
 
@@ -68,11 +80,33 @@ def main(argv: Sequence[str] | None = None, run: Run | None = None) -> int:
             summary, "## dokime audit: not audited", "", "- The base or the head is not a commit."
         )
         return CODES["ERROR"]
+    if _git(project, "merge-base", base, head).stdout.strip() != base:
+        _write(
+            summary,
+            "## dokime audit: not audited",
+            "",
+            "- `branch-not-up-to-date`: the branch is not up to date with its base, so its patch"
+            " would hold the newer commits of the base reversed. Rebase it on its base.",
+        )
+        return CODES["ERROR"]
     listed = _git(project, "diff", "--name-only", "-z", base, head).stdout
     paths = [path for path in listed.split("\0") if path]
     if paths and all(path.startswith(CHANGES) for path in paths):
         return _contracts(project, head, paths, summary, runner)
     story = story_of(arguments.branch)
+    contract = story is not None and (
+        _git(project, "cat-file", "-e", f"{base}:{CHANGES}{story}/{CONTRACT}").returncode == 0
+    )
+    if not contract and any(path.startswith(CHANGES) for path in paths):
+        _write(
+            summary,
+            "## dokime audit: not audited",
+            "",
+            "- `contract-with-the-change`: the pull request brings a contract together with other"
+            " changes, and its base has no contract for its story. The contract goes in a pull"
+            " request of its own, merged first (ADR-0067).",
+        )
+        return CODES["ERROR"]
     if story is None:
         _write(
             summary,
@@ -81,7 +115,7 @@ def main(argv: Sequence[str] | None = None, run: Run | None = None) -> int:
             "- The name of the branch gives no story: it is not `<type>/<scope>-<story>`.",
         )
         return CODES["PASS"]
-    if _git(project, "cat-file", "-e", f"{base}:{CHANGES}{story}/{CONTRACT}").returncode != 0:
+    if not contract:
         _write(
             summary,
             "## dokime audit: not audited",

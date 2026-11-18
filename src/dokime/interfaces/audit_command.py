@@ -20,6 +20,7 @@ from dokime.core.repository import CommitName, RefusalError
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.evidence.run import Gate, GateNotReached, GateRan
+from dokime.evidence.schema import NAME
 from dokime.interfaces.audit import Audited, Ports, Request, run_audit
 from dokime.interfaces.env import sigterm_raises
 from dokime.interfaces.text import EXIT_CODES, summary
@@ -36,6 +37,8 @@ DISTRIBUTION = "raclab-dokime"
 UNVERSIONED = "unversioned"
 """The version of a harness whose package is not installed."""
 _FULL_NAME = re.compile(r"[0-9a-f]{40}")
+_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+_VERSION = re.compile(r"[0-9A-Za-z][0-9A-Za-z.+!-]*")
 HARNESS = Path(__file__).resolve().parents[1]
 """The directory of the package of the harness, whose checkout gives its commit (ADR-0068)."""
 
@@ -75,7 +78,22 @@ def audit_command(arguments: argparse.Namespace) -> int:
     else:
         sys.stdout.write(f"harness {harness.version} {harness.said()}\n")
         sys.stdout.write(text_of(audited, evidence))
+    if arguments.summary is not None:
+        try:
+            with Path(arguments.summary).open("a", encoding="utf-8") as summary:
+                summary.write(summary_of(audited, harness, arguments.story or _story_of(arguments)))
+        except OSError as error:
+            reason = error.strerror or type(error).__name__
+            sys.stderr.write(
+                f"dokime audit: the summary {arguments.summary} cannot be written: {reason}\n"
+            )
+            return EXIT_CODES[Verdict.ERROR]
     return EXIT_CODES[audited.verdict]
+
+
+def _story_of(arguments: argparse.Namespace) -> str | None:
+    """The story of an audit given a contract from outside: the name of its directory."""
+    return None if arguments.contract is None else Path(arguments.contract).parent.name
 
 
 def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName | None]) -> Audited:
@@ -121,6 +139,46 @@ def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName 
             return run_audit(request, ports, LedgerFile(out / LEDGER), SystemClock())
     except RefusalError as refusal:
         return Audited(verdict=Verdict.ERROR, findings=(refusal.finding,))
+
+
+def summary_of(audited: Audited, harness: Harness, story: str | None) -> str:
+    """The summary of the job of an audit, in Markdown, with only what dokime fixes.
+
+    Every value is a name, a status, a verdict, a code, a version or a digest that matches its
+    pattern, so the summary needs no escaping; a message or a reason, which may quote the code of
+    the change, is left in the artifact.
+    """
+    lines = [f"## dokime audit: {audited.verdict.value}", ""]
+    if story is not None and NAME.fullmatch(story):
+        lines.append(f"- Story: `{story}`")
+    predicate = json.loads(audited.evidence.data)["predicate"] if audited.evidence else None
+    digest = predicate["contract"].get("digest") if predicate else None
+    if isinstance(digest, str) and _DIGEST.fullmatch(digest):
+        lines.append(f"- Contract: `{digest}`")
+    if _VERSION.fullmatch(harness.version):
+        commit = f"at `{harness.commit.text}`" if harness.commit else harness.said()
+        lines.append(f"- Harness: `{harness.version}`, {commit}")
+    if audited.evidence is not None:
+        lines.append(f"- Evidence: `{audited.evidence.digest}`, in the artifact of the job")
+    if audited.findings:
+        codes = ", ".join(f"`{finding.code}`" for finding in audited.findings)
+        lines.append(f"- Ended by: {codes}")
+    if audited.gates:
+        lines += ["", *_table(audited.gates)]
+    return "\n".join(lines) + "\n\n"
+
+
+def _table(gates: tuple[Gate, ...]) -> list[str]:
+    """Each gate with its status, its verdict and the codes of its findings."""
+    rows = ["| Gate | Status | Verdict | Findings |", "|---|---|---|---|"]
+    for gate in gates:
+        if isinstance(gate, GateRan):
+            codes = ", ".join(f"`{f.code}`" for f in gate.findings) or "—"
+            rows.append(f"| {gate.gate} | run | {gate.verdict.value} | {codes} |")
+        else:
+            status = "not-reached" if isinstance(gate, GateNotReached) else "not-applicable"
+            rows.append(f"| {gate.gate} | {status} | — | — |")
+    return rows
 
 
 def text_of(audited: Audited, evidence: Path | None) -> str:

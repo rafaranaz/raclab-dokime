@@ -1,4 +1,5 @@
-<!-- translation-of: README.md sha256:8c2f1ee3a139408c -->
+<!-- translation-of: README.md sha256:b52fd28357bdc89b -->
+<!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -68,7 +69,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md) | Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse | Aceptada, enmendada por el 0057 |
 | [0056](0056-the-pack-names-the-configuration-of-its-tests.es.md) | El pack nombra la configuración de sus tests, que queda protegida | Aceptada |
-| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada, enmendada por el 0061 |
+| [0057](0057-the-cases-of-the-corpus-come-from-witnesses-that-fit-a-boundary.es.md) | Los casos del conjunto salen de testigos más allá del segundo, que caben en una frontera | Aceptada, enmendada por el 0061 y el 0074 |
 | [0058](0058-existing-tests-runs-the-tests-of-the-base-on-the-code-of-the-patch.es.md) | existing-tests ejecuta los tests de la base sobre el código del parche | Aceptada |
 | [0059](0059-a-mixed-file-protects-the-section-that-configures-the-tests.es.md) | Un fichero mixto protege la sección que configura los tests | Aceptada |
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |
@@ -85,3 +86,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.es.md) | El arnés que audita una pull request es el de su base | Aceptada |
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.es.md) | El almacén sellado se cifra con age para una lista de destinatarios | Aceptada |
 | [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md) | La clave de la reserva vive fuera de CI hasta B4 | Aceptada |
+| [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md) | Un testigo está aislado cuando es un arreglo y nada más | Propuesta |

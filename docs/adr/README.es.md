@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:9ac0b151917ebc09 -->
+<!-- translation-of: README.md sha256:121c55b7269ca3ad -->
 # Registro de decisiones (ADR)
 
 *Read in [English](README.md).*
@@ -82,3 +82,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0068](0068-the-harness-is-named-by-its-version-and-its-commit.es.md) | El arnés se nombra por su versión y su commit | Aceptada |
 | [0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md) | El predicado v0.2 añade lo que registra A4 | Aceptada |
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.es.md) | La evidencia de una pull request va en el resumen de su job y en un artefacto | Aceptada |
+| [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.es.md) | El arnés que audita una pull request es el de su base | Propuesta |

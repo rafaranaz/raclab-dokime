@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
-from dokime.evidence.run import Contract, Gate, GateNotReached, GateRan, Inputs, Run
+from dokime.evidence.run import Contract, Gate, GateNotReached, GateRan, Image, Inputs, Run
 from dokime.evidence.schema import MESSAGE, NAME, ORIGINS, PREDICATE, STATEMENT, cut, read_back
 from dokime.evidence.unchecked import not_checked
 
@@ -44,6 +44,27 @@ def build(run: Run) -> Evidence:
 
 def statement(run: Run) -> Value:
     """The statement of a run, as a value of the canonical form."""
+    predicate: Value = {
+        "verdict": run.verdict.value,
+        "delivered": False,
+        "independence": "self-attested",
+        "verifier": _present(
+            harness=run.harness,
+            ran_on="developer",
+            commit=None if run.harness_commit is None else run.harness_commit.text,
+        ),
+        "contract": _contract(run.story, run.contract),
+        "inputs": _inputs(run.inputs),
+        "gates": [_gate(gate) for gate in run.gates],
+        "human_decisions": [],
+        "not_checked": not_checked(run),
+        "ledger": _present(head=run.ledger.hash, events=run.ledger.events),
+    }
+    if run.repeated is not None:
+        predicate["repeated"] = {
+            "runs": run.repeated.runs,
+            "consistent": run.repeated.consistent,
+        }
     return {
         "_type": STATEMENT,
         "subject": [
@@ -51,18 +72,7 @@ def statement(run: Run) -> Value:
             {"name": "change.patch", "digest": {"sha256": hashlib.sha256(run.patch).hexdigest()}},
         ],
         "predicateType": PREDICATE,
-        "predicate": {
-            "verdict": run.verdict.value,
-            "delivered": False,
-            "independence": "self-attested",
-            "verifier": {"harness": run.harness, "ran_on": "developer"},
-            "contract": _contract(run.story, run.contract),
-            "inputs": _inputs(run.inputs),
-            "gates": [_gate(gate) for gate in run.gates],
-            "human_decisions": [],
-            "not_checked": not_checked(run),
-            "ledger": _present(head=run.ledger.hash, events=run.ledger.events),
-        },
+        "predicate": predicate,
     }
 
 
@@ -70,22 +80,26 @@ def _contract(story: str, contract: Contract | None) -> Value:
     return _present(story=story, digest=None if contract is None else _sha256(contract.text))
 
 
+def _image(image: Image | None) -> Value | None:
+    if image is None:
+        return None
+    return _present(
+        digest=image.digest.text,
+        platform=None if image.platform is None else image.platform.text,
+    )
+
+
 def _inputs(inputs: Inputs) -> Value:
-    image = inputs.image
     return _present(
         base=inputs.base.text,
         policy={
             "digest": inputs.policy.digest(),
             "source": "file" if inputs.policy.from_file else "defaults",
         },
-        image=None
-        if image is None
-        else _present(
-            digest=image.digest.text,
-            platform=None if image.platform is None else image.platform.text,
-        ),
+        image=_image(inputs.image),
         pack=None if inputs.pack is None else {"digest": _sha256(inputs.pack)},
         probe=None if inputs.probe is None else inputs.probe.text,
+        change_image=_image(inputs.change_image),
     )
 
 

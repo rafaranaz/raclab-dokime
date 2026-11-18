@@ -29,6 +29,8 @@ class Inputs:
     """The bytes of the file of the pack."""
     probe: Digest | None = None
     """The digest of the program that observes the examples."""
+    change_image: Image | None = None
+    """The image built with the tree of the change, in which `visible-examples` observed."""
 
 
 @dataclass(frozen=True)
@@ -87,6 +89,14 @@ type Gate = GateRan | GateNotApplicable | GateNotReached
 
 
 @dataclass(frozen=True)
+class Repeated:
+    """How many times the verification ran, and whether every run gave the same verdicts."""
+
+    runs: int
+    consistent: bool
+
+
+@dataclass(frozen=True)
 class Run:
     """A finished run: its subject, its verdict, what it was given, its gates and its ledger."""
 
@@ -102,3 +112,6 @@ class Run:
     ledger: Head
     """The head of the ledger before the event `evidence.built`."""
     contract: Contract | None = None
+    harness_commit: CommitName | None = None
+    """The commit of the harness, when it runs from a checkout of git."""
+    repeated: Repeated | None = None

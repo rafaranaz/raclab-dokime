@@ -1,0 +1,35 @@
+# The change of the exit criterion of A4: the first pull request of this repository that carries
+# its evidence. Approved by the merge of its own pull request (ADR-0067).
+format: 1
+story: show-the-version
+may_modify_tests: [tests/interfaces/test_version.py]
+
+requirements:
+  - id: print-the-version
+    kind: new
+    text: When dokime is run with the option --version, dokime shall print dokime and the version of the installed harness on one line and exit with status 0.
+    source: written
+  - id: refuse-a-missing-area
+    kind: preserve
+    text: If dokime is run with no area, then dokime shall exit with status 2.
+    source: written
+
+examples:
+  - id: E-0001
+    requirement: print-the-version
+    case: version
+    boundary: cli
+    target: python -m dokime.interfaces
+    origin: human
+    steps:
+      - input: {args: ["--version"]}
+        expect: {exit: 0, stdout: "dokime 0.0.0\n"}
+  - id: E-0002
+    requirement: refuse-a-missing-area
+    case: no-area
+    boundary: cli
+    target: python -m dokime.interfaces
+    origin: human
+    steps:
+      - input: {args: []}
+        expect: {exit: 2}

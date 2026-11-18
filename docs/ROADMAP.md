@@ -75,7 +75,7 @@ and published. A bad result is published as well.
 The milestones of a block are written here when the block opens, and its measured numbers when it
 closes. The order of blocks B and C is confirmed when block A closes.
 
-**Block A closed on 2026-11-19**, with version 0.1.0; its
+**Block A closed on 2026-11-18**, with version 0.1.0; its
 [closing note](#block-a--closing-note) is after its milestones. Its first milestone, A0, had no
 code: it tested by hand the formats that the rest of the block depends on.
 
@@ -313,9 +313,9 @@ Reasoned, not measured:
   of block B.
 - No case of the corpus ends in `ASK`, so the stop of the run at a state that asks is tested only
   with doubles.
-- The time of the review without the help of another model was not measured; the maintainer's
-  estimate of it is still to come, since it is the cost of adoption that a person without that help
-  would pay.
+- The time of the review without the help of another model was not measured; it is the cost of
+  adoption that a person without that help would pay. The maintainer decided, when block A closed,
+  not to estimate it ([closing note](#block-a--closing-note)).
 
 A3 resolved no hypothesis of the table above; none had its test in A3.
 
@@ -345,7 +345,7 @@ Noted while A4 is built:
 
 ### Block A · Closing note
 
-**A4 closed on 2026-11-19, and block A with it**, with version 0.1.0 and the tag `v0.1.0`
+**A4 closed on 2026-11-18, and block A with it**, with version 0.1.0 and the tag `v0.1.0`
 ([ADR-0068](adr/0068-the-harness-is-named-by-its-version-and-its-commit.md)).
 
 **The exit criterion of A4 is met by
@@ -427,6 +427,9 @@ block A:
 - Whether the boundary `function` is widened to objects and methods, given that cachetools gives 0
   or 1 of 14.
 - A rule that protects the tags `v*` from being deleted or moved.
+- Where the key of the sealed store lives: the workflow file comes from the pull request
+  (ADR-0071), and the pull requests from branches of this same repository receive the secrets of the
+  repository, so a secret of the repository would be within reach of a pull request.
 - The way of working and the autonomy of the sessions, set aside until the harness is finished.
 - The order of blocks B and C, which is confirmed when block A closes.
 

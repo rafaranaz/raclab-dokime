@@ -52,7 +52,9 @@ the same. The same file keeps the measurement of ADR-0057: for each project, the
 from and how many candidates and witnesses it found; for each witness, whether it is isolated and
 whether it is expressible at a boundary of ADR-0039, each with its reason; and a sample of the
 witnesses drawn with a written seed, one expressible and one not in each project, whose examples
-were run on both sides of the change to check the reading. The tests demand that the table counts
+were run on both sides of the change to check the reading. It keeps too a second reading of every
+witness, made without seeing the first, and how many witnesses the two label alike, which a test
+computes again. The tests demand that the table counts
 the witnesses classified, that the witness of each good case is isolated and expressible, and that
 the sample is the one its seed draws. The search past the second witness is `witnesses.py`, run by
 hand:

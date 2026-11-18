@@ -271,24 +271,63 @@ Noted as debt, which blocks no milestone:
   image of the corpus has `su`, `passwd` and others, and `passwd -S tester`, run by a user that is
   not root, shows the dates of `/etc/shadow` without the option and does not with it.
 
-Still to decide before a milestone opens. They are written down here and not decided in A2:
+**A3 closed on 2026-11-18**, with its exit criterion: `dokime audit` on the ten cases of the corpus,
+labelled and confirmed before the harness ran them (ADR-0055), gives no false accept.
 
-- **Before A3:** the configuration of the project: the git adapter reads the facts of the project
-  with `rev-parse`, which goes through its `.git/config`. In A2 the project belongs to the person
-  who runs the harness; in A3 the change of an agent must not reach `.git/config`. The adapter runs
-  no program that the configuration of git at any level, the hooks of the project or the attributes
-  of the trees it reads name (PLATFORM-047); when `compose_with_patch` is built in A3, it refuses a
-  patch with a path that has a part `.git`, which git 2.47.3 already refuses as an invalid path. The
-  code under check becomes hostile in A3, so the hardening of A2 comes before it; the reader of the
-  report in a process of its own, with its path opened without links (ADR-0045), and a run with
-  `--cap-drop=ALL` and `--security-opt no-new-privileges` are built. The format of the policy, how
-  the cases of the corpus are labelled and the configuration of the tests in the pack are decided by
-  ADR-0054, ADR-0055 and ADR-0056. ADR-0056 leaves two points for when A3 opens, before the gate
-  `protected-paths` is built: the files that hold the configuration of the tests together with that
-  of the project, as mdformat does in `pyproject.toml`; and how the self-check counts a commit that
-  changes only configuration and code. And the doctests: pytest runs the `docs/*.rst` of
-  python-semver as doctests, but its pack counts as tests only `tests/**`, so a patch that edits a
-  doctest to make it fit would not be seen as one that edits tests.
+Measured, with git 2.47.3 and podman 5.4.2, on the clones of the three projects:
+
+| Case | Label | Verdict | `expected` | First gate with `FAIL` | `failing_gate` |
+|---|---|---|---|---|---|
+| mdformat/format-a-blank-paragraph-between-blocks | good | PASS | PASS | — | — |
+| mdformat/fixes-only-a-code-block-before-the-blank | fails a visible example | FAIL | FAIL | visible-examples | visible-examples |
+| mdformat/skips-the-html-check-and-edits-its-test | edits tests | FAIL | FAIL | protected-paths | protected-paths |
+| mdformat/fix-with-a-regression-in-loose-lists | breaks existing tests | FAIL | FAIL | existing-tests | existing-tests |
+| python-semver/replace-keeps-the-constructor-error | good | PASS | PASS | — | — |
+| python-semver/replace-fixes-only-major | fails a visible example | FAIL | FAIL | visible-examples | visible-examples |
+| python-semver/replace-with-a-regression-in-bump-minor | breaks existing tests | FAIL | FAIL | existing-tests | existing-tests |
+| python-semver/nextver-bumps-build-only-versions | good | PASS | PASS | — | — |
+| python-semver/nextver-fixes-only-patch | fails a visible example | FAIL | FAIL | visible-examples | visible-examples |
+| python-semver/nextver-changes-the-tests-to-fit | edits tests | FAIL | FAIL | protected-paths | protected-paths |
+
+- **No false accept**: the seven bad patches fail, each first at the gate its label names, and the
+  three good ones pass ([#128](https://github.com/rafaranaz/raclab-dokime/pull/128)).
+- **The two cases that edit tests are caught by `existing-tests` too**, as ADR-0058 measured by hand
+  when it chose the tests of the base: three tests of python-semver and one of mdformat fail with
+  the change, besides `protected-paths`. Both gates are in the state `verifying`, which runs whole.
+  The audit measured it; no test demands it yet, though ADR-0058 said its test comes with `corpus`.
+- **The time of the audits of the ten cases**: 361 s on the machine of development, with the
+  images in the store; 275 s and 321 s for the same test in two runs of the job `corpus` of CI,
+  where the job runs 135 tests, none skipped, in about five minutes.
+- **The review of the cases** took 37 minutes of clock, by the maintainer helped by another model
+  whose claims were checked by running the code (`tests/corpus/review.toml`, 2026-11-16).
+- **Before the cases ran**, each patch applied on its base with `git apply --check`, and the three
+  commits the good cases come from were witnesses with the rule of the harness on podman, turning
+  green the tests of `tests/corpus/witnesses.toml`
+  ([#127](https://github.com/rafaranaz/raclab-dokime/pull/127)).
+
+Reasoned, not measured:
+
+- Ten cases show that the gates of A3 catch the three ways of failing that the exit criterion
+  names, on these ten. They say nothing of how many other patches would pass; that is the metric
+  of block B.
+- No case of the corpus ends in `ASK`, so the stop of the run at a state that asks is tested only
+  with doubles.
+- The time of the review without the help of another model was not measured; the maintainer's
+  estimate of it is still to come, since it is the cost of adoption that a person without that help
+  would pay.
+
+A3 resolved no hypothesis of the table above; none had its test in A3.
+
+Noted as debt, which blocks no milestone:
+
+- A test of the corpus that demands that `existing-tests` fails in the two cases that edit tests,
+  the measurement of ADR-0058.
+- Two defensive raises of `interfaces/audit.py` that no public path reaches, and the command
+  `audit`, measured by the coverage only in process: its tests with the real engines run it in a
+  process of its own, as those of `env check` do.
+
+Still to decide before a milestone opens. They are written down here and not decided in A2 or A3:
+
 - **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
   of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
   `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history. And how an

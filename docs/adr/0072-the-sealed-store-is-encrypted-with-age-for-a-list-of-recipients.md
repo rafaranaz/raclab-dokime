@@ -69,6 +69,12 @@ in B1.
 
 - dokime gets a second dependency at run time, compiled, with wheels for the platforms above; a
   platform without a wheel builds it from source with Rust.
+- age does not pad the content: the
+  [specification](https://github.com/C2SP/C2SP/blob/main/age.md) splits the payload in chunks of
+  64 KiB, whose final chunk "MAY be shorter than 64 KiB", each encrypted with ChaCha20-Poly1305,
+  which adds a tag of fixed size. So the size of a sealed file shows roughly how much held-out
+  content there is. Knowing how many examples are held out does not help to cheat, but it is the
+  same kind of leak that the alternative of SOPS is weighed against above.
 - The maintenance of pyrage depends on one person. If it stops, the adapter can call the binary
   `age` instead without changing the files.
 - Only `platform` imports `pyrage`; an import contract of `lint-imports` says so when the adapter

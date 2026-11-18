@@ -1,4 +1,4 @@
-<!-- translation-of: 0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md sha256:dae59b3fe546fe6c -->
+<!-- translation-of: 0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md sha256:827ba684736c6e07 -->
 # ADR-0072 · El almacén sellado se cifra con age para una lista de destinatarios
 
 **Estado:** propuesta
@@ -70,6 +70,12 @@ mismos ficheros. La prueba es descifrar con el binario `age` un lote escrito por
 
 - dokime gana una segunda dependencia en tiempo de ejecución, compilada, con ruedas para las
   plataformas de arriba; una plataforma sin rueda la compila desde el código con Rust.
+- age no rellena el contenido: la
+  [especificación](https://github.com/C2SP/C2SP/blob/main/age.md) parte la carga en trozos de
+  64 KiB, cuyo último trozo "MAY be shorter than 64 KiB", cada uno cifrado con ChaCha20-Poly1305,
+  que añade una etiqueta de tamaño fijo. Así que el tamaño de un fichero sellado deja ver
+  aproximadamente cuánto contenido reservado hay. Saber cuántos ejemplos hay reservados no ayuda a
+  hacer trampa, pero es el mismo tipo de fuga contra el que se sopesa arriba la alternativa de SOPS.
 - El mantenimiento de pyrage depende de una persona. Si se detiene, el adaptador puede llamar al
   binario `age` sin cambiar los ficheros.
 - Solo `platform` importa `pyrage`; un contrato de importación de `lint-imports` lo dice cuando

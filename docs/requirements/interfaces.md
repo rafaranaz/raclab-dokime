@@ -142,3 +142,13 @@ it is given, runs the gates of `verify` and builds the evidence with `evidence`
 - **INTERFACES-129** When the option `--format json` is given to `audit`, the command shall write one JSON document with the verdict, the path and the digest of the evidence or `null`, the path of the ledger, the gates and the findings.
 - **INTERFACES-130** When the audit ends, the command shall exit with the code of its verdict ([ADR-0040](../adr/0040-commands-exit-with-a-code-for-each-verdict.md)).
 - **INTERFACES-131** If the harness receives SIGINT or SIGTERM while `audit` runs, then the command shall close the container of the run, the temporary directories and the adapters, from the inside out, before it ends.
+
+## `audit`: the runs of the verification and what A4 records ([ADR-0068](../adr/0068-the-harness-is-named-by-its-version-and-its-commit.md), [ADR-0069](../adr/0069-the-predicate-v0-2-adds-what-a4-records.md))
+
+- **INTERFACES-140** When the state `verifying` runs and the gate `repeatability` is built, the command shall run the other gates of the state as many times as `verification.runs` of the policy says, and once when it is not built.
+- **INTERFACES-141** When the gates of `verifying` ran more than once, the command shall give the aggregation, for each gate, the result of the run with its worst verdict by the precedence of ADR-0015, `ERROR`, `FAIL`, `ASK`, `PASS`, the first such run on a tie, together with the result of `repeatability` over every run, so that the verdict of the state does not depend on the order of the runs.
+- **INTERFACES-142** When the gate `repeatability` ran, the command shall give the evidence `repeated` with the number of runs and whether they were consistent, and no `repeated` when it did not run.
+- **INTERFACES-143** When the gates of `verifying` run more than once, the command shall record the number of the run in each `gate.started` and `gate.finished` of those gates.
+- **INTERFACES-144** When the state `verifying` runs, the command shall build the image of the change once for the audit and give the evidence its digest, with the platform of its base image, as `inputs.change_image`.
+- **INTERFACES-145** When `audit` runs, the command shall give the evidence the commit that `platform` gives for the directory of the package of the harness, asked after the git adapter has checked its version and before the command writes anything.
+- **INTERFACES-146** When `audit` writes its result, the command shall write the version of the harness and its commit, or that it has no commit, as the line `harness <version> <commit>` or `harness <version> without a commit` in the text, and as `harness` in the JSON document.

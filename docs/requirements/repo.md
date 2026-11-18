@@ -100,9 +100,20 @@ same rules as those of the corpus.
 
 - **REPO-140** The pack of this repository at `.dokime/pack.yaml` shall pass the check of packs with no finding.
 - **REPO-141** The Dockerfile of this repository shall name its base image by its digest.
-- **REPO-142** The Dockerfile of this repository shall install every package that `uv.lock` holds with the exact version that `uv.lock` gives it and without resolving dependencies.
+- **REPO-142** The Dockerfile of this repository shall install only packages that `uv.lock` holds, each with the exact version that `uv.lock` gives it, and without resolving dependencies.
 - **REPO-143** The Dockerfile of this repository shall put `/dokime/project/src` on `PYTHONPATH`, since the image does not install the project.
 - **REPO-144** The pack of this repository shall name as the configuration of its tests the section `tool.pytest.ini_options` of `pyproject.toml` and every `conftest.py`.
 - **REPO-145** The Dockerfile of this repository shall install every dependency that `uv.lock` gives the packages it installs, except those whose marker names another system than Linux, since it resolves none of them.
 - **REPO-146** The command of the tests of the pack of this repository shall go on past an error in the collection of a module of tests, since otherwise one module that does not import stops every test and the side looks red as a whole.
 - **REPO-147** The Dockerfile of this repository shall install the project itself from its context, with the build backend of `pyproject.toml` at an exact version within the range it requires, so that the tests that read the metadata of the package, run its command or import it from another process run in the image.
+
+## The audit of a pull request (`tools/audit_pr.py`, [ADR-0067](../adr/0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md), [ADR-0070](../adr/0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md), [ADR-0071](../adr/0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md))
+
+The workflow `audit` checks out the pull request and, apart, its base, and runs this tool from the
+checkout of the base, so that neither the tool nor the harness it runs comes from the change.
+
+- **REPO-150** When a pull request is audited, the tool shall take its story from the name of its branch, `<type>/<scope>-<description>`, as the description.
+- **REPO-151** If every path that the pull request changes is under `.dokime/changes/`, then the tool shall check each contract it adds or changes with `contract check`, write in the summary of the job `contract pull request: checked, not audited` with the verdict and the codes of each contract, and exit with the code of the worst verdict.
+- **REPO-152** If the name of the branch gives no story, or the base has no contract for the story, then the tool shall write in the summary of the job that the pull request is not audited and why, and exit with the code of `PASS`.
+- **REPO-153** When the base has the contract of the story, the tool shall write the patch of the pull request from its base to its head, and run `audit` on it with the story, the checkout of the pull request as the project, a directory of the runner as `--out` and the summary of the job as `--summary`, and exit with the code of `audit`.
+- **REPO-154** The tool shall run dokime with the Python it runs on, from the checkout of the base, never from the checkout of the pull request.

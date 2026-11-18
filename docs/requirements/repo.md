@@ -100,8 +100,9 @@ same rules as those of the corpus.
 
 - **REPO-140** The pack of this repository at `.dokime/pack.yaml` shall pass the check of packs with no finding.
 - **REPO-141** The Dockerfile of this repository shall name its base image by its digest.
-- **REPO-142** The Dockerfile of this repository shall install every package with the exact version that `uv.lock` gives it and without resolving dependencies.
+- **REPO-142** The Dockerfile of this repository shall install every package that `uv.lock` holds with the exact version that `uv.lock` gives it and without resolving dependencies.
 - **REPO-143** The Dockerfile of this repository shall put `/dokime/project/src` on `PYTHONPATH`, since the image does not install the project.
 - **REPO-144** The pack of this repository shall name as the configuration of its tests the section `tool.pytest.ini_options` of `pyproject.toml` and every `conftest.py`.
 - **REPO-145** The Dockerfile of this repository shall install every dependency that `uv.lock` gives the packages it installs, except those whose marker names another system than Linux, since it resolves none of them.
 - **REPO-146** The command of the tests of the pack of this repository shall go on past an error in the collection of a module of tests, since otherwise one module that does not import stops every test and the side looks red as a whole.
+- **REPO-147** The Dockerfile of this repository shall install the project itself from its context, with the build backend of `pyproject.toml` at an exact version within the range it requires, so that the tests that read the metadata of the package, run its command or import it from another process run in the image.

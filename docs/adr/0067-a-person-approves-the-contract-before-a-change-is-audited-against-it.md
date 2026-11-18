@@ -31,11 +31,18 @@ mode of use; what changes from one mode to another is the mechanism that meets i
   whoever opens it writes.
 - **The summary of the job shows the story and the digest of the contract** that the audit used,
   and the maintainer checks them before merging the pull request of the change.
+- **A pull request that only adds or changes files under `.dokime/changes/` is a pull request of a
+  contract.** It is not audited, since `protected-paths` would always refuse it: its contract is
+  checked with `contract check`, and the summary of the job says
+  `contract pull request: checked, not audited`. A pull request that mixes `.dokime/` with code is
+  audited, and `protected-paths` refuses it, as it should.
 
 **The limit.** In A4 the pull requests are opened with the account of the maintainer, so the merge
 as approval and the story from the branch hold by discipline, not because GitHub prevents anything
 else: an agent with that account could merge a contract or name another branch. The protection is
-that the maintainer checks the story and the digest of the contract before merging the code. When
+that the maintainer checks the story and the digest of the contract before merging the code. Not
+even a required review would hold in A4: the owners and the administrators of a repository can
+merge without an approved review. When
 the agent has an identity of its own, the same rule is met by a mechanism, not by discipline.
 
 **Mechanisms the rule admits later**, without rewriting it:
@@ -59,10 +66,11 @@ Verified in the documentation of GitHub:
   `pull_request_target` gets one that can write
   ([the token of GitHub](https://docs.github.com/fr/enterprise-server@3.13/actions/reference/github_token-reference)).
 
-Looked for and not found: the page of GitHub that says that the author of a pull request cannot
-approve it. Guides of others say so
-([Graphite](https://graphite.com/guides/pull-request-approval-permissions-rules-github)); it does
-not matter in A4, where one account opens and merges.
+- The session that reviews the work read in the documentation of GitHub, "Approving a pull request
+  with required reviews", that "Pull request authors cannot approve their own pull requests", and
+  that the owners and the administrators of a repository can merge without an approved review. With
+  the account of the maintainer, then, not even a required review would prevent a merge, which is
+  the limit above.
 
 Reasoning, without a test: that a story taken from the branch, shown with the digest of its
 contract in the summary of the job, is enough for the maintainer to see that the change was audited

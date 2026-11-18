@@ -1,7 +1,7 @@
-<!-- translation-of: 0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md sha256:34b62622ed05f288 -->
+<!-- translation-of: 0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md sha256:b5e5a743f33e22f2 -->
 # ADR-0064 · La evidencia de A3 es un statement sin firmar con un predicado cerrado
 
-**Estado:** aceptada, enmendada por el [ADR-0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) y el [ADR-0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md)
+**Estado:** aceptada, enmendada por el [ADR-0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md), el [ADR-0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) y el [ADR-0069](0069-the-predicate-v0-2-adds-what-a4-records.es.md)
 
 ## Contexto
 

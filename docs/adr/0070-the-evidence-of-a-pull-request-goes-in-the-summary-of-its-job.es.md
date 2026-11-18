@@ -1,7 +1,7 @@
-<!-- translation-of: 0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md sha256:19eb99af702b1bc7 -->
+<!-- translation-of: 0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md sha256:4425b4e6c742a529 -->
 # ADR-0070 · La evidencia de una pull request va en el resumen de su job y en un artefacto
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

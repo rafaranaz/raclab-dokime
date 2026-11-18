@@ -1,7 +1,7 @@
-<!-- translation-of: 0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md sha256:b5f16963a770a2a2 -->
+<!-- translation-of: 0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md sha256:42442262fe20141a -->
 # ADR-0067 · Una persona aprueba el contrato antes de que se audite un cambio contra él
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

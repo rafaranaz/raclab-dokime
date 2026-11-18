@@ -1,6 +1,6 @@
 # ADR-0069 · The predicate v0.2 adds what A4 records
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

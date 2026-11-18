@@ -1,6 +1,6 @@
 # ADR-0070 · The evidence of a pull request goes in the summary of its job and in an artifact
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

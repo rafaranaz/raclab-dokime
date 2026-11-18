@@ -74,10 +74,10 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Accepted |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.md) | A digest is taken over a restricted canonical JSON, and a hashed record is kept in it | Accepted |
 | [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Accepted |
-| [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Accepted, amended by 0065 and 0066 |
+| [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Accepted, amended by 0065, 0066 and 0069 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md) | The evidence of A3 lists every gate of the audit flow, reached or not | Accepted |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md) | The untrusted texts of the evidence are bounded | Accepted |
-| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md) | A person approves the contract before a change is audited against it | Proposed |
-| [0068](0068-the-harness-is-named-by-its-version-and-its-commit.md) | The harness is named by its version and its commit | Proposed |
-| [0069](0069-the-predicate-v0-2-adds-what-a4-records.md) | The predicate v0.2 adds what A4 records | Proposed |
-| [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Proposed |
+| [0067](0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md) | A person approves the contract before a change is audited against it | Accepted |
+| [0068](0068-the-harness-is-named-by-its-version-and-its-commit.md) | The harness is named by its version and its commit | Accepted |
+| [0069](0069-the-predicate-v0-2-adds-what-a4-records.md) | The predicate v0.2 adds what A4 records | Accepted |
+| [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Accepted |

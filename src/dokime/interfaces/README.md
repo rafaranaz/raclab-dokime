@@ -95,7 +95,9 @@ PASS: no findings
 - The version of the harness in the evidence is that of the installed package, or `unversioned`
   when it is not installed, and its commit is the one `platform` gives for the checkout of the
   package, asked once the git adapter has checked its version and before anything is written. The
-  output says both, as `harness <version> <commit>` or `harness <version> without a commit`.
+  output says both, as `harness <version> <commit>` or `harness <version> without a commit`, and
+  `harness <version> commit not asked` when the audit ended before the git adapter opened; the JSON
+  document says it in `commit_asked`.
 - SIGINT and SIGTERM close every layer, from the inside out, as for `env check`.
 
 - The contract comes from `.dokime/changes/<story>/contract.yaml` of the tree of the base commit,

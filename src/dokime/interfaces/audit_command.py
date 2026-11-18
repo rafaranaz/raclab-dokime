@@ -12,6 +12,7 @@ import importlib.metadata
 import json
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from dokime.core.findings import Finding
@@ -39,6 +40,21 @@ HARNESS = Path(__file__).resolve().parents[1]
 """The directory of the package of the harness, whose checkout gives its commit (ADR-0068)."""
 
 
+@dataclass(frozen=True)
+class Harness:
+    """The version of the harness, its commit, and whether the commit was asked at all."""
+
+    version: str
+    commit: CommitName | None
+    asked: bool
+
+    def said(self) -> str:
+        """The commit as the text says it."""
+        if not self.asked:
+            return "commit not asked"
+        return self.commit.text if self.commit is not None else "without a commit"
+
+
 def audit_command(arguments: argparse.Namespace) -> int:
     """Run `audit` and return its exit code."""
     if (arguments.story is None) == (arguments.contract is None):
@@ -48,7 +64,7 @@ def audit_command(arguments: argparse.Namespace) -> int:
     as_json = arguments.format == "json"
     asked: list[CommitName | None] = []
     audited = _audit(arguments, as_json, asked)
-    harness = (_version(), asked[0] if asked else None)
+    harness = Harness(_version(), asked[0] if asked else None, asked=bool(asked))
     evidence = None
     if audited.evidence is not None:
         evidence = out / audited.evidence.name
@@ -57,9 +73,7 @@ def audit_command(arguments: argparse.Namespace) -> int:
     if as_json:
         sys.stdout.write(json_of(audited, evidence, out / LEDGER, harness))
     else:
-        version, commit = harness
-        said = commit.text if commit is not None else "without a commit"
-        sys.stdout.write(f"harness {version} {said}\n")
+        sys.stdout.write(f"harness {harness.version} {harness.said()}\n")
         sys.stdout.write(text_of(audited, evidence))
     return EXIT_CODES[audited.verdict]
 
@@ -123,15 +137,15 @@ def json_of(
     audited: Audited,
     evidence: Path | None,
     ledger: Path,
-    harness: tuple[str, CommitName | None] | None = None,
+    harness: "Harness | None" = None,
 ) -> str:
     """The output of `audit` as one JSON document."""
     document: dict[str, object] = {}
     if harness is not None:
-        version, commit = harness
         document["harness"] = {
-            "version": version,
-            "commit": None if commit is None else commit.text,
+            "version": harness.version,
+            "commit": None if harness.commit is None else harness.commit.text,
+            "commit_asked": harness.asked,
         }
     document |= {
         "verdict": audited.verdict.value,

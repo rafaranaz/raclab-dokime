@@ -1,4 +1,4 @@
-# SDD-EARS: INTERFACES-145 INTERFACES-146
+# SDD-EARS: INTERFACES-145 INTERFACES-146 INTERFACES-147
 import json
 import subprocess
 from pathlib import Path
@@ -74,8 +74,32 @@ def test_the_output_says_when_the_harness_has_no_commit(
     monkeypatch.setattr(audit_command, "PodmanRuntime", stop_at_podman)
     main([*arguments(tmp_path), "--format", "json"])
     document = json.loads(capsys.readouterr().out)
-    assert document["harness"] == {"version": audit_command._version(), "commit": None}
+    assert document["harness"] == {
+        "version": audit_command._version(),
+        "commit": None,
+        "commit_asked": True,
+    }
     (tmp_path / "again").mkdir()
     main(arguments(tmp_path / "again"))
     lines = capsys.readouterr().out.splitlines()
     assert f"harness {audit_command._version()} without a commit" in lines
+
+
+def test_an_audit_that_ends_before_git_says_that_the_commit_was_not_asked(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    given = arguments(tmp_path)
+    given[given.index("--base") + 1] = "HEAD~1"
+    main(given)
+    lines = capsys.readouterr().out.splitlines()
+    assert f"harness {audit_command._version()} commit not asked" in lines
+    (tmp_path / "json").mkdir()
+    again = arguments(tmp_path / "json", "--format", "json")
+    again[again.index("--base") + 1] = "HEAD~1"
+    main(again)
+    document = json.loads(capsys.readouterr().out)
+    assert document["harness"] == {
+        "version": audit_command._version(),
+        "commit": None,
+        "commit_asked": False,
+    }

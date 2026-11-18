@@ -1,13 +1,18 @@
 """A change to audit on the doubles of the ports, which the tests of the run of `audit` share."""
 
+import contextlib
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from unittest import mock
 
 from dokime.core.observation import ExampleObservation, ExampleRequest, ObservationLimits
 from dokime.core.runtime import Build, BuildLimits, Digest
+from dokime.interfaces import audit as audit_module
 from dokime.interfaces.audit import Audited, Ports, Request, run_audit
+from dokime.verify import aggregate
 from tests.core.ledgers import Lines, Ticks
 from tests.verify.doubles import AuditedDouble, Files, ObserverDouble, RuntimeDouble, patch
 
@@ -152,6 +157,23 @@ class Done:
         return value
 
 
+@contextlib.contextmanager
+def built(repeating: bool) -> Iterator[None]:
+    """The gate repeatability built or not, whatever this version of verify says."""
+    gate = "repeatability"
+    if repeating:
+        has = aggregate.BUILT | {gate}
+        lacks = {k: v for k, v in aggregate.NOT_BUILT.items() if k != gate}
+    else:
+        has = aggregate.BUILT - {gate}
+        lacks = {**aggregate.NOT_BUILT, gate: "the gate is not built in this test"}
+    with contextlib.ExitStack() as stack:
+        for module in (audit_module, aggregate):
+            stack.enter_context(mock.patch.object(module, "BUILT", has))
+            stack.enter_context(mock.patch.object(module, "NOT_BUILT", lacks))
+        yield
+
+
 def audit(
     files: Files | None = None,
     changed: bytes | None = None,
@@ -159,6 +181,7 @@ def audit(
     runtime: BuildsRecorded | None = None,
     observer: ObserverDouble | None = None,
     repository: AuditedDouble | None = None,
+    repeating: bool = False,
     **request: Any,
 ) -> Done:
     """Audit a change on the doubles."""
@@ -173,5 +196,6 @@ def audit(
         harness="0.0.0",
         **({"story": STORY} | request),
     )
-    audited = run_audit(asked, Ports(repository, runtime, observer, PROBE), store, Ticks())
+    with built(repeating):
+        audited = run_audit(asked, Ports(repository, runtime, observer, PROBE), store, Ticks())
     return Done(audited, store, repository, runtime, observer)

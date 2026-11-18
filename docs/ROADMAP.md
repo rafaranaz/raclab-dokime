@@ -75,8 +75,9 @@ and published. A bad result is published as well.
 The milestones of a block are written here when the block opens, and its measured numbers when it
 closes. The order of blocks B and C is confirmed when block A closes.
 
-**Block A is open.** Its first milestone, A0, has no code: it tests by hand the formats that the
-rest of the block depends on.
+**Block A closed on 2026-11-19**, with version 0.1.0; its
+[closing note](#block-a--closing-note) is after its milestones. Its first milestone, A0, had no
+code: it tested by hand the formats that the rest of the block depends on.
 
 **A0 is done.** Three hand-written contracts were made on changes that public projects already
 made (a pull-request description cleaner, `humanize.naturalsize`, `tabulate` pipe escaping), each
@@ -123,7 +124,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 
 | Hypothesis | Test | If it fails |
 |---|---|---|
-| Most real requirements can be expressed as examples at a boundary | By hand, before any code of block A | The contract format is revised before building |
+| Most real requirements can be expressed as examples at a boundary | By hand, before any code of block A. **Measured** when block A closed: it holds on the changes chosen by hand in A0, 9 of 9 requirements; on the fixes taken from the history, 15 to 20 of 41 are expressible ([closing note](#block-a--closing-note)) | The contract format is revised before building; whether the boundary `function` is widened goes to the strategic review |
 | Approving two or more examples per case costs an acceptable time | By hand, with the previous one | The hold-out rule is revised |
 | ~~A pack can be proposed from the CI configuration of a project~~ | **Discarded** by [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md): the harness does not derive a pack, a person writes it | Applied: packs are written by hand per project, a cost of adoption |
 | Holding out by case catches overfitted solutions | The metric "value of the hold-out" when block B closes | The hold-out becomes optional and the weight moves to relations and to block D |
@@ -318,12 +319,8 @@ Reasoned, not measured:
 
 A3 resolved no hypothesis of the table above; none had its test in A3.
 
-For the note that closes block A, at the end of A4: the share of real fixes that do not fit the
-format of the contract, as ADR-0057 asks, with the hypothesis of A0 measured both on changes chosen
-by hand and on changes taken from the history. What was read, not run: in python-semver about 12 of
-the 18 witnesses among its first 25 candidates, a count that the session that reviews the work gave;
-in cachetools almost none, since nearly all are decorators and methods of classes; in mdformat at
-least 2 of its 7 witnesses.
+The share of real fixes that do not fit the format of the contract, which ADR-0057 asks for, is
+measured in the [closing note of block A](#block-a--closing-note).
 
 Noted as debt, which blocks no milestone:
 
@@ -346,34 +343,98 @@ Noted while A4 is built:
   that of this repository does (REPO-146). Without it a module of tests that does not import stops
   every test of a side. None of the ten patches breaks an import, so their results do not change.
 
-Still to decide before a milestone opens. They are written down here and not decided in A2 or A3:
+### Block A · Closing note
 
-- **Before A4:** how the harness is versioned and published; and the history in CI: the checkout
-  of GitHub Actions is shallow by default, and the git adapter refuses a shallow clone with
-  `shallow-clone`, so a workflow that self-checks a pack has to fetch the whole history. And how an
-  audit of a pull request that brings its own contract fits the rule of A3, where the contract is
-  taken from the base, or given to `audit` from outside the patch, and never from the patch, with
-  `.dokime/` protected without exception: a contract that the patch brings cannot be told from one
-  that its agent wrote until approvals are signed (block E). The candidate: the patch may bring only
-  the contract whose digest matches an approval, once approvals exist.
-  And the gate `repeatability` (ADR-0017): the table of the gates puts it in block A, asking when
-  two runs of the verification give different verdicts, as many as `verification.runs` of the
-  policy says, but no milestone of A3 builds it, so A3 runs the verification once and its evidence
-  shows the gate as not applicable. The candidate: an increment of `verify` in A4, before version
-  0.1, since block A closes with A4.
-  And the fine separation of the messages of the findings
-  ([ADR-0064](adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)):
-  in A3 the whole message of a finding goes to `untrusted`, since the modules mix the words of
-  dokime with text quoted from the contract, the tree, the patch or the zone. The step: a
-  `message` with only the words of dokime, and each module that quotes passing that text to
-  `untrusted`, a change of `Finding` in `core` and one for each of `contract`, `packs`, `oracle`,
-  `sandbox`, `platform`, `verify` and `interfaces`. It is made in A4, when the evidence is shown in
-  pull requests, or in each module when it is touched for another reason.
-  And the image of the change: `visible-examples` observes in an image built with the tree of the
-  change, whose digest A3 keeps in the ledger, in the `gate.finished` of that gate, and the
-  evidence binds it through the head of the ledger. The next version of the predicate adds a field
-  for it, together with what the two notes above bring to the predicate, the `repeated` of
-  `repeatability` and the `message` of the fine separation, so that its version changes once.
+**A4 closed on 2026-11-19, and block A with it**, with version 0.1.0 and the tag `v0.1.0`
+([ADR-0068](adr/0068-the-harness-is-named-by-its-version-and-its-commit.md)).
+
+**The exit criterion of A4 is met by
+[#146](https://github.com/rafaranaz/raclab-dokime/pull/146)**, the first pull request of this
+repository audited in CI with the harness of its base
+([ADR-0071](adr/0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md)):
+
+- Its contract, the story `show-the-version`, came first in a pull request of its own,
+  [#145](https://github.com/rafaranaz/raclab-dokime/pull/145), whose merge by the maintainer was its
+  approval ([ADR-0067](adr/0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md)).
+- The audit gave `PASS`, with the six gates of A3 and `repeatability` run, `repeated` 2 runs and
+  consistent, the commit of the harness that of the base, `b7b87e0`, and the evidence
+  `sha256:e9cb2094…` in the artifact of the job. The step of the audit took 136 s in CI, and the
+  same audit 358 s on the machine of development.
+- The session that reviews the work checked the evidence end to end against git: its digest is the
+  one in the log, `read_back` gives no finding, the digests of the contract, the patch and the tree
+  are those of the base, of `git diff --binary` from the base to the head and of the head, and the
+  chain of the ledger is whole, with the head it cites the one before `evidence.built`, which
+  records the same digest.
+- In #146 the agent did not touch five tests that the contract did not authorise, which patch the
+  reading of the version, because `protected-paths` would have refused the change: the contract
+  acted before the audit, while the change was being written.
+
+**The exit criterion of block A**, no false accept on patches that fail visible examples, edit tests
+or break existing tests, was measured in A3 on the ten cases of the corpus, and holds.
+
+**The measurement of ADR-0057, the share of real fixes that fit the contract**
+([#147](https://github.com/rafaranaz/raclab-dokime/pull/147), `tests/corpus/witnesses.toml`):
+
+- **The witnesses**: 41, with the candidates of the self-check on podman from the commit of each
+  project: 14 of 25 candidates in cachetools, 20 of 25 in python-semver and 7 of 16 in mdformat. The
+  measurement of 2026-11-15, in a local environment, had found 18 in python-semver instead of 20,
+  and listed no commits; the difference was not reconciled.
+- **Two readings of each witness**, with the two filters of ADR-0057, isolated and expressible at a
+  boundary of ADR-0039: the session that builds, and the session that reviews the work, which read
+  them before it saw the first labels. They label alike 33 of 41 for isolated (κ 0.57), 36 for
+  expressible (κ 0.75) and 38 for fitting, isolated and expressible (κ 0.84). They fit: 12 of 41 in
+  the first reading, 15 in the second; the three differences go the same way.
+- **A sample run**: one expressible witness and one not in each project, drawn with the seed
+  20261118 and run in the image of the pack of its project on both sides of the change. The six
+  confirm the reading; in cachetools the only expressible witness was drawn by force.
+- **What does not fit**: 26 to 29 of the 41 witnesses, 63 % to 71 %. The main reason is the same in
+  the three projects: the fix needs an object, a class, a method or an installed plugin, which a
+  function called with JSON values or a command line cannot reach. cachetools, whose fixes are
+  decorators and methods, gives 0 or 1 of 14.
+- **Expressible without the filter of isolated**: 15 to 20 of 41, since the hypothesis of A0 speaks
+  of requirements, and a new feature is a requirement too.
+- **A0, in its own unit**: 9 of 9 requirements fit as examples, on three changes chosen by hand. It
+  measured requirements on chosen changes; ADR-0057 measures fixes taken from the history. The two
+  are not subtracted nor compared as if they were the same.
+- **A finding: "isolated" is not well defined in ADR-0057.** The first reading took it as "the
+  change is a fix", so a new feature or a deprecation does not count; the second as "the change is
+  only the behaviour sought, with no refactor nor tooling". That is the cause of most of the
+  differences on isolated.
+- **Compared with SWE-bench Verified only as an order of magnitude**, since they are different
+  measures of different things. There, read by the session that reviews the work in
+  [the account of OpenAI](https://openai.com/index/introducing-swe-bench-verified/), each sample was
+  labelled by three different annotators who passed a screening, with a scale of severity from 0 to
+  3 for each criterion; 38.3 % of the samples were flagged for underspecified statements and 61.1 %
+  for tests that could reject valid solutions; 68.3 % were excluded, and 500 samples stayed. Our
+  reading used two readers instead of three, without a screening, with the sample run as its
+  calibration.
+
+**What A3 left open, and a correction:**
+
+- The time of the review without the help of another model is not estimated: the maintainer
+  decides that an estimate from memory would be worth little. If it matters for adoption, it is
+  measured with new cases in block B.
+- The fine separation of the messages of the findings was not made in A4, though the list of what
+  was still to decide said it would be: [ADR-0069](adr/0069-the-predicate-v0-2-adds-what-a4-records.md)
+  left it out, so `message` is in the predicate v0.2 but no module fills it, and the whole message
+  of a finding is still in `untrusted`. It is made in each module when it is touched for another
+  reason.
+
+**For the strategic review of the maintainer**, which lives outside the repository, at the close of
+block A:
+
+- Whether "isolated" of ADR-0057 counts new features.
+- Whether the boundary `function` is widened to objects and methods, given that cachetools gives 0
+  or 1 of 14.
+- A rule that protects the tags `v*` from being deleted or moved.
+- The way of working and the autonomy of the sessions, set aside until the harness is finished.
+- The order of blocks B and C, which is confirmed when block A closes.
+
+### Still to decide
+
+Still to decide before a milestone opens. They are written down here and not decided in the
+milestone that finds them:
+
 - **Before B1:** the tool that encrypts the held-out content of the sealed store for a list of
   recipients; and the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the

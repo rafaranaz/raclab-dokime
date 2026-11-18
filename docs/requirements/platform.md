@@ -96,3 +96,14 @@ event of the ledger, which its canonical form keeps on one line.
 ## The system clock
 
 - **PLATFORM-070** The system clock shall give the current time of the system, in UTC.
+
+## The commit of the harness ([ADR-0068](../adr/0068-the-harness-is-named-by-its-version-and-its-commit.md))
+
+The evidence names the code of the harness by its version and its commit. The commit names the
+code only when the checkout that runs it has no change, so a checkout with changes has no commit to
+give.
+
+- **PLATFORM-080** When it is asked the commit of the checkout that holds a directory, the platform shall give the commit of its `HEAD`.
+- **PLATFORM-081** If the directory is not in a checkout of git, has no commit yet, or git cannot be found, then the platform shall give no commit.
+- **PLATFORM-082** If the checkout has a change to a file that git follows, or a file that it does not follow and does not ignore, then the platform shall give no commit, since the commit would not name the code that runs.
+- **PLATFORM-083** When it reads the commit of a checkout, the platform shall run no program that the configuration of git at any level or the hooks of the checkout name.

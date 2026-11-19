@@ -90,6 +90,10 @@ Each decision says what it rests on. These rest on reasoning and need a test bef
 The first version verifies Python projects; Java arrives in block G. These parts of dokime assume
 Python, and are the ones a second language reaches first:
 
+- **The program that observes the examples**, of any boundary, is a program of Python,
+  `sandbox/observe_program.py`, run with the `python` of the image of the project
+  (`sandbox/podman.py`). The image of a project needs an interpreter of Python even to observe a
+  command line.
 - **The boundary `function`.** The program that observes the examples in the zone,
   `sandbox/observe_program.py`, imports the target with `importlib`, and `oracle/compare.py` reads an
   exception as `pytest.raises` reads it.
@@ -100,8 +104,10 @@ Python, and are the ones a second language reaches first:
 - **The matcher `$fullmatch`.** Its pattern is a regular expression of Python
   ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.md)).
 
-The boundary `cli`, the gates that compare trees and patches, the ledger and the evidence do not
-depend on the language of the project.
+The gates that compare trees and patches, the ledger and the evidence do not depend on the
+language of the project. Nor does the boundary `cli` in what it compares, but it does in the
+program that runs it, as the first point says. This is read in the code, not tested: no project in
+another language has been verified yet.
 
 ## Out of the first version
 

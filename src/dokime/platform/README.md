@@ -72,3 +72,34 @@ follows or a file it neither follows nor ignores: the commit would not name the 
 runs with the environment of the adapter, with `core.fsmonitor` and the hooks turned off, and with
 `GIT_ATTR_SOURCE` on the empty tree, so that no program that the configuration, the hooks or the
 attributes name runs, not even a filter that cleans a file to compare it (PLATFORM-083).
+
+## The sealed store
+
+The adapter of `SealedStore` with age, through pyrage, the only module that imports it (ADR-0072,
+ADR-0073).
+
+```python
+from dokime.platform.sealed_store import (
+    create_identity,
+    default_identity_path,
+    load_identity,
+    read_passphrase,
+)
+
+path = default_identity_path(os.environ)  # $XDG_DATA_HOME/dokime/identity.age
+recipient = create_identity(path, read_passphrase(None))  # "age1…", for .dokime/recipients.txt
+store, findings = load_identity(path, read_passphrase(descriptor))
+sealed = store.seal(content, recipients)  # the recipients read from the base
+content = store.open(sealed)  # in memory
+```
+
+- **The identity** is an age file encrypted with a passphrase, holding one secret key with the
+  comments of `age-keygen`, so the binary `age` reads it with `-i` and asks the passphrase. It is
+  created with the permissions 0600, its new directories with 0700, never over another file; it is
+  loaded with an `ASK` finding `open-identity` when its group or others can read or write it.
+- **The passphrase** comes from the descriptor that the caller names, up to its first newline, or
+  from `/dev/tty` with the echo off. Without both it is refused with `no-passphrase-source`;
+  `getpass` is not used, since without a terminal it would read the standard input.
+- **Refusals**: `bad-recipient`, `not-a-recipient`, `unreadable-batch`, `identity-exists`,
+  `empty-passphrase`, `wrong-passphrase`, `bad-identity` and `no-identity`, each a `RefusalError`
+  with an `ERROR` finding.

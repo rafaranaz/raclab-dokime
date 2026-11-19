@@ -104,3 +104,17 @@ content = store.open(sealed)  # in memory
   `empty-passphrase`, `wrong-passphrase`, `bad-identity`, `no-identity`, `no-home` and
   `unreadable-passphrase`, each a `RefusalError`
   with an `ERROR` finding.
+
+## The randomness of the system
+
+`random_bytes(count)` and `seed()` give bytes and a natural integer of 64 bits from `secrets`, for
+the seed of a split, the salts of the held-out examples and the canary. They never come from a
+value that a person chooses, since with a seed of one's own one could try seeds until the split
+suits (ADR-0014).
+
+## The versions of a file in the history
+
+`versions(directory, start, path)` gives, newest first, each commit reachable from `start` that
+changes the path and leaves it as a file, with its bytes, so that the audit can find a held-out
+example that was once in clear. git runs as for `checkout_commit`, with renames not followed; an
+unknown commit, a directory that is not a checkout or no git is `unknown-commit`.

@@ -64,6 +64,19 @@ class Contract:
     requirements: tuple[Requirement, ...]
     examples: tuple[Example, ...]
     relations: tuple[Relation, ...]
+    held_out: tuple["HeldOut", ...] = ()
+    """After the split, what the file keeps of each held-out example (ADR-0014)."""
+
+
+@dataclass(frozen=True)
+class HeldOut:
+    """What a contract keeps of a held-out example after the split: its content is sealed."""
+
+    id: str
+    requirement: str
+    case: str
+    digest: str
+    line: int
 
 
 @dataclass(frozen=True)

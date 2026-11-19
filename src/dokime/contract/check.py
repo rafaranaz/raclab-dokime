@@ -4,13 +4,13 @@ from collections.abc import Callable, Iterator
 
 from dokime.contract import shape
 from dokime.contract.compare import compare
-from dokime.contract.model import Checked, Contract, Example, Relation, Requirement
+from dokime.contract.model import Checked, Contract, Example, HeldOut, Relation, Requirement
 from dokime.contract.notes import Notes
 from dokime.core.findings import Finding
 from dokime.core.reading import Path, Value, read
 from dokime.core.verdicts import Verdict
 
-_SECTIONS = ("requirements", "examples", "relations")
+_SECTIONS = ("requirements", "examples", "held_out", "relations")
 
 
 def check(text: str) -> Checked:
@@ -40,7 +40,9 @@ def _contract(notes: Notes, root: Value) -> Contract | None:
     requirements = _each(notes, root, "requirements", shape.requirement)
     examples = _each(notes, root, "examples", shape.example)
     relations = _each(notes, root, "relations", shape.relation)
+    held = _each(notes, root, "held_out", shape.held_out)
     _repeated_ids(notes, root)
+    _in_clear(notes, root)
     _unknown_requirements(notes, root)
     _coverage(notes, root)
     notes.findings.extend(compare(examples))
@@ -51,10 +53,11 @@ def _contract(notes: Notes, root: Value) -> Contract | None:
         requirements=tuple(requirements),
         examples=tuple(examples),
         relations=tuple(relations),
+        held_out=tuple(held),
     )
 
 
-def _each[Item: (Requirement, Example, Relation)](
+def _each[Item: (Requirement, Example, Relation, HeldOut)](
     notes: Notes,
     root: dict[str, Value],
     section: str,
@@ -96,6 +99,24 @@ def _repeated_ids(notes: Notes, root: dict[str, Value]) -> None:
                 notes.add_at("duplicate-id", message, tuple(where))
 
 
+def _in_clear(notes: Notes, root: dict[str, Value]) -> None:
+    """Report each held-out example whose id is also that of an example in clear."""
+    visible = {
+        str(item["id"]): notes.line((*path, "id"))
+        for path, item in _items(root, "examples")
+        if isinstance(item.get("id"), str)
+    }
+    for path, item in _items(root, "held_out"):
+        name = item.get("id")
+        if isinstance(name, str) and name in visible:
+            message = (
+                f"the held-out example {name!r} is also in the examples, in clear: it has to be"
+                " replaced and sealed again"
+            )
+            lines = tuple(sorted((visible[name], notes.line((*path, "id")))))
+            notes.add_at("held-out-in-clear", message, lines, Verdict.ERROR)
+
+
 def _requirement_ids(root: dict[str, Value]) -> list[str] | None:
     """The ids of the requirements, or nothing when one of them cannot be relied on."""
     items = root.get("requirements")
@@ -111,7 +132,7 @@ def _unknown_requirements(notes: Notes, root: dict[str, Value]) -> None:
     known = _requirement_ids(root)
     if known is None:
         return
-    for section in ("examples", "relations"):
+    for section in ("examples", "held_out", "relations"):
         for path, item in _items(root, section):
             name = item.get("requirement")
             if shape.is_name(name) and name not in known:

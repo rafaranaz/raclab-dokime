@@ -106,3 +106,27 @@ def test_without_git_it_is_refused(project: Path) -> None:
     with pytest.raises(RefusalError) as refused:
         versions(project, head, CONTRACT, git="no-such-git")
     assert refused.value.finding.code == "unknown-commit"
+
+
+def test_a_version_on_a_merged_branch_that_was_taken_back_is_read(project: Path) -> None:
+    base = commit(project, {str(CONTRACT): "v1\n"})
+    git(project, "checkout", "--quiet", "-b", "side")
+    leak = commit(project, {str(CONTRACT): "LEAK\n"})
+    commit(project, {str(CONTRACT): "v1\n"})
+    git(project, "checkout", "--quiet", "main")
+    git(
+        project,
+        "-c",
+        "user.name=t",
+        "-c",
+        "user.email=t@example.com",
+        "merge",
+        "--quiet",
+        "--no-ff",
+        "--no-edit",
+        "side",
+    )
+    head = CommitName(git(project, "rev-parse", "HEAD"))
+    read = versions(project, head, CONTRACT)
+    assert (leak, b"LEAK\n") in read
+    assert (base, b"v1\n") in read

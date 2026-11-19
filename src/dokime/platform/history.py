@@ -4,8 +4,13 @@ To find a held-out example that was once in clear, the audit reads every version
 a story in the history that its commit reaches. git runs as `checkout_commit` runs it: with the
 environment of the adapter, which reads no configuration but that of the checkout, with the hooks
 and the monitor of the file system turned off, and with the attributes read from the empty tree, so
-that no filter they name changes the bytes read. Renames are not followed: the path of a contract is
-that of its story.
+that no filter they name changes the bytes read. The whole history is walked with
+`--full-history`: without it, git follows only one parent of a merge that leaves the file as it was,
+and misses a version in clear on a branch that took it back before the merge.
+
+These are limits, not guarantees: renames are not followed, so a version under an earlier path is
+not seen; commits that only other refs reach are not read; and copies of an example in other files
+are not looked for.
 """
 
 import shutil
@@ -37,7 +42,9 @@ def versions(
     known = run("rev-parse", "--verify", "--quiet", f"{start.text}^{{commit}}")
     if known.returncode != 0:
         raise RefusalError("unknown-commit", f"{start.text} is not a commit of the checkout")
-    listed = run("log", "--no-renames", "--format=%H", start.text, "--", str(path))
+    listed = run(
+        "log", "--full-history", "--no-renames", "--format=%H", start.text, "--", str(path)
+    )
     found_versions = []
     for line in listed.stdout.decode().split():
         shown = run("cat-file", "blob", f"{line}:{path}")

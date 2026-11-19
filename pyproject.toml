@@ -18,6 +18,7 @@ dev = [
     "import-linter>=2.16",
     "mypy>=1.18",
     "pip-audit>=2.9",
+    "pyrage-stubs>=1.4.0",
     "pytest>=8.4",
     "pytest-cov>=7.0",
     "ruff>=0.14",

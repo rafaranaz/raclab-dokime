@@ -15,6 +15,7 @@ from dokime.core.findings import Finding
 from dokime.core.verdicts import Verdict
 from dokime.interfaces.audit_command import audit_command, harness_version
 from dokime.interfaces.env import env_check
+from dokime.interfaces.seal_command import seal_command
 from dokime.interfaces.text import EXIT_CODES, finding_line, summary
 
 
@@ -25,6 +26,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return env_check(arguments)
     if arguments.area == "audit":
         return audit_command(arguments)
+    if arguments.action == "seal":
+        return seal_command(arguments)
     checked = _check_file(arguments.path)
     write = _as_json if arguments.format == "json" else _as_text
     sys.stdout.write(write(str(arguments.path), checked))
@@ -50,6 +53,27 @@ def _parser() -> argparse.ArgumentParser:
     check_one.add_argument("path", type=Path, help="the contract file")
     check_one.add_argument(
         "--format", choices=("text", "json"), default="text", help="how the findings are written"
+    )
+    seal = actions.add_parser(
+        "seal", help="split an approved contract and seal its held-out examples"
+    )
+    seal.add_argument("--story", required=True, help="the story of the contract")
+    seal.add_argument(
+        "--contract",
+        type=Path,
+        required=True,
+        help="the approved contract with all its examples, outside the project",
+    )
+    seal.add_argument(
+        "--out", type=Path, required=True, help="an empty directory outside the project"
+    )
+    seal.add_argument("--project", type=Path, default=Path(), help="the clean checkout")
+    seal.add_argument(
+        "--recipients-confirmed-by-fd",
+        type=int,
+        default=None,
+        dest="confirmation_fd",
+        help="read the confirmation of the recipients from this descriptor",
     )
     env = areas.add_parser("env", help="work with the environment of a verified project")
     env_actions = env.add_subparsers(dest="action", required=True, metavar="ACTION")

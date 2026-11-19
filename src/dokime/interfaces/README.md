@@ -44,6 +44,38 @@ The exit code is that of the verdict
 The codes of the findings are listed in the README of
 [`contract`](../contract/README.md) and of [`core`](../core/README.md).
 
+## `contract seal`
+
+Splits an approved contract and seals its held-out examples (ADR-0014, ADR-0072, ADR-0073), in the
+clean checkout of the project where the pull request of the contract is made.
+
+```console
+$ python -m dokime.interfaces contract seal --story add-one \
+    --contract ~/approved/add-one.yaml --out ~/runs/seal-add-one
+the batch will be sealed for these recipients of HEAD:
+  age1…
+seal? [y/N] y
+kept visible, already published: E-a1
+no held-out example in R-add/c2: single-example
+PASS: 2 held-out examples sealed for 1 recipients
+```
+
+- **The contract** with all its examples comes from outside the tree, where the agent that works
+  in the checkout cannot read it; a contract or `--out` inside the tree is `inside-the-tree`. The
+  directory of the change receives only the contract with its visible examples and its list
+  `held_out`, and `sealed.age`: the held-out examples are never written into the tree.
+- **The base** is `HEAD` of the clean checkout (`not-a-clean-checkout` otherwise). The recipients
+  are those of `.dokime/recipients.txt` at that commit, shown and confirmed with `y` on the
+  terminal, or through the descriptor `--recipients-confirmed-by-fd N`; without both,
+  `no-confirmation-source`.
+- **An example already published**, in a version of the contract in the history of `HEAD` by its
+  id or by its boundary, target and steps, is kept visible, whatever the seed. The seed, the salts
+  and the canary come from the randomness of the system. A contract whose split holds out nothing
+  is `nothing-to-hold-out`.
+- **The ledger** of the run, in `--out/ledger.jsonl`, records its start with the story and the
+  base, the question and the answer of the confirmation, and its end with the digests of the seed
+  and of the batch.
+
 ## `env check`
 
 Self-checks a pack on the history of its project, with the git adapter and the podman adapter.

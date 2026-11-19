@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:0f541b4a8714eca0 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:67f8f8e84d799953 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -164,8 +164,7 @@ relations:
   primero las categorías, donde "a category is a major property or characteristic of a parameter",
   como el tipo de un valor o la clase de un carácter en blanco; después, para cada una, opciones que
   "include all the different kinds of values that are possible for the category"; y ejemplos que
-  tomen opciones distintas. En B0 la revisión encontró dos contratos cuyos casos compartían todas
-  las opciones, todos los valores `None` en uno y un solo tipo de espacio en el otro.
+  tomen opciones distintas.
 - **Identificadores.** El id de un requisito es descriptivo, porque la persona lo lee y lo elige.
   El id de un ejemplo es opaco y aleatorio, porque un id derivado del contenido se podría adivinar
   y diría algo de un ejemplo reservado.
@@ -213,9 +212,11 @@ ejemplos reservados ya no está en el fichero. Por eso se calcula sobre las huel
 no sobre el fichero:
 
 1. Cada requisito, ejemplo y relación tiene la huella de su forma canónica. La huella de un
-   ejemplo se calcula con una sal aleatoria que se guarda con el ejemplo. Sin ella, un ejemplo
-   reservado de contenido corto y adivinable podría encontrarse probando candidatos contra su
-   huella.
+   ejemplo es el SHA-256 de la forma canónica de su sal y el ejemplo: una sal de 16 bytes del azar
+   del sistema, nueva para cada ejemplo, como piden los hashes con sal de la
+   [RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html), cuyo mínimo recomendado son 128 bits.
+   Sin ella, un ejemplo reservado de contenido corto y adivinable podría encontrarse probando
+   candidatos contra su huella.
 2. La huella del contrato es la huella de la cabecera y de la lista ordenada de esas huellas.
 3. Tras el reparto, el fichero conserva enteros los ejemplos visibles y, de cada ejemplo
    reservado, solo su identificador, su requisito, su caso y su huella. La sal de un ejemplo

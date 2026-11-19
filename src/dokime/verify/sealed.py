@@ -2,14 +2,19 @@
 
 The sealed batch is what the sealed store encrypts: the held-out examples of a contract, each with
 its salt and its text as approved, the seed of the split and the canary, in canonical form
-(ADR-0062). The canary is a copy of a held-out example, chosen by the seed, with only its first step
-and, as its one expectation, a text of 32 hexadecimal digits that the caller draws at random: it
-cannot hold. If it holds, the comparison accepts what it should not, the side of a false accept; an
-observer that makes everything fail is not what it detects, since that gives rejections, the safe
-side. The canary never counts as the failure of a requirement nor reaches the agent.
+(ADR-0062). It keeps besides what the split is drawn again from, the order of the examples of the
+contract before the split and the examples kept visible as already published, and each case that
+holds out nothing with its reason, `single-example` or `all-published`, so that the evidence can
+tell a PASS on a case without a hidden part from one with it. The canary is a copy of a held-out
+example, chosen by the seed, with only its first step and, as its one expectation, a text of 32
+hexadecimal digits that the caller draws at random: it cannot hold. If it holds, the comparison
+accepts what it should not, the side of a false accept; an observer that makes everything fail is
+not what it detects, since that gives rejections, the safe side. The canary never counts as the
+failure of a requirement nor reaches the agent.
 
 The gate checks first that the batch is the one the contract names, by the digest of the salt and
-the text of each held-out example, and observes nothing otherwise. It reads each held-out example
+the text of each held-out example and by the split drawn again from the batch, and observes nothing
+otherwise. It reads each held-out example
 from its text with the requirements of the contract, observes them and the canary on the tree of
 the change, and words a held-out failure as the oracle does for the agent, with no value, input or
 identifier.
@@ -18,6 +23,7 @@ identifier.
 import json
 import random
 import re
+from collections import Counter
 from dataclasses import dataclass, replace
 
 from dokime.contract.check import check
@@ -29,7 +35,7 @@ from dokime.core.observation import ExampleObserver, ObservationLimits
 from dokime.core.repository import AuditedRepository, CommitName, RefusalError
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
-from dokime.oracle.holdout import feedback
+from dokime.oracle.holdout import Split, feedback, split
 from dokime.packs.model import Pack
 from dokime.verify.examples import _observe
 from dokime.verify.result import GateResult, checks_of
@@ -60,13 +66,42 @@ class Canary:
 
 
 @dataclass(frozen=True)
+class Unheld:
+    """A case that holds out nothing, with its reason: `single-example` or `all-published`."""
+
+    requirement: str
+    case: str
+    reason: str
+
+
+@dataclass(frozen=True)
 class Batch:
     """What the sealed store encrypts for a contract."""
 
     story: str
     seed: int
+    order: tuple[str, ...]
+    kept_visible: tuple[str, ...]
     examples: tuple[SealedExample, ...]
+    unheld: tuple[Unheld, ...]
     canary: Canary
+
+
+REASONS = ("single-example", "all-published")
+
+
+def unheld_cases(contract: Contract, done: Split) -> tuple[Unheld, ...]:
+    """Each case of a split that holds out nothing, with its reason: `single-example` when it has
+    one example, `all-published` when every example of a case of two or more was kept visible."""
+    sizes = Counter((e.requirement, e.case) for e in contract.examples)
+    return tuple(
+        Unheld(
+            requirement,
+            case,
+            "single-example" if sizes[requirement, case] == 1 else "all-published",
+        )
+        for requirement, case in done.cases_without_holdout
+    )
 
 
 def make_canary(contract: Contract, seed: int, canary_id: str, expected: str) -> Canary:
@@ -87,7 +122,12 @@ def _mapping(batch: Batch) -> dict[str, object]:
         "format": 1,
         "story": batch.story,
         "seed": batch.seed,
+        "order": list(batch.order),
+        "kept_visible": list(batch.kept_visible),
         "examples": [{"id": e.id, "salt": e.salt.hex(), "text": e.text} for e in batch.examples],
+        "without_holdout": [
+            {"requirement": u.requirement, "case": u.case, "reason": u.reason} for u in batch.unheld
+        ],
         "canary": {"id": batch.canary.id, "of": batch.canary.of, "expected": batch.canary.expected},
     }
 
@@ -99,6 +139,16 @@ def read_batch(content: bytes) -> Batch:
         batch = Batch(
             story=_text(data["story"]),
             seed=_natural(data["seed"]),
+            order=_texts(data["order"]),
+            kept_visible=_texts(data["kept_visible"]),
+            unheld=tuple(
+                Unheld(
+                    requirement=_text(u["requirement"]),
+                    case=_text(u["case"]),
+                    reason=_reason(u["reason"]),
+                )
+                for u in data["without_holdout"]
+            ),
             examples=tuple(
                 SealedExample(id=_text(e["id"]), salt=_salt(e["salt"]), text=_text(e["text"]))
                 for e in data["examples"]
@@ -109,7 +159,8 @@ def read_batch(content: bytes) -> Batch:
                 expected=_impossible(data["canary"]["expected"]),
             ),
         )
-        if data["format"] != 1 or set(data) != {"format", "story", "seed", "examples", "canary"}:
+        fields = {"format", "story", "seed", "order", "kept_visible", "examples", "without_holdout"}
+        if data["format"] != 1 or set(data) != {*fields, "canary"}:
             raise ValueError("not the fields of a batch")
         if batch_bytes(batch) != content:
             raise ValueError("not in canonical form")
@@ -122,6 +173,18 @@ def _text(value: object) -> str:
     if not isinstance(value, str):
         raise TypeError("not a text")
     return value
+
+
+def _texts(value: object) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        raise TypeError("not a list of texts")
+    return tuple(_text(item) for item in value)
+
+
+def _reason(value: object) -> str:
+    if value not in REASONS:
+        raise ValueError("not a reason of a case without a held-out example")
+    return str(value)
 
 
 def _natural(value: object) -> int:
@@ -221,7 +284,24 @@ def _held_examples(contract: Contract, batch: Batch) -> tuple[Example, ...] | No
         ):
             return None
         examples.append(read)
+    if not _split_again(contract, batch, examples):
+        return None
     return tuple(examples)
+
+
+def _split_again(contract: Contract, batch: Batch, held: list[Example]) -> bool:
+    """Whether the split drawn again from the seed, the examples kept visible and the order of the
+    batch holds out these examples and leaves without one the cases that the batch names."""
+    known = {e.id: e for e in (*contract.examples, *held)}
+    if len(batch.order) != len(known) or set(batch.order) != set(known):
+        return False
+    before = replace(contract, examples=tuple(known[name] for name in batch.order), held_out=())
+    try:
+        done = split(before, batch.seed, batch.kept_visible)
+    except ValueError:
+        return False
+    drawn = sorted(e.id for e in done.held_out)
+    return drawn == sorted(e.id for e in held) and unheld_cases(before, done) == batch.unheld
 
 
 def _read(contract: Contract, text: str) -> Example | None:

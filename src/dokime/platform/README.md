@@ -109,7 +109,8 @@ content = store.open(sealed)  # in memory
 
 ## The randomness of the system
 
-`random_bytes(count)` and `seed()` give bytes and a natural integer of 64 bits from `secrets`, for
+`random_bytes(count)` and `seed()` give bytes and a natural integer of 53 bits, the largest that
+the canonical form of ADR-0062 holds, from `secrets`, for
 the seed of a split, the salts of the held-out examples and the canary. They never come from a
 value that a person chooses, since with a seed of one's own one could try seeds until the split
 suits (ADR-0014).

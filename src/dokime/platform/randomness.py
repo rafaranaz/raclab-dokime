@@ -14,6 +14,11 @@ def random_bytes(count: int) -> bytes:
     return secrets.token_bytes(count)
 
 
+SEED_BITS = 53
+"""The bits of a seed: the largest whole number that the canonical form of ADR-0062 holds is
+2**53 - 1, and the seed is written in the sealed batch."""
+
+
 def seed() -> int:
-    """A natural integer of 64 random bits, from the randomness of the system."""
-    return secrets.randbits(64)
+    """A natural integer of 53 random bits, from the randomness of the system."""
+    return secrets.randbits(SEED_BITS)

@@ -154,7 +154,7 @@ The seed of a split, the salts of the held-out examples and the canary come from
 the system, never from a value that a person chooses (ADR-0014).
 
 - **PLATFORM-120** When it is asked for a number of random bytes, the platform shall give that many bytes from the randomness of the system.
-- **PLATFORM-121** When it is asked for a seed, the platform shall give a natural integer of 64 random bits from the randomness of the system.
+- **PLATFORM-121** When it is asked for a seed, the platform shall give a natural integer of 53 random bits from the randomness of the system, the largest that the canonical form of ADR-0062 holds, since the seed is written in the sealed batch.
 - **PLATFORM-122** If it is asked for a number of random bytes below 1, then the platform shall refuse with an error that names the number.
 
 ## The versions of a file in the history ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))

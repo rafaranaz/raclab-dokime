@@ -106,6 +106,8 @@ same rules as those of the corpus.
 - **REPO-145** The Dockerfile of this repository shall install every dependency that `uv.lock` gives the packages it installs, except those whose marker names another system than Linux, since it resolves none of them.
 - **REPO-146** The command of the tests of the pack of this repository shall go on past an error in the collection of a module of tests, since otherwise one module that does not import stops every test and the side looks red as a whole.
 - **REPO-147** The Dockerfile of this repository shall install the project itself from its context, with the build backend of `pyproject.toml` at an exact version within the range it requires, so that the tests that read the metadata of the package, run its command or import it from another process run in the image.
+- **REPO-158** The Dockerfile of this repository shall install every dependency at run time that `pyproject.toml` declares for the project, since it installs the project without its dependencies.
+- **REPO-159** The package `dokime` shall import pyrage only from the module `platform`, which holds the adapter of the sealed store (ADR-0072).
 
 ## The audit of a pull request (`tools/audit_pr.py`, [ADR-0067](../adr/0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md), [ADR-0070](../adr/0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md), [ADR-0071](../adr/0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md))
 

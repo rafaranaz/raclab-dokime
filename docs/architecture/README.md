@@ -85,6 +85,24 @@ Each decision says what it rests on. These rest on reasoning and need a test bef
 | An agent can start with its credential and a configuration directory made for the run | Try it with two agents on Linux and macOS | C |
 | ~~A pack can be proposed from the CI configuration of a project~~ | **Discarded** by [ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md): a person writes the pack | — |
 
+## What depends on Python
+
+The first version verifies Python projects; Java arrives in block G. These parts of dokime assume
+Python, and are the ones a second language reaches first:
+
+- **The boundary `function`.** The program that observes the examples in the zone,
+  `sandbox/observe_program.py`, imports the target with `importlib`, and `oracle/compare.py` reads an
+  exception as `pytest.raises` reads it.
+- **The tests of a file.** `verify/existing.py` ties each test to its file by the path of a module
+  of Python, the path without `.py` and with `/` as `.`.
+- **The configuration of the tests.** `packs/sections.py` reads the sections of a pack in the formats
+  that pytest uses, TOML and INI.
+- **The matcher `$fullmatch`.** Its pattern is a regular expression of Python
+  ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.md)).
+
+The boundary `cli`, the gates that compare trees and patches, the ledger and the evidence do not
+depend on the language of the project.
+
 ## Out of the first version
 
 Graphical interfaces, several repositories per project, a code index with compiler precision, a

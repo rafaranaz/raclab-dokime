@@ -292,7 +292,7 @@ finished run, whatever its verdict.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
-      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key lives only in CI"},
+      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key is not here"},
       {"gate": "changed-line-coverage", "status": "skipped", "reason": "optional in the policy"},
       {"gate": "behaviour-differences", "status": "not-applicable", "reason": "pack level P2"}
     ],

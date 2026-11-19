@@ -52,13 +52,18 @@ of the exception". So a subclass of `TypeError` holds for `TypeError`, a class o
 A case is the set of examples of one requirement that share a name of case. The split holds out one
 example of each case that has two or more, at random with a seed, and keeps the rest visible, so
 that every case keeps at least one visible example. Ensuring that the held-out example is of another
-partition than the visible ones is decided with the data of B3.
+partition than the visible ones is decided with the data of B3. An example that was already published,
+which the caller finds in the history, is kept visible: it is never drawn, so that the held-out
+part of a case is only made of examples that nobody has seen.
 
 - **ORACLE-040** When the examples of a contract are split with a seed, the oracle shall hold out one example of each case that has two examples or more.
 - **ORACLE-041** When the examples of a contract are split, the oracle shall keep visible every example that it does not hold out, and give the visible and the held-out examples each in the order of the contract.
 - **ORACLE-042** When the examples of a contract are split, the oracle shall choose the example held out of each case with `random.Random(seed).choice` over the examples of the case in the order of the contract, one generator for the contract, case by case in the order in which each case first appears.
 - **ORACLE-043** When the examples of a contract are split, the split shall name, in the order of the contract, the requirements that hold out no example.
 - **ORACLE-044** If the seed of a split is not an integer of at least 0, then the oracle shall refuse to split with an error that names what it was given.
+- **ORACLE-045** When the examples of a contract are split with examples to keep visible, the oracle shall keep each of them visible and choose the example held out of a case of two or more only among its other examples, holding out none from a case where none is left.
+- **ORACLE-046** When the examples of a contract are split, the split shall name, in the order of the contract, each case that holds out no example, by its requirement and its name.
+- **ORACLE-047** If an example to keep visible is not an example of the contract, then the oracle shall refuse to split with an error that names it.
 
 ## Words for the agent on a held-out failure ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
 

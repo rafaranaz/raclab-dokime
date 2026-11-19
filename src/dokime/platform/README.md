@@ -81,6 +81,7 @@ ADR-0073).
 ```python
 from dokime.platform.sealed_store import (
     create_identity,
+    seal_for,
     default_identity_path,
     load_identity,
     read_passphrase,
@@ -90,6 +91,7 @@ path = default_identity_path(os.environ)  # under an absolute $XDG_DATA_HOME or 
 recipient = create_identity(path, read_passphrase(None))  # "age1…", for .dokime/recipients.txt
 store, findings = load_identity(path, read_passphrase(descriptor))
 sealed = store.seal(content, recipients)  # the recipients read from the base
+sealed = seal_for(content, recipients)  # the same, where no identity is, as when sealing
 content = store.open(sealed)  # in memory
 ```
 

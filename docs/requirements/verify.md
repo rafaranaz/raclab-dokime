@@ -117,9 +117,10 @@ held-out example whose expected value cannot hold; it detects a comparison that 
 should not, the side of a false accept, and not an observer that makes everything fail, which gives
 rejections and is the safe side.
 
-- **VERIFY-150** When a sealed batch is made, the module shall give the canonical form of a mapping with `format` 1, the story, the seed, each held-out example with its id, its salt in hexadecimal and its text, and the canary.
+- **VERIFY-150** When a sealed batch is made, the module shall give the canonical form of a mapping with `format` 1, the story, the seed, the ids of every example of the contract before the split in their order, the ids of the examples kept visible as already published, each held-out example with its id, its salt in hexadecimal and its text, each case that holds out nothing, and the canary.
 - **VERIFY-151** When the canary of a batch is made, the module shall copy the held-out example that `random.Random(seed).choice` chooses in the order of the contract, with an id of its own and with only its first step, whose one expectation is a given text of 32 hexadecimal digits, as `stdout` at `cli` or as `returns` at `function`.
 - **VERIFY-152** If the content of a sealed batch is not the canonical form of such a mapping, then the module shall refuse to read it, with the code `unreadable-batch`.
+- **VERIFY-153** When a sealed batch is made, the module shall give each case that holds out nothing with its requirement, its name and its reason: `single-example` when the case has one example, `all-published` when every example of a case of two or more was kept visible as already published.
 
 ## The gate `sealed-examples` ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
 
@@ -134,3 +135,4 @@ decides when. Where the key is not, the gate is not applicable.
 - **VERIFY-165** When the canary does not hold, the gate shall give no finding of it and count it as no check, so that the canary never counts as the failure of a requirement nor reaches the agent.
 - **VERIFY-166** The gate shall give no finding whose message holds a value, an input or the identifier of a held-out example or of the canary.
 - **VERIFY-167** The reason of the gate `sealed-examples` where the key is not shall be `the key is not here`.
+- **VERIFY-168** When the digests of the batch hold, the gate shall draw the split again from the seed, the examples kept visible and the order of the batch, over the visible and the held-out examples, and if the examples it holds out, or the cases that hold out nothing with their reasons, differ from those of the batch, then give the finding `sealed-batch-mismatch` and observe nothing.

@@ -57,3 +57,34 @@ the project, and on a double of the port that observes that answers from a file
 of the extracted project,
 itself tested against the rule of CORE-099, so that a double that overlays instead of replacing
 cannot let the gates pass.
+
+## The sealed batch and the gate `sealed-examples`
+
+The sealed batch is what the sealed store encrypts (ADR-0014, ADR-0072): each held-out example with
+its salt and its text as approved, the seed of the split and the canary, in canonical form.
+
+```python
+from dokime.verify.sealed import Batch, SealedExample, batch_bytes, make_canary, read_batch
+
+canary = make_canary(contract, seed, canary_id, impossible)  # 32 hexadecimal digits at random
+content = batch_bytes(Batch(contract.story, seed, sealed, canary))  # sealed: SealedExample, ...
+batch = read_batch(content)  # or a RefusalError unreadable-batch
+
+result = sealed_examples(pack, contract, batch, base, patch, image, repository, observer, limits)
+```
+
+- **The canary** copies the held-out example that the seed chooses, with only its first step and,
+  as its one expectation, the impossible text, as `stdout` at `cli` or `returns` at `function`. If
+  it holds, the gate gives `canary-passed`, an `ERROR`: the comparison accepts what cannot hold,
+  the side of a false accept. When it fails, which it has to, it is no finding and no check, so it
+  never counts as the failure of a requirement nor reaches the agent.
+- **The batch is checked before anything is observed**: it has to hold exactly the held-out
+  examples of the contract, each with the digest of its salt and its text that the contract gives,
+  and each text has to read as the example of its id, requirement and case. Otherwise the gate
+  gives `sealed-batch-mismatch`, an `ERROR`.
+- **A held-out example that fails** is `sealed-example-fails`, a `FAIL`, or
+  `sealed-model-example-fails`, an `ASK`, for one whose origin is `model`, with the words of the
+  oracle for the agent: the requirement and the classes of the failure, never a value, an input or
+  an identifier.
+- **Where the key is not**, the gate is not applicable with the reason `NOT_HERE`, "the key is not
+  here". The flow of the audit runs the gate only after `visible-examples` passed.

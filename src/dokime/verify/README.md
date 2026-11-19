@@ -70,7 +70,9 @@ canary = make_canary(contract, seed, canary_id, impossible)  # 32 hexadecimal di
 content = batch_bytes(batch)  # Batch(story, base, seed, order, kept_visible, examples, …)
 batch = read_batch(content)  # or a RefusalError unreadable-batch
 
-result = sealed_examples(pack, contract, batch, base, patch, image, repository, observer, limits)
+result = sealed_examples(
+    pack, contract, text, batch, base, patch, image, repository, history, observer, limits
+)
 ```
 
 - **The canary** copies the held-out example that the seed chooses, with only its first step and,
@@ -84,6 +86,18 @@ result = sealed_examples(pack, contract, batch, base, patch, image, repository, 
   from the seed, the examples kept visible and the order of the batch has to hold out those
   examples and leave without one the cases the batch names, with their reasons. Otherwise the gate
   gives `sealed-batch-mismatch`, an `ERROR`.
+- **The history of the contract** is read through the port `FileHistory`, with `published` of
+  `verify.published`, the same function that the command that seals uses: an example is published
+  when an example of the list `examples` of a version has its id, or its boundary, target and steps
+  as YAML reads them; an entry of `held_out` publishes nothing. A base of the batch out of the
+  history of the change, or examples kept visible other than those published from that base, is
+  `sealed-batch-mismatch`. A held-out example published in the history of the change is
+  `held-out-published`, an `ERROR` at its entry in `held_out`, whose message says to replace it and
+  seal again. A refusal of a port, `git-failed` among them, ends the gate in `ERROR`, never in a
+  pass. Nothing is observed in any of these cases. The limits of the comparison are those of the
+  history: an example published with a field added or a value spelt otherwise is not recognised,
+  nor a version under an earlier path or in a commit that the base does not reach, nor a copy in
+  another file.
 - **The cases without a hidden part** are in the batch with their reason, `single-example` or
   `all-published` (every example of the case was already published, so none was drawn), and
   `unheld_cases(contract, done)` gives them from a split; the evidence shows them.

@@ -4,7 +4,9 @@ A work state of the flow lists its gates and closes with the aggregation of thei
 `ERROR` gives `ERROR`, else any `FAIL` gives `FAIL` and drops the `ASK` of the round, else any `ASK`
 gives `ASK`, else `PASS`. Every gate of the state is listed in its order, so that the evidence can
 show each one (INV-7): run, with its result, or not applicable, with the block or milestone that
-builds it. A gate that this version builds and has no result is an error, never a pass.
+builds it. A gate that this version builds and has no result is an error, never a pass, unless the
+caller gives it as not applicable with a reason, as the gate of the sealed examples where the key is
+not.
 """
 
 from collections import Counter
@@ -72,13 +74,22 @@ class StateOutcome:
         return summarise((*found, *self.findings))
 
 
-def aggregate_state(gates: tuple[str, ...], results: tuple[GateResult, ...]) -> StateOutcome:
+def aggregate_state(
+    gates: tuple[str, ...],
+    results: tuple[GateResult, ...],
+    not_applicable: Mapping[str, str] | None = None,
+) -> StateOutcome:
     """Aggregate the results of the gates of a state, listed in the order of the state."""
+    absent = dict(not_applicable or {})
     findings: list[Finding] = []
     counted = Counter(result.gate for result in results)
     for gate in sorted(name for name, count in counted.items() if count > 1):
         findings.append(_error("gate-repeated", f"the gate {gate} has more than one result"))
-    for gate in sorted(set(counted) - set(gates)):
+    for gate in sorted(set(absent) & set(counted)):
+        findings.append(
+            _error("gate-repeated", f"the gate {gate} has a result and a reason not to apply")
+        )
+    for gate in sorted((set(counted) | set(absent)) - set(gates)):
         findings.append(
             _error("gate-not-of-the-state", f"the gate {gate} has a result but is not of the state")
         )
@@ -91,6 +102,8 @@ def aggregate_state(gates: tuple[str, ...], results: tuple[GateResult, ...]) -> 
             )
         elif gate not in BUILT:
             findings.append(_error("gate-unknown", f"the gate {gate} is not in the table of gates"))
+        elif gate in absent and gate not in by_gate:
+            entries.append(GateEntry(gate=gate, status=Status.NOT_APPLICABLE, reason=absent[gate]))
         elif gate in by_gate:
             entries.append(GateEntry(gate=gate, status=Status.RUN, result=by_gate[gate]))
         else:

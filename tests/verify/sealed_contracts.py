@@ -7,19 +7,22 @@ hold out nothing for each of the two reasons.
 """
 
 import json
+from collections.abc import Callable
 
 from dokime.contract.check import check
 from dokime.contract.held_out import held_out_digest
 from dokime.contract.model import Contract
 from dokime.core.observation import ObservationLimits
-from dokime.core.repository import RefusalError
+from dokime.core.repository import CommitName, FileVersion, RefusalError
 from dokime.verify.result import GateResult
 from dokime.verify.sealed import Batch, SealedExample, Unheld, make_canary, sealed_examples
-from tests.verify.doubles import AuditedDouble, ObserverDouble, patch
+from tests.verify.doubles import AuditedDouble, HistoryDouble, ObserverDouble, patch
 from tests.verify.gates import IMAGE, PACK
 
 IMPOSSIBLE = "0123456789abcdef0123456789abcdef"
 BASE = "b" * 40
+TEXTS: dict[int, str] = {}
+"""The text of each contract that `split` gives, by the identity of the contract."""
 
 HEADER = """\
 format: 1
@@ -74,9 +77,27 @@ def split(*texts: tuple[str, str]) -> tuple[Contract, tuple[SealedExample, ...]]
         f"    digest: {held_out_digest(s.salt, s.text)}\n"
         for n, s in enumerate(sealed)
     )
-    checked = check(HEADER + "examples:\n" + visible + "held_out:\n" + entries)
+    text = HEADER + "examples:\n" + visible + "held_out:\n" + entries
+    checked = check(text)
     assert checked.contract is not None, checked.findings
+    TEXTS[id(checked.contract)] = text
     return checked.contract, sealed
+
+
+def published_before(contract: Contract) -> str:
+    """The version of the contract before the seal that publishes the examples kept visible: the
+    partner of each held-out example and the two of the case `c-pub`."""
+    examples = "".join(held(partner(n), case=f"c{n}") for n in range(len(contract.held_out)))
+    examples += held("E-q1", case="c-pub") + held("E-q2", case="c-pub")
+    return HEADER + "examples:\n" + examples
+
+
+def history_of(contract: Contract, base: CommitName) -> HistoryDouble:
+    """The history of the contract of a seal from `BASE`: the version before the seal, and on the
+    base of the change the contract after the split as well."""
+    before = FileVersion(CommitName(BASE), published_before(contract).encode())
+    after = FileVersion(base, TEXTS[id(contract)].encode())
+    return HistoryDouble({CommitName(BASE): (before,), base: (after, before)})
 
 
 def batch_of(contract: Contract, sealed: tuple[SealedExample, ...], seed: int = 7) -> Batch:
@@ -95,14 +116,32 @@ def batch_of(contract: Contract, sealed: tuple[SealedExample, ...], seed: int = 
 
 
 def run(
-    contract: Contract, batch: Batch, answers: dict[str, object]
+    contract: Contract,
+    batch: Batch,
+    answers: dict[str, object],
+    *,
+    history: Callable[[CommitName], HistoryDouble] | None = None,
+    ancestors: tuple[CommitName, ...] = (CommitName(BASE),),
 ) -> tuple[GateResult, ObserverDouble]:
-    """Run the gate on a patch after which the observer returns `answers` by example."""
+    """Run the gate on a patch after which the observer returns `answers` by example, with the
+    history of the contract that `history` gives for the base of the change, `history_of` unless
+    given, and the commits that the base of the change reaches."""
     repository, observer = AuditedDouble(), ObserverDouble()
     base = repository.add({"answers.json": b"{}", "src/p.py": b"code"})
+    repository.ancestry[base] = ancestors
     changed = patch({"answers.json": json.dumps(answers), "src/p.py": "new"})
     result = sealed_examples(
-        PACK, contract, batch, base, changed, IMAGE, repository, observer, ObservationLimits()
+        PACK,
+        contract,
+        TEXTS[id(contract)],
+        batch,
+        base,
+        changed,
+        IMAGE,
+        repository,
+        history_of(contract, base) if history is None else history(base),
+        observer,
+        ObservationLimits(),
     )
     return result, observer
 
@@ -112,7 +151,18 @@ def run_with(contract: Contract, batch: Batch, refusal: RefusalError) -> GateRes
     repository = AuditedDouble()
     observer = ObserverDouble(refusal=refusal)
     base = repository.add({"answers.json": b"{}", "src/p.py": b"code"})
+    repository.ancestry[base] = (CommitName(BASE),)
     changed = patch({"answers.json": "{}", "src/p.py": "new"})
     return sealed_examples(
-        PACK, contract, batch, base, changed, IMAGE, repository, observer, ObservationLimits()
+        PACK,
+        contract,
+        TEXTS[id(contract)],
+        batch,
+        base,
+        changed,
+        IMAGE,
+        repository,
+        history_of(contract, base),
+        observer,
+        ObservationLimits(),
     )

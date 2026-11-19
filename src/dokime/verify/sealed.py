@@ -18,6 +18,11 @@ otherwise. It reads each held-out example
 from its text with the requirements of the contract, observes them and the canary on the tree of
 the change, and words a held-out failure as the oracle does for the agent, with no value, input or
 identifier.
+
+Before it observes, the gate reads the history of the contract of the story: the base of the batch
+has to be in the history of the change, the examples kept visible have to be exactly those that
+`published` finds from that base, and no held-out example may be published in the history of the
+change, which is `held-out-published`. A refusal of a port ends the gate in `ERROR`.
 """
 
 import json
@@ -31,13 +36,21 @@ from dokime.contract.held_out import held_out_digest
 from dokime.contract.model import Contract, Example, Step
 from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
+from dokime.core.layout import contract_path
 from dokime.core.observation import ExampleObserver, ObservationLimits
-from dokime.core.repository import AuditedRepository, CommitName, RefusalError
+from dokime.core.repository import (
+    AuditedRepository,
+    CommitName,
+    FileHistory,
+    RefusalError,
+    RepoPath,
+)
 from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.oracle.holdout import Split, feedback, split
 from dokime.packs.model import Pack
 from dokime.verify.examples import _observe
+from dokime.verify.published import example_items, published
 from dokime.verify.result import GateResult, checks_of
 from dokime.verify.trees import change_tree
 
@@ -221,11 +234,13 @@ def _impossible(value: object) -> str:
 def sealed_examples(
     pack: Pack,
     contract: Contract,
+    text: str,
     batch: Batch,
     base: CommitName,
     patch: bytes,
     image: Digest,
     repository: AuditedRepository,
+    history: FileHistory,
     observer: ExampleObserver,
     limits: ObservationLimits,
 ) -> GateResult:
@@ -240,6 +255,12 @@ def sealed_examples(
                 Finding(code="sealed-batch-mismatch", message=message, verdict=Verdict.ERROR),
             ),
         )
+    try:
+        told = _history(contract, text, batch, base, repository, history)
+    except RefusalError as refusal:
+        return GateResult(gate=SEALED, findings=(refusal.finding,))
+    if told:
+        return GateResult(gate=SEALED, findings=told)
     canary = _canary(held, batch.canary)
     observed = _observe(
         SEALED,
@@ -276,6 +297,55 @@ def sealed_examples(
         findings=tuple(findings),
         checks=checks_of(example.origin for example in held),
     )
+
+
+def _history(
+    contract: Contract,
+    text: str,
+    batch: Batch,
+    base: CommitName,
+    repository: AuditedRepository,
+    history: FileHistory,
+) -> tuple[Finding, ...]:
+    """The findings of the history of the contract: a base of the batch out of the history of the
+    change or examples kept visible other than those published from it, a mismatch; a held-out
+    example published in the history of the change, `held-out-published` at its entry."""
+    try:
+        start = CommitName(batch.base)
+    except ValueError:
+        return (_mismatch("the base of the sealed batch is not the name of a commit"),)
+    if start not in {commit.name for commit in repository.history(base)}:
+        return (_mismatch("the base of the sealed batch is not in the history of the change"),)
+    path = RepoPath(str(contract_path(contract.story)))
+    sealed = [item for one in batch.examples for item in example_items("examples:\n" + one.text)]
+    kept = published((*example_items(text), *sealed), history.versions(start, path))
+    if tuple(name for name in batch.order if name in kept) != batch.kept_visible:
+        return (
+            _mismatch(
+                "the examples that the sealed batch keeps visible are not those published from its"
+                " base"
+            ),
+        )
+    since = published(sealed, history.versions(base, path))
+    lines = {h.id: h.line for h in contract.held_out}
+    message = (
+        "a held-out example is already in a version of the contract in the history, so this gate"
+        " cannot answer for it: replace it with a new example and seal again"
+    )
+    return tuple(
+        Finding(
+            code="held-out-published",
+            message=message,
+            verdict=Verdict.ERROR,
+            lines=(lines[h.id],),
+        )
+        for h in contract.held_out
+        if h.id in since
+    )
+
+
+def _mismatch(message: str) -> Finding:
+    return Finding(code="sealed-batch-mismatch", message=message, verdict=Verdict.ERROR)
 
 
 def _held_examples(contract: Contract, batch: Batch) -> tuple[Example, ...] | None:

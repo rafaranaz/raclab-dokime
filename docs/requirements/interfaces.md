@@ -168,3 +168,25 @@ only what dokime fixes, so that it needs no escaping.
 
 - **INTERFACES-154** When dokime is run with the option `--version`, the command shall print `dokime` and the version of the installed harness on one line of the standard output and exit with status 0.
 - **INTERFACES-155** If the harness is not installed as a distribution, then the command shall print `dokime unversioned` for `--version` and exit with status 0.
+
+## `contract seal` ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0072](../adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
+
+The command splits an approved contract and seals its held-out examples, in the clean checkout of
+the project where its pull request is made. The contract with all its examples is read from outside
+the tree, where the agent that works in that checkout cannot read it, and the held-out examples are
+never written into the tree. The ledger of the run goes to `--out`, empty and outside the project.
+
+- **INTERFACES-160** When `contract seal` is run with a story, a contract and `--out`, the command shall write in the directory of the change of the story only the contract with its visible examples and its list `held_out`, and the sealed batch `sealed.age`.
+- **INTERFACES-161** If the contract or `--out` is inside the tree of the project, or `--out` is not an empty directory, then the command shall refuse to seal, with the code `inside-the-tree` or `out-not-empty`.
+- **INTERFACES-162** If the project is not a clean checkout of git, then the command shall refuse to seal, with the code `not-a-clean-checkout`.
+- **INTERFACES-163** If the contract has a finding of the verdict `FAIL` or `ERROR`, its story is not the one given, or it already holds out examples, then the command shall refuse to seal, with the findings or with the code `story-mismatch` or `already-split`.
+- **INTERFACES-164** The command shall read the recipients from `.dokime/recipients.txt` of the commit of `HEAD`, never from the working tree, and refuse to seal on any finding of their reading.
+- **INTERFACES-165** When the recipients are read, the command shall show each of them before it encrypts and take the answer `y` or `yes` from the terminal, or from the descriptor that `--recipients-confirmed-by-fd` names, and refuse to seal with the code `recipients-not-confirmed` on any other answer.
+- **INTERFACES-166** If no descriptor of the confirmation is given and the process has no terminal, then the command shall refuse to seal, with the code `no-confirmation-source`.
+- **INTERFACES-167** When the contract is split, the command shall keep visible each example whose id, or whose boundary, target and steps, appear in an example of any version of the contract of the story in the history reachable from `HEAD`.
+- **INTERFACES-168** The examples that the command keeps visible shall not depend on the seed.
+- **INTERFACES-169** The command shall take the seed, the salt of 16 bytes of each held-out example, and the id and the impossible value of the canary from the randomness of the system, the id of the canary being none of the ids of the contract.
+- **INTERFACES-170** The command shall write in the batch the commit of `HEAD` as its base, and write to the standard error the ids kept visible and each case that holds out nothing with its reason.
+- **INTERFACES-171** The command shall record in `--out/ledger.jsonl` the start of the run with its story and its base, the question and the answer of the confirmation, and the end with its verdict, the digest of the seed and the digest of the batch.
+- **INTERFACES-172** The command shall write no file of the tree of the project that holds the text of a held-out example.
+- **INTERFACES-173** If the split holds out no example, then the command shall refuse to seal, with the code `nothing-to-hold-out`, and name each case with its reason.

@@ -203,22 +203,25 @@ relations:
 
 ### The digest of a contract
 
-The digest has to stay verifiable after the split, when the content of the held-out examples is
-no longer in the file. So it is computed over the digests of its parts, not over the file:
+The digest of a contract is the digest of the bytes of the committed file
+([ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md)).
+After the split, the file keeps the visible examples whole and, for each held-out example, only its
+identifier, requirement, case and digest, so the digest of the file covers the held-out examples
+through their digests.
 
-1. Each requirement, example and relation has the digest of its canonical form. The digest of an
-   example is the SHA-256 of the canonical form of its salt and the example: a salt of 16 bytes
-   from the randomness of the system, a new one for each example, as the salted hashes of
-   [RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html) ask, whose minimum recommended is 128
-   bits. Without it, a held-out example with a short, guessable content could be found by trying
-   candidates against its digest.
-2. The digest of the contract is the digest of the header and the ordered list of those digests.
-3. After the split, the file keeps the visible examples whole and, for each held-out example, only
-   its identifier, requirement, case and digest. The salt of a held-out example stays under the
-   key, not in the file.
+The digest of a held-out example is the SHA-256 of the canonical form of its salt and its text as
+approved, the block of the example in the contract. The salt is 16 bytes from the randomness of the
+system, a new one for each example, as the salted hashes of
+[RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html) ask, whose minimum recommended is 128 bits.
+Without it, a held-out example with a short, guessable content could be found by trying candidates
+against its digest. The salt and the text stay in the sealed batch, under the key, never in the
+file. The strict reader refuses anchors, aliases, tags and merge keys, so the text of an example
+reads the same alone as inside the contract.
 
 Anyone can recompute the digest of the contract from the file. Only who holds the key can check
-that a held-out digest matches its content.
+that a held-out digest matches its content. A digest over the parts of a contract, which would keep
+an approval verifiable whatever the layout of the file, is left for block E, where approvals are
+signed.
 
 ### The approval
 

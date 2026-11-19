@@ -513,6 +513,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyrage-stubs"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyrage" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ae/50/f87f8cc62b1198840fa686bae94fad9543d1d7f8f7b058193d17f6d2771d/pyrage_stubs-1.4.0.tar.gz", hash = "sha256:9a44b0c1d2c169c67745ccb5790fcd1dd716941e9c4c4a66ecbd0862584766d9", size = 3400, upload-time = "2026-08-23T22:50:30.372Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/f5/e9edcdd379d819a5725b8b2b1dcfc0c7795b8bf1901867123302ce0a90e6/pyrage_stubs-1.4.0-py3-none-any.whl", hash = "sha256:033d58ee47f1fe294e5c576167dc679270557d63daaf79859a88896662eb0ec2", size = 4869, upload-time = "2026-08-23T22:50:29.223Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -574,6 +586,7 @@ dev = [
     { name = "import-linter" },
     { name = "mypy" },
     { name = "pip-audit" },
+    { name = "pyrage-stubs" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -591,6 +604,7 @@ dev = [
     { name = "import-linter", specifier = ">=2.16" },
     { name = "mypy", specifier = ">=1.18" },
     { name = "pip-audit", specifier = ">=2.9" },
+    { name = "pyrage-stubs", specifier = ">=1.4.0" },
     { name = "pytest", specifier = ">=8.4" },
     { name = "pytest-cov", specifier = ">=7.0" },
     { name = "ruff", specifier = ">=0.14" },

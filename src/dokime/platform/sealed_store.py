@@ -30,6 +30,22 @@ _AGE = b"age-encryption.org/v1\n"
 _IDENTITY = "dokime/identity.age"
 
 
+def seal_for(content: bytes, recipients: Sequence[str]) -> bytes:
+    """Encrypt a content for the recipients, without an identity: sealing needs only their public
+    keys."""
+    if not recipients:
+        raise RefusalError("bad-recipient", "there is no recipient to seal for")
+    parsed = []
+    for number, recipient in enumerate(recipients, start=1):
+        try:
+            parsed.append(x25519.Recipient.from_str(recipient))
+        except pyrage.RecipientError:
+            raise RefusalError(
+                "bad-recipient", f"the recipient {number} is not an X25519 recipient of age"
+            ) from None
+    return bytes(pyrage.encrypt(content, parsed))
+
+
 class AgeSealedStore:
     """Seals for X25519 recipients of age, and opens with one identity, in memory."""
 
@@ -38,17 +54,7 @@ class AgeSealedStore:
 
     def seal(self, content: bytes, recipients: Sequence[str]) -> bytes:
         """Encrypt a content for the recipients, and give the sealed bytes."""
-        if not recipients:
-            raise RefusalError("bad-recipient", "there is no recipient to seal for")
-        parsed = []
-        for number, recipient in enumerate(recipients, start=1):
-            try:
-                parsed.append(x25519.Recipient.from_str(recipient))
-            except pyrage.RecipientError:
-                raise RefusalError(
-                    "bad-recipient", f"the recipient {number} is not an X25519 recipient of age"
-                ) from None
-        return bytes(pyrage.encrypt(content, parsed))
+        return seal_for(content, recipients)
 
     def open(self, sealed: bytes) -> bytes:
         """Decrypt sealed bytes in memory, and give their content."""

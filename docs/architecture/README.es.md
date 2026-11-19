@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:2f7bdb798375bfa2 -->
+<!-- translation-of: README.md sha256:a6eb1abe78eb44c5 -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -94,6 +94,10 @@ de contar:
 La primera versión verifica proyectos de Python; Java llega en el bloque G. Estas partes de dokime
 suponen Python, y son las primeras a las que llega un segundo lenguaje:
 
+- **El programa que observa los ejemplos**, de cualquier frontera, es un programa de Python,
+  `sandbox/observe_program.py`, ejecutado con el `python` de la imagen del proyecto
+  (`sandbox/podman.py`). La imagen de un proyecto necesita un intérprete de Python incluso para
+  observar una línea de órdenes.
 - **La frontera `function`.** El programa que observa los ejemplos en la zona,
   `sandbox/observe_program.py`, importa el objetivo con `importlib`, y `oracle/compare.py` lee una
   excepción como la lee `pytest.raises`.
@@ -104,8 +108,10 @@ suponen Python, y son las primeras a las que llega un segundo lenguaje:
 - **El comparador `$fullmatch`.** Su patrón es una expresión regular de Python
   ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.es.md)).
 
-La frontera `cli`, las puertas que comparan árboles y parches, el registro y la evidencia no
-dependen del lenguaje del proyecto.
+Las puertas que comparan árboles y parches, el registro y la evidencia no dependen del lenguaje del
+proyecto. La frontera `cli` tampoco en lo que compara, pero sí en el programa que la ejecuta, como
+dice el primer punto. Esto está leído en el código, no probado: todavía no se ha verificado ningún
+proyecto en otro lenguaje.
 
 ## Fuera de la primera versión
 

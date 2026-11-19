@@ -285,6 +285,8 @@ name: a text of letters, digits and hyphens that starts with a letter, as the `s
 - **CORE-151** The directory of a change shall be `.dokime/changes/<story>/`, with the story of the change.
 - **CORE-152** The contract of a change shall be the file `contract.yaml` in the directory of the change.
 - **CORE-153** If a story is not a name, then the directory of the change shall be refused with an error that names the story.
+- **CORE-172** The recipients of the sealed batches of a project shall be at `.dokime/recipients.txt`.
+- **CORE-173** The sealed batch of a change shall be the file `sealed.age` in the directory of the change.
 
 ## The port that observes the examples ([ADR-0012](../adr/0012-examples-are-observations-at-a-boundary.md), [ADR-0063](../adr/0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md))
 
@@ -309,3 +311,18 @@ self-check uses.
 - **CORE-169** When an adapter of the port that observes refuses an operation, the port shall raise the refusal of CORE-072.
 - **CORE-170** When the process of an example crashed, the observation of the example shall carry the signal that ended it, or its exit code, when they are known.
 - **CORE-171** If an observation that did not crash carries a signal or an exit code, then the observation shall be rejected with an error that names the field.
+
+## The sealed store ([ADR-0072](../adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
+
+The held-out examples of a contract are encrypted with age for the recipients of the project. The
+file of recipients follows the format of age, one recipient per line, with empty lines and lines
+that start with `#` ignored, and holds only X25519 recipients, the type of the identity that
+ADR-0073 chose: `age1` and 58 characters of Bech32. `core` reads the text of the file, which the
+caller takes from the base, and defines the port; it encrypts nothing.
+
+- **CORE-180** When the text of a file of recipients is read, the reader shall give, in order, each line that is not empty and does not start with `#`, without the spaces around it.
+- **CORE-181** If a line of a file of recipients is not an X25519 recipient of age, then the reader shall report a finding with the code `bad-recipient`, the verdict `ERROR` and the number of the line, without the text of the line.
+- **CORE-182** If a file of recipients gives no recipient, then the reader shall report a finding with the code `no-recipient` and the verdict `ERROR`.
+- **CORE-183** If a recipient appears more than once in a file of recipients, then the reader shall report a finding with the code `repeated-recipient`, the verdict `ERROR` and the numbers of its lines.
+- **CORE-184** The port of the sealed store shall offer two operations: seal a content for a list of recipients and give the sealed bytes, and open sealed bytes and give their content.
+- **CORE-185** When the sealed store cannot seal or open, the port shall raise a refusal that carries a finding with the verdict `ERROR`.

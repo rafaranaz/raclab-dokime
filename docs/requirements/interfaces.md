@@ -176,6 +176,14 @@ the project where its pull request is made. The contract with all its examples i
 the tree, where the agent that works in that checkout cannot read it, and the held-out examples are
 never written into the tree. The ledger of the run goes to `--out`, empty and outside the project.
 
+Two limits, accepted by the maintainer and not guaranteed: the command can be run again, and each
+run draws a new seed, so whoever seals can repeat it until the split suits, without a trace, since
+the ledger goes to a local `--out`; a seed derived from the commit and the contract would change by
+touching either. It is accepted because the hold-out of ADR-0014 protects from the agent, and
+whoever seals already knows every example. And an example is recognised as published by its id or
+by its boundary, target and steps as they are read from YAML: one published with a field added or
+a space changed in a value is not recognised, as `versions` does not see a renamed history.
+
 - **INTERFACES-160** When `contract seal` is run with a story, a contract and `--out`, the command shall write in the directory of the change of the story only the contract with its visible examples and its list `held_out`, and the sealed batch `sealed.age`.
 - **INTERFACES-161** If the contract or `--out` is inside the tree of the project, or `--out` is not an empty directory, then the command shall refuse to seal, with the code `inside-the-tree` or `out-not-empty`.
 - **INTERFACES-162** If the project is not a clean checkout of git, then the command shall refuse to seal, with the code `not-a-clean-checkout`.
@@ -190,3 +198,4 @@ never written into the tree. The ledger of the run goes to `--out`, empty and ou
 - **INTERFACES-171** The command shall record in `--out/ledger.jsonl` the start of the run with its story and its base, the question and the answer of the confirmation, and the end with its verdict, the digest of the seed and the digest of the batch.
 - **INTERFACES-172** The command shall write no file of the tree of the project that holds the text of a held-out example.
 - **INTERFACES-173** If the split holds out no example, then the command shall refuse to seal, with the code `nothing-to-hold-out`, and name each case with its reason.
+- **INTERFACES-174** If the contract written after the split does not keep visible exactly the examples that the split keeps visible, or does not hold out exactly the examples sealed, then the command shall refuse to seal, with the code `split-not-written`, and write nothing into the tree.

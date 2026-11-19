@@ -1,0 +1,102 @@
+# A copy, for B0 (hold-out by hand), of the contract of the case of the corpus drafted for
+# milestone A3 (ADR-0055), with more examples in the cases of its requirement of change.
+# python-semver, fix commit 0bd62d4, "Preserve constructor TypeError in Version.replace (#501)".
+format: 1
+story: replace-keeps-the-constructor-error
+may_modify_tests: []
+
+requirements:
+  - id: keep-the-constructor-error
+    kind: change
+    text: When replace is given a known part whose value the version constructor refuses with a TypeError, replace shall raise that TypeError with the message of the constructor.
+    source: written
+  - id: name-the-unknown-parts
+    kind: preserve
+    text: If replace is given a part that a version does not have, then replace shall raise a TypeError that names that part.
+    source: written
+  - id: replace-the-valid-parts
+    kind: preserve
+    text: When every part given to replace is a known part with a valid value, replace shall return the version with those parts replaced.
+    source: written
+
+examples:
+  # keep-the-constructor-error: before the change, replace said "got 0 unexpected keyword
+  # argument(s)", which hid what the constructor had said.
+  - id: E-42df
+    requirement: keep-the-constructor-error
+    case: none-as-a-number
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {major: null}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+  - id: E-7dd9
+    requirement: keep-the-constructor-error
+    case: none-as-a-number
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {minor: null}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+  - id: E-567c
+    requirement: keep-the-constructor-error
+    case: none-as-a-number
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {patch: null}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+
+  # Added for B0: more examples in the cases of the change, each run before and after the fix.
+  - id: E-aacc
+    requirement: keep-the-constructor-error
+    case: none-as-a-number
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {major: null, minor: 4}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+  - id: E-f625
+    requirement: keep-the-constructor-error
+    case: none-as-a-number
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["2.0.0-rc.1+b.7"], kwargs: {patch: null}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+
+  # name-the-unknown-parts: the error for a part that does not exist stays as it was.
+  - id: E-27b6
+    requirement: name-the-unknown-parts
+    case: unknown-part
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {foo: 1}}
+        expect: {raises: {type: TypeError, message: "replace() got 1 unexpected keyword argument(s): foo"}}
+
+  # replace-the-valid-parts: a valid replacement still returns the new version.
+  - id: E-9e6d
+    requirement: replace-the-valid-parts
+    case: number-part
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {major: 2}}
+        expect: {returns: "2.2.3"}
+  - id: E-aa13
+    requirement: replace-the-valid-parts
+    case: text-part
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {prerelease: "rc.1"}}
+        expect: {returns: "1.2.3-rc.1"}

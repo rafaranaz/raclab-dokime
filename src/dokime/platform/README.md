@@ -116,5 +116,11 @@ suits (ADR-0014).
 
 `versions(directory, start, path)` gives, newest first, each commit reachable from `start` that
 changes the path and leaves it as a file, with its bytes, so that the audit can find a held-out
-example that was once in clear. git runs as for `checkout_commit`, with renames not followed; an
-unknown commit, a directory that is not a checkout or no git is `unknown-commit`.
+example that was once in clear. The whole history reachable from `start` is walked, the branches
+merged into it included (`--full-history`), since by default git follows only one parent of a merge
+that leaves the file as it was. git runs as for `checkout_commit`; an unknown commit, a directory
+that is not a checkout or no git is `unknown-commit`.
+
+Its limits, which the detection does not cover: a version under an earlier path when the history
+renamed the file, since renames are not followed; commits that only other refs reach; and copies of
+an example in other files.

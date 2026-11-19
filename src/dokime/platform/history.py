@@ -18,7 +18,7 @@ import subprocess
 from pathlib import Path, PurePosixPath
 
 from dokime.core.repository import CommitName, RefusalError
-from dokime.platform.git import _EMPTY_TREE, _environment
+from dokime.platform.git import _EMPTY_TREE, _environment, file_versions
 
 _QUIET = ("-c", "core.fsmonitor=false", "-c", "core.hooksPath=/dev/null")
 
@@ -42,12 +42,9 @@ def versions(
     known = run("rev-parse", "--verify", "--quiet", f"{start.text}^{{commit}}")
     if known.returncode != 0:
         raise RefusalError("unknown-commit", f"{start.text} is not a commit of the checkout")
-    listed = run(
-        "log", "--full-history", "--no-renames", "--format=%H", start.text, "--", str(path)
-    )
-    found_versions = []
-    for line in listed.stdout.decode().split():
-        shown = run("cat-file", "blob", f"{line}:{path}")
-        if shown.returncode == 0:
-            found_versions.append((CommitName(line), shown.stdout))
-    return tuple(found_versions)
+
+    def output(*args: str) -> bytes | None:
+        done = run(*args)
+        return done.stdout if done.returncode == 0 else None
+
+    return file_versions(output, start, str(path))

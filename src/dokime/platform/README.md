@@ -124,6 +124,13 @@ merged into it included (`--full-history`), since by default git follows only on
 that leaves the file as it was. git runs as for `checkout_commit`; an unknown commit, a directory
 that is not a checkout or no git is `unknown-commit`.
 
+`GitRepository` gives the same versions through the port `FileHistory` of `core`, with
+`versions(start, path)`, as `FileVersion` values. Both walk the history with `file_versions`, so
+that the command that seals and the audit read the same versions; the adapter reads them from the
+objects of the project with its own settings, and refuses an unknown commit as every operation of
+the adapter does. Newest first means by the date of the commit: commits of the same second come in
+the order git walks them.
+
 Its limits, which the detection does not cover: a version under an earlier path when the history
 renamed the file, since renames are not followed; commits that only other refs reach; and copies of
 an example in other files.

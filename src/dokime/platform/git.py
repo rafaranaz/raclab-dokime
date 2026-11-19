@@ -17,6 +17,7 @@ from pathlib import Path
 from dokime.core.repository import (
     Change,
     CommitName,
+    FileVersion,
     HistoryCommit,
     RefusalError,
     RepoPath,
@@ -69,6 +70,24 @@ def _path(raw: bytes) -> RepoPath:
         return RepoPath.from_bytes(raw)
     except ValueError:
         raise RefusalError("path-not-utf8", f"the path {raw!r} is not valid UTF-8") from None
+
+
+def file_versions(
+    run: Callable[..., bytes | None], start: CommitName, path: str
+) -> tuple[tuple[CommitName, bytes], ...]:
+    """Each commit reachable from `start` that changes the path, newest first, with its bytes.
+
+    `run` runs git with the arguments given and gives its output, or `None` when git fails. The
+    whole history is walked with `--full-history`, merged branches included, and renames are not
+    followed; a commit where the path is not a file gives no version.
+    """
+    listed = run("log", "--full-history", "--no-renames", "--format=%H", start.text, "--", path)
+    found = []
+    for line in (listed or b"").decode().split():
+        shown = run("cat-file", "blob", f"{line}:{path}")
+        if shown is not None:
+            found.append((CommitName(line), shown))
+    return tuple(found)
 
 
 class GitRepository:
@@ -128,6 +147,13 @@ class GitRepository:
                 )
             )
         return tuple(commits)
+
+    def versions(self, start: CommitName, path: RepoPath) -> tuple[FileVersion, ...]:
+        """Give the versions of the path from `start`, newest first, as `history.versions` walks
+        them, read from the objects of the project with the settings of the adapter."""
+        self._commit(start)
+        found = file_versions(self._try, start, path.text)
+        return tuple(FileVersion(commit, content) for commit, content in found)
 
     def change(self, commit: CommitName) -> Change:
         """Give the paths that differ between a commit and its one parent, renames as two."""

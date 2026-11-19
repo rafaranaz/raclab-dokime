@@ -8,7 +8,7 @@ import pytest
 from dokime.core.canonical import canonical
 from dokime.core.repository import RefusalError
 from dokime.verify.sealed import Canary, batch_bytes, make_canary, read_batch
-from tests.verify.sealed_contracts import IMPOSSIBLE, batch_of, held, split
+from tests.verify.sealed_contracts import BASE, IMPOSSIBLE, batch_of, held, split
 
 
 def test_a_batch_is_the_canonical_form_of_its_mapping() -> None:
@@ -17,6 +17,7 @@ def test_a_batch_is_the_canonical_form_of_its_mapping() -> None:
     expected = {
         "format": 1,
         "story": "S-1",
+        "base": BASE,
         "seed": 7,
         "order": ["E-p0", "E-h1", "E-s1", "E-q1", "E-q2"],
         "kept_visible": ["E-p0", "E-q1", "E-q2"],
@@ -78,12 +79,22 @@ def test_a_canary_without_32_hexadecimal_digits_is_refused(expected: str) -> Non
 
 @pytest.mark.parametrize(
     ("field", "value"),
-    [("story", 5), ("seed", -1), ("seed", True), ("salt", "zz"), ("text", 3), ("expected", 7)],
+    [
+        ("story", 5),
+        ("seed", -1),
+        ("seed", True),
+        ("salt", "zz"),
+        ("text", 3),
+        ("expected", 7),
+        ("base", "HEAD"),
+        ("base", "a" * 39),
+        ("base", "A" * 40),
+    ],
 )
 def test_a_batch_with_a_field_of_the_wrong_kind_is_refused(field: str, value: object) -> None:
     contract, sealed = split(("E-h1", held("E-h1")))
     data = json.loads(batch_bytes(batch_of(contract, sealed)))
-    if field in ("story", "seed"):
+    if field in ("story", "seed", "base"):
         data[field] = value
     elif field == "expected":
         data["canary"][field] = value

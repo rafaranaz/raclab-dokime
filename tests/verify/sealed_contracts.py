@@ -19,6 +19,7 @@ from tests.verify.doubles import AuditedDouble, ObserverDouble, patch
 from tests.verify.gates import IMAGE, PACK
 
 IMPOSSIBLE = "0123456789abcdef0123456789abcdef"
+BASE = "b" * 40
 
 HEADER = """\
 format: 1
@@ -83,6 +84,7 @@ def batch_of(contract: Contract, sealed: tuple[SealedExample, ...], seed: int = 
     order = [i for n, s in enumerate(sealed) for i in (partner(n), s.id)]
     return Batch(
         story=contract.story,
+        base=BASE,
         seed=seed,
         order=(*order, *EXTRAS),
         kept_visible=(*(partner(n) for n in range(len(sealed))), "E-q1", "E-q2"),

@@ -45,6 +45,7 @@ SEALED = "sealed-examples"
 NOT_HERE = "the key is not here"
 _IMPOSSIBLE = re.compile(r"[0-9a-f]{32}")
 _SALT = re.compile(r"[0-9a-f]{32}")
+_COMMIT = re.compile(r"[0-9a-f]{40}")
 
 
 @dataclass(frozen=True)
@@ -79,6 +80,9 @@ class Batch:
     """What the sealed store encrypts for a contract."""
 
     story: str
+    base: str
+    """The commit of the clean checkout that was sealed from, from which the audit draws again the
+    examples kept visible as already published."""
     seed: int
     order: tuple[str, ...]
     kept_visible: tuple[str, ...]
@@ -121,6 +125,7 @@ def _mapping(batch: Batch) -> dict[str, object]:
     return {
         "format": 1,
         "story": batch.story,
+        "base": batch.base,
         "seed": batch.seed,
         "order": list(batch.order),
         "kept_visible": list(batch.kept_visible),
@@ -138,6 +143,7 @@ def read_batch(content: bytes) -> Batch:
         data = json.loads(content)
         batch = Batch(
             story=_text(data["story"]),
+            base=_commit(data["base"]),
             seed=_natural(data["seed"]),
             order=_texts(data["order"]),
             kept_visible=_texts(data["kept_visible"]),
@@ -159,7 +165,8 @@ def read_batch(content: bytes) -> Batch:
                 expected=_impossible(data["canary"]["expected"]),
             ),
         )
-        fields = {"format", "story", "seed", "order", "kept_visible", "examples", "without_holdout"}
+        fields = {"format", "story", "base", "seed", "order", "kept_visible", "examples"}
+        fields.add("without_holdout")
         if data["format"] != 1 or set(data) != {*fields, "canary"}:
             raise ValueError("not the fields of a batch")
         if batch_bytes(batch) != content:
@@ -172,6 +179,12 @@ def read_batch(content: bytes) -> Batch:
 def _text(value: object) -> str:
     if not isinstance(value, str):
         raise TypeError("not a text")
+    return value
+
+
+def _commit(value: object) -> str:
+    if not isinstance(value, str) or _COMMIT.fullmatch(value) is None:
+        raise ValueError("not the full name of a commit")
     return value
 
 

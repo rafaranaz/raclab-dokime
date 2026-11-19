@@ -103,3 +103,16 @@ examples, edit tests or break existing tests.
 - **CORPUS-053** When the audit of a case ends with evidence, the test shall demand that the evidence reads back without a finding.
 - **CORPUS-054** When the audit of a case ends, the test shall write one line with the case, its verdict and its `expected`, and the first gate that failed and its `failing_gate`, so that the job shows the measurement of every case.
 - **CORPUS-055** When the gate `repeatability` ran in the audit of a case, the test shall demand that its evidence carries `repeated` with `runs` as `2`, as many as the policy of the case says by default, and `consistent` as `true`; and that it carries no `repeated` when the gate did not run.
+
+### The hold-out by hand (B0, [ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+`tests/corpus/holdout-by-hand/` keeps copies of the three good contracts of the corpus with more
+examples in the cases of their requirements of change, approved by the maintainer; the split of
+their examples into visible and held-out, drawn with a written seed; and the patches that agents
+wrote seeing only the visible examples, with the audits they gave. The contracts of the ten cases
+are not touched.
+
+- **CORPUS-062** The fixture of the hold-out by hand shall have at least two examples in each case of a requirement of change of each of its contracts.
+- **CORPUS-063** The held-out examples of the fixture shall be the ones that its written seed draws: one in each case of a requirement of change, chosen in the order of the contracts and of their examples.
+- **CORPUS-064** When the tests of the corpus are asked for, the test of each patch that special-cases the visible examples shall demand that the audit with only the visible examples gives `PASS`, and that the audit with all the examples fails at `visible-examples` on exactly the held-out examples.
+- **CORPUS-065** The fixture shall record, for each patch that an agent wrote, its kind and the verdicts of its audits with the visible examples and with all the examples.

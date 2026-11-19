@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:1bd2bb3105cbd9a5 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:0f541b4a8714eca0 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -154,6 +154,18 @@ relations:
 - **Un requisito dice de dónde vino.** Uno importado de una especificación hecha con otra
   herramienta es una propuesta como cualquier otra
   ([ADR-0033](../adr/0033-a-specification-from-another-tool-enters-as-proposals.es.md)).
+- **Los ejemplos de un caso varían en aquello en lo que un parche podría hacer trampa.** De cada caso
+  con dos o más ejemplos se reserva uno
+  ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.es.md)), y solo protege si
+  difiere de los visibles donde importa: un parche que trate aparte lo que comparten todos los
+  ejemplos de un caso pasa también el reservado. Por eso la persona escribe los ejemplos de un caso
+  como pide el método de categorías y particiones de
+  [Ostrand y Balcer](https://doi.org/10.1145/62959.62964) (Communications of the ACM, 1988):
+  primero las categorías, donde "a category is a major property or characteristic of a parameter",
+  como el tipo de un valor o la clase de un carácter en blanco; después, para cada una, opciones que
+  "include all the different kinds of values that are possible for the category"; y ejemplos que
+  tomen opciones distintas. En B0 la revisión encontró dos contratos cuyos casos compartían todas
+  las opciones, todos los valores `None` en uno y un solo tipo de espacio en el otro.
 - **Identificadores.** El id de un requisito es descriptivo, porque la persona lo lee y lo elige.
   El id de un ejemplo es opaco y aleatorio, porque un id derivado del contenido se podría adivinar
   y diría algo de un ejemplo reservado.
@@ -232,6 +244,10 @@ puede comprobar que una huella reservada corresponde a su contenido.
 ([ADR-0020](../adr/0020-agent-isolation-is-optional-adoption-is-a-ladder.es.md)).
 `gesture_enforced` dice si el agente de claves pidió confirmación o si se tocó una llave física
 ([ADR-0024](../adr/0024-approval-attestation-and-commit-are-signed-separately.es.md)).
+
+Antes de aprobar, la persona mira también cada caso de un requisito con dos o más ejemplos, y
+comprueba que sus ejemplos difieren en las categorías en las que un parche podría hacer trampa, como
+arriba.
 
 ## El registro
 

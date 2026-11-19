@@ -152,6 +152,17 @@ relations:
 - **A requirement says where it came from.** One imported from a specification made with another
   tool is a proposal like any other
   ([ADR-0033](../adr/0033-a-specification-from-another-tool-enters-as-proposals.md)).
+- **The examples of a case vary in what a patch could cheat on.** One example of each case with two
+  or more is held out ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md)),
+  and it protects only if it differs from the visible ones where it matters: a patch that
+  special-cases what every example of a case shares passes the held-out one too. So the person
+  writes the examples of a case as the category-partition method of
+  [Ostrand and Balcer](https://doi.org/10.1145/62959.62964) (Communications of the ACM, 1988)
+  asks: first the categories, where "a category is a major property or characteristic of a
+  parameter", such as the type of a value or the kind of a blank character; then, for each one,
+  choices that "include all the different kinds of values that are possible for the category"; and
+  examples that take different choices. In B0 the review found two contracts whose cases shared
+  every choice, every value `None` in one and one kind of space in the other.
 - **Identifiers.** A requirement id is descriptive, because the person reads it and chooses it.
   An example id is opaque and random, because an id derived from the content could be guessed and
   would say something about an example that is held out.
@@ -227,6 +238,9 @@ agent: `other-machine`, `wrapper`, `other-user` or `none`
 ([ADR-0020](../adr/0020-agent-isolation-is-optional-adoption-is-a-ladder.md)). `gesture_enforced`
 says whether the key agent asked for confirmation or a hardware key was touched
 ([ADR-0024](../adr/0024-approval-attestation-and-commit-are-signed-separately.md)).
+
+Before approving, the person also looks at each case of a requirement with two or more examples,
+and checks that its examples differ in the categories in which a patch could cheat, as above.
 
 ## The ledger
 

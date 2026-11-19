@@ -1,6 +1,6 @@
 # ADR-0075 · The predicate v0.3 records the hold-out
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

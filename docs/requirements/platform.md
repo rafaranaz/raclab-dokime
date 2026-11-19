@@ -146,3 +146,21 @@ ledger.
 - **PLATFORM-111** When no descriptor is given, the platform shall read the passphrase from the terminal of the process, `/dev/tty`, with its echo turned off and turned on again after.
 - **PLATFORM-112** If no descriptor is given and the process has no terminal, then the platform shall refuse to read a passphrase, with the code `no-passphrase-source`, without reading from another source.
 - **PLATFORM-114** If the passphrase read is not valid UTF-8, then the platform shall refuse it, with the code `unreadable-passphrase`.
+
+## The randomness of the system
+
+The seed of a split, the salts of the held-out examples and the canary come from the randomness of
+the system, never from a value that a person chooses (ADR-0014).
+
+- **PLATFORM-120** When it is asked for a number of random bytes, the platform shall give that many bytes from the randomness of the system.
+- **PLATFORM-121** When it is asked for a seed, the platform shall give a natural integer of 64 random bits from the randomness of the system.
+- **PLATFORM-122** If it is asked for a number of random bytes below 1, then the platform shall refuse with an error that names the number.
+
+## The versions of a file in the history ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+To find a held-out example that was once in clear, the audit reads every version of the contract of
+a story in the history that its commit reaches.
+
+- **PLATFORM-130** When it is asked the versions of a path from a commit, the platform shall give, newest first, each commit reachable from it that changes the path and leaves it as a file, with the bytes of the path in that commit.
+- **PLATFORM-131** When it reads the versions of a path, the platform shall run git with the environment of the adapter, with the hooks and the monitor of the file system turned off, the attributes read from the empty tree and the detection of renames turned off.
+- **PLATFORM-132** If the directory is not a checkout of git, git cannot be found, or the commit is not a commit of it, then the platform shall refuse to read the versions, with the code `unknown-commit`.

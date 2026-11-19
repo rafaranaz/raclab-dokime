@@ -8,6 +8,9 @@ that no filter they name changes the bytes read. The whole history is walked wit
 `--full-history`: without it, git follows only one parent of a merge that leaves the file as it was,
 and misses a version in clear on a branch that took it back before the merge.
 
+A failure of git, while it lists the commits or reads a version, is refused with `git-failed`, never
+read as fewer versions, which would be fewer examples published.
+
 These are limits, not guarantees: renames are not followed, so a version under an earlier path is
 not seen; commits that only other refs reach are not read; and copies of an example in other files
 are not looked for.

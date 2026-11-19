@@ -121,6 +121,7 @@ encrypted with a passphrase. The content is decrypted only in memory.
 - **PLATFORM-093** If the identity of the sealed store is not a recipient of the sealed bytes, then the sealed store shall refuse to open them, with the code `not-a-recipient`.
 - **PLATFORM-094** If the sealed bytes are not a file of age, then the sealed store shall refuse to open them, with the code `unreadable-batch`.
 - **PLATFORM-095** The sealed store shall write sealed bytes that the binary `age` opens with the file of an identity that the platform created and its passphrase.
+- **PLATFORM-096** When a content is sealed without an identity, the platform shall encrypt it for the recipients as the sealed store does, since sealing needs only the public keys of the recipients.
 
 ### The identity
 

@@ -21,6 +21,7 @@ from dokime.core.outcomes import Outcome, Report, ReportLimits
 from dokime.core.repository import (
     Change,
     CommitName,
+    FileVersion,
     HistoryCommit,
     RefusalError,
     RepoPath,
@@ -50,6 +51,8 @@ class AuditedDouble:
 
     commits: dict[CommitName, Files] = field(default_factory=dict)
     trees: dict[TreeName, Files] = field(default_factory=dict)
+    ancestry: dict[CommitName, tuple[CommitName, ...]] = field(default_factory=dict)
+    """The commits that each commit reaches besides itself; none unless a test names them."""
 
     def add(self, files: Files) -> CommitName:
         name = CommitName(_name(files))
@@ -66,7 +69,11 @@ class AuditedDouble:
         return name
 
     def history(self, start: CommitName) -> tuple[HistoryCommit, ...]:
-        raise NotImplementedError
+        self._known(start)
+        return tuple(
+            HistoryCommit(name=name, date=0, parents=())
+            for name in (start, *self.ancestry.get(start, ()))
+        )
 
     def change(self, commit: CommitName) -> Change:
         raise NotImplementedError
@@ -196,3 +203,18 @@ class RuntimeDouble:
 
     def read_report(self, output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
         return self._reports[output]
+
+
+@dataclass
+class HistoryDouble:
+    """The history of a file in memory: the versions that each start reaches, or a refusal."""
+
+    versions_from: dict[CommitName, tuple[FileVersion, ...]] = field(default_factory=dict)
+    refusal: RefusalError | None = None
+    asked: list[tuple[CommitName, RepoPath]] = field(default_factory=list)
+
+    def versions(self, start: CommitName, path: RepoPath) -> tuple[FileVersion, ...]:
+        self.asked.append((start, path))
+        if self.refusal is not None:
+            raise self.refusal
+        return self.versions_from.get(start, ())

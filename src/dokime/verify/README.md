@@ -67,7 +67,7 @@ its salt and its text as approved, the seed of the split and the canary, in cano
 from dokime.verify.sealed import Batch, SealedExample, batch_bytes, make_canary, read_batch
 
 canary = make_canary(contract, seed, canary_id, impossible)  # 32 hexadecimal digits at random
-content = batch_bytes(Batch(contract.story, seed, sealed, canary))  # sealed: SealedExample, ...
+content = batch_bytes(batch)  # Batch(story, base, seed, order, kept_visible, examples, …)
 batch = read_batch(content)  # or a RefusalError unreadable-batch
 
 result = sealed_examples(pack, contract, batch, base, patch, image, repository, observer, limits)

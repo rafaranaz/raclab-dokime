@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from dokime.contract import ears
 from dokime.contract.directives import Resolver
 from dokime.contract.expectations import AnyValue, Contains, Expected, FullMatch, Json
-from dokime.contract.model import Example, Relation, Requirement, Step
+from dokime.contract.model import Example, HeldOut, Relation, Requirement, Step
 from dokime.contract.notes import Notes
 from dokime.core.reading import Path, Value
 from dokime.core.verdicts import Verdict
@@ -15,6 +15,7 @@ from dokime.core.verdicts import Verdict
 _NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
 _FUNCTION = re.compile(r"[A-Za-z_][\w.]*:[A-Za-z_]\w*")
 _EXCEPTION = re.compile(r"[A-Za-z_]\w*(\.[A-Za-z_]\w*)*")
+_DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 KINDS = ("new", "change", "preserve")
 BOUNDARIES = ("function", "cli", "http")
 RELATIONS = ("idempotent", "order-insensitive")
@@ -99,6 +100,7 @@ CONTRACT: Mapping[str, Field] = {
     "requirements": Field("a list of requirements", _is_list),
     "examples": Field("a list of examples", _is_list),
     "relations": Field("a list of relations", _is_list, mandatory=False),
+    "held_out": Field("a list of held-out examples", _is_list, mandatory=False),
 }
 _REQUIREMENT: Mapping[str, Field] = {
     "id": _A_NAME,
@@ -116,6 +118,15 @@ _EXAMPLE: Mapping[str, Field] = {
     "description": _A_LINE_IF_ANY,
     "origin": _one_of("human", "model"),
     "steps": Field("a list of steps", _is_list),
+}
+_HELD_OUT: Mapping[str, Field] = {
+    "id": _A_NAME,
+    "requirement": _A_NAME,
+    "case": _A_NAME,
+    "digest": Field(
+        "sha256: and 64 hexadecimal digits in lowercase",
+        lambda value: isinstance(value, str) and _DIGEST.fullmatch(value) is not None,
+    ),
 }
 _STEP: Mapping[str, Field] = {
     "input": Field("a mapping", _is_mapping),
@@ -240,6 +251,24 @@ def relation(notes: Notes, item: Value, path: Path) -> Relation | None:
         relation=str(name),
         target=str(fields["target"]),
         over=given if isinstance(given, str) else None,
+        line=notes.line(path),
+    )
+
+
+def held_out(notes: Notes, item: Value, path: Path) -> HeldOut | None:
+    """Check what the file keeps of one held-out example and return it when it has no finding."""
+    before = len(notes.findings)
+    fields = _mapping(notes, item, path, "a held-out example")
+    if fields is None:
+        return None
+    check_fields(notes, fields, path, _HELD_OUT)
+    if len(notes.findings) > before:
+        return None
+    return HeldOut(
+        id=str(fields["id"]),
+        requirement=str(fields["requirement"]),
+        case=str(fields["case"]),
+        digest=str(fields["digest"]),
         line=notes.line(path),
     )
 

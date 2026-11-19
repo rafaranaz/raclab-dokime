@@ -56,3 +56,32 @@ holds(
 )  # True
 holds(1, 1.0)  # False: an exact value has its type
 ```
+
+## Held-out examples
+
+After the split (ADR-0014), a contract keeps its visible examples in `examples` and, in `held_out`,
+only the id, the requirement, the case and the digest of each held-out example; the salt and the
+text are in the sealed batch.
+
+```yaml
+held_out:
+  - id: E-7c21
+    requirement: round-total-once
+    case: normal
+    digest: sha256:4f0d…
+```
+
+`check` returns them in `contract.held_out`. An id that is both in `examples` and in `held_out` is
+`held-out-in-clear`, an `ERROR`: that example is in the file in clear, and has to be replaced and
+sealed again.
+
+```python
+from dokime.contract.held_out import example_texts, held_out_digest
+
+texts = example_texts(text)  # the block of each example, by its id, as written
+held_out_digest(salt, texts["E-7c21"])  # salt of 16 bytes; "sha256:" and the SHA-256 of
+# the canonical form of {"salt": salt in hexadecimal, "text": the text}
+```
+
+The text of an example reads back the same alone as inside its contract, since the strict reader
+refuses anchors, aliases, tags and merge keys.

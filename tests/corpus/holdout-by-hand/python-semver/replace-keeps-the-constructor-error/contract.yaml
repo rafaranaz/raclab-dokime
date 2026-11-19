@@ -24,7 +24,7 @@ examples:
   # argument(s)", which hid what the constructor had said.
   - id: E-42df
     requirement: keep-the-constructor-error
-    case: none-as-a-number
+    case: a-value-the-constructor-refuses
     boundary: function
     target: semver:replace
     origin: human
@@ -33,7 +33,7 @@ examples:
         expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
   - id: E-7dd9
     requirement: keep-the-constructor-error
-    case: none-as-a-number
+    case: a-value-the-constructor-refuses
     boundary: function
     target: semver:replace
     origin: human
@@ -42,7 +42,7 @@ examples:
         expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
   - id: E-567c
     requirement: keep-the-constructor-error
-    case: none-as-a-number
+    case: a-value-the-constructor-refuses
     boundary: function
     target: semver:replace
     origin: human
@@ -53,7 +53,7 @@ examples:
   # Added for B0: more examples in the cases of the change, each run before and after the fix.
   - id: E-aacc
     requirement: keep-the-constructor-error
-    case: none-as-a-number
+    case: a-value-the-constructor-refuses
     boundary: function
     target: semver:replace
     origin: human
@@ -62,13 +62,22 @@ examples:
         expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
   - id: E-f625
     requirement: keep-the-constructor-error
-    case: none-as-a-number
+    case: a-value-the-constructor-refuses
     boundary: function
     target: semver:replace
     origin: human
     steps:
       - input: {args: ["2.0.0-rc.1+b.7"], kwargs: {patch: null}}
         expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+  - id: E-80f5
+    requirement: keep-the-constructor-error
+    case: a-value-the-constructor-refuses
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["1.2.3"], kwargs: {major: [1]}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'list'"}}}
 
   # name-the-unknown-parts: the error for a part that does not exist stays as it was.
   - id: E-27b6

@@ -26,7 +26,7 @@ examples:
   # because its check that the output renders like the input failed.
   - id: E-cd49
     requirement: drop-a-blank-paragraph-between-blocks
-    case: em-space-between-code-and-heading
+    case: blank-between-code-and-heading
     boundary: cli
     target: python -m mdformat
     origin: human
@@ -35,7 +35,7 @@ examples:
         expect: {exit: 0, stdout: "```\na\n```\n\n# A\n"}
   - id: E-9a59
     requirement: drop-a-blank-paragraph-between-blocks
-    case: nbsp-between-headings
+    case: blank-between-headings
     boundary: cli
     target: python -m mdformat
     origin: human
@@ -46,7 +46,7 @@ examples:
   # Added for B0: more examples in the cases of the change, each run before and after the fix.
   - id: E-2527
     requirement: drop-a-blank-paragraph-between-blocks
-    case: em-space-between-code-and-heading
+    case: blank-between-code-and-heading
     boundary: cli
     target: python -m mdformat
     origin: human
@@ -55,7 +55,7 @@ examples:
         expect: {exit: 0, stdout: "```\nb\n```\n\n## B\n"}
   - id: E-ff20
     requirement: drop-a-blank-paragraph-between-blocks
-    case: em-space-between-code-and-heading
+    case: blank-between-code-and-heading
     boundary: cli
     target: python -m mdformat
     origin: human
@@ -64,7 +64,7 @@ examples:
         expect: {exit: 0, stdout: "```\nz\n```\n\n### C\n"}
   - id: E-4cdd
     requirement: drop-a-blank-paragraph-between-blocks
-    case: nbsp-between-headings
+    case: blank-between-headings
     boundary: cli
     target: python -m mdformat
     origin: human
@@ -73,13 +73,31 @@ examples:
         expect: {exit: 0, stdout: "## x\n\n### y\n"}
   - id: E-d21b
     requirement: drop-a-blank-paragraph-between-blocks
-    case: nbsp-between-headings
+    case: blank-between-headings
     boundary: cli
     target: python -m mdformat
     origin: human
     steps:
       - input: {args: ["-"], stdin: "#### p\n\n\u00a0\n\n# q\n"}
         expect: {exit: 0, stdout: "#### p\n\n# q\n"}
+  - id: E-47ce
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: blank-between-code-and-heading
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "```\nq\n```\n\u00a0\n## Q\n"}
+        expect: {exit: 0, stdout: "```\nq\n```\n\n## Q\n"}
+  - id: E-ac4c
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: blank-between-headings
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "# r\n\n\u3000\n\n## s\n"}
+        expect: {exit: 0, stdout: "# r\n\n## s\n"}
 
   # drop-a-blank-paragraph-next-to-paragraphs: this already worked, and must keep working.
   - id: E-f358

@@ -1,4 +1,4 @@
-<!-- translation-of: 0075-the-predicate-v0-3-records-the-hold-out.md sha256:b102c31c97627d0a -->
+<!-- translation-of: 0075-the-predicate-v0-3-records-the-hold-out.md sha256:1e60cc9522a5033d -->
 # ADR-0075 · El predicado v0.3 registra la reserva
 
 **Estado:** propuesta
@@ -60,8 +60,10 @@ la ADR-0069 se mantiene: ningún campo ni código de una versión anterior cambi
   caso sin parte oculta es `case-without-holdout`.
 - **Donde no está la clave**, el gate no es aplicable con la razón `the key is not here`
   (VERIFY-167), y la evidencia no tiene `holdout`, ni `case-without-holdout`, ni
-  `best-effort-secrecy`: no se comprobó nada de la reserva, y el gate lo dice una vez. Un run que se
-  detuvo antes del gate lo lista como no alcanzado, igual.
+  `best-effort-secrecy`: no se comprobó nada de la reserva, y el gate lo dice una vez. Tampoco se
+  listan los casos sin parte oculta, aunque el contrato visible los diría: listarlos sería informar
+  de una cobertura que el run no tiene. Un run que se detuvo antes del gate lo lista como no
+  alcanzado, igual.
 - **El orden de `not_checked`** es el de EVIDENCE-066 con `case-without-holdout` en el lugar de
   `no-holdout` y `best-effort-secrecy` al final; las entradas de `case-without-holdout` en el orden
   de los casos en el contrato, y las de `best-effort-secrecy` en el orden de la tabla.
@@ -103,8 +105,11 @@ cuya evidencia lista cada caso del contrato una sola vez, en `held` o en `withou
   v0.2.
 - `evidence` necesita, del run, los casos, los ejemplos mantenidos visibles y el digest del lote: el
   gate de `verify` tiene que entregarlos, y `interfaces` los lleva al run.
-- La evidencia de un run sin la clave no dice nada de la reserva salvo la razón del gate; no lista
-  los casos sin parte oculta, que solo el lote dice.
+- La evidencia de un run sin la clave no dice nada de la reserva salvo la razón del gate. Los casos
+  sin parte oculta podrían saberse sin la clave, porque las entradas de `held_out` del contrato
+  visible nombran los casos que reservan un ejemplo, y el número de ejemplos visibles de cada otro
+  caso da su motivo; no se listan porque en ese run no se comprobó nada de la reserva, y el gate ya
+  lo dice una vez con su razón: listarlos sería informar de una cobertura que el run no tiene.
 - Los límites de la detección están escritos en tres sitios: los requisitos de `verify`, su README y
   la evidencia. Un cambio de la detección cambia los tres.
 - La tabla de la arquitectura en `03-data-and-evidence.md` tiene que nombrar `case-without-holdout`

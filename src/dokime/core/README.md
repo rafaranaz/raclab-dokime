@@ -228,3 +228,26 @@ name of the type of a value that JSON cannot hold); a step at `cli` is `Exited`,
 its output, its error and the files it wrote. An example says how it ended, `completed`, `time-limit`,
 `output-limit` or `crashed` with the signal or the exit code of its process when known, with the steps observed. `ObservationLimits` bounds one example to 60 seconds and the
 observations to 32 MiB by default, with the limits of a run for the whole.
+
+## The sealed store
+
+The held-out examples of a contract are encrypted with age for the recipients of the project
+(ADR-0072). `.dokime/recipients.txt` lists them, in the format of age: one recipient per line, with
+empty lines and lines that start with `#` ignored. The sealed batch of a change is `sealed.age` in
+the directory of the change.
+
+```python
+from dokime.core.sealed import SealedStore, read_recipients
+
+recipients, findings = read_recipients(text)  # the text of the file, taken from the base
+```
+
+Only X25519 recipients are read, the type of the identity of ADR-0073: `age1` and 58 characters of
+Bech32 whose checksum holds. A line that is not one is `bad-recipient`, a repeated recipient is
+`repeated-recipient`, and a file without recipients is `no-recipient`, all `ERROR`; a finding never
+quotes a line, since it may be a secret key pasted by mistake. The caller reads the file from the
+base commit, never from the working tree, so that an agent cannot add its key before the sealing.
+
+`SealedStore.seal(content, recipients)` encrypts a content and gives the sealed bytes;
+`SealedStore.open(sealed)` decrypts them in memory and gives the content. The adapter, with pyrage,
+is in `platform`; an operation it cannot do raises a `RefusalError` with an `ERROR` finding.

@@ -453,6 +453,38 @@ witness is isolated when it is a fix and nothing else
 | B3 Measurement | The boundary measured, the corpus widened to about thirty cases and `bench` computing its metrics | `corpus`, `bench` | First, the test of ADR-0074 (the eight witnesses in dispute labelled again, and κ computed again), and the boundary: how other tools write examples that build objects and call methods, and how many of the 41 witnesses each option would let fit, before an ADR decides whether the boundary `function` is widened. Then about thirty cases, each labelled before it runs, with the cases noted for it below and cases of the two cheating techniques that block A does not cover, overloaded comparison and state between calls; and `bench` computes false accepts per label, false rejects, the rate of questions, the value of the hold-out and stability |
 | B4 Close | The exit criterion of the block measured, and version 0.2 | None new | No false accept on the four cheating techniques; the value of the hold-out measured; the hypothesis that holding out by case catches overfitting resolved either way; whether the sealed gate runs in CI decided by an ADR either way, as ADR-0073 asks, which may conclude that it does not; the closing note, and version 0.2 with its tag and its Release, published even if the result is bad |
 
+**B0 closed on 2026-11-19**, done by hand on copies of the three good contracts of the corpus, with
+more examples in the cases of their requirements of change (`tests/corpus/holdout-by-hand/`).
+
+- **The second hypothesis holds.** The maintainer approved the extended contracts in 2, 3 and 3 to 4
+  minutes, and the three examples added after a first review in 3 more: about 11 to 12 minutes for
+  the three, about 4 per contract, against a threshold of 10 minutes per contract fixed before
+  timing, and the 2 to 5 of A0. Two nuances: the difficulty depends on the domain and not only on
+  the number of examples, since mdformat could be reviewed only with the help of another model, its
+  examples being about invisible characters; and the hold-out protects only if the examples of a
+  case vary in what a patch can cheat on, which the review found missing in two contracts (every
+  example of `replace` used `None`, and each case of mdformat one kind of space) and was mended.
+- **Agents without pressure did not overfit.** A new agent for each contract, seeing only the
+  visible examples, once and without a loop, asked to make them pass with the minimum, wrote a
+  general fix every time: in `replace` and `nextver` the fix of the commit, in mdformat a narrower
+  one of its own; the hold-out had nothing to catch. The fix of `nextver` failed `existing-tests` on
+  a doctest of the documentation that its commit updates, because the agent was told not to touch
+  the documentation. This says little of block C, where the agent runs in a loop:
+  [ImpossibleBench](https://arxiv.org/abs/2510.20270) relates cheating to the access to the tests
+  and to the loop of feedback; that is reasoning, not a measure.
+- **The mechanism catches overfitting made on purpose.** A new agent for each contract, asked to
+  make the visible examples pass by special-casing their inputs, wrote patches that pass the audit
+  with the visible examples and fail it at `visible-examples` with all of them, on exactly the
+  held-out examples: 1 of 1 in `replace`, 4 of 4 in `nextver`, 2 of 2 in mdformat. A test of the
+  corpus repeats it (CORPUS-064); it adds about 7 minutes to the job `corpus`.
+- **For B1.** In `replace` the seed held out an example like the visible ones and left visible the
+  one that differs; whether the split must hold out at least one example of another partition is
+  decided with the data of B3. The guidance that the examples of a case cover the partitions of
+  what matters, after the category-partition method of
+  [Ostrand and Balcer](https://doi.org/10.1145/62959.62964) (Communications of the ACM, 1988), goes
+  where the contract is described and in what the person who approves looks at; a warning of
+  `contract check` is reconsidered with the data of B3.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
@@ -470,6 +502,12 @@ milestone that finds them:
   in two phases: first try it without touching the code of dokime, then make three cases pass; with
   a limited time and without changing the central abstractions. The parts of dokime that depend on
   Python are listed in the [architecture](architecture/README.md#what-depends-on-python).
+- **For block D:** a case found in B0. The fix of mdformat `27e2ba3`, the good patch of a case of
+  the corpus, passes every example and every test and widens the check `is_md_equal`, which then
+  holds as equal documents that render differently: `*a* b` and `*a*b`, `a *b*` and `a*b*`,
+  `[l](u) next` and `[l](u)next`. The fix that an agent wrote for the same examples does not, and
+  the current mdformat keeps the wider rule. A change that passes everything and makes a part of
+  the program worse is what block D looks for.
 - **Before C1:** what happens when two changes run at the same time on the same repository; and a
   limit of spending for a run, since the budgets of the flow count repetitions, not money; and the
   expected verdict of `replace-fixes-only-major` and `nextver-changes-the-tests-to-fit` under the

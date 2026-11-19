@@ -94,6 +94,8 @@ not applicable, each with the block that builds it.
 - **VERIFY-125** If a result is of a gate that is not of the state, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-not-of-the-state`, naming the gate.
 - **VERIFY-124** If a gate of the state is not in the table of the gates, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-unknown`, naming the gate.
 - **VERIFY-126** If two results are of the same gate, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-repeated`, naming the gate.
+- **VERIFY-127** When a gate of the state that this version builds is given as not applicable with a reason, the aggregation shall list it as not applicable with that reason.
+- **VERIFY-128** If a gate given as not applicable also has a result, then the aggregation shall give the verdict `ERROR` with a finding with the code `gate-repeated`, naming the gate.
 
 ## The gate `repeatability` ([ADR-0017](../adr/0017-damage-outside-the-change-against-a-baseline.md), [ADR-0054](../adr/0054-the-policy-is-an-optional-file-of-values.md))
 
@@ -136,3 +138,20 @@ decides when. Where the key is not, the gate is not applicable.
 - **VERIFY-166** The gate shall give no finding whose message holds a value, an input or the identifier of a held-out example or of the canary.
 - **VERIFY-167** The reason of the gate `sealed-examples` where the key is not shall be `the key is not here`.
 - **VERIFY-168** When the digests of the batch hold, the gate shall draw the split again from the seed, the examples kept visible and the order of the batch, over the visible and the held-out examples, and if the examples it holds out, or the cases that hold out nothing with their reasons, differ from those of the batch, then give the finding `sealed-batch-mismatch` and observe nothing.
+
+### What was already published
+
+An example is published when a version of the contract of the story in the history has it, by its
+id or by its boundary, target and steps; the command that seals keeps such an example visible, and
+the gate checks with the same function that the batch kept visible exactly those, and that no
+held-out example was published since. These are limits, not guarantees: the content is compared as
+YAML reads it, so an example published with a field added or a value spelt otherwise is not
+recognised; a version under an earlier path, after a rename, is not read, nor one in a commit that
+the start does not reach, nor a copy of an example in another file.
+
+- **VERIFY-169** When it is given the examples of a contract and the versions of the file of the contract, the verification shall count as published each example whose id, or whose boundary, target and steps as YAML reads them, an example of a version has.
+- **VERIFY-170** When it reads the examples of a version of a contract, the verification shall take them from its list `examples` only, never from its list `held_out`.
+- **VERIFY-171** If the base of the batch is not a commit reachable from the base of the change, then the gate shall give the finding `sealed-batch-mismatch` and observe nothing.
+- **VERIFY-172** If the examples published in the versions of the contract of the story reachable from the base of the batch, among the visible examples and those of the batch, differ from the examples that the batch keeps visible, then the gate shall give the finding `sealed-batch-mismatch` and observe nothing.
+- **VERIFY-173** If a held-out example is published in a version of the contract of the story reachable from the base of the change, then the gate shall give a finding `held-out-published` of the verdict `ERROR`, at the line of its entry in `held_out`, whose message says to replace the example and seal again, and observe nothing.
+- **VERIFY-174** If the port of the repository or the port of the history of a file refuses while the gate reads the history, then the gate shall give the finding of the refusal, of the verdict `ERROR`, and observe nothing.

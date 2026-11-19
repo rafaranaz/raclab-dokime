@@ -122,7 +122,9 @@ changes the path and leaves it as a file, with its bytes, so that the audit can 
 example that was once in clear. The whole history reachable from `start` is walked, the branches
 merged into it included (`--full-history`), since by default git follows only one parent of a merge
 that leaves the file as it was. git runs as for `checkout_commit`; an unknown commit, a directory
-that is not a checkout or no git is `unknown-commit`.
+that is not a checkout or no git is `unknown-commit`. A commit where the path is absent, or is a
+directory or a submodule, gives no version; `ls-tree` tells that apart from a failure of git, which
+is `git-failed`, since fewer versions would read as fewer examples published.
 
 `GitRepository` gives the same versions through the port `FileHistory` of `core`, with
 `versions(start, path)`, as `FileVersion` values. Both walk the history with `file_versions`, so

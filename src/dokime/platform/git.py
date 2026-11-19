@@ -79,14 +79,28 @@ def file_versions(
 
     `run` runs git with the arguments given and gives its output, or `None` when git fails. The
     whole history is walked with `--full-history`, merged branches included, and renames are not
-    followed; a commit where the path is not a file gives no version.
+    followed. A commit where the path is absent, or is a directory or a submodule, gives no
+    version: `ls-tree` tells it apart from a failure of git, which is refused with `git-failed`,
+    since giving fewer versions would read as fewer examples published.
     """
     listed = run("log", "--full-history", "--no-renames", "--format=%H", start.text, "--", path)
+    if listed is None:
+        raise RefusalError("git-failed", f"git log failed on the history of {path!r}")
     found = []
-    for line in (listed or b"").decode().split():
-        shown = run("cat-file", "blob", f"{line}:{path}")
-        if shown is not None:
-            found.append((CommitName(line), shown))
+    for line in listed.decode().split():
+        entry = run("ls-tree", "--full-tree", "-z", line, "--", path)
+        if entry is None:
+            raise RefusalError("git-failed", f"git ls-tree failed on {path!r} in {line}")
+        record = entry.split(b"\0", 1)[0]
+        if not record:
+            continue
+        kind, rest = record.split(b" ", 2)[1:]
+        if kind != b"blob":
+            continue
+        shown = run("cat-file", "blob", rest.split(b"\t", 1)[0].decode())
+        if shown is None:
+            raise RefusalError("git-failed", f"git cat-file failed on {path!r} in {line}")
+        found.append((CommitName(line), shown))
     return tuple(found)
 
 

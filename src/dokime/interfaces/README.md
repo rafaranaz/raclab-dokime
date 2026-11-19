@@ -75,6 +75,14 @@ PASS: 2 held-out examples sealed for 1 recipients
 - **The ledger** of the run, in `--out/ledger.jsonl`, records its start with the story and the
   base, the question and the answer of the confirmation, and its end with the digests of the seed
   and of the batch.
+- **The contract written** has to keep visible exactly the examples of the split and hold out
+  exactly those sealed, or nothing is written (`split-not-written`).
+- **Limits, not guarantees.** The command can be run again, each run drawing a new seed, so whoever
+  seals can repeat it until the split suits, with no trace, since the ledger is local; the
+  maintainer accepts it because the hold-out protects from the agent, and whoever seals already
+  knows every example. An example is recognised as published by its id or by its boundary, target
+  and steps as YAML reads them: one published with a field added or a space changed in a value is
+  not recognised, as the history under an earlier path is not read.
 
 ## `env check`
 

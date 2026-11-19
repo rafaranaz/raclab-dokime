@@ -104,10 +104,16 @@ def _seal(arguments: argparse.Namespace) -> str:
     )
     visible = _visible_text(text, sealed)
     written = check(visible)
-    if written.contract is None or {h.id for h in written.contract.held_out} != {
-        s.id for s in sealed
-    }:
-        raise RefusalError("split-not-written", "the contract after the split does not check")
+    if (
+        written.contract is None
+        or [e.id for e in written.contract.examples] != [e.id for e in done.visible]
+        or {h.id for h in written.contract.held_out} != {s.id for s in sealed}
+    ):
+        raise RefusalError(
+            "split-not-written",
+            "the contract written after the split does not keep visible the examples of the split"
+            " or does not hold out the examples sealed",
+        )
     ids = [e.id for e in contract.examples]
     batch = Batch(
         story=contract.story,

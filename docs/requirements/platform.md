@@ -132,8 +132,9 @@ encrypted with a passphrase. The content is decrypted only in memory.
 - **PLATFORM-105** If the passphrase does not open the file of an identity, then the platform shall refuse to load it, with the code `wrong-passphrase`.
 - **PLATFORM-106** If the file of an identity can be read or written by its group or by others, then the platform shall load it with a finding `open-identity` of the verdict `ASK` that names its permissions.
 - **PLATFORM-107** If there is no file at the path of an identity to load, then the platform shall refuse to load it, with the code `no-identity`.
-- **PLATFORM-108** The default path of the identity shall be `dokime/identity.age` under `$XDG_DATA_HOME`, or under `$HOME/.local/share` when `XDG_DATA_HOME` is not set or is empty.
+- **PLATFORM-108** The default path of the identity shall be `dokime/identity.age` under `$XDG_DATA_HOME` when it is an absolute path, or under `$HOME/.local/share` otherwise, since the specification of XDG holds a relative path in those variables invalid.
 - **PLATFORM-109** If the file of an identity opens with its passphrase but does not hold exactly one secret key of age, then the platform shall refuse to load it, with the code `bad-identity`.
+- **PLATFORM-113** If neither `XDG_DATA_HOME` nor `HOME` is an absolute path, then the platform shall refuse to give the default path of the identity, with the code `no-home`, instead of a path relative to the working directory.
 
 ### The passphrase
 
@@ -144,3 +145,4 @@ ledger.
 - **PLATFORM-110** When a descriptor of the passphrase is given, the platform shall read the passphrase from it up to its first newline, without the newline.
 - **PLATFORM-111** When no descriptor is given, the platform shall read the passphrase from the terminal of the process, `/dev/tty`, with its echo turned off and turned on again after.
 - **PLATFORM-112** If no descriptor is given and the process has no terminal, then the platform shall refuse to read a passphrase, with the code `no-passphrase-source`, without reading from another source.
+- **PLATFORM-114** If the passphrase read is not valid UTF-8, then the platform shall refuse it, with the code `unreadable-passphrase`.

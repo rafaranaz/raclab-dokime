@@ -46,3 +46,21 @@ of the exception". So a subclass of `TypeError` holds for `TypeError`, a class o
 - **ORACLE-030** When a step expects `exit`, `stdout` or `stderr`, the oracle shall count each as holding when it holds for the exit code, the standard output or the standard error observed.
 - **ORACLE-031** When a step expects `files`, the oracle shall count each file expected as holding when it holds for the text of the file of that name that the command wrote.
 - **ORACLE-032** If a file that a step expects was not written, then the comparison shall give a difference that names the file.
+
+## Splitting the examples ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+A case is the set of examples of one requirement that share a name of case. The split holds out one
+example of each case that has two or more, at random with a seed, and keeps the rest visible, so
+that every case keeps at least one visible example. Ensuring that the held-out example is of another
+partition than the visible ones is decided with the data of B3.
+
+- **ORACLE-040** When the examples of a contract are split with a seed, the oracle shall hold out one example of each case that has two examples or more.
+- **ORACLE-041** When the examples of a contract are split, the oracle shall keep visible every example that it does not hold out, and give the visible and the held-out examples each in the order of the contract.
+- **ORACLE-042** When the examples of a contract are split, the oracle shall choose the example held out of each case with `random.Random(seed).choice` over the examples of the case in the order of the contract, one generator for the contract, case by case in the order in which each case first appears.
+- **ORACLE-043** When the examples of a contract are split, the split shall name, in the order of the contract, the requirements that hold out no example.
+- **ORACLE-044** If the seed of a split is not an integer of at least 0, then the oracle shall refuse to split with an error that names what it was given.
+
+## Words for the agent on a held-out failure ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+- **ORACLE-050** When the comparison of a held-out example does not hold, the oracle shall word for the agent one line that names the requirement of the example and the classes of its differences, without any value, input or identifier of the example.
+- **ORACLE-051** The oracle shall give as the class of a difference its part, with `files` for every file expected and, for a step that was not observed, `time-limit` or `crashed`.

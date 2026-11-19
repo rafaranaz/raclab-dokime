@@ -1,0 +1,15 @@
+diff --git a/src/mdformat/_util.py b/src/mdformat/_util.py
+index a4d634f..993bd86 100644
+--- a/src/mdformat/_util.py
++++ b/src/mdformat/_util.py
+@@ -85,6 +85,10 @@ def is_md_equal(
+         html = html.replace("<p> ", "<p>")
+         html = html.replace(" </p>", "</p>")
+ 
++        # An empty paragraph between a closing and an opening tag is replaced
++        # by the single space that separates the two tags without it.
++        html = re.sub(r"(</[^>]+>)(?: <p></p>)+ (?=<[^/])", r"\1 ", html)
++
+         # Also strip whitespace leading/trailing the <p> elements so that we can
+         # safely remove empty paragraphs below without introducing extra whitespace.
+         html = html.replace(" <p>", "<p>")

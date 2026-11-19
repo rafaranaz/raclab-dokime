@@ -4,8 +4,9 @@ A case is the set of examples of one requirement that share a name of case. The 
 example of each case that has two or more and keeps every other example visible, so that each case
 keeps at least one. The example held out of a case is chosen with `random.Random(seed).choice` over
 the examples of the case in the order of the contract, with one generator for the contract and the
-cases in the order in which each first appears, so that the split can be drawn again from the seed
-that is recorded. The seed itself comes from outside, since the randomness of the system is an
+cases in the order in which each first appears, and a case with none to draw takes nothing from the
+generator, so that the split can be drawn again from the seed and the examples kept visible, which
+are recorded. The seed itself comes from outside, since the randomness of the system is an
 adapter of `platform`.
 
 An example to keep visible, one already published that the caller finds in the history, is never
@@ -31,15 +32,16 @@ class Split:
     visible: tuple[Example, ...]
     held_out: tuple[Example, ...]
     without_holdout: tuple[str, ...]
-    cases_without_holdout: tuple[tuple[str, str], ...] = ()
+    cases_without_holdout: tuple[tuple[str, str], ...]
 
 
 def split(contract: Contract, seed: int, keep_visible: Collection[str] = ()) -> Split:
     """Hold out one example of each case with two or more, chosen by the seed."""
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValueError(f"the seed of a split is an integer of at least 0, not {seed!r}")
+    kept = frozenset(keep_visible)
     known = {e.id for e in contract.examples}
-    strangers = sorted(set(keep_visible) - known)
+    strangers = sorted(kept - known)
     if strangers:
         raise ValueError(f"the examples to keep visible {strangers} are not of the contract")
     cases: dict[tuple[str, str], list[Example]] = {}
@@ -48,7 +50,7 @@ def split(contract: Contract, seed: int, keep_visible: Collection[str] = ()) -> 
     chance = random.Random(seed)  # noqa: S311 - a draw anyone can repeat from the seed, not a secret
     held = set()
     for examples in cases.values():
-        drawable = [e for e in examples if e.id not in keep_visible]
+        drawable = [e for e in examples if e.id not in kept]
         if len(examples) >= 2 and drawable:
             held.add(chance.choice(drawable).id)
     holding = {e.requirement for e in contract.examples if e.id in held}

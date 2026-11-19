@@ -1,4 +1,10 @@
-"""A split contract, its sealed batch and a run of the gate `sealed-examples`, for its tests."""
+"""A split contract, its sealed batch and a run of the gate `sealed-examples`, for its tests.
+
+Each held-out example has a visible partner in a case of its own, kept visible as published, so
+that the split drawn again holds out that example whatever the seed. The contract has besides a
+case of a single example, `c-single`, and a case of two examples both published, `c-pub`, which
+hold out nothing for each of the two reasons.
+"""
 
 import json
 
@@ -8,7 +14,7 @@ from dokime.contract.model import Contract
 from dokime.core.observation import ObservationLimits
 from dokime.core.repository import RefusalError
 from dokime.verify.result import GateResult
-from dokime.verify.sealed import Batch, SealedExample, make_canary, sealed_examples
+from dokime.verify.sealed import Batch, SealedExample, Unheld, make_canary, sealed_examples
 from tests.verify.doubles import AuditedDouble, ObserverDouble, patch
 from tests.verify.gates import IMAGE, PACK
 
@@ -24,41 +30,64 @@ requirements:
     text: When the function is called with a number, the function shall return two.
     source: written
 """
+EXTRAS = ("E-s1", "E-q1", "E-q2")
+UNHELD = (Unheld("R-new", "c-single", "single-example"), Unheld("R-new", "c-pub", "all-published"))
 
 
 def held(name: str, origin: str = "human", case: str = "c") -> str:
     return (
         f"  - id: {name}\n    requirement: R-new\n    case: {case}\n    boundary: function\n"
         f"    target: p:f\n    origin: {origin}\n    steps:\n"
-        "      - input: {args: [1]}\n        expect: {returns: 2}\n"
+        f"      - input: {{args: [{_argument(name)}]}}\n        expect: {{returns: 2}}\n"
     )
+
+
+def _argument(name: str) -> int:
+    """A number of its own for each example, so that no two have the same steps."""
+    return int.from_bytes(name.encode(), "big") % 1_000_000
 
 
 def salt(number: int) -> bytes:
     return bytes([number]) * 16
 
 
+def partner(number: int) -> str:
+    return f"E-p{number}"
+
+
 def split(*texts: tuple[str, str]) -> tuple[Contract, tuple[SealedExample, ...]]:
-    """A contract with one visible example and the held-out ones given as (id, text)."""
+    """The contract after the split, with the held-out examples given as (id, text), each put in
+    the case `c<n>` of its position."""
     sealed = tuple(
-        SealedExample(id=name, salt=salt(n), text=text) for n, (name, text) in enumerate(texts)
+        SealedExample(
+            id=name, salt=salt(n), text=text.replace("    case: c\n", f"    case: c{n}\n")
+        )
+        for n, (name, text) in enumerate(texts)
+    )
+    visible = "".join(held(partner(n), case=f"c{n}") for n in range(len(sealed)))
+    visible += (
+        held("E-s1", case="c-single") + held("E-q1", case="c-pub") + held("E-q2", case="c-pub")
     )
     entries = "".join(
-        f"  - id: {s.id}\n    requirement: R-new\n    case: c\n"
+        f"  - id: {s.id}\n    requirement: R-new\n    case: c{n}\n"
         f"    digest: {held_out_digest(s.salt, s.text)}\n"
-        for s in sealed
+        for n, s in enumerate(sealed)
     )
-    text = HEADER + "examples:\n" + held("E-v1") + "held_out:\n" + entries
-    checked = check(text)
+    checked = check(HEADER + "examples:\n" + visible + "held_out:\n" + entries)
     assert checked.contract is not None, checked.findings
     return checked.contract, sealed
 
 
 def batch_of(contract: Contract, sealed: tuple[SealedExample, ...], seed: int = 7) -> Batch:
+    """The batch that the seal of the contract gives."""
+    order = [i for n, s in enumerate(sealed) for i in (partner(n), s.id)]
     return Batch(
         story=contract.story,
         seed=seed,
+        order=(*order, *EXTRAS),
+        kept_visible=(*(partner(n) for n in range(len(sealed))), "E-q1", "E-q2"),
         examples=sealed,
+        unheld=UNHELD,
         canary=make_canary(contract, seed, "E-cana", IMPOSSIBLE),
     )
 

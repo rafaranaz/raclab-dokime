@@ -80,8 +80,13 @@ result = sealed_examples(pack, contract, batch, base, patch, image, repository, 
   never counts as the failure of a requirement nor reaches the agent.
 - **The batch is checked before anything is observed**: it has to hold exactly the held-out
   examples of the contract, each with the digest of its salt and its text that the contract gives,
-  and each text has to read as the example of its id, requirement and case. Otherwise the gate
+  and each text has to read as the example of its id, requirement and case. The split drawn again
+  from the seed, the examples kept visible and the order of the batch has to hold out those
+  examples and leave without one the cases the batch names, with their reasons. Otherwise the gate
   gives `sealed-batch-mismatch`, an `ERROR`.
+- **The cases without a hidden part** are in the batch with their reason, `single-example` or
+  `all-published` (every example of the case was already published, so none was drawn), and
+  `unheld_cases(contract, done)` gives them from a split; the evidence shows them.
 - **A held-out example that fails** is `sealed-example-fails`, a `FAIL`, or
   `sealed-model-example-fails`, an `ASK`, for one whose origin is `model`, with the words of the
   oracle for the agent: the requirement and the classes of the failure, never a value, an input or

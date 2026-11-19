@@ -56,7 +56,10 @@ def test_no_finding_holds_a_value_an_input_or_an_identifier() -> None:
 
 def test_a_batch_with_another_text_is_a_mismatch_and_observes_nothing() -> None:
     contract, sealed = split(*PAIR)
-    changed = (dataclasses.replace(sealed[0], text=held("E-h1").replace("[1]", "[9]")), sealed[1])
+    changed = (
+        dataclasses.replace(sealed[0], text=sealed[0].text.replace("returns: 2", "returns: 3")),
+        sealed[1],
+    )
     result, observer = run(contract, batch_of(contract, changed), {"E-h1": 2, "E-h2": 2})
     assert codes(list(result.findings)) == [("sealed-batch-mismatch", Verdict.ERROR)]
     assert observer.calls == []

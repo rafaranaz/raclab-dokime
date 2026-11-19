@@ -1,4 +1,5 @@
 # SDD-EARS: VERIFY-150 VERIFY-151 VERIFY-152
+import dataclasses
 import json
 import random
 
@@ -6,7 +7,7 @@ import pytest
 
 from dokime.core.canonical import canonical
 from dokime.core.repository import RefusalError
-from dokime.verify.sealed import Batch, Canary, batch_bytes, make_canary, read_batch
+from dokime.verify.sealed import Canary, batch_bytes, make_canary, read_batch
 from tests.verify.sealed_contracts import IMPOSSIBLE, batch_of, held, split
 
 
@@ -17,7 +18,13 @@ def test_a_batch_is_the_canonical_form_of_its_mapping() -> None:
         "format": 1,
         "story": "S-1",
         "seed": 7,
+        "order": ["E-p0", "E-h1", "E-s1", "E-q1", "E-q2"],
+        "kept_visible": ["E-p0", "E-q1", "E-q2"],
         "examples": [{"id": "E-h1", "salt": sealed[0].salt.hex(), "text": sealed[0].text}],
+        "without_holdout": [
+            {"requirement": "R-new", "case": "c-single", "reason": "single-example"},
+            {"requirement": "R-new", "case": "c-pub", "reason": "all-published"},
+        ],
         "canary": {"id": "E-cana", "of": "E-h1", "expected": IMPOSSIBLE},
     }
     assert batch_bytes(batch) == canonical(expected).encode()
@@ -63,7 +70,7 @@ def test_a_batch_that_is_not_in_canonical_form_is_refused() -> None:
 def test_a_canary_without_32_hexadecimal_digits_is_refused(expected: str) -> None:
     contract, sealed = split(("E-h1", held("E-h1")))
     batch = batch_of(contract, sealed)
-    wrong = Batch(batch.story, batch.seed, batch.examples, Canary("E-cana", "E-h1", expected))
+    wrong = dataclasses.replace(batch, canary=Canary("E-cana", "E-h1", expected))
     with pytest.raises(RefusalError) as refused:
         read_batch(batch_bytes(wrong))
     assert refused.value.finding.code == "unreadable-batch"
@@ -94,6 +101,29 @@ def test_a_whole_batch_of_another_format_or_with_another_field_is_refused(
     contract, sealed = split(("E-h1", held("E-h1")))
     data = json.loads(batch_bytes(batch_of(contract, sealed)))
     data[key] = value
+    with pytest.raises(RefusalError) as refused:
+        read_batch(canonical(data).encode())
+    assert refused.value.finding.code == "unreadable-batch"
+
+
+@pytest.mark.parametrize(
+    ("path", "value"),
+    [
+        (("order",), ["E-p0", 3]),
+        (("kept_visible",), "E-p0"),
+        (("without_holdout", 0, "reason"), "no-reason"),
+        (("without_holdout", 0, "case"), 4),
+    ],
+)
+def test_a_batch_whose_split_fields_are_of_the_wrong_kind_is_refused(
+    path: tuple[object, ...], value: object
+) -> None:
+    contract, sealed = split(("E-h1", held("E-h1")))
+    data = json.loads(batch_bytes(batch_of(contract, sealed)))
+    place = data
+    for step in path[:-1]:
+        place = place[step]
+    place[path[-1]] = value
     with pytest.raises(RefusalError) as refused:
         read_batch(canonical(data).encode())
     assert refused.value.finding.code == "unreadable-batch"

@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:59351914e845b2cc -->
+<!-- translation-of: README.md sha256:fc911b020b1377f1 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -87,3 +87,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.es.md) | El almacén sellado se cifra con age para una lista de destinatarios | Aceptada |
 | [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md) | La clave de la reserva vive fuera de CI hasta B4 | Aceptada |
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md) | Un testigo está aislado cuando es un arreglo y nada más | Aceptada |
+| [0075](0075-the-predicate-v0-3-records-the-hold-out.es.md) | El predicado v0.3 registra la reserva | Propuesta |

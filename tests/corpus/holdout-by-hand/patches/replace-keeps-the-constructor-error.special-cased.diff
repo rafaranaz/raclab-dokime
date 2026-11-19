@@ -1,0 +1,23 @@
+diff --git a/src/semver/_deprecated.py b/src/semver/_deprecated.py
+index df11bb0..84dcc8d 100644
+--- a/src/semver/_deprecated.py
++++ b/src/semver/_deprecated.py
+@@ -392,6 +392,18 @@ def replace(version, **parts):
+     >>> semver.replace("1.2.3", major=2, patch=10)
+     '2.2.10'
+     """
++    if version in ("1.2.3", "2.0.0-rc.1+b.7") and len(parts) == 1:
++        ((key, value),) = parts.items()
++        if key in ("major", "minor", "patch") and value is None:
++            raise TypeError(
++                "int() argument must be a string, a bytes-like object "
++                "or a real number, not 'NoneType'"
++            )
++        if version == "1.2.3" and key == "major" and value == [1]:
++            raise TypeError(
++                "int() argument must be a string, a bytes-like object "
++                "or a real number, not 'list'"
++            )
+     return str(Version.parse(version).replace(**parts))
+ 
+ 

@@ -62,3 +62,15 @@ hand:
 ```console
 $ python -m tests.corpus.witnesses python-semver ../python-semver 25
 ```
+
+## The hold-out by hand
+
+`holdout-by-hand/` is B0, the hold-out of ADR-0014 tested by hand before B1 builds it. It keeps
+copies of the three good contracts with more examples in the cases of their requirements of
+change, approved by the maintainer, and `holdout.toml`: the seed of the split, the example held out
+in each case of change, the minutes of the review, and the six patches of agents in `patches/`,
+written by new agents that saw only the visible examples, with the verdicts of their audits. Three
+were asked for the minimum and three to special-case the visible inputs. A test draws the split
+again from the seed, and, when the tests of the corpus are asked for, audits each special-cased
+patch with the visible examples, where it passes, and with all of them, where it fails on exactly
+the held-out examples. The contracts of the ten cases are not touched.

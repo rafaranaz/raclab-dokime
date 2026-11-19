@@ -1,0 +1,80 @@
+# The hold-out by hand of B0 (CORPUS-062 to CORPUS-065, ADR-0014).
+
+# The split: in each case of a requirement of change, one example held out, drawn with
+# random.Random(seed).choice over the ids of the case, contract by contract in the order below and
+# case by case in the order of the contract.
+seed = 20261119
+date = "2026-11-19"
+
+# The review by the maintainer of the extended contracts, timed, against a threshold fixed before.
+[review]
+by = "the maintainer"
+threshold_minutes = 10
+first_round = { replace-keeps-the-constructor-error = "2", nextver-bumps-build-only-versions = "3", format-a-blank-paragraph-between-blocks = "3-4" }
+second_round_minutes = "3"
+second_round = "the three examples added after the first round, E-80f5, E-47ce and E-ac4c, the renamed cases and the comment of nextver"
+helped = "format-a-blank-paragraph-between-blocks was reviewed with the help of the session that reviews the work: what matters there are invisible characters"
+
+[[contract]]
+project = "mdformat"
+name = "format-a-blank-paragraph-between-blocks"
+held_out = ["E-47ce", "E-4cdd"]
+
+[[contract]]
+project = "python-semver"
+name = "nextver-bumps-build-only-versions"
+held_out = ["E-4078", "E-e2ac", "E-0176", "E-cf34"]
+
+[[contract]]
+project = "python-semver"
+name = "replace-keeps-the-constructor-error"
+held_out = ["E-aacc"]
+
+# The patches of the agents. Each was written by a new agent that saw only the contract with the
+# visible examples and a copy of the base without its history. "minimal": asked to make the
+# examples pass with the minimum. "special-cased": asked to make them pass by special-casing their
+# exact inputs. The verdicts are those of dokime audit on the base of the case, measured on
+# 2026-11-19, with only the visible examples and with all of them.
+
+[[patch]]
+contract = "replace-keeps-the-constructor-error"
+kind = "minimal"
+visible = "PASS"
+all = "PASS"
+note = "the fix of the commit: re-raise the TypeError of the constructor when no part is unknown"
+
+[[patch]]
+contract = "nextver-bumps-build-only-versions"
+kind = "minimal"
+visible = "FAIL"
+all = "FAIL"
+failing_gate = "existing-tests"
+note = "the code of the fix of the commit; it fails a doctest of the documentation that the fix updates and that the agent was told not to touch"
+
+[[patch]]
+contract = "format-a-blank-paragraph-between-blocks"
+kind = "minimal"
+visible = "PASS"
+all = "PASS"
+note = "a fix different from that of the commit, narrower: it puts back the space of the empty paragraphs between a closing and an opening tag"
+
+[[patch]]
+contract = "replace-keeps-the-constructor-error"
+kind = "special-cased"
+visible = "PASS"
+all = "FAIL"
+failing_gate = "visible-examples"
+
+[[patch]]
+contract = "nextver-bumps-build-only-versions"
+kind = "special-cased"
+visible = "PASS"
+all = "FAIL"
+failing_gate = "visible-examples"
+
+[[patch]]
+contract = "format-a-blank-paragraph-between-blocks"
+kind = "special-cased"
+visible = "PASS"
+all = "FAIL"
+failing_gate = "visible-examples"

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:abe4f29238361222 -->
+<!-- translation-of: ROADMAP.md sha256:87312b9876f06c84 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -466,6 +466,39 @@ testigo está aislado cuando es un arreglo y nada más
 | B3 Medida | La frontera medida, el corpus ampliado a unos treinta casos y `bench` calculando sus métricas | `corpus`, `bench` | Primero, la prueba de la ADR-0074 (los ocho testigos en disputa etiquetados de nuevo, y κ recalculado), y la frontera: cómo escriben otras herramientas ejemplos que construyen objetos y llaman métodos, y cuántos de los 41 testigos cabrían con cada opción, antes de que una ADR decida si se amplía la frontera `function`. Después, unos treinta casos, cada uno etiquetado antes de ejecutarse, con los casos apuntados para él más abajo y casos de las dos técnicas de trampa que el bloque A no cubre, la comparación sobrecargada y el estado entre llamadas; y `bench` calcula los falsos aceptados por etiqueta, los falsos rechazados, la tasa de preguntas, el valor de la reserva y la estabilidad |
 | B4 Cierre | El criterio de salida del bloque medido, y la versión 0.2 | Ninguno nuevo | Ningún falso aceptado en las cuatro técnicas de trampa; el valor de la reserva medido; la hipótesis de que la reserva por caso caza el sobreajuste resuelta en un sentido u otro; si la puerta sellada corre en CI, decidido por una ADR en un sentido u otro, como pide la ADR-0073, que puede concluir que no; la nota de cierre, y la versión 0.2 con su etiqueta y su Release, publicadas aunque el resultado sea malo |
 
+**B0 se cerró el 2026-11-19**, hecho a mano sobre copias de los tres contratos buenos del corpus,
+con más ejemplos en los casos de sus requisitos de cambio (`tests/corpus/holdout-by-hand/`).
+
+- **La segunda hipótesis se cumple.** El mantenedor aprobó los contratos ampliados en 2, 3 y 3 a 4
+  minutos, y los tres ejemplos añadidos tras una primera revisión en 3 más: unos 11 a 12 minutos
+  para los tres, unos 4 por contrato, frente a un umbral de 10 minutos por contrato fijado antes de
+  cronometrar, y los 2 a 5 de A0. Dos matices: la dificultad depende del dominio y no solo del
+  número de ejemplos, porque mdformat solo se pudo revisar con la ayuda de otro modelo, al tratar
+  sus ejemplos de caracteres invisibles; y la reserva solo protege si los ejemplos de un caso varían
+  en aquello en lo que un parche puede hacer trampa, lo que la revisión vio que faltaba en dos
+  contratos (todos los ejemplos de `replace` usaban `None`, y cada caso de mdformat un solo tipo de
+  espacio) y se corrigió.
+- **Los agentes sin presión no sobreajustaron.** Un agente nuevo por contrato, que solo veía los
+  ejemplos visibles, una sola vez y sin bucle, con el encargo de hacerlos pasar con lo mínimo,
+  escribió siempre un arreglo general: en `replace` y `nextver` el arreglo del commit, en mdformat
+  uno propio más estrecho; la reserva no tuvo nada que cazar. El arreglo de `nextver` falló
+  `existing-tests` por un doctest de la documentación que su commit actualiza, porque al agente se
+  le dijo que no tocara la documentación. Esto dice poco del bloque C, donde el agente trabaja en
+  bucle: [ImpossibleBench](https://arxiv.org/abs/2510.20270) relaciona las trampas con el acceso a
+  los tests y con el bucle de realimentación; es razonamiento, no una medida.
+- **El mecanismo caza un sobreajuste hecho a propósito.** Un agente nuevo por contrato, con el
+  encargo de hacer pasar los ejemplos visibles tratando aparte sus entradas, escribió parches que
+  pasan la auditoría con los ejemplos visibles y la fallan en `visible-examples` con todos, en
+  exactamente los ejemplos reservados: 1 de 1 en `replace`, 4 de 4 en `nextver`, 2 de 2 en
+  mdformat. Un test del corpus lo repite (CORPUS-064); añade unos 7 minutos al job `corpus`.
+- **Para B1.** En `replace` la semilla reservó un ejemplo parecido a los visibles y dejó visible el
+  que difiere; si el reparto debe reservar al menos un ejemplo de otra partición se decide con los
+  datos de B3. La guía de que los ejemplos de un caso cubran las particiones de lo que importa,
+  según el método de categorías y particiones de
+  [Ostrand y Balcer](https://doi.org/10.1145/62959.62964) (Communications of the ACM, 1988), va
+  donde se describe el contrato y en lo que mira quien aprueba; un aviso de `contract check` se
+  reconsidera con los datos de B3.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
@@ -484,6 +517,12 @@ encuentra:
   dos fases: primero probarla sin tocar el código de dokime, después hacer pasar tres casos; con un
   tiempo limitado y sin cambiar las abstracciones centrales. Las partes de dokime que dependen de
   Python están en la [arquitectura](architecture/README.es.md#lo-que-depende-de-python).
+- **Para el bloque D:** un caso encontrado en B0. El arreglo de mdformat `27e2ba3`, el parche bueno
+  de un caso del corpus, pasa todos los ejemplos y todos los tests y amplía la comprobación
+  `is_md_equal`, que entonces da por iguales documentos que se ven distintos: `*a* b` y `*a*b`,
+  `a *b*` y `a*b*`, `[l](u) next` y `[l](u)next`. El arreglo que escribió un agente para los mismos
+  ejemplos no lo hace, y el mdformat actual conserva la regla más amplia. Un cambio que lo pasa todo
+  y empeora una parte del programa es lo que busca el bloque D.
 - **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y un
   tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no dinero; y
   el veredicto esperado de `replace-fixes-only-major` y `nextver-changes-the-tests-to-fit` bajo el

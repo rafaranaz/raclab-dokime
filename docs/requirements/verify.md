@@ -108,3 +108,29 @@ compares them.
 - **VERIFY-142** If a gate has a result in some runs and not in others, or twice in one run, then the gate `repeatability` shall report a finding with the code `runs-differ` and the verdict `ERROR` that names the gate.
 - **VERIFY-143** If fewer than two runs are given, then the gate `repeatability` shall refuse them with an error that names how many were given.
 - **VERIFY-144** When every gate gave the same verdict in every run, the gate `repeatability` shall pass with no finding.
+
+## The sealed batch ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0072](../adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md))
+
+The sealed batch is what the sealed store encrypts: the held-out examples of a contract, each with
+its salt and its text as approved, the seed of the split and the canary. The canary is a copy of a
+held-out example whose expected value cannot hold; it detects a comparison that accepts what it
+should not, the side of a false accept, and not an observer that makes everything fail, which gives
+rejections and is the safe side.
+
+- **VERIFY-150** When a sealed batch is made, the module shall give the canonical form of a mapping with `format` 1, the story, the seed, each held-out example with its id, its salt in hexadecimal and its text, and the canary.
+- **VERIFY-151** When the canary of a batch is made, the module shall copy the held-out example that `random.Random(seed).choice` chooses in the order of the contract, with an id of its own and with only its first step, whose one expectation is a given text of 32 hexadecimal digits, as `stdout` at `cli` or as `returns` at `function`.
+- **VERIFY-152** If the content of a sealed batch is not the canonical form of such a mapping, then the module shall refuse to read it, with the code `unreadable-batch`.
+
+## The gate `sealed-examples` ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
+
+The gate runs on the tree of the change, after `visible-examples` passed; the flow of the audit
+decides when. Where the key is not, the gate is not applicable.
+
+- **VERIFY-160** If the sealed batch does not hold exactly the held-out examples of the contract, or the digest of the salt and the text of one of them is not the one that the contract gives, then the gate shall give a finding `sealed-batch-mismatch` of the verdict `ERROR`, and observe nothing.
+- **VERIFY-161** When the digests of the batch hold, the gate shall read each held-out example from its text with the requirements of the contract, observe the held-out examples and the canary on the tree of the change, and compare each one with its observation.
+- **VERIFY-162** If a held-out example does not hold, then the gate shall give a finding `sealed-example-fails` of the verdict `FAIL`, whose message is the words of the oracle for the agent: the requirement and the classes of the failure.
+- **VERIFY-163** If a held-out example whose origin is `model` does not hold, then the gate shall give a finding `sealed-model-example-fails` of the verdict `ASK`, with the same words.
+- **VERIFY-164** If the canary holds, then the gate shall give a finding `canary-passed` of the verdict `ERROR`, since the comparison accepts an expectation that cannot hold.
+- **VERIFY-165** When the canary does not hold, the gate shall give no finding of it and count it as no check, so that the canary never counts as the failure of a requirement nor reaches the agent.
+- **VERIFY-166** The gate shall give no finding whose message holds a value, an input or the identifier of a held-out example or of the canary.
+- **VERIFY-167** The reason of the gate `sealed-examples` where the key is not shall be `the key is not here`.

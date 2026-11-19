@@ -1,4 +1,4 @@
-# SDD-EARS: REPO-140 REPO-141 REPO-142 REPO-143 REPO-144 REPO-145 REPO-146 REPO-147
+# SDD-EARS: REPO-140 REPO-141 REPO-142 REPO-143 REPO-144 REPO-145 REPO-146 REPO-147 REPO-158
 import re
 import shlex
 import tomllib
@@ -106,3 +106,11 @@ def test_the_project_is_installed_with_its_backend_at_an_exact_version() -> None
     assert (int(low[0]), int(low[1])) <= (major, minor) < (int(high[0]), int(high[1]))
     assert "COPY . /dokime/build" in lines()
     assert "RUN pip install --no-cache-dir --no-deps --no-build-isolation /dokime/build" in lines()
+
+
+def test_the_image_installs_every_dependency_of_the_project() -> None:
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    declared = {normal(re.split(r"[<>=!~ ;\[]", d, maxsplit=1)[0]) for d in project["dependencies"]}
+    assert declared
+    missing = sorted(declared - set(pinned()))
+    assert missing == []

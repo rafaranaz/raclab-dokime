@@ -34,6 +34,7 @@ done = split(contract, seed)
 done.visible  # the examples the agent sees, in the order of the contract
 done.held_out  # one example of each case with two or more
 done.without_holdout  # the requirements that hold out nothing, for the evidence
+done.cases_without_holdout  # (requirement, case) of each case that holds out nothing
 
 feedback(example, comparison)  # "the requirement a fails a held-out example: stdout, exit"
 ```
@@ -41,6 +42,8 @@ feedback(example, comparison)  # "the requirement a fails a held-out example: st
 A case is the set of examples of one requirement that share a name of case. The example held out of
 a case is chosen with `random.Random(seed).choice` over its examples in the order of the contract,
 with one generator for the contract, so the split is drawn again from the seed that is recorded.
-The seed is a natural integer that comes from outside. On a held-out failure, `feedback` names the
+The seed is a natural integer that comes from outside. `split(contract, seed, keep_visible)` never draws an example to keep visible, one already
+published: the draw of a case is among its other examples, and a case where none is left holds out
+nothing. On a held-out failure, `feedback` names the
 requirement and the classes of the differences (the part, `files` for any file, `time-limit` or
 `crashed` for a step not seen), never a value, an input or the identifier of the example.

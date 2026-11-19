@@ -8,11 +8,16 @@ cases in the order in which each first appears, so that the split can be drawn a
 that is recorded. The seed itself comes from outside, since the randomness of the system is an
 adapter of `platform`.
 
+An example to keep visible, one already published that the caller finds in the history, is never
+drawn: the draw of a case is among its other examples, and a case where none is left holds out
+nothing. The split names every case that holds out nothing, by its requirement and its name.
+
 On a held-out failure the agent receives the requirement and the classes of the differences, never
 a value, an input or the identifier of the example.
 """
 
 import random
+from collections.abc import Collection
 from dataclasses import dataclass
 
 from dokime.contract.model import Contract, Example
@@ -26,22 +31,34 @@ class Split:
     visible: tuple[Example, ...]
     held_out: tuple[Example, ...]
     without_holdout: tuple[str, ...]
+    cases_without_holdout: tuple[tuple[str, str], ...] = ()
 
 
-def split(contract: Contract, seed: int) -> Split:
+def split(contract: Contract, seed: int, keep_visible: Collection[str] = ()) -> Split:
     """Hold out one example of each case with two or more, chosen by the seed."""
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValueError(f"the seed of a split is an integer of at least 0, not {seed!r}")
+    known = {e.id for e in contract.examples}
+    strangers = sorted(set(keep_visible) - known)
+    if strangers:
+        raise ValueError(f"the examples to keep visible {strangers} are not of the contract")
     cases: dict[tuple[str, str], list[Example]] = {}
     for example in contract.examples:
         cases.setdefault((example.requirement, example.case), []).append(example)
     chance = random.Random(seed)  # noqa: S311 - a draw anyone can repeat from the seed, not a secret
-    held = {chance.choice(examples).id for examples in cases.values() if len(examples) >= 2}
+    held = set()
+    for examples in cases.values():
+        drawable = [e for e in examples if e.id not in keep_visible]
+        if len(examples) >= 2 and drawable:
+            held.add(chance.choice(drawable).id)
     holding = {e.requirement for e in contract.examples if e.id in held}
     return Split(
         visible=tuple(e for e in contract.examples if e.id not in held),
         held_out=tuple(e for e in contract.examples if e.id in held),
         without_holdout=tuple(r.id for r in contract.requirements if r.id not in holding),
+        cases_without_holdout=tuple(
+            case for case, examples in cases.items() if not any(e.id in held for e in examples)
+        ),
     )
 
 

@@ -108,6 +108,7 @@ same rules as those of the corpus.
 - **REPO-147** The Dockerfile of this repository shall install the project itself from its context, with the build backend of `pyproject.toml` at an exact version within the range it requires, so that the tests that read the metadata of the package, run its command or import it from another process run in the image.
 - **REPO-158** The Dockerfile of this repository shall install every dependency at run time that `pyproject.toml` declares for the project, since it installs the project without its dependencies.
 - **REPO-159** The package `dokime` shall import pyrage only from the module `platform`, which holds the adapter of the sealed store (ADR-0072).
+- **REPO-160** The job of CI that runs the tests shall install the binary `age` before it runs the tests, so that the test of the sealed store against the binary runs instead of being skipped (ADR-0072).
 
 ## The audit of a pull request (`tools/audit_pr.py`, [ADR-0067](../adr/0067-a-person-approves-the-contract-before-a-change-is-audited-against-it.md), [ADR-0070](../adr/0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md), [ADR-0071](../adr/0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md))
 

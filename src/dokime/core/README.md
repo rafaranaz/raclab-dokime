@@ -117,6 +117,14 @@ The port of the audited repository, `AuditedRepository`, extends it with
 with the paths of a commit that the rule takes (ADR-0058). Only what audits a change needs it, so
 the self-check of a pack and its doubles keep the port of the project repository.
 
+The port of the history of a file, `FileHistory`, gives with `versions(start, path)` each
+`FileVersion` of a path, newest first: the commit that changed it and its bytes there, for every
+commit reachable from `start`, merged branches included. A rename is not followed and a commit
+where the path is absent gives none. The command that seals and the gate of the sealed examples
+read through it the versions of the contract of a story, to tell which examples were already
+published (ADR-0014). It is a port of its own, apart from the audited repository, so that the
+doubles of that port do not change.
+
 ## The outcome of a test run
 
 `Outcome` is what happened to one test in one run: passed, failed, error or skipped. A `Report`

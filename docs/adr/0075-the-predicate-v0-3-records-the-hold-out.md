@@ -59,8 +59,10 @@ ADR-0069 holds: no field and no code of an earlier version changes what it means
   hidden part is `case-without-holdout`.
 - **Where the key is not**, the gate is not applicable with the reason `the key is not here`
   (VERIFY-167), and the evidence has no `holdout`, no `case-without-holdout` and no
-  `best-effort-secrecy`: nothing of the hold-out was checked, which the gate says once. A run that
-  stopped before the gate lists it as not reached, likewise.
+  `best-effort-secrecy`: nothing of the hold-out was checked, which the gate says once. The cases
+  without a hidden part are not listed either, although the visible contract would tell them:
+  listing them would report a coverage that the run does not have. A run that stopped before the
+  gate lists it as not reached, likewise.
 - **The order of `not_checked`** is that of EVIDENCE-066 with `case-without-holdout` in the place of
   `no-holdout` and `best-effort-secrecy` last; the entries of `case-without-holdout` in the order
   of the cases in the contract, and those of `best-effort-secrecy` in the order of the table.
@@ -101,8 +103,12 @@ whose evidence lists each case of the contract once, in `held` or in `without_ho
   `not_checked` differs by version: `case-without-holdout` is not a code of v0.1 or v0.2.
 - `evidence` needs, from the run, the cases, the examples kept visible and the digest of the batch:
   the gate of `verify` has to hand them over, which `interfaces` carries into the run.
-- An evidence of a run without the key says nothing of the hold-out but the reason of the gate; it
-  does not list the cases without a hidden part, which only the batch tells.
+- An evidence of a run without the key says nothing of the hold-out but the reason of the gate. The
+  cases without a hidden part could be told without the key, since the entries of `held_out` of the
+  visible contract name the cases that hold out an example, and the number of visible examples of
+  each other case gives its motive; they are not listed, because nothing of the hold-out was checked
+  in that run, and the gate already says so once with its reason: listing them would report a
+  coverage that the run does not have.
 - The limits of the detection are written in three places: the requirements of `verify`, its
   README, and the evidence. A change of the detection changes all three.
 - The table of the architecture in `03-data-and-evidence.md` has to name `case-without-holdout`

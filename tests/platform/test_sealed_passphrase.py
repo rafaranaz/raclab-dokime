@@ -1,4 +1,4 @@
-# SDD-EARS: PLATFORM-110 PLATFORM-111 PLATFORM-112
+# SDD-EARS: PLATFORM-110 PLATFORM-111 PLATFORM-112 PLATFORM-114
 import os
 import subprocess
 import sys
@@ -89,3 +89,16 @@ def test_a_process_without_a_terminal_does_not_read_its_standard_input() -> None
         timeout=60,
     )
     assert done.stdout == "no-passphrase-source\n", done.stderr
+
+
+@pytest.mark.parametrize("raw", [b"\xff\xfe\n", b"caf\xe9\n"])
+def test_a_passphrase_that_is_not_utf8_is_refused(raw: bytes) -> None:
+    read, write = os.pipe()
+    os.write(write, raw)
+    os.close(write)
+    try:
+        with pytest.raises(RefusalError) as refused:
+            read_passphrase(read)
+    finally:
+        os.close(read)
+    assert refused.value.finding.code == "unreadable-passphrase"

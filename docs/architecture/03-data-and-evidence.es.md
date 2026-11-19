@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:67f8f8e84d799953 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:4881b46f7f15a015 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -207,23 +207,25 @@ relations:
 
 ### La huella de un contrato
 
-La huella tiene que seguir siendo verificable después del reparto, cuando el contenido de los
-ejemplos reservados ya no está en el fichero. Por eso se calcula sobre las huellas de sus partes,
-no sobre el fichero:
+La huella de un contrato es la huella de los bytes del fichero confirmado
+([ADR-0064](../adr/0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md)).
+Tras el reparto, el fichero conserva enteros los ejemplos visibles y, de cada ejemplo reservado,
+solo su identificador, su requisito, su caso y su huella, así que la huella del fichero cubre los
+ejemplos reservados a través de las suyas.
 
-1. Cada requisito, ejemplo y relación tiene la huella de su forma canónica. La huella de un
-   ejemplo es el SHA-256 de la forma canónica de su sal y el ejemplo: una sal de 16 bytes del azar
-   del sistema, nueva para cada ejemplo, como piden los hashes con sal de la
-   [RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html), cuyo mínimo recomendado son 128 bits.
-   Sin ella, un ejemplo reservado de contenido corto y adivinable podría encontrarse probando
-   candidatos contra su huella.
-2. La huella del contrato es la huella de la cabecera y de la lista ordenada de esas huellas.
-3. Tras el reparto, el fichero conserva enteros los ejemplos visibles y, de cada ejemplo
-   reservado, solo su identificador, su requisito, su caso y su huella. La sal de un ejemplo
-   reservado queda bajo la clave, no en el fichero.
+La huella de un ejemplo reservado es el SHA-256 de la forma canónica de su sal y su texto tal como
+se aprobó, el bloque del ejemplo en el contrato. La sal son 16 bytes del azar del sistema, nueva
+para cada ejemplo, como piden los hashes con sal de la
+[RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html), cuyo mínimo recomendado son 128 bits. Sin
+ella, un ejemplo reservado de contenido corto y adivinable podría encontrarse probando candidatos
+contra su huella. La sal y el texto quedan en el lote sellado, bajo la clave, nunca en el fichero.
+El lector estricto rechaza anclas, alias, etiquetas y claves de fusión, así que el texto de un
+ejemplo se lee igual solo que dentro del contrato.
 
-Cualquiera puede recalcular la huella del contrato desde el fichero. Solo quien tiene la clave
-puede comprobar que una huella reservada corresponde a su contenido.
+Cualquiera puede recalcular la huella del contrato desde el fichero. Solo quien tiene la clave puede
+comprobar que una huella reservada coincide con su contenido. Una huella sobre las partes de un
+contrato, que mantendría verificable una aprobación fuera cual fuera la disposición del fichero, se
+deja para el bloque E, donde las aprobaciones se firman.
 
 ### La aprobación
 

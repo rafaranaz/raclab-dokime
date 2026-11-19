@@ -42,13 +42,14 @@ def test_an_example_to_keep_visible_that_the_contract_does_not_have_is_refused()
 
 
 def test_a_case_with_none_to_draw_takes_nothing_from_the_generator() -> None:
-    first = random.Random(13)  # noqa: S311 - a draw anyone can repeat
+    first = random.Random(4)  # noqa: S311 - a draw anyone can repeat
     drawn_first = first.choice(["E-01", "E-03", "E-05"])
     second_when_drawn = first.choice(["E-02", "E-06"])
-    alone = random.Random(13)  # noqa: S311 - a draw anyone can repeat
+    alone = random.Random(4)  # noqa: S311 - a draw anyone can repeat
     second_when_skipped = alone.choice(["E-02", "E-06"])
-    every = split(CONTRACT, 13)
-    skipped = split(CONTRACT, 13, keep_visible={"E-01", "E-03", "E-05"})
+    assert second_when_drawn != second_when_skipped
+    every = split(CONTRACT, 4)
+    skipped = split(CONTRACT, 4, keep_visible={"E-01", "E-03", "E-05"})
     assert set(ids(every.held_out)) == {drawn_first, second_when_drawn}
     assert ids(skipped.held_out) == [second_when_skipped]
 

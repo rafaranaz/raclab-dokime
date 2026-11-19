@@ -142,3 +142,22 @@ class AuditedRepository(ProjectRepository, Protocol):
         overlaid, so a file of `tree` under it that `source` does not have is not in the result.
         """
         ...
+
+
+@dataclass(frozen=True)
+class FileVersion:
+    """A version of a file of the history: the commit that changed its path, and its bytes there."""
+
+    commit: CommitName
+    content: bytes
+
+
+class FileHistory(Protocol):
+    """The port of the history of a file. Every operation may raise a `RefusalError`."""
+
+    def versions(self, start: CommitName, path: RepoPath) -> tuple[FileVersion, ...]:
+        """Give the versions of the path, newest first: one for every commit reachable from
+        `start` that changes the path, merged branches included; renames are not followed, so a
+        version under an earlier path is not given, and a commit where the path is absent gives no
+        version."""
+        ...

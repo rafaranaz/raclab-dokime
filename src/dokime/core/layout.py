@@ -10,6 +10,8 @@ HARNESS = PurePosixPath(".dokime")
 POLICY = HARNESS / "policy.yaml"
 CHANGES = HARNESS / "changes"
 CONTRACT = "contract.yaml"
+RECIPIENTS = HARNESS / "recipients.txt"
+SEALED = "sealed.age"
 
 _NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
 """A name, as the `story` of a contract: letters, digits and hyphens, starting with a letter."""
@@ -28,3 +30,8 @@ def change_directory(story: str) -> PurePosixPath:
 def contract_path(story: str) -> PurePosixPath:
     """The contract of the change of a story."""
     return change_directory(story) / CONTRACT
+
+
+def sealed_path(story: str) -> PurePosixPath:
+    """The sealed batch of the change of a story."""
+    return change_directory(story) / SEALED

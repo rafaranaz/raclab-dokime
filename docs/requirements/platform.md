@@ -108,3 +108,39 @@ give.
 - **PLATFORM-082** If the checkout has a change to a file that git follows, or a file that it does not follow and does not ignore, then the platform shall give no commit, since the commit would not name the code that runs.
 - **PLATFORM-083** When it reads the commit of a checkout, the platform shall run no program that the configuration of git at any level, the hooks of the checkout or its attributes name, such as a filter that cleans a file to compare it.
 - **PLATFORM-084** If the checkout follows no file under the directory, then the platform shall give no commit, since the directory is not part of the code of that checkout, as one inside an ignored environment of another project is not.
+
+## The sealed store ([ADR-0072](../adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
+
+The adapter of the port `SealedStore` of `core`, with pyrage. It encrypts with age for the X25519
+recipients given, which the caller reads from the base, and opens with one identity, an age file
+encrypted with a passphrase. The content is decrypted only in memory.
+
+- **PLATFORM-090** When a content is sealed for a list of recipients, the sealed store shall encrypt it with age so that the identity of any one of them opens it.
+- **PLATFORM-091** If the list of recipients given to seal is empty or holds a text that is not an X25519 recipient of age, then the sealed store shall refuse to seal, with the code `bad-recipient`.
+- **PLATFORM-092** When sealed bytes are opened, the sealed store shall decrypt them with its identity and give the content, without writing a file.
+- **PLATFORM-093** If the identity of the sealed store is not a recipient of the sealed bytes, then the sealed store shall refuse to open them, with the code `not-a-recipient`.
+- **PLATFORM-094** If the sealed bytes are not a file of age, then the sealed store shall refuse to open them, with the code `unreadable-batch`.
+- **PLATFORM-095** The sealed store shall write sealed bytes that the binary `age` opens with the file of an identity that the platform created and its passphrase.
+
+### The identity
+
+- **PLATFORM-100** When an identity is created at a path with a passphrase, the platform shall write a new X25519 identity of age, encrypted with the passphrase in the format of age, and give its recipient.
+- **PLATFORM-101** When the platform creates the file of an identity, the platform shall create it with the permissions 0600, and the directories it lacks with 0700.
+- **PLATFORM-102** If a file exists at the path of an identity to create, then the platform shall refuse to create it, with the code `identity-exists`, and leave the file as it was.
+- **PLATFORM-103** If the passphrase of an identity to create is empty, then the platform shall refuse to create it, with the code `empty-passphrase`.
+- **PLATFORM-104** When an identity is loaded with its passphrase, the platform shall decrypt it in memory and give the sealed store that opens with it.
+- **PLATFORM-105** If the passphrase does not open the file of an identity, then the platform shall refuse to load it, with the code `wrong-passphrase`.
+- **PLATFORM-106** If the file of an identity can be read or written by its group or by others, then the platform shall load it with a finding `open-identity` of the verdict `ASK` that names its permissions.
+- **PLATFORM-107** If there is no file at the path of an identity to load, then the platform shall refuse to load it, with the code `no-identity`.
+- **PLATFORM-108** The default path of the identity shall be `dokime/identity.age` under `$XDG_DATA_HOME`, or under `$HOME/.local/share` when `XDG_DATA_HOME` is not set or is empty.
+- **PLATFORM-109** If the file of an identity opens with its passphrase but does not hold exactly one secret key of age, then the platform shall refuse to load it, with the code `bad-identity`.
+
+### The passphrase
+
+The passphrase comes only from a descriptor that the caller names or from the terminal of the
+process, never from a variable of the environment, an argument, a file read by its path or the
+ledger.
+
+- **PLATFORM-110** When a descriptor of the passphrase is given, the platform shall read the passphrase from it up to its first newline, without the newline.
+- **PLATFORM-111** When no descriptor is given, the platform shall read the passphrase from the terminal of the process, `/dev/tty`, with its echo turned off and turned on again after.
+- **PLATFORM-112** If no descriptor is given and the process has no terminal, then the platform shall refuse to read a passphrase, with the code `no-passphrase-source`, without reading from another source.

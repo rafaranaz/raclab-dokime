@@ -72,6 +72,9 @@ examples:
         expect: {exit: 0, stdout: "2.0.0\n"}
 
   # Added for B0: more examples in the cases of the change, each run before and after the fix.
+  # patch and patch-of-a-zero are different cases: a fix that, as for prereleases, finalizes the
+  # version when its patch is 0 would print 1.2.4 for 1.2.3+build.5 but 1.0.0 for 1.0.0+build.5,
+  # and only patch-of-a-zero catches it.
   - id: E-f1b8
     requirement: bump-build-only-versions
     case: patch

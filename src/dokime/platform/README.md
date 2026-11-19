@@ -86,7 +86,7 @@ from dokime.platform.sealed_store import (
     read_passphrase,
 )
 
-path = default_identity_path(os.environ)  # $XDG_DATA_HOME/dokime/identity.age
+path = default_identity_path(os.environ)  # under an absolute $XDG_DATA_HOME or $HOME
 recipient = create_identity(path, read_passphrase(None))  # "age1…", for .dokime/recipients.txt
 store, findings = load_identity(path, read_passphrase(descriptor))
 sealed = store.seal(content, recipients)  # the recipients read from the base
@@ -101,5 +101,6 @@ content = store.open(sealed)  # in memory
   from `/dev/tty` with the echo off. Without both it is refused with `no-passphrase-source`;
   `getpass` is not used, since without a terminal it would read the standard input.
 - **Refusals**: `bad-recipient`, `not-a-recipient`, `unreadable-batch`, `identity-exists`,
-  `empty-passphrase`, `wrong-passphrase`, `bad-identity` and `no-identity`, each a `RefusalError`
+  `empty-passphrase`, `wrong-passphrase`, `bad-identity`, `no-identity`, `no-home` and
+  `unreadable-passphrase`, each a `RefusalError`
   with an `ERROR` finding.

@@ -1,4 +1,4 @@
-# SDD-EARS: PLATFORM-105 PLATFORM-106 PLATFORM-107 PLATFORM-108 PLATFORM-109
+# SDD-EARS: PLATFORM-105 PLATFORM-106 PLATFORM-107 PLATFORM-108 PLATFORM-109 PLATFORM-113
 import stat
 from pathlib import Path
 
@@ -61,3 +61,19 @@ def test_an_identity_without_exactly_one_secret_key_is_refused(tmp_path: Path, k
     with pytest.raises(RefusalError) as refused:
         load_identity(path, "a passphrase")
     assert refused.value.finding.code == "bad-identity"
+
+
+@pytest.mark.parametrize("data", ["data", "./data", "~/data"])
+def test_a_relative_xdg_data_home_is_ignored(data: str) -> None:
+    environ = {"XDG_DATA_HOME": data, "HOME": "/home/p"}
+    assert default_identity_path(environ) == Path("/home/p/.local/share/dokime/identity.age")
+
+
+@pytest.mark.parametrize(
+    "environ",
+    [{}, {"HOME": ""}, {"HOME": "home/p"}, {"HOME": "~"}, {"XDG_DATA_HOME": "data", "HOME": "p"}],
+)
+def test_without_an_absolute_home_the_default_path_is_refused(environ: dict[str, str]) -> None:
+    with pytest.raises(RefusalError) as refused:
+        default_identity_path(environ)
+    assert refused.value.finding.code == "no-home"

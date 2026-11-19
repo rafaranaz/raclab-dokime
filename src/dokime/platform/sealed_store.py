@@ -134,16 +134,27 @@ def load_identity(path: Path, passphrase: str) -> tuple[AgeSealedStore, tuple[Fi
 
 
 def default_identity_path(environ: Mapping[str, str]) -> Path:
-    """The path of the identity when none is given."""
-    data = environ.get("XDG_DATA_HOME", "")
-    base = Path(data) if data else Path(environ.get("HOME", "~")) / ".local" / "share"
-    return base / _IDENTITY
+    """The path of the identity when none is given.
+
+    The specification of XDG holds a relative path in its variables invalid, to be ignored, so a
+    relative `XDG_DATA_HOME` falls back to `HOME`, and without an absolute `HOME` there is no
+    default: a relative path would put the identity in the working directory, the checkout.
+    """
+    data = Path(environ.get("XDG_DATA_HOME", ""))
+    if data.is_absolute():
+        return data / _IDENTITY
+    home = Path(environ.get("HOME", ""))
+    if not home.is_absolute():
+        raise RefusalError(
+            "no-home", "there is no absolute XDG_DATA_HOME nor HOME to keep the identity under"
+        )
+    return home / ".local" / "share" / _IDENTITY
 
 
 def read_passphrase(descriptor: int | None, terminal: str = "/dev/tty") -> str:
     """The passphrase, from a descriptor or from the terminal without echo."""
     if descriptor is not None:
-        return _line(descriptor).decode()
+        return _text(_line(descriptor))
     try:
         tty = os.open(terminal, os.O_RDWR | os.O_NOCTTY)
     except OSError:
@@ -158,12 +169,20 @@ def read_passphrase(descriptor: int | None, terminal: str = "/dev/tty") -> str:
         termios.tcsetattr(tty, termios.TCSAFLUSH, quiet)
         try:
             os.write(tty, b"passphrase of the identity: ")
-            return _line(tty).decode()
+            return _text(_line(tty))
         finally:
             termios.tcsetattr(tty, termios.TCSAFLUSH, before)
             os.write(tty, b"\n")
     finally:
         os.close(tty)
+
+
+def _text(read: bytes) -> str:
+    """A passphrase read as UTF-8."""
+    try:
+        return read.decode()
+    except UnicodeDecodeError:
+        raise RefusalError("unreadable-passphrase", "the passphrase is not valid UTF-8") from None
 
 
 def _line(descriptor: int) -> bytes:

@@ -466,6 +466,10 @@ milestone that finds them:
   `bump_prerelease`; a concealment that touches no test; overfitting by returning the expected
   value, by excluding the visible input or by matching it exactly; and `replace("1.2.3",
   major=1.5)`, which returns `1.2.3`, a candidate of unspecified behaviour.
+- **At the close of block B:** a probe of a second language with Java, only at the boundary `cli`,
+  in two phases: first try it without touching the code of dokime, then make three cases pass; with
+  a limited time and without changing the central abstractions. The parts of dokime that depend on
+  Python are listed in the [architecture](architecture/README.md#what-depends-on-python).
 - **Before C1:** what happens when two changes run at the same time on the same repository; and a
   limit of spending for a run, since the budgets of the flow count repetitions, not money; and the
   expected verdict of `replace-fixes-only-major` and `nextver-changes-the-tests-to-fit` under the

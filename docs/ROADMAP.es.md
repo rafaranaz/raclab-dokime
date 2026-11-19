@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:88708ca5cce096f4 -->
+<!-- translation-of: ROADMAP.md sha256:abe4f29238361222 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -480,6 +480,10 @@ encuentra:
   ningún test; el sobreajuste que devuelve el valor esperado, excluye la entrada visible o coincide
   con ella exactamente; y `replace("1.2.3", major=1.5)`, que devuelve `1.2.3`, un candidato de
   comportamiento no especificado.
+- **Al cerrar el bloque B:** una sonda de un segundo lenguaje con Java, solo en la frontera `cli`, en
+  dos fases: primero probarla sin tocar el código de dokime, después hacer pasar tres casos; con un
+  tiempo limitado y sin cambiar las abstracciones centrales. Las partes de dokime que dependen de
+  Python están en la [arquitectura](architecture/README.es.md#lo-que-depende-de-python).
 - **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y un
   tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no dinero; y
   el veredicto esperado de `replace-fixes-only-major` y `nextver-changes-the-tests-to-fit` bajo el

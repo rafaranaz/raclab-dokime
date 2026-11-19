@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:6183240dce619de7 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:1bd2bb3105cbd9a5 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -298,7 +298,7 @@ terminada, sea cual sea su veredicto.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
-      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key lives only in CI"},
+      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key is not here"},
       {"gate": "changed-line-coverage", "status": "skipped", "reason": "optional in the policy"},
       {"gate": "behaviour-differences", "status": "not-applicable", "reason": "pack level P2"}
     ],

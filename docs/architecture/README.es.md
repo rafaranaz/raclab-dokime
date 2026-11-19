@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:aba0f8532aec7f9f -->
+<!-- translation-of: README.md sha256:2f7bdb798375bfa2 -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -88,6 +88,24 @@ de contar:
 | La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | Proporción de requisitos marcados sin ejemplo | A |
 | Un agente puede arrancar con su credencial y un directorio de configuración hecho para la ejecución | Probarlo con dos agentes en Linux y macOS | C |
 | ~~Un pack se puede proponer a partir de la configuración de CI de un proyecto~~ | **Descartada** por la [ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md): el pack lo escribe una persona | — |
+
+## Lo que depende de Python
+
+La primera versión verifica proyectos de Python; Java llega en el bloque G. Estas partes de dokime
+suponen Python, y son las primeras a las que llega un segundo lenguaje:
+
+- **La frontera `function`.** El programa que observa los ejemplos en la zona,
+  `sandbox/observe_program.py`, importa el objetivo con `importlib`, y `oracle/compare.py` lee una
+  excepción como la lee `pytest.raises`.
+- **Los tests de un fichero.** `verify/existing.py` asocia cada test con su fichero por la ruta de un
+  módulo de Python, la ruta sin `.py` y con `/` como `.`.
+- **La configuración de los tests.** `packs/sections.py` lee las secciones de un pack en los formatos
+  que usa pytest, TOML e INI.
+- **El comparador `$fullmatch`.** Su patrón es una expresión regular de Python
+  ([ADR-0039](../adr/0039-what-a-contract-of-the-first-version-may-say.es.md)).
+
+La frontera `cli`, las puertas que comparan árboles y parches, el registro y la evidencia no
+dependen del lenguaje del proyecto.
 
 ## Fuera de la primera versión
 

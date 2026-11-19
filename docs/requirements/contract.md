@@ -31,7 +31,7 @@ are mandatory and what each holds.
 - **CONTRACT-013** If the value of a field is not what the table of fields states, then the checker shall report a finding with the code `wrong-type` that names the field, with its line.
 - **CONTRACT-014** If a field with a closed list of values has another value, then the checker shall report a finding with the code `unknown-value` that lists the values allowed, with its line.
 - **CONTRACT-015** If a list that the table of fields marks as not empty has no item, then the checker shall report a finding with the code `empty-list`, with its line.
-- **CONTRACT-016** If an id appears more than once among the requirements, among the examples or among the relations, then the checker shall report one finding with the code `duplicate-id` that lists every line where it appears.
+- **CONTRACT-016** If an id appears more than once among the requirements, among the examples, among the held-out examples or among the relations, then the checker shall report one finding with the code `duplicate-id` that lists every line where it appears.
 - **CONTRACT-017** If a literal block is not the value of the directive `$text`, then the checker shall report a finding with the code `block-outside-text`, with its line.
 
 ## Requirements
@@ -42,7 +42,7 @@ are mandatory and what each holds.
 
 ## Examples
 
-- **CONTRACT-030** If an example or a relation names a requirement that the contract does not have, then the checker shall report a finding with the code `unknown-requirement`, with its line.
+- **CONTRACT-030** If an example, a held-out example or a relation names a requirement that the contract does not have, then the checker shall report a finding with the code `unknown-requirement`, with its line.
 - **CONTRACT-031** If the boundary of an example is `http`, then the checker shall report a finding with the code `not-supported-yet` and the verdict `ERROR`, with its line.
 - **CONTRACT-032** If a step at the `function` boundary expects both `returns` and `raises`, then the checker shall report a finding with the code `two-expectations`, with the line of the expectation.
 - **CONTRACT-033** If a step expects nothing, then the checker shall report a finding with the code `no-expectation`, with the line of the expectation.
@@ -99,6 +99,21 @@ compared from the first one, as long as the inputs are the same.
 - **CONTRACT-084** When two compared examples expect two matchers for the same field, the checker shall report no contradiction between them.
 - **CONTRACT-085** If an example has a finding of its shape or of its directives, then the checker shall leave it out of the search for duplicates and contradictions.
 
+## Held-out examples ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+After the split, a contract keeps its visible examples whole in `examples` and, in `held_out`, only
+the id, the requirement, the case and the digest of each held-out example; its salt and its text are
+in the sealed batch, under the key. The digest of a held-out example is that of its salt and its
+text as approved, so that a held-out example with a short content cannot be found by trying
+candidates against it, and the digest of the contract, that of the bytes of its file, covers the
+held-out examples through theirs.
+
+- **CONTRACT-090** When a contract has held-out examples, the checker shall return each one with its id, its requirement, its case and its digest.
+- **CONTRACT-091** If an id appears both among the examples and among the held-out examples, then the checker shall report a finding with the code `held-out-in-clear` and the verdict `ERROR`, with the lines of both, since that held-out example is then in the file in clear.
+- **CONTRACT-092** When the digest of a held-out example is computed from its salt and its text, the contract shall give `sha256:` and the SHA-256 of the canonical form of the mapping with `salt`, the salt in lowercase hexadecimal, and `text`, the text of the example.
+- **CONTRACT-093** If the salt of the digest of a held-out example is not 16 bytes, then the contract shall refuse to compute it with an error that says so.
+- **CONTRACT-094** When the text of a contract is read, the contract shall give the text of each of its examples as it is written in the file, so that a contract made of the header, the requirements and that text reads back the same example.
+
 ## Tables of fields
 
 A name is a text of letters, digits and hyphens that starts with a letter. A value is any data, with
@@ -112,6 +127,7 @@ the directives allowed where it is.
 | Contract | `requirements` | Yes | A list of requirements, not empty |
 | Contract | `examples` | Yes | A list of examples |
 | Contract | `relations` | No | A list of relations |
+| Contract | `held_out` | No | A list of held-out examples |
 | Requirement | `id` | Yes | A name |
 | Requirement | `kind` | Yes | `new`, `change` or `preserve` |
 | Requirement | `text` | Yes | A text of one line |
@@ -139,6 +155,10 @@ the directives allowed where it is.
 | Expectation at `cli` | `stdout` | No | A text or a matcher |
 | Expectation at `cli` | `stderr` | No | A text or a matcher |
 | Expectation at `cli` | `files` | No | A mapping from a file name, as in the input, to a text or a matcher |
+| Held-out example | `id` | Yes | A name |
+| Held-out example | `requirement` | Yes | A name |
+| Held-out example | `case` | Yes | A name |
+| Held-out example | `digest` | Yes | `sha256:` and 64 hexadecimal digits in lowercase |
 | Relation | `id` | Yes | A name |
 | Relation | `requirement` | Yes | A name |
 | Relation | `relation` | Yes | `idempotent` or `order-insensitive` |

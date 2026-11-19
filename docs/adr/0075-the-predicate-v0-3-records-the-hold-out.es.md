@@ -1,7 +1,7 @@
-<!-- translation-of: 0075-the-predicate-v0-3-records-the-hold-out.md sha256:1e60cc9522a5033d -->
+<!-- translation-of: 0075-the-predicate-v0-3-records-the-hold-out.md sha256:7df0ccd8bbb1f45f -->
 # ADR-0075 · El predicado v0.3 registra la reserva
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -161,8 +161,7 @@ relations:
   asks: first the categories, where "a category is a major property or characteristic of a
   parameter", such as the type of a value or the kind of a blank character; then, for each one,
   choices that "include all the different kinds of values that are possible for the category"; and
-  examples that take different choices. In B0 the review found two contracts whose cases shared
-  every choice, every value `None` in one and one kind of space in the other.
+  examples that take different choices.
 - **Identifiers.** A requirement id is descriptive, because the person reads it and chooses it.
   An example id is opaque and random, because an id derived from the content could be guessed and
   would say something about an example that is held out.
@@ -208,8 +207,11 @@ The digest has to stay verifiable after the split, when the content of the held-
 no longer in the file. So it is computed over the digests of its parts, not over the file:
 
 1. Each requirement, example and relation has the digest of its canonical form. The digest of an
-   example is computed with a random salt that is kept with the example. Without it, a held-out
-   example with a short, guessable content could be found by trying candidates against its digest.
+   example is the SHA-256 of the canonical form of its salt and the example: a salt of 16 bytes
+   from the randomness of the system, a new one for each example, as the salted hashes of
+   [RFC 9901](https://www.rfc-editor.org/rfc/rfc9901.html) ask, whose minimum recommended is 128
+   bits. Without it, a held-out example with a short, guessable content could be found by trying
+   candidates against its digest.
 2. The digest of the contract is the digest of the header and the ordered list of those digests.
 3. After the split, the file keeps the visible examples whole and, for each held-out example, only
    its identifier, requirement, case and digest. The salt of a held-out example stays under the

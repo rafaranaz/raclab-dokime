@@ -3,8 +3,8 @@
 Compares what the zone of verification observed of an example with what the example expects,
 outside the zone (ADR-0012, ADR-0063). It imports only `contract` and `core`, and runs nothing: it
 receives an example of a checked contract and its observation, and the gate that calls it decides
-the verdict. Splitting the visible from the sealed examples and the relations come in block B. Its
-requirements are in [oracle.md](../../../docs/requirements/oracle.md).
+the verdict. It also splits the examples of a contract into visible and held-out; the relations
+come in block B. Its requirements are in [oracle.md](../../../docs/requirements/oracle.md).
 
 ```python
 from dokime.oracle.compare import compare
@@ -24,3 +24,23 @@ The type of an exception is read as `pytest.raises` reads it, as the maintainer 
 type holds when it is the full name of any class of the MRO observed. So a subclass of `TypeError`
 holds for `TypeError`, a class of the project named `TypeError` that is not one does not, and
 `Exception` holds for any exception. A `message` has to hold as well.
+
+## The split into visible and held-out (ADR-0014)
+
+```python
+from dokime.oracle.holdout import feedback, split
+
+done = split(contract, seed)
+done.visible  # the examples the agent sees, in the order of the contract
+done.held_out  # one example of each case with two or more
+done.without_holdout  # the requirements that hold out nothing, for the evidence
+
+feedback(example, comparison)  # "the requirement a fails a held-out example: stdout, exit"
+```
+
+A case is the set of examples of one requirement that share a name of case. The example held out of
+a case is chosen with `random.Random(seed).choice` over its examples in the order of the contract,
+with one generator for the contract, so the split is drawn again from the seed that is recorded.
+The seed is a natural integer that comes from outside. On a held-out failure, `feedback` names the
+requirement and the classes of the differences (the part, `files` for any file, `time-limit` or
+`crashed` for a step not seen), never a value, an input or the identifier of the example.

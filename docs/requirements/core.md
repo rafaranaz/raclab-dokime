@@ -326,3 +326,16 @@ caller takes from the base, and defines the port; it encrypts nothing.
 - **CORE-183** If a recipient appears more than once in a file of recipients, then the reader shall report a finding with the code `repeated-recipient`, the verdict `ERROR` and the numbers of its lines.
 - **CORE-184** The port of the sealed store shall offer two operations: seal a content for a list of recipients and give the sealed bytes, and open sealed bytes and give their content.
 - **CORE-185** When the sealed store cannot seal or open, the port shall raise a refusal that carries a finding with the verdict `ERROR`.
+
+## The history of a file ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
+
+The hold-out holds out only examples that nobody has seen, so the command that seals and the gate
+that checks the sealed batch read every version of the contract of a story that the history of a
+commit holds. The port gives those versions; what counts as published is decided by whoever reads
+them. Its limits are those of the history it reads: a version under an earlier path, after a
+rename, is not given, and neither is one in a commit that the start does not reach.
+
+- **CORE-186** The port of the history of a file shall offer one operation: give the versions of a path in the commits reachable from a commit.
+- **CORE-187** The operation that gives the versions of a path shall receive the commit to start from and the path in the repository.
+- **CORE-188** The version of a file that the port gives shall carry the commit that changed the path and the bytes of the file in that commit.
+- **CORE-189** The port of the history of a file shall give the versions newest first, one for each commit reachable from the start that changes the path, without following a rename and without a commit where the path is absent.

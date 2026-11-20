@@ -1,4 +1,4 @@
-<!-- translation-of: 0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md sha256:cdd4c5523f1a270b -->
+<!-- translation-of: 0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md sha256:b543869982ffb8de -->
 # ADR-0076 · Una relación se ejecuta sobre los ejemplos visibles de su requisito
 
 **Estado:** propuesta
@@ -48,20 +48,29 @@ con una semilla que se registra, y su fallo le dice al agente dónde sin darle u
   - Un caso de partida cuya ejecución lanza una excepción, o sale con un código distinto de cero, no
     tiene caso derivado.
 - **`over` nombra una entrada.** En `function` es `args[N]`, el argumento en esa posición contando
-  desde cero, o el nombre de un argumento con nombre. En `cli`, para `order-insensitive`, es `stdin`,
-  cuyas líneas se permutan, o el nombre de un fichero de la entrada, cuyas líneas se permutan.
-  `contract check` rechaza un `over` que no nombra ninguna entrada de la frontera del target.
-- **`order-insensitive` permuta con una semilla.** Para cada caso de partida cuya entrada nombrada
-  por `over` tiene dos elementos o más, los casos derivados son el orden inverso, siempre, y hasta
-  `relations.permutations` órdenes distintos más sacados con la semilla, 10 salvo que la política
-  diga otra cosa ([ADR-0054](0054-the-policy-is-an-optional-file-of-values.es.md)), nunca el orden
-  de partida ni más órdenes de los que permiten los elementos. La relación se cumple cuando cada
-  caso derivado da lo que dio el de partida.
+  desde cero, o el nombre de un argumento con nombre; para `order-insensitive`, lo que se permuta son
+  los elementos de la lista que el ejemplo de partida da en ese argumento, y un caso de partida cuyo
+  valor ahí no es una lista no tiene casos derivados. En `cli`, para `order-insensitive`, es
+  `stdin`, cuyas líneas se permutan, o el nombre de un fichero de la entrada, cuyas líneas se
+  permutan. `contract check` rechaza un `over` que no nombra ninguna entrada de la frontera del
+  target.
+- **`order-insensitive` permuta con una semilla.** Los casos derivados de un caso de partida son
+  entradas, distintas entre sí y distintas de la entrada de partida, porque con elementos repetidos
+  dos permutaciones dan la misma entrada y el orden inverso puede ser igual al de partida. Son el
+  orden inverso, siempre que difiera del de partida, y hasta `relations.permutations` entradas
+  distintas más sacadas con la semilla, 10 salvo que la política diga otra cosa
+  ([ADR-0054](0054-the-policy-is-an-optional-file-of-values.es.md)); el tope es el número de
+  entradas distintas que permiten los elementos, no n!. Un caso de partida cuyos elementos no
+  permiten ninguna otra entrada no tiene casos derivados. La relación se cumple cuando cada caso
+  derivado da lo que dio el de partida.
 - **La semilla** de las relaciones es un entero natural de 53 bits aleatorios de la aleatoriedad
   del sistema, sacado en cada auditoría y registrado en su registro.
-- **Una relación sin ningún caso de partida** que se le aplique es un hallazgo
-  `relation-without-source` con el veredicto `ASK`: el contrato pide una comprobación que ningún
-  ejemplo puede alimentar.
+- **Una relación sin caso de partida** es un hallazgo `relation-without-source` con el veredicto
+  `ASK`: el contrato pide una comprobación que ningún ejemplo puede alimentar. Lo es cuando no queda
+  ningún ejemplo como caso de partida, sea porque ningún ejemplo visible de un paso tiene el
+  requisito y el target, o porque ninguno tiene casos derivados: su ejecución lanza una excepción o
+  sale con un código distinto de cero, en `idempotent`, o su entrada nombrada por `over` no es una
+  lista o no permite ninguna otra entrada, en `order-insensitive`.
 - **Una relación que no se cumple** es un hallazgo `relation-fails` con el veredicto `FAIL`, en la
   línea de la relación, cuyo mensaje da el requisito, la relación y el id del ejemplo visible de
   partida, y ni la permutación ni ningún valor.
@@ -70,7 +79,8 @@ con una semilla que se registra, y su fallo le dice al agente dónde sin darle u
   la v0.3 con un campo añadido y la regla de la ADR-0069 mantenida. La entrada de la puerta
   `relations`, cuando se ejecutó, tiene `relations`: la `seed`, en claro, porque nada en ella es
   secreto, y `failed`, cada caso derivado que no se cumplió como `{relation, example}`, con `order`,
-  la permutación como lista de índices del orden de partida, para `order-insensitive`. No contiene
+  para `order-insensitive`, una permutación que da su entrada, como lista de índices del orden de
+  partida. No contiene
   ninguna entrada ni ningún valor.
 
 ## Base

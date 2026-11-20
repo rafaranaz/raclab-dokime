@@ -46,19 +46,27 @@ drawn with a seed that is recorded, and its failure tells the agent where withou
     and the standard output, or the files written.
   - A source whose run raises, or exits with a code other than zero, has no follow-up.
 - **`over` names an input.** At `function` it is `args[N]`, the argument at that position from
-  zero, or the name of a keyword argument. At `cli`, for `order-insensitive`, it is `stdin`, whose
-  lines are permuted, or the name of a file of the input, whose lines are permuted. `contract
-  check` refuses an `over` that names no input of the boundary of the target.
-- **`order-insensitive` permutes with a seed.** For each source whose input named by `over` has two
-  or more items, the follow-ups are the reversed order, always, and up to
-  `relations.permutations` other distinct orders drawn with the seed, 10 unless the policy says
-  otherwise ([ADR-0054](0054-the-policy-is-an-optional-file-of-values.md)), never the order of the
-  source nor more orders than the items allow. The relation holds when each follow-up gives what
-  the source gave.
+  zero, or the name of a keyword argument; for `order-insensitive`, what is permuted are the items
+  of the list that the source example gives in that argument, and a source whose value there is not
+  a list has no follow-up. At `cli`, for `order-insensitive`, it is `stdin`, whose lines are
+  permuted, or the name of a file of the input, whose lines are permuted. `contract check` refuses
+  an `over` that names no input of the boundary of the target.
+- **`order-insensitive` permutes with a seed.** The follow-ups of a source are inputs, distinct from
+  each other and from the input of the source, since repeated items make two permutations give the
+  same input and can make the reversed order equal to the source. They are the reversed order,
+  always when it differs from the source, and up to `relations.permutations` other distinct inputs
+  drawn with the seed, 10 unless the policy says otherwise
+  ([ADR-0054](0054-the-policy-is-an-optional-file-of-values.md)); the bound is the number of
+  distinct inputs that the items allow, not n!. A source whose items allow no other input has no
+  follow-up. The relation holds when each follow-up gives what the source gave.
 - **The seed** of the relations is a natural integer of 53 random bits from the randomness of the
   system, drawn for each audit and recorded in its ledger.
-- **A relation with no source** that applies is a finding `relation-without-source` of the verdict
-  `ASK`: the contract asks for a check that no example can feed.
+- **A relation with no source** is a finding `relation-without-source` of the verdict `ASK`: the
+  contract asks for a check that no example can feed. That is so when no example is left as a
+  source, whether because no visible example of one step has the requirement and the target, or
+  because each of them has no follow-up: its run raises or exits with a code other than zero, for
+  `idempotent`, or its input named by `over` is not a list or allows no other input, for
+  `order-insensitive`.
 - **A relation that does not hold** is a finding `relation-fails` of the verdict `FAIL`, at the
   line of the relation, whose message gives the requirement, the relation and the id of the
   visible source example, and neither the permutation nor any value.
@@ -66,8 +74,8 @@ drawn with a seed that is recorded, and its failure tells the agent where withou
   `https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.4`, the closed schema of
   v0.3 with one field added and the rule of ADR-0069 kept. The entry of the gate `relations`, when
   it ran, has `relations`: the `seed`, in clear, since nothing in it is secret, and `failed`, each
-  follow-up that did not hold as `{relation, example}`, with `order`, the permutation as a list of
-  indices of the source order, for `order-insensitive`. It holds no input and no value.
+  follow-up that did not hold as `{relation, example}`, with `order`, for `order-insensitive`, a
+  permutation that gives its input, as a list of indices of the source order. It holds no input and no value.
 
 ## Basis
 

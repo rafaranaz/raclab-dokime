@@ -125,5 +125,5 @@ this repository, outside the history of the projects, so the run measures the me
 the value of a hold-out with secret examples, which B3 and B4 measure.
 
 - **CORPUS-066** The fixture of the sealed run shall record, for each contract of B0, the base of its batch, its seed, its held-out examples, the examples kept visible and each case without a held-out example with its motive, as the batch holds them.
-- **CORPUS-067** The fixture of the sealed run shall record, for each patch of B0, the verdict, the gate and the outcome of the gate `sealed-examples` that it expects, with the reason.
+- **CORPUS-067** The fixture of the sealed run shall record, for each patch of B0 and each patch written for the seal, the verdict, the gate and the outcome of the gate `sealed-examples` that it expects, with the reason.
 - **CORPUS-068** The fixture of the sealed run shall keep, for each contract, the visible contract and the sealed batch of the seal, whose examples are those of the contract of B0 without the held-out ones and whose entries `held_out` name the held-out examples that it records.

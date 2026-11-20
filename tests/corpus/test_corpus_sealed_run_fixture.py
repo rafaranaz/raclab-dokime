@@ -70,10 +70,15 @@ def test_each_sealed_contract_is_the_visible_part_of_its_contract_of_b0(
     assert batch.startswith(b"age-encryption.org/v1\n")
 
 
-def test_each_patch_of_b0_has_what_it_expects_with_its_reason() -> None:
+def test_each_patch_has_what_it_expects_with_its_reason() -> None:
     kinds = sorted((p["contract"], p["kind"]) for p in PATCHES)
     names = sorted(c["name"] for c in CONTRACTS)
-    assert kinds == sorted((n, k) for n in names for k in ("minimal", "special-cased"))
+    written_for_this_seal = [
+        ("format-a-blank-paragraph-between-blocks", "special-cased-b1"),
+        ("nextver-bumps-build-only-versions", "special-cased-b1"),
+    ]
+    of_b0 = [(n, k) for n in names for k in ("minimal", "special-cased")]
+    assert kinds == sorted(of_b0 + written_for_this_seal)
     for patch in PATCHES:
         assert patch["expected"] in VERDICTS
         assert patch["expected_sealed"] in {"run PASS", "run FAIL", "not-reached"}

@@ -45,7 +45,7 @@ from tests.evidence.runs import GONE, changed, statement
         ("predicate/human_decisions", [{}]),
         ("predicate/not_checked/0/code", "made-up"),
         ("predicate/not_checked/0/what", "a b"),
-        ("predicate/not_checked/5/untrusted/0/text", 3),
+        ("predicate/not_checked/2/untrusted/0/text", 3),
         ("predicate/not_checked", GONE),
         ("predicate/ledger/events", -1),
         ("predicate/ledger/events", True),

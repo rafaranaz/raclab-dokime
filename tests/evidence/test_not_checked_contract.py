@@ -10,9 +10,6 @@ def entries(given: list[dict[str, Any]]) -> list[tuple[str, str]]:
 
 def test_what_was_not_checked_is_listed_by_code_in_its_order() -> None:
     assert entries(predicate()["not_checked"]) == [
-        ("no-holdout", "R-1"),
-        ("no-holdout", "R-2"),
-        ("no-holdout", "R-3"),
         ("requirement-without-example", "R-2"),
         ("only-model-checks", "R-3"),
         ("test-excluded-unstable", "existing-tests"),

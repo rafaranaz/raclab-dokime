@@ -20,8 +20,10 @@ from dokime.core.verdicts import EmptyRoundError, Verdict, aggregate
 STATEMENT = "https://in-toto.io/Statement/v1"
 PREDICATE_V01 = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1"
 """The predicate of A3 (ADR-0064), which the reader still reads."""
-PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2"
-"""The predicate that the builder writes (ADR-0069)."""
+PREDICATE_V02 = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2"
+"""The predicate of A4 (ADR-0069), which the reader still reads."""
+PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3"
+"""The predicate that the builder writes (ADR-0075)."""
 ORIGINS = ("existing", "human", "derived", "model")
 """The origins of the checks of a gate, in the order a gate lists them."""
 NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
@@ -38,7 +40,13 @@ NOT_CHECKED = (
     "outside-threat-model",
     "example-unstable",
 )
-"""The closed list of the codes of what was not checked."""
+"""The closed list of the codes of what was not checked in the predicates of A3 and A4."""
+NOT_CHECKED_V03 = (*NOT_CHECKED, "case-without-holdout")
+"""The closed list of the codes of what was not checked in the predicate of ADR-0075."""
+SEALED = "sealed-examples"
+"""The gate whose entry may hold the hold-out."""
+MOTIVES = ("single-example", "all-published")
+"""Why a case holds out nothing."""
 AUDIT_GATES = (
     "contract",
     "environment",
@@ -223,12 +231,32 @@ def _boolean(check: _Check, value: object, place: Place) -> None:
         check.bad(place, "is not true or false")
 
 
-def _optional(v02: bool, fields: Mapping[str, Rule]) -> dict[str, Rule]:
-    """The fields that the second version of the predicate adds, or none in the first."""
-    return dict(fields) if v02 else {}
+def _optional(present: bool, fields: Mapping[str, Rule]) -> dict[str, Rule]:
+    """The fields that a later version of the predicate adds, where the version has them."""
+    return dict(fields) if present else {}
 
 
-def _gates_rule(v02: bool) -> Rule:
+_CASE = _fields({"requirement": _NAME, "case": _NAME})
+_HOLDOUT = _fields(
+    {
+        "batch": _DIGEST,
+        "held": _list(_CASE),
+        "kept_visible": _list(_NAME),
+        "without_holdout": _list(
+            _fields(
+                {
+                    "requirement": _NAME,
+                    "case": _NAME,
+                    "motive": _matches("is not a motive", MOTIVES.__contains__),
+                }
+            )
+        ),
+    }
+)
+
+
+def _gates_rule(version: int) -> Rule:
+    v02 = version >= 2
     finding = _fields(
         {
             "code": _matches("is not a code", _builds(_code)),
@@ -240,9 +268,10 @@ def _gates_rule(v02: bool) -> Rule:
         },
         _optional(v02, {"message": _MESSAGE_TEXT}),
     )
-    ran = _fields(
+    fields_of_a_run = _fields(
         {"gate": _NAME, "status": _is("run"), "verdict": _VERDICT, "findings": _list(finding)},
         {
+            **_optional(version >= 3, {"holdout": _HOLDOUT}),
             "checks": _list(
                 _fields(
                     {
@@ -251,9 +280,14 @@ def _gates_rule(v02: bool) -> Rule:
                     }
                 ),
                 at_least=1,
-            )
+            ),
         },
     )
+
+    def ran(check: _Check, value: object, place: Place) -> None:
+        fields_of_a_run(check, value, place)
+        if isinstance(value, dict) and "holdout" in value and value.get("gate") != SEALED:
+            check.bad((*place, "holdout"), f"is only of the gate {SEALED}")
 
     def gate(check: _Check, value: object, place: Place) -> None:
         status = value.get("status") if isinstance(value, dict) else None
@@ -296,17 +330,32 @@ def _reached(check: _Check, gates: list[object], place: Place) -> None:
             stopped = stopped or gate.get("verdict") != "PASS"
 
 
-_NOT_CHECKED = _fields(
-    {
-        "code": _matches("is not a code of what was not checked", NOT_CHECKED.__contains__),
-        "what": _NAME,
-        "reason": _TEXT,
-    },
-    {"untrusted": _list(_UNTRUSTED, at_least=1)},
-)
+def _not_checked_rule(version: int) -> Rule:
+    codes = NOT_CHECKED_V03 if version >= 3 else NOT_CHECKED
+    fields = _fields(
+        {
+            "code": _matches("is not a code of what was not checked", codes.__contains__),
+            "what": _NAME,
+            "reason": _TEXT,
+        },
+        {"untrusted": _list(_UNTRUSTED, at_least=1), **_optional(version >= 3, {"case": _NAME})},
+    )
+
+    def entry(check: _Check, value: object, place: Place) -> None:
+        fields(check, value, place)
+        if version < 3 or not isinstance(value, dict):
+            return
+        by_case = value.get("code") == "case-without-holdout"
+        if by_case and "case" not in value:
+            check.bad((*place, "case"), "is missing")
+        if not by_case and "case" in value:
+            check.bad((*place, "case"), "is only of an entry case-without-holdout")
+
+    return _list(entry)
 
 
-def _predicate_rule(v02: bool) -> Rule:
+def _predicate_rule(version: int) -> Rule:
+    v02 = version >= 2
     fields = _fields(
         {
             "verdict": _VERDICT,
@@ -336,9 +385,9 @@ def _predicate_rule(v02: bool) -> Rule:
                     **_optional(v02, {"change_image": _IMAGE}),
                 },
             ),
-            "gates": _gates_rule(v02),
+            "gates": _gates_rule(version),
             "human_decisions": _is([]),
-            "not_checked": _list(_NOT_CHECKED),
+            "not_checked": _not_checked_rule(version),
             "ledger": _fields({"events": _whole(0)}, {"head": _DIGEST}),
         },
         _optional(v02, {"repeated": _fields({"runs": _whole(2), "consistent": _boolean})}),
@@ -397,20 +446,21 @@ def _subject(check: _Check, value: object, place: Place) -> None:
         check.bad((*place, position), "is not a subject of the schema")
 
 
-def _statement_rule(predicate_type: str, v02: bool) -> Rule:
+def _statement_rule(predicate_type: str, version: int) -> Rule:
     return _fields(
         {
             "_type": _is(STATEMENT),
             "subject": _subject,
             "predicateType": _is(predicate_type),
-            "predicate": _predicate_rule(v02),
+            "predicate": _predicate_rule(version),
         }
     )
 
 
 _STATEMENTS = {
-    PREDICATE_V01: _statement_rule(PREDICATE_V01, False),
-    PREDICATE: _statement_rule(PREDICATE, True),
+    PREDICATE_V01: _statement_rule(PREDICATE_V01, 1),
+    PREDICATE_V02: _statement_rule(PREDICATE_V02, 2),
+    PREDICATE: _statement_rule(PREDICATE, 3),
 }
 """The schema of each version of the predicate, which a file is read with (ADR-0069)."""
 

@@ -58,6 +58,35 @@ class Checks:
 
 
 @dataclass(frozen=True)
+class HeldCase:
+    """A case that holds out an example: its requirement and its name."""
+
+    requirement: str
+    case: str
+
+
+@dataclass(frozen=True)
+class UnheldCase:
+    """A case that holds out nothing, with its motive: `single-example` or `all-published`."""
+
+    requirement: str
+    case: str
+    motive: str
+
+
+@dataclass(frozen=True)
+class Holdout:
+    """The hold-out of a sealed run: the digest of its batch, the cases that hold out an example,
+    the examples kept visible as already published and the cases that hold out nothing. It holds no
+    id of a held-out example and no value (ADR-0075)."""
+
+    batch: str
+    held: tuple[HeldCase, ...]
+    kept_visible: tuple[str, ...]
+    without_holdout: tuple[UnheldCase, ...]
+
+
+@dataclass(frozen=True)
 class GateRan:
     """A gate that ran, with the verdict it gave, its findings, its checks and what it left out."""
 
@@ -67,6 +96,8 @@ class GateRan:
     checks: tuple[Checks, ...] = ()
     unstable_tests: tuple[str, ...] = ()
     unstable_examples: tuple[str, ...] = ()
+    holdout: Holdout | None = None
+    """The hold-out of the batch, for the gate `sealed-examples` when it observed."""
 
 
 @dataclass(frozen=True)

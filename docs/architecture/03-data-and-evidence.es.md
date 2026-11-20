@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:44b7e96bdf468e5a -->
+<!-- translation-of: 03-data-and-evidence.md sha256:5ba102d1312d4e92 -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -318,7 +318,7 @@ terminada, sea cual sea su veredicto.
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
       {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
-       "checks": {"origin": "human", "total": 3},
+       "checks": {"origin": "human", "total": 2},
        "holdout": {
          "batch": "sha256:5a7d…",
          "held": [{"requirement": "R1", "case": "half-up"}, {"requirement": "R2", "case": "negative"}],
@@ -368,7 +368,8 @@ terminada, sea cual sea su veredicto.
   ya publicados, y los casos que no reservan nada con su motivo, `single-example` o `all-published`;
   nunca el id de un ejemplo reservado. `not_checked` lista entonces cada uno de esos casos como
   `case-without-holdout`, y cada límite de la detección de lo publicado como
-  `best-effort-secrecy`. Donde no está la clave, o el contrato no reserva ningún ejemplo, la puerta
+  `best-effort-secrecy`, una entrada por cada uno de sus cinco límites, de las que el ejemplo
+  muestra una. Donde no está la clave, o el contrato no reserva ningún ejemplo, la puerta
   no es aplicable con esa razón, y la evidencia no dice nada más de la reserva.
 - Donde un campo significa lo mismo que uno del resumen de verificación de SLSA, usa ese nombre,
   para que más adelante se pueda producir un resumen en ese formato a partir de la evidencia. Ese

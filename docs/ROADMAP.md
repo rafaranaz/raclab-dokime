@@ -485,6 +485,58 @@ more examples in the cases of their requirements of change (`tests/corpus/holdou
   where the contract is described and in what the person who approves looks at; a warning of
   `contract check` is reconsidered with the data of B3.
 
+**B1 closed on 2026-11-20.** The three contracts of B0 were sealed with `dokime contract seal`, each
+in a local clone of its project on the base of its case, and audited with the key; what each patch
+was expected to give was pushed before its audit (`tests/corpus/holdout-by-hand/sealed-run.toml`).
+
+- [x] **On the contracts of B0, the local sealed run gives the verdict each case expects.** Each of
+  the eight patches gave the verdict, the gate and the outcome of `sealed-examples` written before
+  its audit (CORPUS-066 to CORPUS-068, CORPUS-072). The seed held out the same example as B0 in
+  `replace`, and others in mdformat and `nextver`, where the special-cased patches of B0 fail at
+  `visible-examples` on examples of B0 left visible; two patches written for this seal, as in B0,
+  fail at `sealed-examples`.
+
+  | Contract | Patch | Expected | Measured | `sealed-examples` |
+  |---|---|---|---|---|
+  | `replace` | minimal | PASS | PASS | run, PASS |
+  | `replace` | special-cased of B0 | FAIL at `sealed-examples` | FAIL at `sealed-examples` | run, FAIL |
+  | mdformat | minimal | PASS | PASS | run, PASS |
+  | mdformat | special-cased of B0 | FAIL at `visible-examples` | FAIL at `visible-examples` | not reached |
+  | mdformat | special-cased for this seal | FAIL at `sealed-examples` | FAIL at `sealed-examples`, 2 of 2 | run, FAIL |
+  | `nextver` | minimal | FAIL at `existing-tests` | FAIL at `existing-tests` | not reached |
+  | `nextver` | special-cased of B0 | FAIL at `visible-examples` | FAIL at `visible-examples` | not reached |
+  | `nextver` | special-cased for this seal | FAIL at `sealed-examples` | FAIL at `sealed-examples`, 4 of 4 | run, FAIL |
+
+- [x] **A batch whose canary passes is detected by the gate:** `canary-passed`, of the verdict
+  `ERROR` (VERIFY-164, `tests/verify/test_sealed_examples.py`).
+- [x] **The evidence records the barrier and the best effort**, as
+  [ADR-0075](adr/0075-the-predicate-v0-3-records-the-hold-out.md) decided: the barrier is checked
+  by the gate, and a break is a finding (`sealed-batch-mismatch`, `canary-passed`); what is only
+  attempted, the detection of a held-out example already published, is listed as
+  `best-effort-secrecy`, one entry for each of its limits, with the cases without a held-out
+  example as `case-without-holdout` (the evidence in `sealed-run/`).
+- [x] **The identity never enters the sandbox,** checked and not only reasoned: every call of git
+  and podman of the eight audits was logged, 1456 and 476, with 64 build contexts, and none held
+  the path of the identity, its name or its passphrase, nor inherited the descriptor of
+  `--passphrase-fd`; the job `corpus` repeats it with an identity made for the test (CORPUS-071).
+- [x] **In CI the gate is not applicable with its reason:** a contract sealed in the measurement,
+  committed on the base of its case and audited without the key, gives `the key is not here`
+  (CORPUS-069), and every case of the corpus that reaches the gate gives `the contract holds out
+  no example` (CORPUS-070).
+- [x] **A batch written by pyrage decrypts with the binary `age`** (PLATFORM-095, run in CI with
+  `age` installed).
+
+Its limits:
+
+- **The examples are public.** They are in this repository, outside the history of the projects,
+  where the detection of what was published does not look: the limit of a copy in another file.
+  The run measures the mechanism, not the value of a hold-out with secret examples.
+- **The agents of the two patches written for this seal** were asked not to read outside their
+  directory, which could not be enforced: the whole contracts of B0 are in this repository. What
+  bounds it: each of those patches fails every held-out example of its contract, 2 of 2 and 4 of
+  4, so even if they could have read the whole contracts, they did not use them.
+- **The value of a hold-out with secret examples** is left to B3 and B4, which measure it.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
@@ -512,6 +564,9 @@ milestone that finds them:
   limit of spending for a run, since the budgets of the flow count repetitions, not money; and the
   expected verdict of `replace-fixes-only-major` and `nextver-changes-the-tests-to-fit` under the
   loop of attempts, which may fix or clean them, so it depends on the budget of attempts.
+- **Before the evidence reaches the agent, in block C:** each finding of the gate of the sealed
+  examples carries in `lines` the line of its entry in `held_out`, which tells which held-out id
+  failed; whether that reaches the agent is decided before the agent sees the evidence.
 - **Before D2:** how the differences found outside the change are grouped without the gateway to
   a model.
 

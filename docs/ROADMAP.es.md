@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:87312b9876f06c84 -->
+<!-- translation-of: ROADMAP.md sha256:03d94470ad7007b4 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -499,6 +499,59 @@ con más ejemplos en los casos de sus requisitos de cambio (`tests/corpus/holdou
   donde se describe el contrato y en lo que mira quien aprueba; un aviso de `contract check` se
   reconsidera con los datos de B3.
 
+**B1 se cerró el 2026-11-20.** Los tres contratos de B0 se sellaron con `dokime contract seal`, cada
+uno en un clon local de su proyecto sobre la base de su caso, y se auditaron con la clave; lo que se
+esperaba de cada parche se subió antes de su auditoría (`tests/corpus/holdout-by-hand/sealed-run.toml`).
+
+- [x] **Sobre los contratos de B0, la ejecución sellada local da el veredicto que espera cada
+  caso.** Cada uno de los ocho parches dio el veredicto, la puerta y el resultado de
+  `sealed-examples` escritos antes de su auditoría (CORPUS-066 a CORPUS-068, CORPUS-072). La
+  semilla reservó el mismo ejemplo que B0 en `replace`, y otros en mdformat y `nextver`, donde los
+  parches de casos especiales de B0 fallan en `visible-examples` por ejemplos de B0 que quedaron
+  visibles; dos parches escritos para este sellado, como en B0, fallan en `sealed-examples`.
+
+  | Contrato | Parche | Esperado | Medido | `sealed-examples` |
+  |---|---|---|---|---|
+  | `replace` | mínimo | PASS | PASS | ejecutada, PASS |
+  | `replace` | de casos especiales de B0 | FAIL en `sealed-examples` | FAIL en `sealed-examples` | ejecutada, FAIL |
+  | mdformat | mínimo | PASS | PASS | ejecutada, PASS |
+  | mdformat | de casos especiales de B0 | FAIL en `visible-examples` | FAIL en `visible-examples` | no alcanzada |
+  | mdformat | de casos especiales para este sellado | FAIL en `sealed-examples` | FAIL en `sealed-examples`, 2 de 2 | ejecutada, FAIL |
+  | `nextver` | mínimo | FAIL en `existing-tests` | FAIL en `existing-tests` | no alcanzada |
+  | `nextver` | de casos especiales de B0 | FAIL en `visible-examples` | FAIL en `visible-examples` | no alcanzada |
+  | `nextver` | de casos especiales para este sellado | FAIL en `sealed-examples` | FAIL en `sealed-examples`, 4 de 4 | ejecutada, FAIL |
+
+- [x] **La puerta detecta un lote cuyo canario pasa:** `canary-passed`, con el veredicto `ERROR`
+  (VERIFY-164, `tests/verify/test_sealed_examples.py`).
+- [x] **La evidencia registra la barrera y el mejor esfuerzo**, como decidió la
+  [ADR-0075](adr/0075-the-predicate-v0-3-records-the-hold-out.es.md): la barrera la comprueba la
+  puerta, y una rotura es un hallazgo (`sealed-batch-mismatch`, `canary-passed`); lo que solo se
+  intenta, la detección de un ejemplo reservado ya publicado, se lista como `best-effort-secrecy`,
+  una entrada por cada uno de sus límites, con los casos sin ejemplo reservado como
+  `case-without-holdout` (las evidencias en `sealed-run/`).
+- [x] **La identidad nunca entra en el sandbox,** comprobado y no solo razonado: se registró cada
+  llamada a git y a podman de las ocho auditorías, 1456 y 476, con 64 contextos de construcción, y
+  ninguna llevaba la ruta de la identidad, su nombre ni su frase de paso, ni heredaba el descriptor
+  de `--passphrase-fd`; el job `corpus` lo repite con una identidad hecha para el test
+  (CORPUS-071).
+- [x] **En CI la puerta no es aplicable con su razón:** un contrato sellado en la medición,
+  commiteado sobre la base de su caso y auditado sin la clave, da `the key is not here`
+  (CORPUS-069), y cada caso del corpus que llega a la puerta da `the contract holds out no example`
+  (CORPUS-070).
+- [x] **Un lote escrito por pyrage se descifra con el binario `age`** (PLATFORM-095, ejecutado en CI
+  con `age` instalado).
+
+Sus límites:
+
+- **Los ejemplos son públicos.** Están en este repositorio, fuera del historial de los proyectos,
+  donde la detección de lo publicado no mira: el límite de una copia en otro fichero. La ejecución
+  mide el mecanismo, no el valor de una reserva con ejemplos secretos.
+- **A los agentes de los dos parches escritos para este sellado** se les pidió no leer fuera de su
+  directorio, y no se pudo impedir: los contratos completos de B0 están en este repositorio. Lo que
+  lo acota: cada uno de esos parches falla todos los ejemplos reservados de su contrato, 2 de 2 y 4
+  de 4, así que, aunque hubieran podido leer los contratos completos, no los usaron.
+- **El valor de una reserva con ejemplos secretos** queda para B3 y B4, que lo miden.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
@@ -528,6 +581,9 @@ encuentra:
   el veredicto esperado de `replace-fixes-only-major` y `nextver-changes-the-tests-to-fit` bajo el
   bucle de intentos, que puede arreglarlos o limpiarlos, así que depende del presupuesto de
   intentos.
+- **Antes de que la evidencia llegue al agente, en el bloque C:** cada hallazgo de la puerta de los
+  ejemplos sellados lleva en `lines` la línea de su entrada en `held_out`, que dice qué id reservado
+  falló; si eso llega al agente se decide antes de que el agente vea la evidencia.
 - **Antes de D2:** cómo se agrupan las diferencias encontradas fuera del cambio sin la pasarela a
   un modelo.
 

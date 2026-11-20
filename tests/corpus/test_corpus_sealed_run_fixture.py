@@ -1,7 +1,8 @@
-# SDD-EARS: CORPUS-066 CORPUS-067 CORPUS-068
+# SDD-EARS: CORPUS-066 CORPUS-067 CORPUS-068 CORPUS-072
 """The fixture of the sealed run of B1: the seal of each contract of B0, and what each patch expects
 of its audit."""
 
+import json
 import re
 import tomllib
 from collections import Counter
@@ -11,6 +12,7 @@ from typing import Any
 import pytest
 
 from dokime.contract.check import check
+from dokime.evidence.schema import read_back
 
 HERE = Path(__file__).parent / "holdout-by-hand"
 RUN: dict[str, Any] = tomllib.loads((HERE / "sealed-run.toml").read_text())
@@ -85,3 +87,31 @@ def test_each_patch_has_what_it_expects_with_its_reason() -> None:
         assert ("expected_gate" in patch) == (patch["expected"] != "PASS")
         assert patch["why"]
         assert (HERE / "patches" / f"{patch['contract']}.{patch['kind']}.diff").is_file()
+
+
+@pytest.mark.parametrize("patch", PATCHES, ids=lambda p: f"{p['contract']}.{p['kind']}")
+def test_each_patch_gave_what_it_expected_and_keeps_its_evidence(patch: dict[str, Any]) -> None:
+    assert patch["measured"] == patch["expected"]
+    assert patch.get("measured_gate") == patch.get("expected_gate")
+    assert patch["measured_sealed"] == patch["expected_sealed"]
+    data = (
+        HERE / "sealed-run" / f"{patch['contract']}.{patch['kind']}.statement.json"
+    ).read_bytes()
+    assert read_back(data) == ()
+    predicate = json.loads(data)["predicate"]
+    assert predicate["verdict"] == patch["measured"]
+    (gate,) = [g for g in predicate["gates"] if g["gate"] == "sealed-examples"]
+    assert ("holdout" in gate) == (patch["measured_sealed"] in {"run PASS", "run FAIL"})
+    (contract,) = [c for c in CONTRACTS if c["name"] == patch["contract"]]
+    for held in contract["held_out"]:
+        assert held.encode() not in data
+
+
+def test_no_call_of_the_sealed_audits_held_the_identity_or_the_passphrase() -> None:
+    calls = RUN["subprocesses"]
+    assert calls["git"] > 0
+    assert calls["podman"] > 0
+    assert calls["builds_with_a_context"] > 0
+    assert calls["holding_the_identity"] == 0
+    assert calls["holding_the_passphrase"] == 0
+    assert calls["inheriting_the_descriptor"] == 0

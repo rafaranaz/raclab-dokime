@@ -70,6 +70,8 @@ kind = "minimal"
 expected = "PASS"
 expected_sealed = "run PASS"
 why = "the patch holds every example of the contract (B0: all PASS)"
+measured = "PASS"
+measured_sealed = "run PASS"
 
 [[patch]]
 contract = "format-a-blank-paragraph-between-blocks"
@@ -78,6 +80,9 @@ expected = "FAIL"
 expected_gate = "visible-examples"
 expected_sealed = "not-reached"
 why = "E-4cdd, held out by hand in B0 and failed by the patch, is visible after this seal"
+measured = "FAIL"
+measured_gate = "visible-examples"
+measured_sealed = "not-reached"
 
 [[patch]]
 contract = "nextver-bumps-build-only-versions"
@@ -86,6 +91,9 @@ expected = "FAIL"
 expected_gate = "existing-tests"
 expected_sealed = "not-reached"
 why = "the patch fails a doctest of the documentation that the fix updates (B0)"
+measured = "FAIL"
+measured_gate = "existing-tests"
+measured_sealed = "not-reached"
 
 [[patch]]
 contract = "nextver-bumps-build-only-versions"
@@ -94,6 +102,9 @@ expected = "FAIL"
 expected_gate = "visible-examples"
 expected_sealed = "not-reached"
 why = "E-0176, E-4078 and E-e2ac, held out by hand in B0 and failed by the patch, are visible after this seal"
+measured = "FAIL"
+measured_gate = "visible-examples"
+measured_sealed = "not-reached"
 
 [[patch]]
 contract = "replace-keeps-the-constructor-error"
@@ -101,6 +112,8 @@ kind = "minimal"
 expected = "PASS"
 expected_sealed = "run PASS"
 why = "the patch holds every example of the contract (B0: all PASS)"
+measured = "PASS"
+measured_sealed = "run PASS"
 
 [[patch]]
 contract = "replace-keeps-the-constructor-error"
@@ -109,6 +122,9 @@ expected = "FAIL"
 expected_gate = "sealed-examples"
 expected_sealed = "run FAIL"
 why = "the seal holds out E-aacc, as B0 did, and the patch fails it while it holds the visible examples"
+measured = "FAIL"
+measured_gate = "sealed-examples"
+measured_sealed = "run FAIL"
 
 # Two patches written for this seal, as in B0: a new agent for each contract, which saw only the
 # visible examples of this split and a copy of the base without its history, ran nothing against
@@ -122,6 +138,9 @@ expected = "FAIL"
 expected_gate = "sealed-examples"
 expected_sealed = "run FAIL"
 why = "the patch maps the exact input of each visible example to its output, so it holds them and fails the held-out ones of this seal"
+measured = "FAIL"
+measured_gate = "sealed-examples"
+measured_sealed = "run FAIL"
 
 [[patch]]
 contract = "nextver-bumps-build-only-versions"
@@ -130,3 +149,18 @@ expected = "FAIL"
 expected_gate = "sealed-examples"
 expected_sealed = "run FAIL"
 why = "the patch answers the exact version and part of each visible example of build metadata, so it holds them and fails the held-out ones of this seal"
+measured = "FAIL"
+measured_gate = "sealed-examples"
+measured_sealed = "run FAIL"
+
+# Every call of git and podman of the eight sealed audits went through a wrapper that logged its
+# arguments, its environment, the descriptors it inherited and, for a build, the files of its
+# context. The passphrase was given with --passphrase-fd. None of the calls held the path of the
+# identity, its name or the passphrase, and none inherited the descriptor of the passphrase.
+[subprocesses]
+git = 1456
+podman = 476
+builds_with_a_context = 64
+holding_the_identity = 0
+holding_the_passphrase = 0
+inheriting_the_descriptor = 0

@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-050 CORPUS-051 CORPUS-052 CORPUS-053 CORPUS-054 CORPUS-055
+# SDD-EARS: CORPUS-050 CORPUS-051 CORPUS-052 CORPUS-053 CORPUS-054 CORPUS-055 CORPUS-070
 """The audit of each case of the corpus with the command `audit`, the real git and podman.
 
 It measures the exit criterion of A3: a good case passes, and a bad one fails first at the gate
@@ -80,6 +80,12 @@ def test_a_case_gets_its_expected_verdict_at_its_gate(tmp_path: Path, case: Case
         data = Path(document["evidence"]["path"]).read_bytes()
         assert read_back(data) == ()
         predicate = json.loads(data)["predicate"]
+        (sealed,) = [g for g in predicate["gates"] if g["gate"] == "sealed-examples"]
+        if sealed["status"] != "not-reached":
+            assert (sealed["status"], sealed["reason"]) == (
+                "not-applicable",
+                "the contract holds out no example",
+            )
         ran = any(g["gate"] == "repeatability" and g["status"] == "run" for g in predicate["gates"])
         if ran:
             assert predicate.get("repeated") == {"runs": 2, "consistent": True}

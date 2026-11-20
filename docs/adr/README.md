@@ -86,3 +86,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md) | The key of the hold-out lives outside CI until B4 | Accepted |
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Accepted |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.md) | The predicate v0.3 records the hold-out | Accepted |
+| [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) | A relation runs on the visible examples of its requirement | Proposed |

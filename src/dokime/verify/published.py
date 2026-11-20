@@ -9,8 +9,11 @@ published since.
 
 These are limits, not guarantees: the content is compared as YAML reads it, so an example published
 with a field added or a value spelt otherwise is not recognised; the versions are those that the
-history of the file gives, without a rename nor a commit that the start does not reach; and a copy
-of an example in another file is not looked for.
+history of the file gives, without a rename nor a commit that the start does not reach; a copy of
+an example in another file is not looked for; and the gate reads the history up to the base of the
+change, so a held-out example published in a commit of the change and taken back in another is not
+seen by its audit: where the project merges keeping the commits, by rebase or by a merge commit,
+the next audit sees it, and with a squash merge no audit does.
 """
 
 import json

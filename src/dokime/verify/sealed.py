@@ -19,6 +19,11 @@ from its text with the requirements of the contract, observes them and the canar
 the change, and words a held-out failure as the oracle does for the agent, with no value, input or
 identifier.
 
+Whether the gate applies is decided first, from the entries `held_out` of the contract and the
+sealed batch of the base, before the key: the two go together, or the gate gives an `ERROR`;
+without both it does not apply, since the contract holds out no example; and without the key it
+does not apply either, for its own reason.
+
 Before it observes, the gate reads the history of the contract of the story: the base of the batch
 has to be in the history of the change, the examples kept visible have to be exactly those that
 `published` finds from that base, and no held-out example may be published in the history of the
@@ -56,6 +61,7 @@ from dokime.verify.trees import change_tree
 
 SEALED = "sealed-examples"
 NOT_HERE = "the key is not here"
+NOT_SEALED = "the contract holds out no example"
 _IMPOSSIBLE = re.compile(r"[0-9a-f]{32}")
 _SALT = re.compile(r"[0-9a-f]{32}")
 _COMMIT = re.compile(r"[0-9a-f]{40}")
@@ -229,6 +235,28 @@ def _impossible(value: object) -> str:
     if not isinstance(value, str) or _IMPOSSIBLE.fullmatch(value) is None:
         raise ValueError("not 32 hexadecimal digits")
     return value
+
+
+def applicability(holds_out: bool, batched: bool, key: bool) -> GateResult | str | None:
+    """Whether the gate applies, from whether the contract of the base has entries in `held_out`,
+    whether the base has a sealed batch for the story, and whether the key is here: a result with a
+    finding when the two of the base do not go together, which is decided before the key; the
+    reason not to apply when neither is, or when the key is not here; and `None` when the gate
+    runs."""
+    if batched and not holds_out:
+        message = "the base has a sealed batch for the story and its contract holds out no example"
+        return GateResult(gate=SEALED, findings=(_mismatch(message),))
+    if holds_out and not batched:
+        message = "the contract holds out examples and the base has no sealed batch for the story"
+        return GateResult(
+            gate=SEALED,
+            findings=(
+                Finding(code="sealed-batch-missing", message=message, verdict=Verdict.ERROR),
+            ),
+        )
+    if not holds_out:
+        return NOT_SEALED
+    return None if key else NOT_HERE
 
 
 def sealed_examples(

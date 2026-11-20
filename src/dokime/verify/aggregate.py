@@ -27,13 +27,13 @@ BUILT = frozenset(
         "existing-tests",
         "visible-examples",
         "repeatability",
+        "sealed-examples",
     }
 )
 """The gates of the table of the architecture that this version runs."""
 
 NOT_BUILT: Mapping[str, str] = {
     "relations": "the gate is built in block B",
-    "sealed-examples": "the gate is built in block B",
     "agent-run": "the gate is built in block C",
     "changed-line-coverage": "the gate is built in block D",
     "behaviour-differences": "the gate is built in block D",

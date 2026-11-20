@@ -19,10 +19,13 @@ from dokime.evidence.run import (
     GateNotApplicable,
     GateNotReached,
     GateRan,
+    HeldCase,
+    Holdout,
     Image,
     Inputs,
     Requirement,
     Run,
+    UnheldCase,
 )
 from dokime.evidence.schema import read_back
 from dokime.evidence.statement import build
@@ -168,3 +171,32 @@ def changed(*changes: tuple[str, object]) -> list[tuple[str, str]]:
     found = read_back(canonical(value).encode())
     assert all(f.verdict is Verdict.ERROR for f in found)
     return [(f.code, f.message) for f in found]
+
+
+BATCH = "sha256:" + "f" * 64
+HOLDOUT = Holdout(
+    batch=BATCH,
+    held=(HeldCase("R-1", "c1"), HeldCase("R-3", "c3")),
+    kept_visible=("E-k1", "E-k2"),
+    without_holdout=(
+        UnheldCase("R-1", "c-single", "single-example"),
+        UnheldCase("R-3", "c-pub", "all-published"),
+    ),
+)
+"""The hold-out of a sealed run: two cases with a held-out example and one of each motive."""
+
+
+def sealed(
+    holdout: Holdout | None = HOLDOUT,
+    verdict: Verdict = Verdict.PASS,
+    findings: tuple[Finding, ...] = (),
+) -> Run:
+    """The whole run with the gate `sealed-examples` run, with the hold-out given."""
+    ran = GateRan(
+        "sealed-examples",
+        verdict,
+        findings=findings,
+        checks=(Checks("human", 2),),
+        holdout=holdout,
+    )
+    return run(gates=gates_with(ran))

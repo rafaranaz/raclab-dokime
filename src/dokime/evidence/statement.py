@@ -11,8 +11,28 @@ from dataclasses import dataclass
 
 from dokime.core.canonical import canonical
 from dokime.core.findings import Finding
-from dokime.evidence.run import Contract, Gate, GateNotReached, GateRan, Image, Inputs, Run
-from dokime.evidence.schema import MESSAGE, NAME, ORIGINS, PREDICATE, STATEMENT, cut, read_back
+from dokime.core.runtime import Digest
+from dokime.evidence.run import (
+    Contract,
+    Gate,
+    GateNotReached,
+    GateRan,
+    Holdout,
+    Image,
+    Inputs,
+    Run,
+)
+from dokime.evidence.schema import (
+    MESSAGE,
+    MOTIVES,
+    NAME,
+    ORIGINS,
+    PREDICATE,
+    SEALED,
+    STATEMENT,
+    cut,
+    read_back,
+)
 from dokime.evidence.unchecked import not_checked
 
 type Value = dict[str, object]
@@ -113,9 +133,24 @@ def _gate(gate: Gate) -> Value:
         }
         if gate.checks:
             entry["checks"] = [{"origin": c.origin, "total": c.total} for c in gate.checks]
+        if gate.holdout is not None:
+            entry["holdout"] = _holdout(gate.holdout)
         return entry
     status = "not-reached" if isinstance(gate, GateNotReached) else "not-applicable"
     return {"gate": gate.gate, "status": status, "reason": gate.reason}
+
+
+def _holdout(holdout: Holdout) -> Value:
+    """The hold-out of the batch: cases, ids of visible examples and the digest, nothing else."""
+    return {
+        "batch": holdout.batch,
+        "held": [{"requirement": c.requirement, "case": c.case} for c in holdout.held],
+        "kept_visible": list(holdout.kept_visible),
+        "without_holdout": [
+            {"requirement": c.requirement, "case": c.case, "motive": c.motive}
+            for c in holdout.without_holdout
+        ],
+    }
 
 
 def _finding(finding: Finding) -> Value:
@@ -147,6 +182,9 @@ def _check(run: Run) -> None:
                 f"the name {name!r} of the story, a requirement or an unstable example is not"
                 " letters and digits in words joined by hyphens, starting with a letter"
             )
+    for gate in ran:
+        if gate.holdout is not None:
+            _check_holdout(gate.gate, gate.holdout)
     counted = Counter(gate.gate for gate in run.gates)
     repeated = sorted(name for name, count in counted.items() if count > 1)
     if repeated:
@@ -158,3 +196,23 @@ def _check(run: Run) -> None:
                     f"the check of origin {checks.origin!r} with total {checks.total} of the gate"
                     f" {gate.gate!r} is not of {', '.join(ORIGINS)} with a total of at least one"
                 )
+
+
+def _check_holdout(gate: str, holdout: Holdout) -> None:
+    if gate != SEALED:
+        raise ValueError(f"the gate {gate!r} has a hold-out, which only {SEALED} may have")
+    try:
+        Digest(holdout.batch)
+    except ValueError:
+        raise ValueError(f"the digest {holdout.batch!r} of the batch is not a digest") from None
+    names = [
+        *(name for c in holdout.held for name in (c.requirement, c.case)),
+        *holdout.kept_visible,
+        *(name for c in holdout.without_holdout for name in (c.requirement, c.case)),
+    ]
+    for name in names:
+        if NAME.fullmatch(name) is None:
+            raise ValueError(f"the name {name!r} of the hold-out is not a name")
+    for case in holdout.without_holdout:
+        if case.motive not in MOTIVES:
+            raise ValueError(f"the motive {case.motive!r} is not one of {', '.join(MOTIVES)}")

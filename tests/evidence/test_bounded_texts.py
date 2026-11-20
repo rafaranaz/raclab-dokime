@@ -58,7 +58,7 @@ def test_a_message_longer_than_4096_characters_is_refused() -> None:
 
 
 def test_a_quoted_text_longer_than_200_characters_is_refused() -> None:
-    place = "predicate/not_checked/5/untrusted/0/text"
+    place = "predicate/not_checked/2/untrusted/0/text"
     ((code, message),) = changed((place, "t" * 201))
     assert code == "evidence-schema"
     assert place in message

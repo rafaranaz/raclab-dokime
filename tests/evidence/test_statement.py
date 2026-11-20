@@ -10,7 +10,7 @@ def test_the_statement_is_an_in_toto_statement_of_the_tree_and_the_patch() -> No
     given = statement()
     assert given["_type"] == "https://in-toto.io/Statement/v1"
     assert given["predicateType"] == (
-        "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2"
+        "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3"
     )
     assert given["subject"] == [
         {"name": "tree", "digest": {"gitTree": "1" * 40}},

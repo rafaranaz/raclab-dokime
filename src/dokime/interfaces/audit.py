@@ -11,19 +11,27 @@ event that says so. A patch that does not apply, a policy that does not read and
 not a name end the audit before the run, since there is nothing to attest or name.
 """
 
+import hashlib
 import tempfile
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
-from dokime.contract.model import Contract
+from dokime.contract.model import Contract, HeldOut
 from dokime.core.clock import Clock
 from dokime.core.findings import Finding
-from dokime.core.layout import change_directory
+from dokime.core.layout import change_directory, sealed_path
 from dokime.core.ledger import Ledger, LedgerStore, head
 from dokime.core.observation import ExampleObserver, ObservationLimits
 from dokime.core.policy import Policy
-from dokime.core.repository import AuditedRepository, CommitName, RefusalError, TreeName
+from dokime.core.repository import (
+    AuditedRepository,
+    CommitName,
+    FileHistory,
+    RefusalError,
+    TreeName,
+)
 from dokime.core.runtime import Build, BuildLimits, Digest, VerificationRuntime
+from dokime.core.sealed import SealedStore
 from dokime.core.verdicts import Verdict
 from dokime.evidence import run as evidence
 from dokime.evidence.statement import Evidence, build
@@ -31,6 +39,7 @@ from dokime.interfaces.inputs import (
     ContractRead,
     PackRead,
     read_contract,
+    read_in_tree,
     read_pack,
     read_tree_policy,
 )
@@ -42,6 +51,7 @@ from dokime.verify.protected import protected_paths
 from dokime.verify.repeatability import GATE as REPEATABILITY
 from dokime.verify.repeatability import repeatability
 from dokime.verify.result import GateResult
+from dokime.verify.sealed import SEALED, applicability, read_batch, sealed_examples
 from dokime.verify.trees import base_tree, change_tree
 
 STATES: tuple[tuple[str, tuple[str, ...]], ...] = (
@@ -77,6 +87,10 @@ class Ports:
     runtime: VerificationRuntime
     observer: ExampleObserver
     probe: Digest
+    history: FileHistory | None = None
+    """The history of the files of the project, which the gate of the sealed examples reads."""
+    sealed: SealedStore | None = None
+    """The store that opens the sealed batch with the key, or none where the key is not."""
 
 
 @dataclass(frozen=True)
@@ -104,7 +118,7 @@ class Audited:
     evidence: Evidence | None = None
 
 
-def convert(entry: GateEntry) -> evidence.Gate:
+def convert(entry: GateEntry, holdout: evidence.Holdout | None = None) -> evidence.Gate:
     """A gate of a state of `verify` in the types of `evidence`."""
     if entry.status is Status.NOT_APPLICABLE or entry.result is None:
         return evidence.GateNotApplicable(entry.gate, entry.reason or "")
@@ -121,6 +135,7 @@ def convert(entry: GateEntry) -> evidence.Gate:
         checks=tuple(evidence.Checks(c.origin, c.total) for c in result.checks),
         unstable_tests=result.unstable if result.gate == _UNSTABLE_TESTS else (),
         unstable_examples=result.unstable if result.gate == _UNSTABLE_EXAMPLES else (),
+        holdout=holdout,
     )
 
 
@@ -180,8 +195,15 @@ class _Run:
         self.change_build: Build | None = None
         self.change_refusal: RefusalError | None = None
         self.repeated: evidence.Repeated | None = None
+        self.story = ""
+        self.absent: dict[str, str] = {}
+        """The gates that this version builds and that do not apply, with their reason."""
+        self.sealed_decided: GateResult | None = None
+        self.sealed_bytes: bytes | None = None
+        self.holdout: evidence.Holdout | None = None
 
     def go(self, story: str, tree: TreeName) -> Audited:
+        self.story = story
         self.ledger.record("run.started", {"base": self.request.base.text, "story": story})
         gates: list[evidence.Gate] = []
         verdict = Verdict.PASS
@@ -192,7 +214,7 @@ class _Run:
                 continue
             self.ledger.record("state.entered", {"state": state})
             results = self._results(names)
-            outcome = aggregate_state(names, results)
+            outcome = aggregate_state(names, results, self.absent)
             if outcome.findings:
                 self.ledger.record(
                     "run.finished",
@@ -202,7 +224,10 @@ class _Run:
                     },
                 )
                 return Audited(verdict=Verdict.ERROR, findings=outcome.findings, gates=tuple(gates))
-            gates.extend(convert(entry) for entry in outcome.gates)
+            gates.extend(
+                convert(entry, self.holdout if entry.gate == SEALED else None)
+                for entry in outcome.gates
+            )
             verdict = outcome.verdict
             if verdict is not Verdict.PASS:
                 stopped = (state, verdict)
@@ -214,8 +239,16 @@ class _Run:
     def _results(self, names: tuple[str, ...]) -> tuple[GateResult, ...]:
         """The results of the gates of a state; those of `verifying` as many times as the policy
         says when `repeatability` is built, each with its worst run and with `repeatability`."""
+        if SEALED in names and SEALED in BUILT:
+            decided = self._sealed_applies()
+            if isinstance(decided, str):
+                self.absent[SEALED] = decided
+            else:
+                self.sealed_decided = decided
         if REPEATABILITY not in names or REPEATABILITY not in BUILT:
-            return tuple(self._gate(name) for name in names if name in BUILT)
+            return tuple(
+                self._gate(name) for name in names if name in BUILT and name not in self.absent
+            )
         repeated = [name for name in names if name in BUILT and name != REPEATABILITY]
         count = self.policy.verification_runs
         runs = [
@@ -280,7 +313,72 @@ class _Run:
             return visible_examples(
                 pack, contract, base, patch, changed, repository, self.ports.observer, limits
             )
+        if name == SEALED:
+            return self.sealed_decided or self._sealed(contract, pack, dockerfile)
         raise ValueError(f"the gate {name!r} is not one that this version runs")
+
+    def _sealed_applies(self) -> GateResult | str | None:
+        """Whether the gate of the sealed examples applies, from the entries `held_out` of the
+        contract of the story in the base, its sealed batch in the base and whether the key is
+        here, before the batch is opened; a contract given from outside has to hold the entries of
+        the base."""
+        given = self.contract.contract if self.contract is not None else None
+        if given is None:
+            raise ValueError("the gate of the sealed examples runs only after the contract")
+        if self.request.contract is None:
+            base_held = given.held_out
+        else:
+            read = read_contract(self.root, story=self.story)
+            base_held = read.contract.held_out if read.contract is not None else ()
+            if _entries(given.held_out) != _entries(base_held):
+                return GateResult(gate=SEALED, findings=(_given_mismatch(given, base_held),))
+        try:
+            self.sealed_bytes = read_in_tree(self.root, PurePosixPath(sealed_path(self.story)))
+        except RefusalError as refusal:
+            if refusal.finding.code != "file-missing":
+                return GateResult(gate=SEALED, findings=(refusal.finding,))
+            self.sealed_bytes = None
+        return applicability(
+            holds_out=bool(base_held),
+            batched=self.sealed_bytes is not None,
+            key=self.ports.sealed is not None,
+        )
+
+    def _sealed(self, contract: Contract, pack: Pack, dockerfile: Path) -> GateResult:
+        """Open the batch with the key, and run the gate on the change; when it observed, keep the
+        hold-out for the evidence."""
+        store, history, sealed = self.ports.sealed, self.ports.history, self.sealed_bytes
+        if store is None or history is None or sealed is None or self.contract is None:
+            raise ValueError("the gate of the sealed examples runs only with its key and batch")
+        try:
+            batch = read_batch(store.open(sealed))
+            changed = self._image_of_the_change(pack, contract, dockerfile)
+        except RefusalError as refusal:
+            return GateResult(gate=SEALED, findings=(refusal.finding,))
+        text = (self.contract.text or b"").decode("utf-8")
+        result = sealed_examples(
+            pack,
+            contract,
+            text,
+            batch,
+            self.request.base,
+            self.request.patch,
+            changed,
+            self.ports.repository,
+            history,
+            self.ports.observer,
+            ObservationLimits(),
+        )
+        if result.checks:
+            self.holdout = evidence.Holdout(
+                batch="sha256:" + hashlib.sha256(sealed).hexdigest(),
+                held=tuple(evidence.HeldCase(h.requirement, h.case) for h in contract.held_out),
+                kept_visible=batch.kept_visible,
+                without_holdout=tuple(
+                    evidence.UnheldCase(u.requirement, u.case, u.reason) for u in batch.unheld
+                ),
+            )
+        return result
 
     def _image_of_the_change(self, pack: Pack, contract: Contract, dockerfile: Path) -> Digest:
         """The image built with the tree of the change of ADR-0058 as the context, built once
@@ -383,6 +481,22 @@ def _unreached(name: str, state: str, verdict: Verdict) -> evidence.Gate:
     return evidence.GateNotReached(
         name, f"the run stopped at the state {state}, whose verdict is {verdict.value}"
     )
+
+
+def _entries(held: tuple[HeldOut, ...]) -> list[tuple[str, str, str, str]]:
+    return [(h.id, h.requirement, h.case, h.digest) for h in held]
+
+
+def _given_mismatch(given: Contract, base_held: tuple[HeldOut, ...]) -> Finding:
+    if base_held and not given.held_out:
+        message = (
+            "the contract given lacks the entries held_out of the base: a local audit is made with"
+            " the visible contract, which holds those entries, not with the whole contract that"
+            " was sealed"
+        )
+    else:
+        message = "the entries held_out of the contract given are not those of the base"
+    return _error("sealed-batch-mismatch", message)
 
 
 def _before(*findings: Finding) -> Audited:

@@ -12,7 +12,6 @@ randomness of the system. The ledger of the run goes to `--out`, empty and outsi
 """
 
 import argparse
-import json
 import os
 import sys
 import tempfile
@@ -25,8 +24,7 @@ from dokime.core.canonical import digest
 from dokime.core.findings import Finding, summarise
 from dokime.core.layout import RECIPIENTS, contract_path, sealed_path
 from dokime.core.ledger import Ledger
-from dokime.core.reading import read
-from dokime.core.repository import CommitName, RefusalError
+from dokime.core.repository import CommitName, FileVersion, RefusalError
 from dokime.core.sealed import read_recipients
 from dokime.core.verdicts import Verdict
 from dokime.interfaces.inputs import read_in_tree
@@ -39,12 +37,12 @@ from dokime.platform.history import versions
 from dokime.platform.ledger_file import LedgerFile
 from dokime.platform.randomness import random_bytes, seed
 from dokime.platform.sealed_store import seal_for
+from dokime.verify.published import example_items, published
 from dokime.verify.sealed import Batch, SealedExample, batch_bytes, make_canary, unheld_cases
 from dokime.verify.trees import base_tree
 
 LEDGER = "ledger.jsonl"
 _YES = {"y", "yes"}
-_CONTENT = ("boundary", "target", "steps")
 
 
 def seal_command(arguments: argparse.Namespace) -> int:
@@ -90,7 +88,7 @@ def _seal(arguments: argparse.Namespace) -> str:
     if answer.lower() not in _YES:
         ledger.record("run.finished", {"verdict": Verdict.ERROR.value})
         raise RefusalError("recipients-not-confirmed", "the recipients were not confirmed")
-    kept = _published(contract, text, project, head, arguments.story)
+    kept = _published(text, project, head, arguments.story)
     drawn_seed = seed()
     done = split(contract, drawn_seed, kept)
     unheld = unheld_cases(contract, done)
@@ -211,34 +209,11 @@ def _line(descriptor: int) -> str:
         read += byte
 
 
-def _published(
-    contract: Contract, text: str, project: Path, head: CommitName, story: str
-) -> frozenset[str]:
-    """The examples of the contract already in a version of it in the history of `HEAD`, by id or
-    by their boundary, target and steps."""
-    ids: set[str] = set()
-    contents: set[str] = set()
-    for _, data in versions(project, head, contract_path(story)):
-        for item in _items(data.decode("utf-8", errors="replace")):
-            if isinstance(item.get("id"), str):
-                ids.add(str(item["id"]))
-            contents.add(_content(item))
-    mine = {
-        str(item["id"]): _content(item) for item in _items(text) if isinstance(item.get("id"), str)
-    }
-    return frozenset(e.id for e in contract.examples if e.id in ids or mine.get(e.id) in contents)
-
-
-def _items(text: str) -> list[dict[str, object]]:
-    value = read(text).value
-    examples = value.get("examples") if isinstance(value, dict) else None
-    if not isinstance(examples, list):
-        return []
-    return [dict(item) for item in examples if isinstance(item, dict)]
-
-
-def _content(item: dict[str, object]) -> str:
-    return json.dumps({k: item.get(k) for k in _CONTENT}, sort_keys=True, default=str)
+def _published(text: str, project: Path, head: CommitName, story: str) -> frozenset[str]:
+    """The examples of the contract already in a version of it in the history of `HEAD`, as
+    `published` of `verify` tells them, the function that the gate of the sealed examples uses."""
+    found = versions(project, head, contract_path(story))
+    return published(example_items(text), (FileVersion(c, data) for c, data in found))
 
 
 def _visible_text(text: str, sealed: tuple[SealedExample, ...]) -> str:

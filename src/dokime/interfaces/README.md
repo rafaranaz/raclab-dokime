@@ -69,7 +69,8 @@ PASS: 2 held-out examples sealed for 1 recipients
   terminal, or through the descriptor `--recipients-confirmed-by-fd N`; without both,
   `no-confirmation-source`.
 - **An example already published**, in a version of the contract in the history of `HEAD` by its
-  id or by its boundary, target and steps, is kept visible, whatever the seed. The seed, the salts
+  id or by its boundary, target and steps, as `published` of `verify` tells it, the function that
+  the gate of the sealed examples uses, is kept visible, whatever the seed. The seed, the salts
   and the canary come from the randomness of the system. A contract whose split holds out nothing
   is `nothing-to-hold-out`.
 - **The ledger** of the run, in `--out/ledger.jsonl`, records its start with the story and the
@@ -200,3 +201,18 @@ the ledger store:
   extracted and a policy with a finding end the audit before the run, with nothing recorded.
 - `convert` turns a result of `verify` into the types of `evidence`, field by field; `CONVERTED`
   names the fields of the result that it carries, and a test fails when `verify` adds one.
+
+### The gate of the sealed examples in `audit`
+
+`--identity PATH` names the key, which has to exist outside the tree of the project
+(`inside-the-tree`, `no-identity`); without it, the identity of its default path is the key when a
+file is there, and otherwise the key is not here, as in CI. The entries `held_out` of the contract
+of the story and `sealed.age` are read from the tree of the base, and `applicability` of `verify`
+decides before anything is opened: a batch without entries, or entries without a batch, is an
+`ERROR` with or without the key; neither makes the gate not applicable with `the contract holds out
+no example`; without the key it is not applicable with `the key is not here`. Only when the gate
+runs is the passphrase asked, once, from `--passphrase-fd N` or the terminal; the batch is opened
+in memory and the gate runs on the change, and when it observed, the evidence gets the hold-out of
+ADR-0075. With `--contract`, the entries `held_out` of the contract given have to be those of the
+base: a whole contract that was sealed, without them, is a `sealed-batch-mismatch` that says a
+local audit is made with the visible contract. The gate runs once `verify` lists it in `BUILT`.

@@ -2,14 +2,16 @@
 
 import contextlib
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from unittest import mock
 
 from dokime.core.observation import ExampleObservation, ExampleRequest, ObservationLimits
+from dokime.core.repository import CommitName, FileHistory
 from dokime.core.runtime import Build, BuildLimits, Digest
+from dokime.core.sealed import SealedStore
 from dokime.interfaces import audit as audit_module
 from dokime.interfaces.audit import Audited, Ports, Request, run_audit
 from dokime.verify import aggregate
@@ -158,15 +160,17 @@ class Done:
 
 
 @contextlib.contextmanager
-def built(repeating: bool) -> Iterator[None]:
-    """The gate repeatability built or not, whatever this version of verify says."""
-    gate = "repeatability"
-    if repeating:
-        has = aggregate.BUILT | {gate}
-        lacks = {k: v for k, v in aggregate.NOT_BUILT.items() if k != gate}
-    else:
-        has = aggregate.BUILT - {gate}
-        lacks = {**aggregate.NOT_BUILT, gate: "the gate is not built in this test"}
+def built(repeating: bool, sealing: bool = False) -> Iterator[None]:
+    """The gates repeatability and sealed-examples built or not, whatever this version of verify
+    says."""
+    has, lacks = set(aggregate.BUILT), dict(aggregate.NOT_BUILT)
+    for gate, on in (("repeatability", repeating), ("sealed-examples", sealing)):
+        if on:
+            has.add(gate)
+            lacks.pop(gate, None)
+        else:
+            has.discard(gate)
+            lacks[gate] = "the gate is not built in this test"
     with contextlib.ExitStack() as stack:
         for module in (audit_module, aggregate):
             stack.enter_context(mock.patch.object(module, "BUILT", has))
@@ -182,11 +186,16 @@ def audit(
     observer: ObserverDouble | None = None,
     repository: AuditedDouble | None = None,
     repeating: bool = False,
+    sealing: bool = False,
+    history: Callable[[CommitName], FileHistory] | None = None,
+    sealed: SealedStore | None = None,
+    ancestors: tuple[CommitName, ...] = (),
     **request: Any,
 ) -> Done:
     """Audit a change on the doubles."""
     repository = repository or AuditedDouble()
     base = repository.add(base_files() if files is None else files)
+    repository.ancestry[base] = ancestors
     runtime = runtime or BuildsRecorded()
     observer = observer or ObserverDouble()
     store = Lines()
@@ -196,6 +205,14 @@ def audit(
         harness="0.0.0",
         **({"story": STORY} | request),
     )
-    with built(repeating):
-        audited = run_audit(asked, Ports(repository, runtime, observer, PROBE), store, Ticks())
+    ports = Ports(
+        repository,
+        runtime,
+        observer,
+        PROBE,
+        history=None if history is None else history(base),
+        sealed=sealed,
+    )
+    with built(repeating, sealing):
+        audited = run_audit(asked, ports, store, Ticks())
     return Done(audited, store, repository, runtime, observer)

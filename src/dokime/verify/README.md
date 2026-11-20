@@ -97,7 +97,16 @@ result = sealed_examples(
   pass. Nothing is observed in any of these cases. The limits of the comparison are those of the
   history: an example published with a field added or a value spelt otherwise is not recognised,
   nor a version under an earlier path or in a commit that the base does not reach, nor a copy in
-  another file.
+  another file; and the history is read up to the base of the change, so a held-out example
+  published in a commit of the change and taken back in another is seen by the next audit where the
+  project merges keeping the commits, by rebase or by a merge commit, and by none after a squash
+  merge.
+- **Whether the gate applies** is `applicability(holds_out, batched, key)`, from the entries
+  `held_out` of the contract and the sealed batch, both of the base, decided before the key: a
+  batch without entries is `sealed-batch-mismatch` and entries without a batch
+  `sealed-batch-missing`, both `ERROR` and in CI too; neither makes the gate not applicable with
+  `NOT_SEALED`, `the contract holds out no example`; and without the key it is not applicable with
+  `NOT_HERE`, `the key is not here`. `None` means that the gate runs.
 - **The cases without a hidden part** are in the batch with their reason, `single-example` or
   `all-published` (every example of the case was already published, so none was drawn), and
   `unheld_cases(contract, done)` gives them from a split; the evidence shows them.

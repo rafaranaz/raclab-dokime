@@ -58,7 +58,6 @@ def test_every_gate_of_the_state_is_listed_in_its_order() -> None:
     ("gate", "where"),
     [
         ("relations", "block B"),
-        ("sealed-examples", "block B"),
         ("agent-run", "block C"),
         ("changed-line-coverage", "block D"),
         ("behaviour-differences", "block D"),
@@ -73,7 +72,7 @@ def test_a_gate_not_built_is_not_applicable_with_where_it_is_built(gate: str, wh
 
 
 def test_a_state_whose_gates_are_all_not_applicable_passes() -> None:
-    assert aggregate_state(("sealed-examples",), ()).verdict is Verdict.PASS
+    assert aggregate_state(("relations",), ()).verdict is Verdict.PASS
 
 
 @pytest.mark.parametrize(
@@ -86,6 +85,7 @@ def test_a_state_whose_gates_are_all_not_applicable_passes() -> None:
         "existing-tests",
         "visible-examples",
         "repeatability",
+        "sealed-examples",
     ],
 )
 def test_a_built_gate_without_a_result_is_an_error(gate: str) -> None:

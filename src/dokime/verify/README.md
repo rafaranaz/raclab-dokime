@@ -45,9 +45,11 @@ The gates of a change that arrives already made, and their aggregation. The requ
   each run; a gate whose verdict differs between two runs asks (`verdict-varies`), naming its
   verdict in each run, and runs that do not hold the same gates once each are `runs-differ`, an
   error. Fewer than two runs are refused. The findings follow the gates in the order of the runs.
-- `aggregate_state(gates, results)`: the aggregation of the gates of a state (ADR-0015,
-  ADR-0034). It lists every gate of the state in its order, run with its result or not applicable
-  with where it is built, and gives the verdict by precedence: `ERROR`, then `FAIL`, which drops the
+- `aggregate_state(gates, results, not_applicable)`: the aggregation of the gates of a state
+  (ADR-0015, ADR-0034). It lists every gate of the state in its order, run with its result, not
+  applicable with where it is built, or, for a gate it builds that the caller gives as not
+  applicable, with the reason given, as `sealed-examples` without its key or never sealed; and
+  gives the verdict by precedence: `ERROR`, then `FAIL`, which drops the
   `ASK` of the round, then `ASK`, then `PASS`. A built gate without a result, a result of a gate
   outside the state, a gate not in the table of the architecture, or two results of one gate, are
   an `ERROR` of the aggregation.

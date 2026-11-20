@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:4881b46f7f15a015 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:44b7e96bdf468e5a -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -292,7 +292,7 @@ terminada, sea cual sea su veredicto.
     {"name": "tree", "digest": {"gitTree": "5b1e…"}},
     {"name": "change.patch", "digest": {"sha256": "9f2c…"}}
   ],
-  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1",
+  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3",
   "predicate": {
     "verdict": "PASS",
     "delivered": true,
@@ -317,7 +317,14 @@ terminada, sea cual sea su veredicto.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
-      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key is not here"},
+      {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
+       "checks": {"origin": "human", "total": 3},
+       "holdout": {
+         "batch": "sha256:5a7d…",
+         "held": [{"requirement": "R1", "case": "half-up"}, {"requirement": "R2", "case": "negative"}],
+         "kept_visible": ["E-0007"],
+         "without_holdout": [{"requirement": "R4", "case": "zero", "motive": "single-example"}]
+       }},
       {"gate": "changed-line-coverage", "status": "skipped", "reason": "optional in the policy"},
       {"gate": "behaviour-differences", "status": "not-applicable", "reason": "pack level P2"}
     ],
@@ -326,9 +333,10 @@ terminada, sea cual sea su veredicto.
        "who": "rafa", "established": "declared", "delegated": false, "at": "2026-11-10T16:20:45Z"}
     ],
     "not_checked": [
-      {"code": "no-holdout", "what": "R4", "reason": "no case with two examples"},
+      {"code": "case-without-holdout", "what": "R4", "case": "zero", "reason": "the case has a single example"},
       {"code": "gate-skipped", "what": "changed-line-coverage", "reason": "optional in the policy"},
-      {"code": "outside-threat-model", "what": "existing-tests", "reason": "they run in the process of the code under test"}
+      {"code": "outside-threat-model", "what": "existing-tests", "reason": "they run in the process of the code under test"},
+      {"code": "best-effort-secrecy", "what": "sealed-examples", "reason": "a copy of an example in another file is not looked for"}
     ],
     "attempts": {"count": 3, "sealed_failures": 0, "disputes": 0},
     "repeated": {"runs": 2, "consistent": true},
@@ -346,12 +354,22 @@ terminada, sea cual sea su veredicto.
   `not-applicable` o `not-reached`. Los tres últimos llevan un motivo calculado por el arnés. Una
   puerta solo es `not-reached` en una ejecución que una puerta anterior detuvo.
 - **`not_checked`** es obligatorio y se rellena mecánicamente. Cada entrada lleva un código de una
-  lista cerrada y un motivo en palabras. La lista empieza con: `no-holdout`,
+  lista cerrada y un motivo en palabras. La lista empieza con: `case-without-holdout`,
   `requirement-without-example`, `only-model-checks`, `gate-skipped`, `test-excluded-unstable`,
   `test-excluded-network`, `boundary-not-supported`, `best-effort-secrecy`, `outside-threat-model`.
+  `case-without-holdout` nombra un caso, en `case`, con su requisito en `what`; `no-holdout`, una
+  entrada por requisito, es un código solo de los predicados v0.1 y v0.2
+  ([ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.es.md)).
 - **`independence`** es `self-attested`, `ci-verified` o `ci-verified, second-approver`.
 - **`informative`** no lo lee ninguna puerta y no decide nada.
 - **De las comprobaciones selladas** lleva huellas y clases de fallo, nunca valores ni entradas.
+  Cuando la puerta `sealed-examples` observó, su entrada lleva `holdout`: la huella del lote
+  sellado, los casos que reservan un ejemplo, los ids de los ejemplos mantenidos visibles por estar
+  ya publicados, y los casos que no reservan nada con su motivo, `single-example` o `all-published`;
+  nunca el id de un ejemplo reservado. `not_checked` lista entonces cada uno de esos casos como
+  `case-without-holdout`, y cada límite de la detección de lo publicado como
+  `best-effort-secrecy`. Donde no está la clave, o el contrato no reserva ningún ejemplo, la puerta
+  no es aplicable con esa razón, y la evidencia no dice nada más de la reserva.
 - Donde un campo significa lo mismo que uno del resumen de verificación de SLSA, usa ese nombre,
   para que más adelante se pueda producir un resumen en ese formato a partir de la evidencia. Ese
   formato solo no bastaba: su resultado es únicamente pasa o falla, y no tiene sitio para lo no

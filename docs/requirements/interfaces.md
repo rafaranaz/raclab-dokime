@@ -164,6 +164,24 @@ only what dokime fixes, so that it needs no escaping.
 - **INTERFACES-152** When the audit ends without evidence, the command shall write in the summary its verdict and the codes of the findings that ended it.
 - **INTERFACES-153** If the file of the summary cannot be written, then the command shall say so on the standard error and exit with the code of `ERROR`.
 
+## `audit`: the sealed examples ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md), [ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.md))
+
+The gate `sealed-examples` runs once `verify` builds it. The entries `held_out` of the contract and
+the sealed batch are read from the base, as the recipients are, and whether the gate applies is
+decided before the passphrase is asked: in CI, where the key is not, nothing asks for it. The key is
+the identity of `--identity`, or of its default path when a file is there.
+
+- **INTERFACES-175** If `--identity` names a path inside the tree of the project, then the command shall refuse to audit with the code `inside-the-tree`.
+- **INTERFACES-176** If `--identity` names a file that does not exist, then the command shall refuse to audit with the code `no-identity`.
+- **INTERFACES-177** When the run reaches the gate `sealed-examples`, the run shall read the entries `held_out` of the contract of the story and its sealed batch from the tree of the base, never from the patch.
+- **INTERFACES-178** When the run reaches the gate `sealed-examples`, the run shall decide whether it applies with `applicability` of `verify`, from those entries, that batch and whether the key is here, before it asks for the passphrase or opens the batch.
+- **INTERFACES-179** When `applicability` gives a reason, the run shall list the gate as not applicable with that reason.
+- **INTERFACES-180** When the gate runs, the run shall ask for the passphrase once, from the descriptor of `--passphrase-fd` or else from the terminal, open the batch with the identity and run the gate on the change.
+- **INTERFACES-181** If the passphrase does not open the identity, or the batch cannot be opened or read, then the gate shall give the finding of the refusal, of the verdict `ERROR`.
+- **INTERFACES-182** When the gate observed, the run shall hand the evidence the hold-out: the digest of the bytes of `sealed.age`, the cases of the entries `held_out`, the examples kept visible and the cases without a held-out example with their motives.
+- **INTERFACES-183** Where the contract is given with `--contract`, the run shall decide whether the gate applies from the entries `held_out` of the contract of the story in the base, and if those of the contract given differ, give the finding `sealed-batch-mismatch`.
+- **INTERFACES-184** If the contract given with `--contract` has no entry `held_out` and the contract of the base has, then the message of `sealed-batch-mismatch` shall say that the contract given lacks the entries `held_out` of the base, and that a local audit is made with the visible contract, not the whole one.
+
 ## The version of the harness
 
 - **INTERFACES-154** When dokime is run with the option `--version`, the command shall print `dokime` and the version of the installed harness on one line of the standard output and exit with status 0.
@@ -199,3 +217,4 @@ a space changed in a value is not recognised, as `versions` does not see a renam
 - **INTERFACES-172** The command shall write no file of the tree of the project that holds the text of a held-out example.
 - **INTERFACES-173** If the split holds out no example, then the command shall refuse to seal, with the code `nothing-to-hold-out`, and name each case with its reason.
 - **INTERFACES-174** If the contract written after the split does not keep visible exactly the examples that the split keeps visible, or does not hold out exactly the examples sealed, then the command shall refuse to seal, with the code `split-not-written`, and write nothing into the tree.
+- **INTERFACES-185** When it tells the examples already published, the command that seals shall use `published` of `verify`, the function that the gate of the sealed examples uses.

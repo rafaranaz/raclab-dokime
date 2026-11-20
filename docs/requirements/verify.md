@@ -83,8 +83,8 @@ not import both well at once, so it is unlikely.
 ## The aggregation of a state ([ADR-0015](../adr/0015-a-gate-returns-one-of-four-verdicts.md), [ADR-0034](../adr/0034-a-state-closes-with-the-aggregated-verdict-of-its-gates.md))
 
 A work state of the flow lists its gates, and closes with the aggregation of their verdicts. In this
-version `verify` builds `baseline`, `protected-paths`, `existing-tests` and `visible-examples`; the
-other gates of the table of [`04-states-and-flows.md`](../architecture/04-states-and-flows.md) are
+version `verify` builds `baseline`, `protected-paths`, `existing-tests`, `visible-examples`,
+`repeatability` and `sealed-examples`; the other gates of the table of [`04-states-and-flows.md`](../architecture/04-states-and-flows.md) are
 not applicable, each with the block that builds it.
 
 - **VERIFY-120** When the gates of a state have run, the aggregation shall give the verdict of the state by the precedence of ADR-0015 over the verdicts of the gates that ran.

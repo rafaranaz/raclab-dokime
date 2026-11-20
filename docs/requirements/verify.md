@@ -147,7 +147,10 @@ the gate checks with the same function that the batch kept visible exactly those
 held-out example was published since. These are limits, not guarantees: the content is compared as
 YAML reads it, so an example published with a field added or a value spelt otherwise is not
 recognised; a version under an earlier path, after a rename, is not read, nor one in a commit that
-the start does not reach, nor a copy of an example in another file.
+the start does not reach, nor a copy of an example in another file. And the history is read up to
+the base of the change, so a held-out example published in a commit of the change and taken back
+in another is not seen by its audit: where the project merges keeping the commits, by rebase or by
+a merge commit, the next audit sees it, and with a squash merge no audit does.
 
 - **VERIFY-169** When it is given the examples of a contract and the versions of the file of the contract, the verification shall count as published each example whose id, or whose boundary, target and steps as YAML reads them, an example of a version has.
 - **VERIFY-170** When it reads the examples of a version of a contract, the verification shall take them from its list `examples` only, never from its list `held_out`.
@@ -155,3 +158,15 @@ the start does not reach, nor a copy of an example in another file.
 - **VERIFY-172** If the examples published in the versions of the contract of the story reachable from the base of the batch, among the visible examples and those of the batch, differ from the examples that the batch keeps visible, then the gate shall give the finding `sealed-batch-mismatch` and observe nothing.
 - **VERIFY-173** If a held-out example is published in a version of the contract of the story reachable from the base of the change, then the gate shall give a finding `held-out-published` of the verdict `ERROR`, at the line of its entry in `held_out`, whose message says to replace the example and seal again, and observe nothing.
 - **VERIFY-174** If the port of the repository or the port of the history of a file refuses while the gate reads the history, then the gate shall give the finding of the refusal, of the verdict `ERROR`, and observe nothing.
+
+### When the gate applies
+
+The entries `held_out` of the contract and the sealed batch are read from the base, as the
+recipients are, so that a patch that takes them away does not make the gate not applicable. They go
+together, which is decided without the key, so in CI as well: a pull request that takes away one of
+them fails there, and does not pass as one without the key.
+
+- **VERIFY-175** If the base has a sealed batch for the story and its contract has no entry in `held_out`, then the gate shall give a finding `sealed-batch-mismatch` of the verdict `ERROR`, whether the key is here or not.
+- **VERIFY-176** If the contract has entries in `held_out` and the base has no sealed batch for the story, then the gate shall give a finding `sealed-batch-missing` of the verdict `ERROR`, whether the key is here or not.
+- **VERIFY-177** When the contract has no entry in `held_out` and the base has no sealed batch for the story, the gate shall be not applicable with the reason `the contract holds out no example`, whether the key is here or not.
+- **VERIFY-178** When the contract has entries in `held_out`, the base has a sealed batch for the story and the key is not here, the gate shall be not applicable with the reason `the key is not here`.

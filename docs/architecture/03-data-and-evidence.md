@@ -286,7 +286,7 @@ finished run, whatever its verdict.
     {"name": "tree", "digest": {"gitTree": "5b1e…"}},
     {"name": "change.patch", "digest": {"sha256": "9f2c…"}}
   ],
-  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.1",
+  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3",
   "predicate": {
     "verdict": "PASS",
     "delivered": true,
@@ -311,7 +311,14 @@ finished run, whatever its verdict.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
-      {"gate": "sealed-examples", "status": "not-applicable", "reason": "the key is not here"},
+      {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
+       "checks": {"origin": "human", "total": 3},
+       "holdout": {
+         "batch": "sha256:5a7d…",
+         "held": [{"requirement": "R1", "case": "half-up"}, {"requirement": "R2", "case": "negative"}],
+         "kept_visible": ["E-0007"],
+         "without_holdout": [{"requirement": "R4", "case": "zero", "motive": "single-example"}]
+       }},
       {"gate": "changed-line-coverage", "status": "skipped", "reason": "optional in the policy"},
       {"gate": "behaviour-differences", "status": "not-applicable", "reason": "pack level P2"}
     ],
@@ -320,9 +327,10 @@ finished run, whatever its verdict.
        "who": "rafa", "established": "declared", "delegated": false, "at": "2026-11-10T16:20:45Z"}
     ],
     "not_checked": [
-      {"code": "no-holdout", "what": "R4", "reason": "no case with two examples"},
+      {"code": "case-without-holdout", "what": "R4", "case": "zero", "reason": "the case has a single example"},
       {"code": "gate-skipped", "what": "changed-line-coverage", "reason": "optional in the policy"},
-      {"code": "outside-threat-model", "what": "existing-tests", "reason": "they run in the process of the code under test"}
+      {"code": "outside-threat-model", "what": "existing-tests", "reason": "they run in the process of the code under test"},
+      {"code": "best-effort-secrecy", "what": "sealed-examples", "reason": "a copy of an example in another file is not looked for"}
     ],
     "attempts": {"count": 3, "sealed_failures": 0, "disputes": 0},
     "repeated": {"runs": 2, "consistent": true},
@@ -340,12 +348,22 @@ finished run, whatever its verdict.
   `not-applicable` or `not-reached`. The last three carry a reason computed by the harness. A gate
   is `not-reached` only in a run that an earlier gate stopped.
 - **`not_checked`** is mandatory and filled mechanically. Each entry has a code from a closed list
-  and a reason in words. The list starts with: `no-holdout`, `requirement-without-example`,
+  and a reason in words. The list starts with: `case-without-holdout`, `requirement-without-example`,
   `only-model-checks`, `gate-skipped`, `test-excluded-unstable`, `test-excluded-network`,
-  `boundary-not-supported`, `best-effort-secrecy`, `outside-threat-model`.
+  `boundary-not-supported`, `best-effort-secrecy`, `outside-threat-model`. `case-without-holdout`
+  names a case, in `case`, with its requirement in `what`; `no-holdout`, one entry per requirement,
+  is a code of the predicates v0.1 and v0.2 only
+  ([ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.md)).
 - **`independence`** is `self-attested`, `ci-verified` or `ci-verified, second-approver`.
 - **`informative`** is read by no gate and decides nothing.
-- **For sealed checks** it carries digests and classes of failure, never values or inputs.
+- **For sealed checks** it carries digests and classes of failure, never values or inputs. When the
+  gate `sealed-examples` observed, its entry has `holdout`: the digest of the sealed batch, the
+  cases that hold out an example, the ids of the examples kept visible as already published, and
+  the cases that hold out nothing with their motive, `single-example` or `all-published`; never the
+  id of a held-out example. `not_checked` then lists each of those cases as
+  `case-without-holdout`, and each limit of the detection of what was published as
+  `best-effort-secrecy`. Where the key is not, or the contract holds out no example, the gate is
+  not applicable with that reason, and the evidence says nothing else of the hold-out.
 - Where a field means the same as one of the verification summary of SLSA, it uses that name, so a
   summary in that format can be produced from the evidence later. That format alone was not
   enough: its result is only passed or failed, and it has no place for what was not checked.

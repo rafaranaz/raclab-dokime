@@ -10,8 +10,10 @@ close every layer, from the inside out, as for `env check`.
 import argparse
 import importlib.metadata
 import json
+import os
 import re
 import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -28,6 +30,12 @@ from dokime.platform.checkout import checkout_commit
 from dokime.platform.clock import SystemClock
 from dokime.platform.git import GitRepository
 from dokime.platform.ledger_file import LedgerFile
+from dokime.platform.sealed_store import (
+    AgeSealedStore,
+    default_identity_path,
+    load_identity,
+    read_passphrase,
+)
 from dokime.sandbox.podman import PodmanRuntime
 
 LEDGER = "ledger.jsonl"
@@ -56,6 +64,49 @@ class Harness:
         if not self.asked:
             return "commit not asked"
         return self.commit.text if self.commit is not None else "without a commit"
+
+
+class IdentityStore:
+    """The sealed store of an identity, which asks for its passphrase when it first opens."""
+
+    def __init__(self, identity: Path, descriptor: int | None) -> None:
+        self.identity, self.descriptor = identity, descriptor
+        self._store: AgeSealedStore | None = None
+
+    def seal(self, content: bytes, recipients: Sequence[str]) -> bytes:
+        """An audit seals nothing."""
+        raise NotImplementedError
+
+    def open(self, sealed: bytes) -> bytes:
+        """Open sealed bytes with the identity, asking for its passphrase the first time only."""
+        if self._store is None:
+            store, warnings = load_identity(self.identity, read_passphrase(self.descriptor))
+            for warning in warnings:
+                sys.stderr.write(f"dokime audit: {warning.code}: {warning.message}\n")
+            self._store = store
+        return self._store.open(sealed)
+
+
+def key_from(
+    identity: Path | None, project: Path, environ: Mapping[str, str], descriptor: int | None
+) -> IdentityStore | None:
+    """The store of the key of the audit, or none where the key is not: the identity given, which
+    has to exist outside the tree of the project, or else that of the default path when a file is
+    there."""
+    if identity is not None:
+        path = identity.resolve()
+        if path == project or path.is_relative_to(project):
+            raise RefusalError(
+                "inside-the-tree", f"the identity {identity} is inside the tree of the project"
+            )
+        if not path.is_file():
+            raise RefusalError("no-identity", f"there is no identity at {identity}")
+        return IdentityStore(path, descriptor)
+    try:
+        default = default_identity_path(environ)
+    except RefusalError:
+        return None
+    return IdentityStore(default, descriptor) if default.is_file() else None
 
 
 def audit_command(arguments: argparse.Namespace) -> int:
@@ -118,6 +169,10 @@ def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName 
     if out.exists() and (not out.is_dir() or any(out.iterdir())):
         return _ended("out-not-empty", f"the directory {arguments.out} is not an empty directory")
     try:
+        key = key_from(arguments.identity, project, os.environ, arguments.passphrase_fd)
+    except RefusalError as refusal:
+        return Audited(verdict=Verdict.ERROR, findings=(refusal.finding,))
+    try:
         with sigterm_raises(), GitRepository(arguments.project) as repository:
             asked.append(checkout_commit(HARNESS, git=str(repository.git_path)))
             out.mkdir(parents=True, exist_ok=True)
@@ -135,7 +190,14 @@ def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName 
                 sys.stdout.write(f"program git {repository.git_path} {repository.git_version}\n")
                 sys.stdout.write(f"program podman {runtime.podman_path} {runtime.podman_version}\n")
                 sys.stdout.flush()
-            ports = Ports(repository, runtime, runtime, Digest(runtime.observe_program_digest))
+            ports = Ports(
+                repository,
+                runtime,
+                runtime,
+                Digest(runtime.observe_program_digest),
+                history=repository,
+                sealed=key,
+            )
             return run_audit(request, ports, LedgerFile(out / LEDGER), SystemClock())
     except RefusalError as refusal:
         return Audited(verdict=Verdict.ERROR, findings=(refusal.finding,))

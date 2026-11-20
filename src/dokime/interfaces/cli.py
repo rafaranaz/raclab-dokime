@@ -119,6 +119,20 @@ def _parser() -> argparse.ArgumentParser:
         "--format", choices=("text", "json"), default="text", help="how the result is written"
     )
     audit.add_argument(
+        "--identity",
+        type=Path,
+        default=None,
+        help="the identity that opens the sealed batch, outside the project; its default path if"
+        " absent",
+    )
+    audit.add_argument(
+        "--passphrase-fd",
+        type=int,
+        default=None,
+        dest="passphrase_fd",
+        help="read the passphrase of the identity from this descriptor, not from the terminal",
+    )
+    audit.add_argument(
         "--summary",
         type=Path,
         default=None,

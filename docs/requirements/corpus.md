@@ -116,3 +116,14 @@ are not touched.
 - **CORPUS-063** The held-out examples of the fixture shall be the ones that its written seed draws: one in each case of a requirement of change, chosen in the order of the contracts and of their examples.
 - **CORPUS-064** When the tests of the corpus are asked for, the test of each patch that special-cases the visible examples shall demand that the audit with only the visible examples gives `PASS`, and that the audit with all the examples fails at `visible-examples` on exactly the held-out examples.
 - **CORPUS-065** The fixture shall record, for each patch that an agent wrote, its kind and the verdicts of its audits with the visible examples and with all the examples.
+
+### The sealed run of B1 ([ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md), [ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.md))
+
+The three contracts of B0 sealed with `contract seal`, each in a local clone of its project on the
+base of its case, and the patches of B0 audited on them with the key. Their examples are public in
+this repository, outside the history of the projects, so the run measures the mechanism and not
+the value of a hold-out with secret examples, which B3 and B4 measure.
+
+- **CORPUS-066** The fixture of the sealed run shall record, for each contract of B0, the base of its batch, its seed, its held-out examples, the examples kept visible and each case without a held-out example with its motive, as the batch holds them.
+- **CORPUS-067** The fixture of the sealed run shall record, for each patch of B0, the verdict, the gate and the outcome of the gate `sealed-examples` that it expects, with the reason.
+- **CORPUS-068** The fixture of the sealed run shall keep, for each contract, the visible contract and the sealed batch of the seal, whose examples are those of the contract of B0 without the held-out ones and whose entries `held_out` name the held-out examples that it records.

@@ -1,0 +1,111 @@
+# The sealed run of B1 (CORPUS-066 to CORPUS-071, ADR-0014, ADR-0075).
+
+# The three contracts of B0 sealed with `dokime contract seal`, each in a local clone of its project
+# on the base of its case, after a commit of the recipients of an identity made for the measurement;
+# the visible contract and the sealed batch were committed on top, and are kept in `sealed-run/`.
+# The examples of these contracts are public in this repository, outside the history of the
+# projects, so the detection of what was published does not see them: the measurement shows the
+# mechanism, not the value of a hold-out with secret examples, which B3 and B4 measure.
+# The seed and the held-out examples are written here only because these examples are already
+# public; in a real seal the seed lives only in the batch, and its digest in the ledger of the seal.
+date = "2026-11-20"
+
+[[contract]]
+project = "mdformat"
+name = "format-a-blank-paragraph-between-blocks"
+batch_base = "3c095095ca58416f3d7c76b7e122a00864b4bffd"
+seed = 3505217664730090
+held_out = ["E-47ce", "E-9a59"]
+kept_visible = []
+held_out_by_hand_in_b0 = ["E-47ce", "E-4cdd"]
+without_holdout = [
+    { requirement = "drop-a-blank-paragraph-next-to-paragraphs", case = "nbsp-between-paragraphs", motive = "single-example" },
+    { requirement = "drop-a-blank-paragraph-next-to-paragraphs", case = "nbsp-before-a-heading", motive = "single-example" },
+    { requirement = "format-other-documents", case = "heading-then-paragraph", motive = "single-example" },
+]
+
+[[contract]]
+project = "python-semver"
+name = "nextver-bumps-build-only-versions"
+batch_base = "bb49b6229158fc95eed79e7feb5f747cbcf393a7"
+seed = 3345969846367980
+held_out = ["E-4e1d", "E-a6ea", "E-cf0e", "E-cf34"]
+kept_visible = []
+held_out_by_hand_in_b0 = ["E-0176", "E-4078", "E-cf34", "E-e2ac"]
+without_holdout = [
+    { requirement = "bump-other-versions-without-prerelease", case = "plain-patch", motive = "single-example" },
+    { requirement = "bump-other-versions-without-prerelease", case = "plain-minor", motive = "single-example" },
+    { requirement = "bump-other-versions-without-prerelease", case = "build-with-a-part-below-not-0", motive = "single-example" },
+    { requirement = "finalize-prereleases", case = "patch-with-build", motive = "single-example" },
+    { requirement = "finalize-prereleases", case = "minor", motive = "single-example" },
+    { requirement = "finalize-prereleases", case = "major", motive = "single-example" },
+    { requirement = "bump-prereleases", case = "minor", motive = "single-example" },
+    { requirement = "bump-prereleases", case = "major", motive = "single-example" },
+    { requirement = "refuse-invalid-versions", case = "not-a-version", motive = "single-example" },
+]
+
+[[contract]]
+project = "python-semver"
+name = "replace-keeps-the-constructor-error"
+batch_base = "fe06de3b2e1fc4ba29be7b87162882d3816474b8"
+seed = 7521867146107232
+held_out = ["E-aacc"]
+kept_visible = []
+held_out_by_hand_in_b0 = ["E-aacc"]
+without_holdout = [
+    { requirement = "name-the-unknown-parts", case = "unknown-part", motive = "single-example" },
+    { requirement = "replace-the-valid-parts", case = "number-part", motive = "single-example" },
+    { requirement = "replace-the-valid-parts", case = "text-part", motive = "single-example" },
+]
+
+# The verdicts that each patch of B0 is expected to give, written after the seal and before any
+# audit. CORPUS-064 shows that each special-cased patch fails on exactly the examples held out by
+# hand in B0 and on no other: where the seal leaves one of those visible, the patch fails at
+# `visible-examples` and the gate of the sealed examples is not reached, which is not a failure of
+# the mechanism; where the seal holds out only examples that the patch covers, it passes.
+
+[[patch]]
+contract = "format-a-blank-paragraph-between-blocks"
+kind = "minimal"
+expected = "PASS"
+expected_sealed = "run PASS"
+why = "the patch holds every example of the contract (B0: all PASS)"
+
+[[patch]]
+contract = "format-a-blank-paragraph-between-blocks"
+kind = "special-cased"
+expected = "FAIL"
+expected_gate = "visible-examples"
+expected_sealed = "not-reached"
+why = "E-4cdd, held out by hand in B0 and failed by the patch, is visible after this seal"
+
+[[patch]]
+contract = "nextver-bumps-build-only-versions"
+kind = "minimal"
+expected = "FAIL"
+expected_gate = "existing-tests"
+expected_sealed = "not-reached"
+why = "the patch fails a doctest of the documentation that the fix updates (B0)"
+
+[[patch]]
+contract = "nextver-bumps-build-only-versions"
+kind = "special-cased"
+expected = "FAIL"
+expected_gate = "visible-examples"
+expected_sealed = "not-reached"
+why = "E-0176, E-4078 and E-e2ac, held out by hand in B0 and failed by the patch, are visible after this seal"
+
+[[patch]]
+contract = "replace-keeps-the-constructor-error"
+kind = "minimal"
+expected = "PASS"
+expected_sealed = "run PASS"
+why = "the patch holds every example of the contract (B0: all PASS)"
+
+[[patch]]
+contract = "replace-keeps-the-constructor-error"
+kind = "special-cased"
+expected = "FAIL"
+expected_gate = "sealed-examples"
+expected_sealed = "run FAIL"
+why = "the seal holds out E-aacc, as B0 did, and the patch fails it while it holds the visible examples"

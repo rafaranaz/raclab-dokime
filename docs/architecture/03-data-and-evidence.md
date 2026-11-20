@@ -312,7 +312,7 @@ finished run, whatever its verdict.
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
       {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
-       "checks": {"origin": "human", "total": 3},
+       "checks": {"origin": "human", "total": 2},
        "holdout": {
          "batch": "sha256:5a7d…",
          "held": [{"requirement": "R1", "case": "half-up"}, {"requirement": "R2", "case": "negative"}],
@@ -362,7 +362,8 @@ finished run, whatever its verdict.
   the cases that hold out nothing with their motive, `single-example` or `all-published`; never the
   id of a held-out example. `not_checked` then lists each of those cases as
   `case-without-holdout`, and each limit of the detection of what was published as
-  `best-effort-secrecy`. Where the key is not, or the contract holds out no example, the gate is
+  `best-effort-secrecy`, one entry for each of its five limits, of which the example shows one.
+  Where the key is not, or the contract holds out no example, the gate is
   not applicable with that reason, and the evidence says nothing else of the hold-out.
 - Where a field means the same as one of the verification summary of SLSA, it uses that name, so a
   summary in that format can be produced from the evidence later. That format alone was not

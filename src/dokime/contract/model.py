@@ -53,6 +53,7 @@ class Relation:
     target: str
     over: str | None
     line: int
+    via: str | None = None
 
 
 @dataclass(frozen=True)

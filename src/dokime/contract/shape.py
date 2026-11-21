@@ -19,6 +19,8 @@ _DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
 KINDS = ("new", "change", "preserve")
 BOUNDARIES = ("function", "cli", "http")
 RELATIONS = ("idempotent", "order-insensitive")
+VIAS = ("stdout", "files")
+"""The channels through which `idempotent` gives its output back at `cli` (ADR-0076)."""
 
 
 @dataclass(frozen=True)
@@ -172,6 +174,7 @@ _RELATION: Mapping[str, Field] = {
 }
 _OVER: Mapping[str, Field] = {"over": _A_LINE}
 _OVER_IF_ANY: Mapping[str, Field] = {"over": _A_LINE_IF_ANY}
+_VIA: Mapping[str, Field] = {"via": _one_of(*VIAS, mandatory=False)}
 
 
 def _is_allowed(value: object, allowed: tuple[object, ...]) -> bool:
@@ -240,11 +243,14 @@ def relation(notes: Notes, item: Value, path: Path) -> Relation | None:
     if fields is None:
         return None
     name = fields.get("relation")
-    over = {"idempotent": {}, "order-insensitive": _OVER}.get(str(name), _OVER_IF_ANY)
+    over = {"idempotent": {**_OVER_IF_ANY, **_VIA}, "order-insensitive": _OVER}.get(
+        str(name), _OVER_IF_ANY
+    )
     check_fields(notes, fields, path, {**_RELATION, **over})
     if len(notes.findings) > before:
         return None
     given = fields.get("over")
+    via = fields.get("via")
     return Relation(
         id=str(fields["id"]),
         requirement=str(fields["requirement"]),
@@ -252,6 +258,7 @@ def relation(notes: Notes, item: Value, path: Path) -> Relation | None:
         target=str(fields["target"]),
         over=given if isinstance(given, str) else None,
         line=notes.line(path),
+        via=via if isinstance(via, str) else None,
     )
 
 

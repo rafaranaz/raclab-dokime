@@ -65,7 +65,7 @@ relations:
     requirement: round-total-once
     relation: order-insensitive
     target: billing.totals:invoice_total
-    over: lines
+    over: args[0]
 """
 
 

@@ -36,8 +36,18 @@ each part of a contract and the directives are listed in the
 | `unknown-directive`, `several-directives`, `directive-parameter`, `directive-value`, `matcher-in-input` | `FAIL` | A directive that is not in the table, or is not written as the table states |
 | `duplicate-example` | `FAIL` | Two examples with the same boundary, target and steps |
 | `contradictory-examples` | `FAIL` | Two examples that expect, for the same inputs, what cannot both hold |
+| `relation-target-ambiguous`, `relation-needs-via`, `relation-via-not-allowed`, `relation-needs-over`, `bad-over` | `FAIL` | A relation whose channel is not declared where it has to be, is declared where it is not allowed, or names no input of its examples (ADR-0076) |
 | `requirement-without-example`, `only-model-examples` | `ASK` | A requirement that no example approved by a person supports |
+| `relation-without-example` | `ASK` | A relation whose target no visible example of its requirement has, so that nothing tells its boundary nor feeds it |
 | `not-supported-yet` | `ERROR` | An example at the `http` boundary, or the matcher `$ref` |
+
+The channel of a relation is checked against the visible examples of its requirement at its target,
+whose boundary is its own: `idempotent` at `cli` says `via`, `stdout` or `files`; at `function`, a
+relation names with `over` the argument it works on, `args[N]` or a keyword argument that an
+example gives, and `idempotent` needs it when an example gives more than one argument; at `cli`,
+`order-insensitive` names `stdin` or a file of the input. While an example does not read or names
+an unknown requirement, the channels are not checked, so that a relation does not lose a source it
+has.
 
 An example with a finding of its own is left out of the search for duplicates and contradictions.
 Two matchers for the same field are not compared with each other.

@@ -26,7 +26,8 @@ def test_a_repeated_example_id_is_one_finding_with_every_line() -> None:
 
 def test_a_repeated_relation_id_is_a_finding() -> None:
     second = (
-        "  - id: L1\n    requirement: round-total-once\n    relation: idempotent\n    target: x\n"
+        "  - id: L1\n    requirement: round-total-once\n    relation: idempotent\n"
+        "    target: billing.totals:invoice_total\n    over: args[0]\n"
     )
     finding = only(check(VALID + second), "duplicate-id")
     assert finding.lines == (line_of("  - id: L1"), VALID.count("\n") + 1)

@@ -54,6 +54,26 @@ The gates of a change that arrives already made, and their aggregation. The requ
   outside the state, a gate not in the table of the architecture, or two results of one gate, are
   an `ERROR` of the aggregation.
 
+## The gate `relations`
+
+`relations(pack, contract, base, patch, image, repository, observer, limits, seed, permutations)`
+runs each relation of the contract (ADR-0076) and gives a `RelationsOutcome`: the result of the
+gate, the seed of the run and each follow-up that did not hold, with its relation, its source and,
+for `order-insensitive`, its order. It is not in `BUILT` yet.
+
+- **The sources** of a relation are the visible examples of its requirement at its target that
+  have one step; a held-out example is never one.
+- **Two observations on the tree of the change**: the sources, then their follow-ups, built by
+  `oracle.relations`. The orders of a source are drawn with `source_seed(seed, relation, example)`,
+  48 bits of the digest of the seed of the run and the two ids, so that sources of the same length
+  do not get the same orders and the same seed gives the same follow-ups.
+- **A source not observed to its end** has no follow-up; a follow-up not observed to its end does
+  not hold. `holds` gets the input of each run.
+- **Findings**: `relation-without-source`, an `ASK`, when no source of a relation has a follow-up;
+  `relation-fails`, a `FAIL`, once for each relation and source, with the words of the oracle. Each
+  follow-up compared is a check of origin `derived`. A refusal of a port is its finding, an
+  `ERROR`, and nothing else.
+
 The tests run on a double of the audited repository held in memory (`tests/verify/doubles.py`), on a double of the runtime that gives the reports listed in a file of
 the project, and on a double of the port that observes that answers from a file
 of the extracted project,

@@ -204,11 +204,14 @@ The reader of the policy receives the text of `.dokime/policy.yaml`; it does not
 | Policy | `format` | Yes | The number 1 | — |
 | Policy | `baseline` | No | A mapping | Its fields by default |
 | Policy | `verification` | No | A mapping | Its fields by default |
+| Policy | `relations` | No | A mapping | Its fields by default |
 | Baseline | `runs` | No | A whole number of at least 2 | 2 |
 | Verification | `runs` | No | A whole number of at least 2 | 2 |
+| Relations | `permutations` | No | A whole number of at least 1 | 10 |
 
 - **CORE-110** The reader of the policy shall read its text by the strict rules of CORE-020 to CORE-042, and check it against the table of fields of the policy with the shape check of CORE-050 to CORE-054.
 - **CORE-111** If `runs` is a whole number below 2, then the reader of the policy shall report a finding with the code `wrong-type` that names the field, with its line.
+- **CORE-190** If `permutations` is a whole number below 1, then the reader of the policy shall report a finding with the code `wrong-type` that names the field, with its line.
 - **CORE-112** If the text of the policy has any finding, then the reader of the policy shall give no policy.
 - **CORE-113** When a field of the policy that is not mandatory is absent, the reader of the policy shall give it its default.
 - **CORE-114** When there is no policy file, the effective policy shall be the defaults of the table.

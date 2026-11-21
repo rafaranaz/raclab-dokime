@@ -141,7 +141,13 @@ def repeated(
 
 
 def holds(
-    relation: Relation, boundary: str, source: StepObservation, follow: StepObservation
+    relation: Relation,
+    boundary: str,
+    source: StepObservation,
+    follow: StepObservation,
+    *,
+    source_given: Mapping[str, object] | None = None,
+    follow_given: Mapping[str, object] | None = None,
 ) -> bool:
     """Whether a follow-up gives what its source gave."""
     if boundary == "function":
@@ -156,11 +162,30 @@ def holds(
         return (source.exit, source.stdout) == (follow.exit, follow.stdout)
     if relation.relation == "idempotent":
         return dict(source.files) == dict(follow.files)
-    return (source.exit, source.stdout, dict(source.files)) == (
-        follow.exit,
-        follow.stdout,
-        dict(follow.files),
+    produced = _produced(relation.over, source, source_given, follow, follow_given)
+    return (source.exit, source.stdout, produced[0]) == (follow.exit, follow.stdout, produced[1])
+
+
+def _produced(
+    over: str | None,
+    source: Exited,
+    source_given: Mapping[str, object] | None,
+    follow: Exited,
+    follow_given: Mapping[str, object] | None,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """The files of each run of `order-insensitive` to compare: the file that `over` names, which
+    the follow-up receives permuted on purpose, is left out when each run leaves it as received."""
+    left, right = dict(source.files), dict(follow.files)
+    if over is None or over == "stdin":
+        return left, right
+    kept = all(
+        _text(given or {}, over) == files.get(over)
+        for given, files in ((source_given, left), (follow_given, right))
     )
+    if kept:
+        left.pop(over, None)
+        right.pop(over, None)
+    return left, right
 
 
 def words(relation: Relation, example: str) -> str:

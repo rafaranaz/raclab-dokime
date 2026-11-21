@@ -76,6 +76,10 @@ for order in orders(items, seed=20261121, permutations=10):  # the reversed orde
   at `cli`, by its `via`. A source that raised or exited with another code than zero has none.
 - **`holds`** compares a follow-up with its source: the return, by value and type, or the type of
   the exception at `function`; at `cli`, the exit code and the standard output for `via: stdout`,
-  the files written for `via: files`, all three for `order-insensitive`.
+  the files written for `via: files`, all three for `order-insensitive`. The files are the whole
+  working directory after a run, so the file that `over` names, which the follow-up receives
+  permuted on purpose, is left out when each run leaves it as it received it, and compared when a
+  run rewrites it: what is compared is what each run produced. `holds` takes the input of each run
+  for that, `source_given` and `follow_given`.
 - **`words`** names the requirement, the relation and the visible source example for the agent,
   never the follow-up nor a value.

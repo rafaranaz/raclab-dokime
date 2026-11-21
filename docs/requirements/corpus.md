@@ -38,16 +38,16 @@ uses the contract of a good case of its project.
 | `base` | The full name of the commit the patch applies to | Every case |
 | `contract` | `contract.yaml` in a good case; the path of the contract of a good case of the project, from the directory of the case, in a bad case | Every case |
 | `patch` | `patch.diff` | Every case |
-| `label` | `good`, `fails-a-visible-example`, `edits-tests` or `breaks-existing-tests` | Every case |
+| `label` | `good`, `fails-a-visible-example`, `edits-tests`, `breaks-existing-tests` or, from B2, `breaks-a-relation` | Every case |
 | `how` | How the patch was built, in one line | Every case |
 | `expected` | `PASS` for a good case, `FAIL` for a bad one | Every case |
 | `intent` | What the patch tries, in one line | A bad case |
 | `mechanism` | How it tries it, in one line | A bad case |
-| `failing_gate` | The gate expected to give `FAIL` first: `visible-examples`, `protected-paths` or `existing-tests` | A bad case |
+| `failing_gate` | The gate expected to give `FAIL` first: `visible-examples`, `protected-paths`, `existing-tests` or `relations` | A bad case |
 
 ### The files of a case
 
-- **CORPUS-020** The corpus shall hold ten cases: three good, and seven bad that are derived from them.
+- **CORPUS-020** The corpus shall hold twelve cases: four good, and eight bad that are derived from them.
 - **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`.
 - **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
 - **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.
@@ -61,12 +61,17 @@ uses the contract of a good case of its project.
 ### The labels do not change ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
 
 A label never changes after the case ran: a correction is a new case, and the old one is withdrawn
-in `tests/corpus/withdrawn.toml` without touching its files.
+in `tests/corpus/withdrawn.toml` without touching its files. A case runs for the first time once it
+is in `main` with its label: until then `tests/corpus/pending.toml` lists it, a file apart, so that
+taking it out of the list changes none of its files. The labels follow what the exit criterion of
+a milestone names: those of A3, and `breaks-a-relation` for B2.
 
 - **CORPUS-030** The files of each case shall be added by one commit, and changed by no other.
 - **CORPUS-031** If a file of a case was deleted or renamed in the history, then the test of the cases shall fail naming it.
 - **CORPUS-032** If the history of the repository is shallow, then the test of the cases shall fail instead of passing.
-- **CORPUS-033** The file `tests/corpus/review.toml` shall name every case as confirmed by the maintainer, with the date and the minutes of the review.
+- **CORPUS-033** The file `tests/corpus/review.toml` shall hold each review of the maintainer, with its date, its minutes and the cases it confirmed, and name every case that is not pending as confirmed by one of them.
+- **CORPUS-073** The file `tests/corpus/pending.toml` shall list the cases that have not run yet, each a case of the corpus, and may list none.
+- **CORPUS-074** When the tests of the corpus are asked for, the test of the audit of the cases shall leave out each case that `tests/corpus/pending.toml` lists.
 
 ### The patches apply
 

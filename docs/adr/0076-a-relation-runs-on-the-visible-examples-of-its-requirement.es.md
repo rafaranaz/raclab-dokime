@@ -1,7 +1,7 @@
-<!-- translation-of: 0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md sha256:b543869982ffb8de -->
+<!-- translation-of: 0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md sha256:71351187eac97cc0 -->
 # ADR-0076 · Una relación se ejecuta sobre los ejemplos visibles de su requisito
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 
@@ -48,9 +48,9 @@ con una semilla que se registra, y su fallo le dice al agente dónde sin darle u
   - Un caso de partida cuya ejecución lanza una excepción, o sale con un código distinto de cero, no
     tiene caso derivado.
 - **`over` nombra una entrada.** En `function` es `args[N]`, el argumento en esa posición contando
-  desde cero, o el nombre de un argumento con nombre; para `order-insensitive`, lo que se permuta son
-  los elementos de la lista que el ejemplo de partida da en ese argumento, y un caso de partida cuyo
-  valor ahí no es una lista no tiene casos derivados. En `cli`, para `order-insensitive`, es
+  desde cero, o el nombre de un argumento con nombre; para `order-insensitive`, lo que se permuta
+  son los elementos de la lista que el ejemplo de partida da en ese argumento, y un caso de partida
+  cuyo valor ahí no es una lista no tiene casos derivados. En `cli`, para `order-insensitive`, es
   `stdin`, cuyas líneas se permutan, o el nombre de un fichero de la entrada, cuyas líneas se
   permutan. `contract check` rechaza un `over` que no nombra ninguna entrada de la frontera del
   target.

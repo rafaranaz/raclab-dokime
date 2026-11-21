@@ -1,6 +1,6 @@
 # ADR-0076 · A relation runs on the visible examples of its requirement
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 
@@ -75,7 +75,8 @@ drawn with a seed that is recorded, and its failure tells the agent where withou
   v0.3 with one field added and the rule of ADR-0069 kept. The entry of the gate `relations`, when
   it ran, has `relations`: the `seed`, in clear, since nothing in it is secret, and `failed`, each
   follow-up that did not hold as `{relation, example}`, with `order`, for `order-insensitive`, a
-  permutation that gives its input, as a list of indices of the source order. It holds no input and no value.
+  permutation that gives its input, as a list of indices of the source order. It holds no input and
+  no value.
 
 ## Basis
 

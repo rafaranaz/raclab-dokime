@@ -136,7 +136,7 @@ def _observe(
     """The comparisons of each example in each run, or the result of a gate that could not run."""
     if not contract.examples:
         return GateResult(gate=gate, findings=())
-    requests = tuple(_request(example) for example in contract.examples)
+    requests = tuple(request_of(example) for example in contract.examples)
     try:
         composed = tree()
         with tempfile.TemporaryDirectory(prefix="dokime-examples-") as work:
@@ -152,7 +152,8 @@ def _observe(
     ]
 
 
-def _request(example: Example) -> ExampleRequest:
+def request_of(example: Example) -> ExampleRequest:
+    """The request that asks the observer for the steps of an example."""
     return ExampleRequest(
         example=example.id,
         boundary=Boundary(example.boundary),

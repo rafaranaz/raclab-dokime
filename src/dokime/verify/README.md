@@ -59,7 +59,7 @@ The gates of a change that arrives already made, and their aggregation. The requ
 `relations(pack, contract, base, patch, image, repository, observer, limits, seed, permutations)`
 runs each relation of the contract (ADR-0076) and gives a `RelationsOutcome`: the result of the
 gate, the seed of the run and each follow-up that did not hold, with its relation, its source and,
-for `order-insensitive`, its order. It is not in `BUILT` yet.
+for `order-insensitive`, its order. It is in `BUILT`, and runs in the state `verifying`.
 
 - **The sources** of a relation are the visible examples of its requirement at its target that
   have one step; a held-out example is never one.

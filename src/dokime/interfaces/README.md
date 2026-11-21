@@ -216,3 +216,13 @@ in memory and the gate runs on the change, and when it observed, the evidence ge
 ADR-0075. With `--contract`, the entries `held_out` of the contract given have to be those of the
 base: a whole contract that was sealed, without them, is a `sealed-batch-mismatch` that says a
 local audit is made with the visible contract. The gate runs once `verify` lists it in `BUILT`.
+
+### The gate of the relations in `audit`
+
+The command draws the seed of the relations of each audit from the randomness of the system, and
+the run records it in the event `gate.started` of the gate `relations`. The gate runs in the state
+`verifying`, on the image of the change, with that seed and `relations.permutations` of the
+policy, as many times as the verification runs; the evidence gets the record of the run whose
+result it lists, the seed and each follow-up that did not hold with its order. A refused build of
+the image of the change is an `ERROR` of the gate and nothing else. The gate runs once `verify`
+lists it in `BUILT`.

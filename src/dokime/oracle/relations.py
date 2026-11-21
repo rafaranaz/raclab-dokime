@@ -146,10 +146,11 @@ def holds(
     source: StepObservation,
     follow: StepObservation,
     *,
-    source_given: Mapping[str, object] | None = None,
-    follow_given: Mapping[str, object] | None = None,
+    source_given: Mapping[str, object],
+    follow_given: Mapping[str, object],
 ) -> bool:
-    """Whether a follow-up gives what its source gave."""
+    """Whether a follow-up gives what its source gave, from the input of each run and what each
+    run produced; both inputs are needed, since at `cli` the files of a run include its input."""
     if boundary == "function":
         if isinstance(source, Returned) and isinstance(follow, Returned):
             return _key(source.value) == _key(follow.value)
@@ -169,9 +170,9 @@ def holds(
 def _produced(
     over: str | None,
     source: Exited,
-    source_given: Mapping[str, object] | None,
+    source_given: Mapping[str, object],
     follow: Exited,
-    follow_given: Mapping[str, object] | None,
+    follow_given: Mapping[str, object],
 ) -> tuple[dict[str, str], dict[str, str]]:
     """The files of each run of `order-insensitive` to compare: the file that `over` names, which
     the follow-up receives permuted on purpose, is left out when each run leaves it as received."""
@@ -179,7 +180,7 @@ def _produced(
     if over is None or over == "stdin":
         return left, right
     kept = all(
-        _text(given or {}, over) == files.get(over)
+        _text(given, over) == files.get(over)
         for given, files in ((source_given, left), (follow_given, right))
     )
     if kept:

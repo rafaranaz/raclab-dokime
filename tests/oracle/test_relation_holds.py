@@ -5,6 +5,9 @@ from dokime.contract.model import Relation
 from dokime.core.observation import Exited, Raised, Returned
 from dokime.oracle.relations import holds, words
 
+GIVEN: dict[str, object] = {"args": [[1, 2]]}
+"""The input of both runs, which these comparisons do not depend on."""
+
 
 def relation(kind: str, via: str | None = None) -> Relation:
     return Relation("L1", "R-sort", kind, "p:f", "args[0]", 9, via=via)
@@ -31,7 +34,15 @@ def raised(name: str) -> Raised:
 def test_at_function_the_same_return_or_exception_holds(
     source: object, follow: object, expected: bool
 ) -> None:
-    assert holds(relation("order-insensitive"), "function", source, follow) is expected  # type: ignore[arg-type]
+    found = holds(
+        relation("order-insensitive"),
+        "function",
+        source,  # type: ignore[arg-type]
+        follow,  # type: ignore[arg-type]
+        source_given=GIVEN,
+        follow_given=GIVEN,
+    )
+    assert found is expected
 
 
 def ran(exit: int = 0, stdout: str = "x\n", files: dict[str, str] | None = None) -> Exited:
@@ -61,7 +72,10 @@ SOURCE = ran()
 def test_at_cli_what_is_compared_follows_the_relation_and_its_channel(
     kind: str, via: str | None, follow: Exited, expected: bool
 ) -> None:
-    assert holds(relation(kind, via), "cli", SOURCE, follow) is expected
+    found = holds(
+        relation(kind, via), "cli", SOURCE, follow, source_given=GIVEN, follow_given=GIVEN
+    )
+    assert found is expected
 
 
 def test_the_words_for_the_agent_name_the_requirement_the_relation_and_the_example() -> None:
@@ -73,4 +87,12 @@ def test_the_words_for_the_agent_name_the_requirement_the_relation_and_the_examp
 
 
 def test_at_cli_an_observation_that_is_not_a_run_does_not_hold() -> None:
-    assert holds(relation("order-insensitive"), "cli", SOURCE, Returned("x")) is False
+    found = holds(
+        relation("order-insensitive"),
+        "cli",
+        SOURCE,
+        Returned("x"),
+        source_given=GIVEN,
+        follow_given=GIVEN,
+    )
+    assert found is False

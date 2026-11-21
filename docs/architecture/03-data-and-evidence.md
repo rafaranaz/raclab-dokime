@@ -115,8 +115,8 @@ examples:
     origin: human               # a proposal has origin model until a person accepts it
     steps:
       - input:
-          args: [total, invoice.json]
-          files: {invoice.json: {$json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}}
+          args: [total, invoice.csv]
+          files: {invoice.csv: "3.335,EUR\n6.695,EUR\n"}
         expect:
           exit: 0
           stdout: {$json: {total: {$approx: 10.03, tolerance: 0.005}}}
@@ -127,7 +127,7 @@ relations:
     requirement: round-total-once
     relation: order-insensitive   # from the closed catalogue: idempotent | order-insensitive
     target: invoice
-    over: lines                   # the input whose order does not matter
+    over: invoice.csv             # the input whose order does not matter: here, the lines of a file
 ```
 
 - **What a step may expect** is an exact value or one of the matchers of the closed catalogue: any
@@ -286,7 +286,7 @@ finished run, whatever its verdict.
     {"name": "tree", "digest": {"gitTree": "5b1e…"}},
     {"name": "change.patch", "digest": {"sha256": "9f2c…"}}
   ],
-  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3",
+  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.4",
   "predicate": {
     "verdict": "PASS",
     "delivered": true,
@@ -311,6 +311,9 @@ finished run, whatever its verdict.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
+      {"gate": "relations", "status": "run", "verdict": "PASS",
+       "checks": {"origin": "derived", "total": 3},
+       "relations": {"seed": 4410937205833312, "failed": []}},
       {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 2},
        "holdout": {
@@ -365,6 +368,11 @@ finished run, whatever its verdict.
   `best-effort-secrecy`, one entry for each of its five limits, of which the example shows one.
   Where the key is not, or the contract holds out no example, the gate is
   not applicable with that reason, and the evidence says nothing else of the hold-out.
+- **For the relations**, the entry of the gate `relations` has `relations`: the seed of the audit,
+  and `failed`, each follow-up that did not hold as `relation` and `example`, with `order`, the
+  indices of the items of its source, for `order-insensitive`; never an input or a value. The seed
+  of each source is recomputed from the seed of the audit and the two ids
+  ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md)).
 - Where a field means the same as one of the verification summary of SLSA, it uses that name, so a
   summary in that format can be produced from the evidence later. That format alone was not
   enough: its result is only passed or failed, and it has no place for what was not checked.

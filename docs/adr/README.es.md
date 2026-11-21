@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:4dd11ef8f07a5e0a -->
+<!-- translation-of: README.md sha256:7b1a9fa225b02318 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -88,4 +88,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md) | La clave de la reserva vive fuera de CI hasta B4 | Aceptada |
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md) | Un testigo está aislado cuando es un arreglo y nada más | Aceptada |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.es.md) | El predicado v0.3 registra la reserva | Aceptada |
-| [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Propuesta |
+| [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Aceptada |

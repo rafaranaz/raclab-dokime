@@ -30,7 +30,7 @@ def test_a_contract_that_is_not_a_mapping_is_one_finding_and_nothing_else(text: 
             "          args: [invoice.json]\n          cwd: /tmp",
             "cwd",
         ),
-        ("    over: lines", "    over: lines\n    seed: 3", "seed"),
+        ("    over: args[0]", "    over: args[0]\n    seed: 3", "seed"),
     ],
 )
 def test_a_field_that_the_table_does_not_list_is_a_finding_with_its_line(
@@ -51,7 +51,7 @@ def test_a_field_that_the_table_does_not_list_is_a_finding_with_its_line(
         ("    case: empty\n", "case", "  - id: E-0003"),
         ("    origin: human\n    steps:\n      - input: {args", "origin", "  - id: E-0003"),
         ("    target: billing.totals:invoice_total\n    over", "target", "  - id: L1"),
-        ("    over: lines\n", "over", "  - id: L1"),
+        ("    over: args[0]\n", "over", "  - id: L1"),
     ],
 )
 def test_a_missing_mandatory_field_is_a_finding_with_the_line_of_its_mapping(
@@ -84,7 +84,7 @@ def test_a_missing_mandatory_field_is_a_finding_with_the_line_of_its_mapping(
         ("          args: [invoice.json]", "          args: [1, 2]"),
         ("          exit: 0", '          exit: "0"'),
         ("          exit: 0", "          exit: true"),
-        ("    over: lines", "    over: [lines]"),
+        ("    over: args[0]", "    over: [args]"),
     ],
 )
 def test_a_value_that_is_not_what_the_table_states_is_a_finding_with_its_line(
@@ -176,7 +176,7 @@ def test_an_item_without_its_id_is_one_finding() -> None:
 
 
 def test_a_relation_with_a_defect_is_not_returned() -> None:
-    checked = seeded("    over: lines", "    over: lines\n    seed: 3")
+    checked = seeded("    over: args[0]", "    over: args[0]\n    seed: 3")
     assert checked.contract is None
 
 

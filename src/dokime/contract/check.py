@@ -6,6 +6,7 @@ from dokime.contract import shape
 from dokime.contract.compare import compare
 from dokime.contract.model import Checked, Contract, Example, HeldOut, Relation, Requirement
 from dokime.contract.notes import Notes
+from dokime.contract.relations import channels
 from dokime.core.findings import Finding
 from dokime.core.reading import Path, Value, read
 from dokime.core.verdicts import Verdict
@@ -46,6 +47,12 @@ def _contract(notes: Notes, root: Value) -> Contract | None:
     _unknown_requirements(notes, root)
     _coverage(notes, root)
     notes.findings.extend(compare(examples))
+    given = root.get("examples")
+    known = frozenset(r.id for r in requirements)
+    read_all = (not isinstance(given, list) or len(examples) == len(given)) and all(
+        e.requirement in known for e in examples
+    )
+    notes.findings.extend(channels(tuple(relations), tuple(examples), known, read_all))
     tests = root.get("may_modify_tests")
     return Contract(
         story=str(root.get("story")),

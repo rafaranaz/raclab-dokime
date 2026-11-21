@@ -175,7 +175,8 @@ digest({"a": 1})  # 'sha256:…', the SHA-256 of the canonical form in UTF-8
 
 `read_policy` reads the text of `.dokime/policy.yaml` by the strict rules and its table of fields
 (ADR-0054); it does not open the file. A field left out takes its default, and fewer than two runs
-is refused. Without a file, the policy is `DEFAULTS`. Either way `from_file` says where it came
+is refused. `relations.permutations`, how many orders `order-insensitive` draws with the seed
+besides the reversed one (ADR-0076), is 10 by default, and fewer than one is refused. Without a file, the policy is `DEFAULTS`. Either way `from_file` says where it came
 from, and its digest is taken over a normalised form with the format and every field, so a file
 that only states the defaults has their digest.
 
@@ -184,6 +185,7 @@ from dokime.core.policy import DEFAULTS, read_policy
 
 read = read_policy("format: 1\nbaseline:\n  runs: 3\n")
 read.policy.baseline_runs, read.policy.verification_runs  # 3, 2
+read.policy.relations_permutations  # 10
 read.policy.digest() == DEFAULTS.digest()  # False: the baseline runs three times
 ```
 

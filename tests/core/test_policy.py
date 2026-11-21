@@ -90,11 +90,17 @@ def test_the_policy_says_whether_it_came_from_the_file() -> None:
 def test_the_normalised_form_holds_the_format_and_every_field_with_the_defaults() -> None:
     read = read_policy("format: 1\nbaseline:\n  runs: 3\n").policy
     assert read is not None
-    assert read.normalised() == {"format": 1, "baseline": {"runs": 3}, "verification": {"runs": 2}}
+    assert read.normalised() == {
+        "format": 1,
+        "baseline": {"runs": 3},
+        "verification": {"runs": 2},
+        "relations": {"permutations": 10},
+    }
     assert DEFAULTS.normalised() == {
         "format": 1,
         "baseline": {"runs": 2},
         "verification": {"runs": 2},
+        "relations": {"permutations": 10},
     }
 
 

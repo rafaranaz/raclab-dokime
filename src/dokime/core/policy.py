@@ -17,6 +17,8 @@ from dokime.core.shape import Field, Notes, check_fields, one_of
 FORMAT = 1
 MINIMUM_RUNS = 2
 """With one run, an unstable test or a verdict that varies cannot be seen."""
+MINIMUM_PERMUTATIONS = 1
+"""With none, `order-insensitive` would try only the reversed order (ADR-0076)."""
 
 
 @dataclass(frozen=True)
@@ -26,6 +28,7 @@ class Policy:
     baseline_runs: int = 2
     verification_runs: int = 2
     from_file: bool = False
+    relations_permutations: int = 10
 
     def normalised(self) -> dict[str, object]:
         """The form whose digest the evidence records: the format and every field."""
@@ -33,6 +36,7 @@ class Policy:
             "format": FORMAT,
             "baseline": {"runs": self.baseline_runs},
             "verification": {"runs": self.verification_runs},
+            "relations": {"permutations": self.relations_permutations},
         }
 
     def digest(self) -> str:
@@ -55,6 +59,10 @@ def _is_runs(value: object) -> bool:
     return type(value) is int and value >= MINIMUM_RUNS
 
 
+def _is_permutations(value: object) -> bool:
+    return type(value) is int and value >= MINIMUM_PERMUTATIONS
+
+
 def _is_mapping(value: object) -> bool:
     return isinstance(value, dict)
 
@@ -64,8 +72,13 @@ _POLICY: Mapping[str, Field] = {
     "format": one_of(FORMAT),
     "baseline": Field("a mapping", _is_mapping, mandatory=False),
     "verification": Field("a mapping", _is_mapping, mandatory=False),
+    "relations": Field("a mapping", _is_mapping, mandatory=False),
 }
 _SECTION: Mapping[str, Field] = {"runs": Field(_RUNS, _is_runs, mandatory=False)}
+_PERMUTATIONS = f"a whole number of at least {MINIMUM_PERMUTATIONS}"
+_RELATIONS: Mapping[str, Field] = {
+    "permutations": Field(_PERMUTATIONS, _is_permutations, mandatory=False)
+}
 
 
 def read_policy(text: str) -> CheckedPolicy:
@@ -75,13 +88,36 @@ def read_policy(text: str) -> CheckedPolicy:
         return CheckedPolicy(policy=None, findings=reading.findings)
     notes = Notes(reading, list(reading.findings))
     runs = _runs(notes, reading.value)
+    permutations = _permutations(notes, reading.value)
     findings = tuple(sorted(notes.findings, key=lambda finding: (finding.lines, finding.code)))
-    if findings or runs is None:
+    if findings or runs is None or permutations is None:
         return CheckedPolicy(policy=None, findings=findings)
     baseline, verification = runs
     return CheckedPolicy(
-        policy=Policy(baseline_runs=baseline, verification_runs=verification, from_file=True),
+        policy=Policy(
+            baseline_runs=baseline,
+            verification_runs=verification,
+            from_file=True,
+            relations_permutations=permutations,
+        ),
         findings=(),
+    )
+
+
+def _permutations(notes: Notes, root: Value) -> int | None:
+    """The permutations of the relations, their default when the section or the field is absent,
+    or none when the section is not a mapping."""
+    if not isinstance(root, dict):
+        return None
+    section = root.get("relations", {})
+    if not isinstance(section, dict):
+        return None
+    check_fields(notes, section, ("relations",), _RELATIONS)
+    value = section.get("permutations", DEFAULTS.relations_permutations)
+    return (
+        value
+        if isinstance(value, int) and _is_permutations(value)
+        else DEFAULTS.relations_permutations
     )
 
 

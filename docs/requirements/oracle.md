@@ -69,3 +69,21 @@ part of a case is only made of examples that nobody has seen.
 
 - **ORACLE-050** When the comparison of a held-out example does not hold, the oracle shall word for the agent one line that names the requirement of the example and the classes of its differences, without any value, input or identifier of the example.
 - **ORACLE-051** The oracle shall give as the class of a difference its part, with `files` for every file expected and, for a step that was not observed, `time-limit` or `crashed`.
+
+## The follow-ups of a relation ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
+
+A relation runs on the visible examples of its requirement at its target. From the input and the
+observation of a source, the oracle builds the inputs of its follow-ups and says whether each
+follow-up gives what the source gave. It runs nothing and draws only from the seed it is given, so
+the same seed gives the same follow-ups.
+
+- **ORACLE-052** When it is given the items that `order-insensitive` permutes, a seed and a number of permutations, the oracle shall give the follow-up orders: the reversed order first when it gives another input, then up to that number of other orders drawn with the seed.
+- **ORACLE-053** The follow-up orders that the oracle gives shall give inputs distinct from each other and from the input of the source, and no more of them than the distinct inputs that the items allow, the source left out.
+- **ORACLE-054** When it is given the same items, the same seed and the same number, the oracle shall give the same follow-up orders in the same order.
+- **ORACLE-055** When the input named by `over` is a list at `function`, or a text at `cli`, the oracle shall permute its items, which at `cli` are its lines, keeping a final line break where the source has one.
+- **ORACLE-056** If the input named by `over` is absent, or is not a list at `function` or a text at `cli`, then the oracle shall give no follow-up for that source.
+- **ORACLE-057** When it is asked the follow-up of `idempotent` at `function`, the oracle shall give the input of the source with the argument named by `over`, or its only argument, replaced by the value that the source returned.
+- **ORACLE-058** When it is asked the follow-up of `idempotent` at `cli`, the oracle shall give the input of the source with `stdin` replaced by the standard output of the source run for `via: stdout`, or with its files replaced and completed by the files that the source run wrote for `via: files`.
+- **ORACLE-059** If the source run raised, exited with a code other than zero or did not complete, then the oracle shall give no follow-up of `idempotent` for that source.
+- **ORACLE-060** When it compares a follow-up with its source, the oracle shall say that the relation holds when the follow-up gives the same return of the same type, or an exception of the same type, at `function`; the same exit code and standard output for `via: stdout`; the same files written for `via: files`; and the same exit code, standard output and files written for `order-insensitive` at `cli`.
+- **ORACLE-061** When a relation does not hold, the oracle shall word it for the agent with the requirement, the relation and the id of the source example, and with neither the input of the follow-up nor any value.

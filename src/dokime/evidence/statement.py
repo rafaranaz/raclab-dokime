@@ -14,12 +14,14 @@ from dokime.core.findings import Finding
 from dokime.core.runtime import Digest
 from dokime.evidence.run import (
     Contract,
+    FailedOrder,
     Gate,
     GateNotReached,
     GateRan,
     Holdout,
     Image,
     Inputs,
+    RelationsRecord,
     Run,
 )
 from dokime.evidence.schema import (
@@ -28,6 +30,7 @@ from dokime.evidence.schema import (
     NAME,
     ORIGINS,
     PREDICATE,
+    RELATIONS,
     SEALED,
     STATEMENT,
     cut,
@@ -135,6 +138,11 @@ def _gate(gate: Gate) -> Value:
             entry["checks"] = [{"origin": c.origin, "total": c.total} for c in gate.checks]
         if gate.holdout is not None:
             entry["holdout"] = _holdout(gate.holdout)
+        if gate.relations is not None:
+            entry["relations"] = {
+                "seed": gate.relations.seed,
+                "failed": [_failed(one) for one in gate.relations.failed],
+            }
         return entry
     status = "not-reached" if isinstance(gate, GateNotReached) else "not-applicable"
     return {"gate": gate.gate, "status": status, "reason": gate.reason}
@@ -151,6 +159,13 @@ def _holdout(holdout: Holdout) -> Value:
             for c in holdout.without_holdout
         ],
     }
+
+
+def _failed(one: FailedOrder) -> Value:
+    entry: Value = {"relation": one.relation, "example": one.example}
+    if one.order is not None:
+        entry["order"] = list(one.order)
+    return entry
 
 
 def _finding(finding: Finding) -> Value:
@@ -182,9 +197,7 @@ def _check(run: Run) -> None:
                 f"the name {name!r} of the story, a requirement or an unstable example is not"
                 " letters and digits in words joined by hyphens, starting with a letter"
             )
-    for gate in ran:
-        if gate.holdout is not None:
-            _check_holdout(gate.gate, gate.holdout)
+    _check_records(ran)
     counted = Counter(gate.gate for gate in run.gates)
     repeated = sorted(name for name, count in counted.items() if count > 1)
     if repeated:
@@ -196,6 +209,15 @@ def _check(run: Run) -> None:
                     f"the check of origin {checks.origin!r} with total {checks.total} of the gate"
                     f" {gate.gate!r} is not of {', '.join(ORIGINS)} with a total of at least one"
                 )
+
+
+def _check_records(ran: list[GateRan]) -> None:
+    """Check the records that a gate may carry: the hold-out and the record of the relations."""
+    for gate in ran:
+        if gate.holdout is not None:
+            _check_holdout(gate.gate, gate.holdout)
+        if gate.relations is not None:
+            _check_relations(gate.gate, gate.relations)
 
 
 def _check_holdout(gate: str, holdout: Holdout) -> None:
@@ -216,3 +238,18 @@ def _check_holdout(gate: str, holdout: Holdout) -> None:
     for case in holdout.without_holdout:
         if case.motive not in MOTIVES:
             raise ValueError(f"the motive {case.motive!r} is not one of {', '.join(MOTIVES)}")
+
+
+def _check_relations(gate: str, record: RelationsRecord) -> None:
+    if gate != RELATIONS:
+        raise ValueError(f"the gate {gate!r} has a record of relations, which only {RELATIONS} may")
+    if isinstance(record.seed, bool) or record.seed < 0:
+        raise ValueError(f"the seed {record.seed!r} of the relations is not a natural number")
+    for one in record.failed:
+        for name in (one.relation, one.example):
+            if NAME.fullmatch(name) is None:
+                raise ValueError(f"the name {name!r} of the record of relations is not a name")
+        if one.order is not None and sorted(one.order) != list(range(len(one.order))):
+            raise ValueError(
+                f"the order {one.order!r} is not the indices from zero of its items, each once"
+            )

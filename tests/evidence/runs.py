@@ -15,6 +15,7 @@ from dokime.core.verdicts import Verdict
 from dokime.evidence.run import (
     Checks,
     Contract,
+    FailedOrder,
     Gate,
     GateNotApplicable,
     GateNotReached,
@@ -23,6 +24,7 @@ from dokime.evidence.run import (
     Holdout,
     Image,
     Inputs,
+    RelationsRecord,
     Requirement,
     Run,
     UnheldCase,
@@ -198,5 +200,28 @@ def sealed(
         findings=findings,
         checks=(Checks("human", 2),),
         holdout=holdout,
+    )
+    return run(gates=gates_with(ran))
+
+
+RECORD = RelationsRecord(
+    seed=20261121,
+    failed=(FailedOrder("L1", "E-1", (2, 0, 1)), FailedOrder("L2", "E-2")),
+)
+"""The record of the gate `relations`: one order that failed and one follow-up of `idempotent`."""
+
+
+def relating(record: RelationsRecord | None = RECORD) -> Run:
+    """The whole run with the gate `relations` run, with the record given."""
+    ran = GateRan(
+        "relations",
+        Verdict.FAIL if record is not None and record.failed else Verdict.PASS,
+        findings=(
+            Finding(code="relation-fails", message="the relation fails", verdict=Verdict.FAIL),
+        )
+        if record is not None and record.failed
+        else (),
+        checks=(Checks("derived", 4),),
+        relations=record,
     )
     return run(gates=gates_with(ran))

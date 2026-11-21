@@ -87,6 +87,25 @@ class Holdout:
 
 
 @dataclass(frozen=True)
+class FailedOrder:
+    """A follow-up of a relation that did not hold: its relation, its source and, for
+    `order-insensitive`, its order as indices of the items of the source."""
+
+    relation: str
+    example: str
+    order: tuple[int, ...] | None = None
+
+
+@dataclass(frozen=True)
+class RelationsRecord:
+    """The record of the gate `relations`: the seed of the audit and each follow-up that did not
+    hold, with no input and no value (ADR-0076)."""
+
+    seed: int
+    failed: tuple[FailedOrder, ...] = ()
+
+
+@dataclass(frozen=True)
 class GateRan:
     """A gate that ran, with the verdict it gave, its findings, its checks and what it left out."""
 
@@ -98,6 +117,8 @@ class GateRan:
     unstable_examples: tuple[str, ...] = ()
     holdout: Holdout | None = None
     """The hold-out of the batch, for the gate `sealed-examples` when it observed."""
+    relations: RelationsRecord | None = None
+    """The record of the relations, for the gate `relations` when it ran."""
 
 
 @dataclass(frozen=True)

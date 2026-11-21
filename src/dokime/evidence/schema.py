@@ -22,8 +22,10 @@ PREDICATE_V01 = "https://github.com/rafaranaz/raclab-dokime/attestation/conforma
 """The predicate of A3 (ADR-0064), which the reader still reads."""
 PREDICATE_V02 = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.2"
 """The predicate of A4 (ADR-0069), which the reader still reads."""
-PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3"
-"""The predicate that the builder writes (ADR-0075)."""
+PREDICATE_V03 = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3"
+"""The predicate of the hold-out (ADR-0075), which the reader still reads."""
+PREDICATE = "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.4"
+"""The predicate that the builder writes (ADR-0076)."""
 ORIGINS = ("existing", "human", "derived", "model")
 """The origins of the checks of a gate, in the order a gate lists them."""
 NAME = re.compile(r"[A-Za-z][A-Za-z0-9]*(-[A-Za-z0-9]+)*")
@@ -45,6 +47,8 @@ NOT_CHECKED_V03 = (*NOT_CHECKED, "case-without-holdout")
 """The closed list of the codes of what was not checked in the predicate of ADR-0075."""
 SEALED = "sealed-examples"
 """The gate whose entry may hold the hold-out."""
+RELATIONS = "relations"
+"""The gate whose entry may hold the record of the relations."""
 MOTIVES = ("single-example", "all-published")
 """Why a case holds out nothing."""
 AUDIT_GATES = (
@@ -175,6 +179,14 @@ def _matches(why: str, accepts: Callable[[str], bool]) -> Rule:
     return rule
 
 
+def _matches_value(why: str, accepts: Callable[[object], bool]) -> Rule:
+    def rule(check: _Check, value: object, place: Place) -> None:
+        if not accepts(value):
+            check.bad(place, why)
+
+    return rule
+
+
 def _builds(kind: Callable[[str], object]) -> Callable[[str], bool]:
     def accepts(text: str) -> bool:
         try:
@@ -255,6 +267,28 @@ _HOLDOUT = _fields(
 )
 
 
+def _is_order(value: object) -> bool:
+    """Whether a value is the indices from zero of its items, each once."""
+    return (
+        isinstance(value, list)
+        and all(type(index) is int for index in value)
+        and sorted(value) == list(range(len(value)))
+    )
+
+
+_RELATIONS_RECORD = _fields(
+    {
+        "seed": _whole(0),
+        "failed": _list(
+            _fields(
+                {"relation": _NAME, "example": _NAME},
+                {"order": _matches_value("is not the indices from zero of its items", _is_order)},
+            )
+        ),
+    }
+)
+
+
 def _gates_rule(version: int) -> Rule:
     v02 = version >= 2
     finding = _fields(
@@ -272,6 +306,7 @@ def _gates_rule(version: int) -> Rule:
         {"gate": _NAME, "status": _is("run"), "verdict": _VERDICT, "findings": _list(finding)},
         {
             **_optional(version >= 3, {"holdout": _HOLDOUT}),
+            **_optional(version >= 4, {"relations": _RELATIONS_RECORD}),
             "checks": _list(
                 _fields(
                     {
@@ -288,6 +323,8 @@ def _gates_rule(version: int) -> Rule:
         fields_of_a_run(check, value, place)
         if isinstance(value, dict) and "holdout" in value and value.get("gate") != SEALED:
             check.bad((*place, "holdout"), f"is only of the gate {SEALED}")
+        if isinstance(value, dict) and "relations" in value and value.get("gate") != RELATIONS:
+            check.bad((*place, "relations"), f"is only of the gate {RELATIONS}")
 
     def gate(check: _Check, value: object, place: Place) -> None:
         status = value.get("status") if isinstance(value, dict) else None
@@ -460,7 +497,8 @@ def _statement_rule(predicate_type: str, version: int) -> Rule:
 _STATEMENTS = {
     PREDICATE_V01: _statement_rule(PREDICATE_V01, 1),
     PREDICATE_V02: _statement_rule(PREDICATE_V02, 2),
-    PREDICATE: _statement_rule(PREDICATE, 3),
+    PREDICATE_V03: _statement_rule(PREDICATE_V03, 3),
+    PREDICATE: _statement_rule(PREDICATE, 4),
 }
 """The schema of each version of the predicate, which a file is read with (ADR-0069)."""
 

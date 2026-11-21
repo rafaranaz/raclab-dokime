@@ -23,7 +23,7 @@ def problems(value: dict[str, Any]) -> list[str]:
     return [f.message for f in read_back(canonical(value).encode()) if f.code == "evidence-schema"]
 
 
-@pytest.mark.parametrize("version", ["v0.1", "v0.2"])
+@pytest.mark.parametrize("version", ["v0.1", "v0.2", "v0.3"])
 def test_a_file_of_an_earlier_version_reads_back_as_it_is(version: str) -> None:
     data = (FILES / f"{version}.statement.json").read_bytes()
     assert json.loads(data)["predicateType"].endswith(f"/conformance/{version}")

@@ -1,4 +1,7 @@
-# The review of the cases by the maintainer, before any of them ran (ADR-0055).
+# The reviews of the cases by the maintainer, each before the cases it confirms ran (ADR-0055,
+# CORPUS-033).
+
+[[review]]
 date = "2026-11-16"
 minutes = 37
 by = "the maintainer"

@@ -5,7 +5,7 @@ import pytest
 
 from dokime.contract.check import check
 from dokime.core.verdicts import Verdict
-from tests.corpus.cases import CASES, Case
+from tests.corpus.cases import CASES, PENDING, Case
 from tests.corpus.projects import HERE
 
 GOOD = [case for case in CASES if case.good]
@@ -38,10 +38,14 @@ def test_the_story_of_a_good_contract_is_the_name_of_its_case(case: Case) -> Non
     assert checked.contract.story == case.name
 
 
-def test_the_review_confirms_every_case_with_its_date_and_minutes() -> None:
+def test_the_reviews_confirm_every_case_that_is_not_pending_with_date_and_minutes() -> None:
     with (HERE / "review.toml").open("rb") as handle:
-        review = tomllib.load(handle)
-    assert sorted(review["confirmed"]) == sorted(case.key for case in CASES)
-    assert isinstance(review["date"], str)
-    assert isinstance(review["minutes"], int)
-    assert review["by"] == "the maintainer"
+        reviews = tomllib.load(handle)["review"]
+    confirmed = [key for review in reviews for key in review["confirmed"]]
+    assert len(confirmed) == len(set(confirmed))
+    assert set(confirmed) <= {case.key for case in CASES}
+    assert {case.key for case in CASES if case.key not in PENDING} <= set(confirmed)
+    for review in reviews:
+        assert isinstance(review["date"], str)
+        assert isinstance(review["minutes"], int)
+        assert review["by"] == "the maintainer"

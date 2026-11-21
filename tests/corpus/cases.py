@@ -7,8 +7,14 @@ from pathlib import Path
 from tests.corpus.projects import PROJECTS
 
 GOOD = "good"
-BAD_LABELS = ("fails-a-visible-example", "edits-tests", "breaks-existing-tests")
-GATES = ("visible-examples", "protected-paths", "existing-tests")
+BAD_LABELS = (
+    "fails-a-visible-example",
+    "edits-tests",
+    "breaks-existing-tests",
+    "breaks-a-relation",
+)
+"""The labels of a bad case: those of the exit criterion of A3, and that of B2."""
+GATES = ("visible-examples", "protected-paths", "existing-tests", "relations")
 
 
 @dataclass(frozen=True)
@@ -41,3 +47,10 @@ CASES = tuple(
     for path in sorted((project.directory / "cases").glob("*"))
     if path.is_dir()
 )
+
+PENDING: tuple[str, ...] = tuple(
+    tomllib.loads((Path(__file__).parent / "pending.toml").read_text())["pending"]
+)
+"""The keys of the cases that have not run yet, which the audit of the corpus leaves out."""
+RUNNABLE = tuple(case for case in CASES if case.key not in PENDING)
+"""The cases that the audit of the corpus runs."""

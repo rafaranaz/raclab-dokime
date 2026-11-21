@@ -7,7 +7,10 @@ in-toto statement alone, without an envelope, with the predicate v0.1 of
 in A4 it wrote the predicate v0.2 of
 [ADR-0069](../adr/0069-the-predicate-v0-2-adds-what-a4-records.md), and from B1 it writes the
 predicate v0.3 of [ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.md), which records
-the hold-out; it reads a file of each version with the schema of its version.
+the hold-out, and in B2 the predicate v0.4 of
+[ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md), which records
+the seed of the relations and the orders that failed; it reads a file of each version with the
+schema of its version.
 `evidence` imports nothing but `core` and decides no verdict: it records the verdicts it is given.
 `interfaces` gives it the run and writes its bytes outside the tree they describe. Each requirement
 follows an EARS template and has at least one test that declares it in its `SDD-EARS:` marker.
@@ -17,7 +20,7 @@ schema of the predicate are built; signing and verifying come with block E.
 
 ## The statement
 
-- **EVIDENCE-001** When a run is built into evidence, the builder shall give an in-toto Statement v1 with the `_type` `https://in-toto.io/Statement/v1`, the `predicateType` `https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3` ([ADR-0075](../adr/0075-the-predicate-v0-3-records-the-hold-out.md)) and the subjects `tree`, with the `gitTree` of the tree of the base with the whole patch, and `change.patch`, with the `sha256` of the bytes of the patch.
+- **EVIDENCE-001** When a run is built into evidence, the builder shall give an in-toto Statement v1 with the `_type` `https://in-toto.io/Statement/v1`, the `predicateType` `https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.4` ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md)) and the subjects `tree`, with the `gitTree` of the tree of the base with the whole patch, and `change.patch`, with the `sha256` of the bytes of the patch.
 - **EVIDENCE-002** When a run is built into evidence, the builder shall give its bytes as the canonical form of [ADR-0062](../adr/0062-a-digest-is-taken-over-a-restricted-canonical-json.md) of the statement in UTF-8.
 - **EVIDENCE-003** When a run is built into evidence, the builder shall give its digest as `sha256:` and the hexadecimal SHA-256 of its bytes, which the event `evidence.built` records.
 - **EVIDENCE-004** When a run is built into evidence, the builder shall name its file `<story>.statement.json` after the story of the run.
@@ -58,6 +61,16 @@ visible examples, never the id of a held-out example, an input or a value.
 - **EVIDENCE-049** If a gate other than `sealed-examples` has a hold-out, a name of the hold-out is not a name, its digest is not a digest, or a motive is not `single-example` or `all-published`, then the builder shall refuse the run with an error that names it.
 - **EVIDENCE-050** The builder shall write in the evidence no id of a held-out example and no input or value of an example.
 
+### The relations ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
+
+The gate `relations` hands the run the seed of the audit and each follow-up that did not hold. The
+seed of each source is not written: it is recomputed from the seed of the audit and the ids of the
+relation and the source.
+
+- **EVIDENCE-094** When the gate `relations` ran with a record of its relations, the builder shall write in its entry `relations` with `seed`, the seed of the audit, and `failed`, each follow-up that did not hold as `relation` and `example`, with `order` for one of `order-insensitive`, in the order given.
+- **EVIDENCE-095** When the gate `relations` ran without a record of its relations, or did not run, the builder shall write no `relations`.
+- **EVIDENCE-096** If a gate other than `relations` has a record of relations, a name of the record is not a name, its seed is not a natural number, or an order is not the indices from zero of its items, each once, then the builder shall refuse the run with an error that names it.
+
 ## What was not checked
 
 - **EVIDENCE-060** The builder shall write no entry `no-holdout` in `not_checked`, a code that keeps its meaning of one entry for each requirement in the files of v0.1 and v0.2.
@@ -88,3 +101,5 @@ visible examples, never the id of a held-out example, an input or a value.
 - **EVIDENCE-091** When the reader reads bytes of v0.2, the reader shall accept in a finding an optional `message` of 1 to 4096 characters, as trusted text.
 - **EVIDENCE-092** When the reader reads bytes of v0.1 or v0.2, the reader shall read them with the schema of their version, in which the object `holdout`, the field `case` and the code `case-without-holdout` are not.
 - **EVIDENCE-093** If bytes of v0.3 have an object `holdout` on a gate other than `sealed-examples`, a `case` on an entry other than `case-without-holdout`, or an entry `case-without-holdout` without a `case`, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names its place.
+- **EVIDENCE-097** When the reader reads bytes of v0.1, v0.2 or v0.3, the reader shall read them with the schema of their version, in which the field `relations` of a gate is not.
+- **EVIDENCE-098** If bytes of v0.4 have `relations` on a gate other than `relations`, or an `order` that is not the indices from zero of its items, each once, then the reader shall report a finding with the code `evidence-schema` and the verdict `ERROR` that names its place.

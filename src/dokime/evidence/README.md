@@ -21,14 +21,17 @@ fixes it for A3. The requirements are in
   than `sealed-examples`, with a name that is not a name, a digest that is not one or a motive
   other than `single-example` and `all-published`.
 - `statement(run)`: the in-toto Statement v1 alone, without an envelope. The subjects are the tree,
-  by `gitTree`, and the patch, by `sha256`. The predicate v0.3 (ADR-0075) leaves out every field
+  by `gitTree`, and the patch, by `sha256`. The predicate v0.4 (ADR-0076) leaves out every field
   the run does not fill; besides those of v0.1 it has, from v0.2 (ADR-0069), `verifier.commit`,
   the commit of the harness, `inputs.change_image`, the image in which `visible-examples` observed,
   and `repeated`, the runs of the verification and whether they were consistent; and, from v0.3,
   `holdout` on the gate `sealed-examples` when it observed: `batch`, the digest of `sealed.age`,
   `held`, the cases that hold out an example, `kept_visible`, the ids of the examples kept visible
   as already published, and `without_holdout`, the cases that hold out nothing with their motive.
-  It holds no id of a held-out example, no input and no value. It writes no trusted `message` in a finding:
+  It holds no id of a held-out example, no input and no value. From v0.4, the gate `relations`,
+  when it ran with a record, has `relations`: `seed`, the seed of the audit, and `failed`, each
+  follow-up that did not hold as `relation` and `example`, with `order` for `order-insensitive`,
+  the indices of the items of the source in the order that failed. No input and no value. It writes no trusted `message` in a finding:
   no module gives one yet. The whole message of a finding goes to `untrusted`, with the label `message`, cut at
   4096 characters; the code, the verdict and the lines are what dokime fixes. A text the evidence
   quotes by itself, such as the name of a test, is cut at 200 (ADR-0066).
@@ -56,8 +59,29 @@ fixes it for A3. The requirements are in
   the harness or an empty reason. The patterns of digests, commits, trees, verdicts and codes are
   those of the types of `core`. A file is read with the schema of its version: one of v0.1 has none
   of the fields of v0.2, one of v0.2 may carry in a finding a trusted `message` of 1 to 4096
-  characters, and only one of v0.3 may carry `holdout`, on the gate `sealed-examples` alone, the
-  code `case-without-holdout` and its field `case`, which it requires. `tests/evidence/files`
-  keeps a file of v0.1, written by the builder of A3, and one of v0.2, written by that of A4.
+  characters, only one of v0.3 or later may carry `holdout`, on the gate `sealed-examples` alone,
+  the code `case-without-holdout` and its field `case`, which it requires, and only one of v0.4
+  may carry `relations`, on the gate `relations` alone, whose `order` is the indices from zero of
+  its items, each once. A file of v0.4 whose gate `relations` did not run has no `relations` and is
+  valid. `tests/evidence/files` keeps a file of v0.1, written by the builder of A3, one of v0.2,
+  written by that of A4, and one of v0.3, written by that of B1.
 
 Signing and verifying an evidence file come with block E.
+
+### Replaying the orders of a relation
+
+The evidence writes the seed of the audit, not the seed of each source. The seed of a source is
+recomputed from it, as `verify.relations.source_seed` draws it: the first 6 bytes, read as a
+big-endian integer, of the SHA-256 of the text `<seed>/<relation>/<example>`, with the seed in
+decimal and the ids of the relation and of the source example. With that seed, the items of the
+source and `relations.permutations` of the policy, `oracle.relations.orders` gives the same
+follow-up orders in the same order; `order` in `failed` names the one that did not hold.
+
+```python
+import hashlib
+
+
+def source_seed(seed: int, relation: str, example: str) -> int:
+    drawn = hashlib.sha256(f"{seed}/{relation}/{example}".encode()).digest()
+    return int.from_bytes(drawn[:6], "big")
+```

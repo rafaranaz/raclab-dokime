@@ -18,3 +18,12 @@ confirmed = [
     "python-semver/replace-keeps-the-constructor-error",
     "python-semver/replace-with-a-regression-in-bump-minor",
 ]
+
+[[review]]
+date = "2026-11-22"
+minutes = 6
+by = "the maintainer"
+confirmed = [
+    "mdformat/formats-a-blank-paragraph-the-same-twice",
+    "mdformat/formats-a-short-code-block-differently-twice",
+]

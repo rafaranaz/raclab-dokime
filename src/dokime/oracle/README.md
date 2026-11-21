@@ -3,8 +3,8 @@
 Compares what the zone of verification observed of an example with what the example expects,
 outside the zone (ADR-0012, ADR-0063). It imports only `contract` and `core`, and runs nothing: it
 receives an example of a checked contract and its observation, and the gate that calls it decides
-the verdict. It also splits the examples of a contract into visible and held-out; the relations
-come in block B. Its requirements are in [oracle.md](../../../docs/requirements/oracle.md).
+the verdict. It also splits the examples of a contract into visible and held-out, and builds the
+follow-ups of a relation. Its requirements are in [oracle.md](../../../docs/requirements/oracle.md).
 
 ```python
 from dokime.oracle.compare import compare
@@ -48,3 +48,34 @@ example to keep visible, one already published: the draw of a case is among its 
 a case where none is left holds out nothing. On a held-out failure, `feedback` names the requirement
 and the classes of the differences (the part, `files` for any file, `time-limit` or `crashed` for a
 step not seen), never a value, an input or the identifier of the example.
+
+## The follow-ups of a relation
+
+`relations` builds the inputs that a relation runs on from a visible source example, and compares
+each follow-up with its source (ADR-0076).
+
+```python
+from dokime.oracle.relations import holds, in_order, items_of, orders, repeated, words
+
+items = items_of("function", {"args": [[3, 1, 2]]}, "args[0]")  # [3, 1, 2]
+for order in orders(items, seed=20261121, permutations=10):  # the reversed order first
+    follow_up = in_order("function", {"args": [[3, 1, 2]]}, "args[0]", order)
+```
+
+- **`orders(items, seed, permutations)`** gives the reversed order, when it gives another input,
+  and up to `permutations` other orders drawn with the seed, as indices of the items. The inputs
+  they give are distinct from each other and from the source, items equal in value and type
+  counting once, and there are never more than the distinct inputs that the items allow. The same
+  seed gives the same orders in the same order: up to 5000 distinct inputs they are a sample of all
+  of them, beyond that they are drawn by shuffling.
+- **`items_of` and `in_order`** read and permute the list of an argument at `function`, `args[N]`
+  or a keyword argument, or the lines of `stdin` or of a file at `cli`, keeping a final line break.
+  An input that is absent, or not a list or a text, has no items.
+- **`repeated`** gives the follow-up of `idempotent`: the return of the source in the argument
+  named, or in the only one, at `function`; the standard output as `stdin`, or the files written,
+  at `cli`, by its `via`. A source that raised or exited with another code than zero has none.
+- **`holds`** compares a follow-up with its source: the return, by value and type, or the type of
+  the exception at `function`; at `cli`, the exit code and the standard output for `via: stdout`,
+  the files written for `via: files`, all three for `order-insensitive`.
+- **`words`** names the requirement, the relation and the visible source example for the agent,
+  never the follow-up nor a value.

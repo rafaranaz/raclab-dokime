@@ -80,6 +80,7 @@ for order in orders(items, seed=20261121, permutations=10):  # the reversed orde
   working directory after a run, so the file that `over` names, which the follow-up receives
   permuted on purpose, is left out when each run leaves it as it received it, and compared when a
   run rewrites it: what is compared is what each run produced. `holds` takes the input of each run
-  for that, `source_given` and `follow_given`.
+  for that, `source_given` and `follow_given`, which are required: without them, a caller would
+  get the false failure back without a warning.
 - **`words`** names the requirement, the relation and the visible source example for the agent,
   never the follow-up nor a value.

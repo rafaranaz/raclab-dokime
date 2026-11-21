@@ -1,4 +1,6 @@
 # SDD-EARS: ORACLE-062
+import pytest
+
 from dokime.contract.model import Relation
 from dokime.core.observation import Exited
 from dokime.oracle.relations import holds, in_order
@@ -54,3 +56,11 @@ def test_over_stdin_compares_every_file_that_the_runs_leave() -> None:
     source = Exited(exit=0, stdout="a\nb\n", stderr="", files={"log.txt": "b"})
     follow = Exited(exit=0, stdout="a\nb\n", stderr="", files={"log.txt": "a"})
     assert not holds(by_stdin, "cli", source, follow, source_given=given, follow_given=given)
+
+
+def test_the_inputs_of_both_runs_have_to_be_given() -> None:
+    source = run("a\nb\n", "b\na\n")
+    with pytest.raises(TypeError):
+        holds(OVER_A_FILE, "cli", source, source)  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        holds(OVER_A_FILE, "cli", source, source, source_given=SOURCE_GIVEN)  # type: ignore[call-arg]

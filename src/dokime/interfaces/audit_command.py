@@ -30,6 +30,7 @@ from dokime.platform.checkout import checkout_commit
 from dokime.platform.clock import SystemClock
 from dokime.platform.git import GitRepository
 from dokime.platform.ledger_file import LedgerFile
+from dokime.platform.randomness import seed
 from dokime.platform.sealed_store import (
     AgeSealedStore,
     default_identity_path,
@@ -85,6 +86,11 @@ class IdentityStore:
                 sys.stderr.write(f"dokime audit: {warning.code}: {warning.message}\n")
             self._store = store
         return self._store.open(sealed)
+
+
+def relations_seed() -> int:
+    """The seed of the relations of an audit, from the randomness of the system (ADR-0076)."""
+    return seed()
 
 
 def key_from(
@@ -184,6 +190,7 @@ def _audit(arguments: argparse.Namespace, as_json: bool, asked: list[CommitName 
                 contract=arguments.contract,
                 pack=arguments.pack,
                 harness_commit=asked[0],
+                relations_seed=relations_seed(),
             )
             runtime = PodmanRuntime()
             if not as_json:

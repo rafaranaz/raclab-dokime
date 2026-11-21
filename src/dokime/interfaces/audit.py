@@ -48,6 +48,8 @@ from dokime.verify.aggregate import BUILT, NOT_BUILT, GateEntry, Status, aggrega
 from dokime.verify.examples import baseline, visible_examples
 from dokime.verify.existing import existing_tests
 from dokime.verify.protected import protected_paths
+from dokime.verify.relations import GATE as RELATIONS
+from dokime.verify.relations import RelationsOutcome, relations
 from dokime.verify.repeatability import GATE as REPEATABILITY
 from dokime.verify.repeatability import repeatability
 from dokime.verify.result import GateResult
@@ -105,6 +107,8 @@ class Request:
     pack: Path | None = None
     harness_commit: CommitName | None = None
     """The commit of the checkout of the harness, when it names its code (ADR-0068)."""
+    relations_seed: int = 0
+    """The seed of the relations of the audit, drawn from the randomness of the system."""
 
 
 @dataclass(frozen=True)
@@ -118,7 +122,11 @@ class Audited:
     evidence: Evidence | None = None
 
 
-def convert(entry: GateEntry, holdout: evidence.Holdout | None = None) -> evidence.Gate:
+def convert(
+    entry: GateEntry,
+    holdout: evidence.Holdout | None = None,
+    relations: evidence.RelationsRecord | None = None,
+) -> evidence.Gate:
     """A gate of a state of `verify` in the types of `evidence`."""
     if entry.status is Status.NOT_APPLICABLE or entry.result is None:
         return evidence.GateNotApplicable(entry.gate, entry.reason or "")
@@ -136,6 +144,7 @@ def convert(entry: GateEntry, holdout: evidence.Holdout | None = None) -> eviden
         unstable_tests=result.unstable if result.gate == _UNSTABLE_TESTS else (),
         unstable_examples=result.unstable if result.gate == _UNSTABLE_EXAMPLES else (),
         holdout=holdout,
+        relations=relations,
     )
 
 
@@ -201,6 +210,8 @@ class _Run:
         self.sealed_decided: GateResult | None = None
         self.sealed_bytes: bytes | None = None
         self.holdout: evidence.Holdout | None = None
+        self.relation_runs: list[RelationsOutcome] = []
+        """The outcome of the gate `relations` in each run of the verification."""
 
     def go(self, story: str, tree: TreeName) -> Audited:
         self.story = story
@@ -225,7 +236,11 @@ class _Run:
                 )
                 return Audited(verdict=Verdict.ERROR, findings=outcome.findings, gates=tuple(gates))
             gates.extend(
-                convert(entry, self.holdout if entry.gate == SEALED else None)
+                convert(
+                    entry,
+                    self.holdout if entry.gate == SEALED else None,
+                    self._record(entry) if entry.gate == RELATIONS else None,
+                )
                 for entry in outcome.gates
             )
             verdict = outcome.verdict
@@ -265,7 +280,10 @@ class _Run:
 
     def _gate(self, name: str, run: int | None = None) -> GateResult:
         numbered: dict[str, object] = {} if run is None else {"run": run}
-        self.ledger.record("gate.started", {"gate": name, **numbered})
+        started: dict[str, object] = {"gate": name, **numbered}
+        if name == RELATIONS:
+            started["seed"] = self.request.relations_seed
+        self.ledger.record("gate.started", started)
         result = self._result(name)
         finished: dict[str, object] = {"gate": name, **numbered, "verdict": result.verdict.value}
         if name == "visible-examples" and self.change_image is not None:
@@ -313,9 +331,45 @@ class _Run:
             return visible_examples(
                 pack, contract, base, patch, changed, repository, self.ports.observer, limits
             )
+        if name == RELATIONS:
+            return self._relations(contract, pack, dockerfile)
         if name == SEALED:
             return self.sealed_decided or self._sealed(contract, pack, dockerfile)
         raise ValueError(f"the gate {name!r} is not one that this version runs")
+
+    def _relations(self, contract: Contract, pack: Pack, dockerfile: Path) -> GateResult:
+        """Run the gate `relations` on the image of the change, with the seed of the audit and the
+        permutations of the policy, and keep its outcome for the evidence."""
+        try:
+            changed = self._image_of_the_change(pack, contract, dockerfile)
+        except RefusalError as refusal:
+            return GateResult(gate=RELATIONS, findings=(refusal.finding,))
+        outcome = relations(
+            pack,
+            contract,
+            self.request.base,
+            self.request.patch,
+            changed,
+            self.ports.repository,
+            self.ports.observer,
+            ObservationLimits(),
+            self.request.relations_seed,
+            self.policy.relations_permutations,
+        )
+        self.relation_runs.append(outcome)
+        return outcome.result
+
+    def _record(self, entry: GateEntry) -> evidence.RelationsRecord | None:
+        """The record of the relations of the run whose result the state lists."""
+        chosen = next((o for o in self.relation_runs if o.result is entry.result), None)
+        if chosen is None:
+            return None
+        return evidence.RelationsRecord(
+            seed=chosen.seed,
+            failed=tuple(
+                evidence.FailedOrder(f.relation, f.example, f.order) for f in chosen.failed
+            ),
+        )
 
     def _sealed_applies(self) -> GateResult | str | None:
         """Whether the gate of the sealed examples applies, from the entries `held_out` of the

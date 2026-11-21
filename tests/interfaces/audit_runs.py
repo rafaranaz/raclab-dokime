@@ -160,11 +160,15 @@ class Done:
 
 
 @contextlib.contextmanager
-def built(repeating: bool, sealing: bool = False) -> Iterator[None]:
-    """The gates repeatability and sealed-examples built or not, whatever this version of verify
-    says."""
+def built(repeating: bool, sealing: bool = False, relating: bool = False) -> Iterator[None]:
+    """The gates repeatability, sealed-examples and relations built or not, whatever this version
+    of verify says."""
     has, lacks = set(aggregate.BUILT), dict(aggregate.NOT_BUILT)
-    for gate, on in (("repeatability", repeating), ("sealed-examples", sealing)):
+    for gate, on in (
+        ("repeatability", repeating),
+        ("sealed-examples", sealing),
+        ("relations", relating),
+    ):
         if on:
             has.add(gate)
             lacks.pop(gate, None)
@@ -187,6 +191,7 @@ def audit(
     repository: AuditedDouble | None = None,
     repeating: bool = False,
     sealing: bool = False,
+    relating: bool = False,
     history: Callable[[CommitName], FileHistory] | None = None,
     sealed: SealedStore | None = None,
     ancestors: tuple[CommitName, ...] = (),
@@ -213,6 +218,6 @@ def audit(
         history=None if history is None else history(base),
         sealed=sealed,
     )
-    with built(repeating, sealing):
+    with built(repeating, sealing, relating):
         audited = run_audit(asked, ports, store, Ticks())
     return Done(audited, store, repository, runtime, observer)

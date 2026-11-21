@@ -1,0 +1,5 @@
+# The cases that have not run yet (CORPUS-073, CORPUS-074, ADR-0055). A case runs for the first time
+# once it is in main with its label and its review: until then it is listed here, and the audit of
+# the corpus leaves it out. Taking a case out of this list is a pull request of its own, whose CI is
+# its first run.
+pending = []

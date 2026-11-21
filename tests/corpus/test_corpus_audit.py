@@ -16,7 +16,7 @@ from typing import Any
 import pytest
 
 from dokime.evidence.schema import read_back
-from tests.corpus.cases import CASES, Case
+from tests.corpus.cases import RUNNABLE, Case
 from tests.corpus.clones import clone, skip_unless_asked
 from tests.corpus.projects import PROJECTS
 from tests.sandbox.engines import require
@@ -27,7 +27,7 @@ def first_failing(gates: list[dict[str, Any]]) -> str | None:
     return next((g["gate"] for g in gates if g["status"] == "run" and g["verdict"] == "FAIL"), None)
 
 
-@pytest.mark.parametrize("case", CASES, ids=lambda c: c.key)
+@pytest.mark.parametrize("case", RUNNABLE, ids=lambda c: c.key)
 def test_a_case_gets_its_expected_verdict_at_its_gate(tmp_path: Path, case: Case) -> None:
     skip_unless_asked()
     require("git")

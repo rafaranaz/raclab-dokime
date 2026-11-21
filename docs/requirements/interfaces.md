@@ -182,6 +182,16 @@ the identity of `--identity`, or of its default path when a file is there.
 - **INTERFACES-183** Where the contract is given with `--contract`, the run shall decide whether the gate applies from the entries `held_out` of the contract of the story in the base, and if those of the contract given differ, give the finding `sealed-batch-mismatch`.
 - **INTERFACES-184** If the contract given with `--contract` has no entry `held_out` and the contract of the base has, then the message of `sealed-batch-mismatch` shall say that the contract given lacks the entries `held_out` of the base, and that a local audit is made with the visible contract, not the whole one.
 
+## `audit`: the relations ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
+
+The gate `relations` runs once `verify` builds it, in the state `verifying`, on the image of the
+change, as many times as the verification runs.
+
+- **INTERFACES-186** When an audit is asked, the command shall draw the seed of the relations from the randomness of the system.
+- **INTERFACES-187** When the gate `relations` starts, the run shall record the seed of the relations in the event `gate.started` of the gate.
+- **INTERFACES-188** When the gate `relations` runs, the run shall give it the seed of the relations of the audit and `relations.permutations` of the policy, on the image of the change.
+- **INTERFACES-189** When the gate `relations` ran, the run shall hand the evidence the record of the relations, the seed and each follow-up that did not hold with its order, of the run whose result the evidence lists.
+
 ## The version of the harness
 
 - **INTERFACES-154** When dokime is run with the option `--version`, the command shall print `dokime` and the version of the installed harness on one line of the standard output and exit with status 0.

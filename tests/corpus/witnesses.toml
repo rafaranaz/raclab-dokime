@@ -59,6 +59,14 @@ turned_green = [
     'tests.test_api::test_output_is_equal[```\na\n```\n\u2003\n# A\n]',
 ]
 
+[[witness]]
+project = "mdformat"
+commit = "27e2ba3e10dad83625662186f2dd3b295fd82079"
+case = "formats-a-blank-paragraph-the-same-twice"
+turned_green = [
+    'tests.test_api::test_output_is_equal[```\na\n```\n\u2003\n# A\n]',
+]
+
 # The two filters of ADR-0057 for each witness of the measurement, read from its diff and the
 # tests it turned green, with the boundaries of ADR-0039.
 

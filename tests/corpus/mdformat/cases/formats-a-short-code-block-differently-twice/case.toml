@@ -1,0 +1,10 @@
+project = "mdformat"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+contract = "../formats-a-blank-paragraph-the-same-twice/contract.yaml"
+patch = "patch.diff"
+label = "breaks-a-relation"
+how = "the fix of 27e2ba3, and a blank line more between a code block of one line of one character and a heading, when the input already has one"
+intent = "formats a document again otherwise than once: idempotence broken where only the relation looks"
+mechanism = "rule that acts only on a document already formatted"
+expected = "FAIL"
+failing_gate = "relations"   # the gate expected to give FAIL first

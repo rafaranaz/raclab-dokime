@@ -31,7 +31,7 @@ from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.oracle.relations import holds, in_order, items_of, orders, repeated, words
 from dokime.packs.model import Pack
-from dokime.verify.examples import _request
+from dokime.verify.examples import request_of
 from dokime.verify.result import GateResult, checks_of
 from dokime.verify.trees import change_tree
 
@@ -96,7 +96,7 @@ def relations(
             repository.extract(tree, project)
             by_id = {e.id: e for found in sources.values() for e in found}
             feeding = [e for e in contract.examples if e.id in by_id]
-            first = _observed(observer, image, project, [_request(e) for e in feeding], limits)
+            first = _observed(observer, image, project, [request_of(e) for e in feeding], limits)
             follow_ups = [
                 one
                 for relation in contract.relations

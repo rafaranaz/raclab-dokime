@@ -1,4 +1,4 @@
-<!-- translation-of: 03-data-and-evidence.md sha256:5ba102d1312d4e92 -->
+<!-- translation-of: 03-data-and-evidence.md sha256:8323d8006265451a -->
 # Datos y evidencia
 
 *Read in [English](03-data-and-evidence.md).*
@@ -117,8 +117,8 @@ examples:
     origin: human               # una propuesta tiene origen model hasta que una persona la acepta
     steps:
       - input:
-          args: [total, invoice.json]
-          files: {invoice.json: {$json: {lines: [{amount: 3.335, currency: EUR}, {amount: 6.695, currency: EUR}]}}}
+          args: [total, invoice.csv]
+          files: {invoice.csv: "3.335,EUR\n6.695,EUR\n"}
         expect:
           exit: 0
           stdout: {$json: {total: {$approx: 10.03, tolerance: 0.005}}}
@@ -129,7 +129,7 @@ relations:
     requirement: round-total-once
     relation: order-insensitive   # del catálogo cerrado: idempotent | order-insensitive
     target: invoice
-    over: lines                   # la entrada cuyo orden no importa
+    over: invoice.csv             # la entrada cuyo orden no importa: aquí, las líneas de un fichero
 ```
 
 - **Lo que un paso puede esperar** es un valor exacto o uno de los comparadores del catálogo
@@ -292,7 +292,7 @@ terminada, sea cual sea su veredicto.
     {"name": "tree", "digest": {"gitTree": "5b1e…"}},
     {"name": "change.patch", "digest": {"sha256": "9f2c…"}}
   ],
-  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.3",
+  "predicateType": "https://github.com/rafaranaz/raclab-dokime/attestation/conformance/v0.4",
   "predicate": {
     "verdict": "PASS",
     "delivered": true,
@@ -317,6 +317,9 @@ terminada, sea cual sea su veredicto.
        "checks": {"origin": "existing", "total": 412, "excluded_unstable": 2}},
       {"gate": "visible-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 9}},
+      {"gate": "relations", "status": "run", "verdict": "PASS",
+       "checks": {"origin": "derived", "total": 3},
+       "relations": {"seed": 4410937205833312, "failed": []}},
       {"gate": "sealed-examples", "status": "run", "verdict": "PASS",
        "checks": {"origin": "human", "total": 2},
        "holdout": {
@@ -371,6 +374,12 @@ terminada, sea cual sea su veredicto.
   `best-effort-secrecy`, una entrada por cada uno de sus cinco límites, de las que el ejemplo
   muestra una. Donde no está la clave, o el contrato no reserva ningún ejemplo, la puerta
   no es aplicable con esa razón, y la evidencia no dice nada más de la reserva.
+- **De las relaciones**, la entrada de la puerta `relations` lleva `relations`: la semilla de la
+  auditoría, y `failed`, cada caso derivado que no se cumplió como `relation` y `example`, con
+  `order`, los índices de los elementos de su caso de partida, para `order-insensitive`; nunca una
+  entrada ni un valor. La semilla de cada caso de partida se recalcula a partir de la semilla de la
+  auditoría y de los dos ids
+  ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md)).
 - Donde un campo significa lo mismo que uno del resumen de verificación de SLSA, usa ese nombre,
   para que más adelante se pueda producir un resumen en ese formato a partir de la evidencia. Ese
   formato solo no bastaba: su resultado es únicamente pasa o falla, y no tiene sitio para lo no

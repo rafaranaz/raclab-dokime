@@ -170,3 +170,19 @@ them fails there, and does not pass as one without the key.
 - **VERIFY-176** If the contract has entries in `held_out` and the base has no sealed batch for the story, then the gate shall give a finding `sealed-batch-missing` of the verdict `ERROR`, whether the key is here or not.
 - **VERIFY-177** When the contract has no entry in `held_out` and the base has no sealed batch for the story, the gate shall be not applicable with the reason `the contract holds out no example`, whether the key is here or not.
 - **VERIFY-178** When the contract has entries in `held_out`, the base has a sealed batch for the story and the key is not here, the gate shall be not applicable with the reason `the key is not here`.
+
+## The gate `relations` ([ADR-0013](../adr/0013-provenance-decides-what-a-check-can-do.md), [ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
+
+The gate runs on the tree of the change. Its sources are the visible examples of the contract; a
+held-out example is never one, since the gate runs where the key may not be. The oracle builds the
+follow-ups and compares them; the gate observes the sources, then the follow-ups, on the same image.
+
+- **VERIFY-179** When the gate `relations` runs, the gate shall take as the sources of a relation the visible examples of its requirement at its target that have one step, never a held-out example.
+- **VERIFY-180** When the gate `relations` runs, the gate shall observe the sources on the tree of the change, build their follow-ups with the oracle, observe the follow-ups on the same tree, and compare each follow-up with its source with the input of each run.
+- **VERIFY-181** The gate shall draw the orders of each source with a seed derived from the seed of the run, the id of the relation and the id of the source, so that the same seed of the run gives the same follow-ups.
+- **VERIFY-182** If a source was not observed to the end of its step, then the gate shall give it no follow-up.
+- **VERIFY-187** If a follow-up was not observed to the end of its step, then the gate shall count it as a follow-up that does not hold.
+- **VERIFY-183** If no source of a relation has a follow-up, then the gate shall give a finding `relation-without-source` of the verdict `ASK`, at the line of the relation.
+- **VERIFY-184** If a follow-up does not hold, then the gate shall give one finding `relation-fails` of the verdict `FAIL` for each relation and source, at the line of the relation, whose message is the words of the oracle for the agent.
+- **VERIFY-185** When the gate gives its result, the gate shall count each follow-up compared as a check of origin `derived`, and give the seed of the run and each follow-up that did not hold, with its relation, its source and, for `order-insensitive`, its order.
+- **VERIFY-186** If a port refuses while the gate composes the tree, extracts it or observes, then the gate shall give the finding of the refusal, of the verdict `ERROR`, and no other finding.

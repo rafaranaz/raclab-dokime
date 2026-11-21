@@ -114,6 +114,21 @@ held-out examples through theirs.
 - **CONTRACT-093** If the salt of the digest of a held-out example is not 16 bytes, then the contract shall refuse to compute it with an error that says so.
 - **CONTRACT-094** When the text of a contract is read, the contract shall give the text of each of its examples as it is written in the file, so that a contract made of the header, the requirements and that text reads back the same example.
 
+## Relations ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
+
+The boundary of a relation is that of the visible examples of its requirement at its target. Its
+channel is declared, never deduced: `via` at `cli` for `idempotent`, `over` for the input that
+`order-insensitive` permutes and for the argument that receives the output of a function of more
+than one argument.
+
+- **CONTRACT-095** If no visible example of the requirement of a relation has its target, then the checker shall report a finding with the code `relation-without-example` and the verdict `ASK`, with the line of the relation.
+- **CONTRACT-096** If the visible examples of the requirement of a relation at its target are at more than one boundary, then the checker shall report a finding with the code `relation-target-ambiguous`, with the line of the relation.
+- **CONTRACT-097** If a relation `idempotent` at `cli` has no `via`, then the checker shall report a finding with the code `relation-needs-via`, with the line of the relation.
+- **CONTRACT-098** If a relation has `via` and is not `idempotent` at `cli`, then the checker shall report a finding with the code `relation-via-not-allowed`, with the line of the relation.
+- **CONTRACT-099** If a relation `idempotent` at `function` has no `over` and an example of its requirement at its target gives more than one argument, then the checker shall report a finding with the code `relation-needs-over`, with the line of the relation.
+- **CONTRACT-100** If the `over` of a relation at `function` is neither `args[N]`, with N a natural number, nor the name of a keyword argument, or names no argument that an example of its requirement at its target gives, then the checker shall report a finding with the code `bad-over`, with the line of the relation.
+- **CONTRACT-101** If the `over` of a relation `order-insensitive` at `cli` is neither `stdin` nor the name of a file of the input of an example of its requirement at its target, or a relation `idempotent` at `cli` has an `over`, then the checker shall report a finding with the code `bad-over`, with the line of the relation.
+
 ## Tables of fields
 
 A name is a text of letters, digits and hyphens that starts with a letter. A value is any data, with
@@ -163,7 +178,8 @@ the directives allowed where it is.
 | Relation | `requirement` | Yes | A name |
 | Relation | `relation` | Yes | `idempotent` or `order-insensitive` |
 | Relation | `target` | Yes | A text of one line |
-| Relation | `over` | Only for `order-insensitive` | A text of one line |
+| Relation | `over` | Only for `order-insensitive` | A text of one line; also allowed for `idempotent` |
+| Relation | `via` | No; allowed only for `idempotent` | `stdout` or `files` |
 
 ## Table of directives
 

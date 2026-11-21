@@ -2,4 +2,7 @@
 # once it is in main with its label and its review: until then it is listed here, and the audit of
 # the corpus leaves it out. Taking a case out of this list is a pull request of its own, whose CI is
 # its first run.
-pending = []
+pending = [
+    "mdformat/formats-a-blank-paragraph-the-same-twice",
+    "mdformat/formats-a-short-code-block-differently-twice",
+]

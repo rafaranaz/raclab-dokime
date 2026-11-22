@@ -1,0 +1,231 @@
+seed = 1362315757
+
+[[batch]]
+number = 1
+file = "batch-1.txt"
+sha256 = "f7e8eb17c5ab22808cd7c8a8e16af567dd7b03a611d2b02d9cf88e880072b429"
+witnesses = 10
+
+[[batch]]
+number = 2
+file = "batch-2.txt"
+sha256 = "8d43e157591e9874827aec85bed62e2b41abddfb15cbe76f1a964d9ae0b96dac"
+witnesses = 10
+
+[[batch]]
+number = 3
+file = "batch-3.txt"
+sha256 = "c14703d02220750665fba46d4be16d5e9a7552bb5241593830229ed36a7304af"
+witnesses = 10
+
+[[batch]]
+number = 4
+file = "batch-4.txt"
+sha256 = "db7c0dc7e7bffd918ac491f99ed7b3d5bb57823998c91b1ba8103ea74fe4d0fa"
+witnesses = 11
+
+# The witness of each id, from the draw
+[[witness]]
+id = "W01"
+project = "python-semver"
+commit = "f53d13d13814a180a464763d6363bacb8a9f6c7f"
+
+[[witness]]
+id = "W02"
+project = "cachetools"
+commit = "4ec4a6734e09362138a7b2a7c3257133908a62db"
+
+[[witness]]
+id = "W03"
+project = "python-semver"
+commit = "bae0b7ca7ce3f2a3268290ff9b4b379e7ed3a779"
+
+[[witness]]
+id = "W04"
+project = "python-semver"
+commit = "887d057e66b7fdfe0adf5a206ac810766b5af938"
+
+[[witness]]
+id = "W05"
+project = "cachetools"
+commit = "73883976431e8e8592b25d1d35c1fe926f973d1b"
+
+[[witness]]
+id = "W06"
+project = "python-semver"
+commit = "1e8757912f633684e1a65d9d7c7e2270c3c79928"
+
+[[witness]]
+id = "W07"
+project = "python-semver"
+commit = "0aa17a3447958cfe13634b0c3917e7aa4eee3334"
+
+[[witness]]
+id = "W08"
+project = "python-semver"
+commit = "ea2524a51767cefab58a9b3bb6bcf38e5cdc7d54"
+
+[[witness]]
+id = "W09"
+project = "mdformat"
+commit = "c22a0b845fd833e22ecb500a6f11020c299993fe"
+
+[[witness]]
+id = "W10"
+project = "python-semver"
+commit = "d8813b67a2ec5d579365f51a6d8f96d02f3fcbc3"
+
+[[witness]]
+id = "W11"
+project = "python-semver"
+commit = "fdec4ae1e5e296e890a5da0fb582b54f1af0da34"
+
+[[witness]]
+id = "W12"
+project = "python-semver"
+commit = "b6e83e3e40d3a7570386e8d694ae8011477a55c1"
+
+[[witness]]
+id = "W13"
+project = "cachetools"
+commit = "c8b4ee2f6ce9237e2c6e50ebf61e1f4b3bd88780"
+
+[[witness]]
+id = "W14"
+project = "cachetools"
+commit = "e96310286ed0f5a8bcb5a2f52adc1bab7ebe8634"
+
+[[witness]]
+id = "W15"
+project = "mdformat"
+commit = "f568716143bde1259fa171f806919886e8565fcc"
+
+[[witness]]
+id = "W16"
+project = "python-semver"
+commit = "1d515915d50b31f23fd1fb0f572ef608453e80e3"
+
+[[witness]]
+id = "W17"
+project = "mdformat"
+commit = "47e0452da9a0dff6d59873abe5bb12c239d31286"
+
+[[witness]]
+id = "W18"
+project = "mdformat"
+commit = "27e2ba3e10dad83625662186f2dd3b295fd82079"
+
+[[witness]]
+id = "W19"
+project = "cachetools"
+commit = "f6066ebe4394766a4ca8aca3ff528a45209998fa"
+
+[[witness]]
+id = "W20"
+project = "python-semver"
+commit = "0bd62d4547c808233f6e033059a98218c9b637c1"
+
+[[witness]]
+id = "W21"
+project = "cachetools"
+commit = "8a85ef71f2bcb48efe2b1cdf0a72e415f91ee6da"
+
+[[witness]]
+id = "W22"
+project = "cachetools"
+commit = "95e6addbd82afd75f81cb5650f32f6d74af2f1f9"
+
+[[witness]]
+id = "W23"
+project = "mdformat"
+commit = "56e221da358612cbae25c7dde371f30607ded566"
+
+[[witness]]
+id = "W24"
+project = "python-semver"
+commit = "9c191564b58bfa7140a7c01f0ed7141506b5ce3b"
+
+[[witness]]
+id = "W25"
+project = "python-semver"
+commit = "bcd151fa63df3053b9f30e698e9ae1020187be1a"
+
+[[witness]]
+id = "W26"
+project = "mdformat"
+commit = "e05f2cfa44ccd77f39f3ce8394412b58465b1fa7"
+
+[[witness]]
+id = "W27"
+project = "cachetools"
+commit = "d0efb773252f2f94d450bc7747e3fc3faaa42f9a"
+
+[[witness]]
+id = "W28"
+project = "cachetools"
+commit = "2609f068f909197d46c1ad84083fb3b1226db3de"
+
+[[witness]]
+id = "W29"
+project = "cachetools"
+commit = "fa8148536763cbe487bf41732296d120c10c5126"
+
+[[witness]]
+id = "W30"
+project = "python-semver"
+commit = "4e09ef0e4c94314731f960d4ce763a2da2e096f1"
+
+[[witness]]
+id = "W31"
+project = "python-semver"
+commit = "bc41390f388d88114e8529b17fe145c5af390cbb"
+
+[[witness]]
+id = "W32"
+project = "cachetools"
+commit = "41e4b1616a292e26ebac3c5f68a8c5d5e43edc68"
+
+[[witness]]
+id = "W33"
+project = "cachetools"
+commit = "a6f073a71633373bdec6d40d39bbef3383ce022a"
+
+[[witness]]
+id = "W34"
+project = "python-semver"
+commit = "37ae009c7cacab8f1a87157ca2b484b8e18a0a78"
+
+[[witness]]
+id = "W35"
+project = "python-semver"
+commit = "9ef41316dbe85f7d0fae6e396c45a1bbf69ebb29"
+
+[[witness]]
+id = "W36"
+project = "python-semver"
+commit = "8c0a3f7d80b98962b9db2861a02a035af831b2ac"
+
+[[witness]]
+id = "W37"
+project = "cachetools"
+commit = "b34643f37174751df37016899f4e7f5f6b189012"
+
+[[witness]]
+id = "W38"
+project = "mdformat"
+commit = "062ad6d0e00b18942944c50857b949f2e19a07c1"
+
+[[witness]]
+id = "W39"
+project = "cachetools"
+commit = "36d4e87f3fd6ec557323e150dcb40123312f2730"
+
+[[witness]]
+id = "W40"
+project = "python-semver"
+commit = "cc4ae0755098dfd52e0ee197c2099ef207079fbe"
+
+[[witness]]
+id = "W41"
+project = "python-semver"
+commit = "9f6894daaf62d55fc37cece10948e7e1cc3dc369"

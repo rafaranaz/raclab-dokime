@@ -36,6 +36,18 @@ of its own; the old one stays as it is, and is listed in `withdrawn.toml` with t
 case that replaces it. A withdrawn case is left out of the counts. This keeps a label or an expected
 verdict from changing out of sight after the case has run.
 
+## The intent of each contract
+
+`intents.toml` gives each good case, by its key, an intent sentence: what someone would say before
+writing any example, for a later experiment where a model writes the contract from it. It is quoted
+from the project of the case, from the title of its issue, else of its pull request, else its commit
+message, with its source; when none is usable, the maintainer writes it before seeing the examples
+(`maintainer`, and `seen_contract = true` for a case whose contract had already been seen). A
+sentence holds no concrete value of the inputs or of the outputs of the examples, nor the name of a
+test, though it may name the behaviour or the error it asks for: "Preserve constructor TypeError in
+Version.replace" is usable, while a title that names the character of the input of an example is
+not, and `skipped` says so. It lives apart from the files of a case, which do not change.
+
 ## The tests that need the network
 
 The self-checks, the check that each patch applies on its base, and the check of the witnesses of

@@ -232,12 +232,19 @@ changes.
 `ExampleObserver.observe(image, project, requests, limits)` runs examples in the zone of
 verification and gives what it saw (ADR-0012, ADR-0063). A request carries the identifier of its
 example, its boundary (`function` or `cli`), its target and the inputs of its steps, and nothing of
-what is expected; the harness compares outside the zone. A step at `function` is `Returned` (any
-value that JSON holds, decimals included), `Raised` (the name of the class, its full name, the full names of the classes of its MRO, as `classes`, and the message) or `NotJson` (the
-name of the type of a value that JSON cannot hold); a step at `cli` is `Exited`, with its exit code,
-its output, its error and the files it wrote. An example says how it ended, `completed`, `time-limit`,
-`output-limit` or `crashed` with the signal or the exit code of its process when known, with the steps observed. `ObservationLimits` bounds one example to 60 seconds and the
-observations to 32 MiB by default, with the limits of a run for the whole.
+what is expected; the harness compares outside the zone.
+
+A step at `function` is `Returned` (any value that JSON holds, decimals included), `Raised` (the
+name of the class, its full name, the full names of the classes of its MRO, as `classes`, and the
+message) or `NotJson`: the name of the type of a value that JSON cannot hold and its `repr`, which
+`not_json` cuts to its first 1,000 characters, `REPR_LIMIT`, and marks as `cut` when it is longer
+(ADR-0079); `None` when the adapter did not record it. A step at `cli` is `Exited`, with its exit
+code, its output, its error and the files it wrote.
+
+An example says how it ended, `completed`, `time-limit`, `output-limit` or `crashed` with the
+signal or the exit code of its process when known, with the steps observed. `ObservationLimits`
+bounds one example to 60 seconds and the observations to 32 MiB by default, with the limits of a
+run for the whole.
 
 ## The sealed store
 

@@ -1,6 +1,6 @@
 # ADR-0078 · The job corpus is split into four parts and a job that gathers them
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

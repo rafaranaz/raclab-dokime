@@ -1,7 +1,7 @@
-<!-- translation-of: 0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md sha256:e9588f0186ceaf6c -->
+<!-- translation-of: 0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md sha256:9860396444bdb185 -->
 # ADR-0052 · El conjunto de casos se ejecuta en CI en un job propio, con red
 
-**Estado:** aceptada, enmendada por el [ADR-0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md)
+**Estado:** aceptada, enmendada por el [ADR-0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) y el [ADR-0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md)
 
 ## Contexto
 

@@ -1,0 +1,27 @@
+# The test of ADR-0074 in B3a, fixed before either reading is made. Two new readers label the 41
+# witnesses of tests/corpus/witnesses.toml again, each a new agent in four conversations of the
+# maintainer, one for each batch of this directory, outside any project, without memory and with
+# the search of the web off. Both get the same batches in the same order, drawn with the seed of
+# draw.toml; the eight witnesses in dispute are among them, unmarked.
+
+criterion = """
+The hypothesis of ADR-0074 holds if Cohen's kappa between the two new readers on isolated, over the
+41 witnesses, is above 0.57, the kappa of the two readings of block A (0.5684 unrounded, 33 of 41
+alike). Otherwise the boundary of isolated is discussed again. A kappa that is undefined does not
+count as above 0.57.
+"""
+
+undecidable = """
+A witness that a reader calls undecidable counts as not isolated, since the rule calls a witness
+isolated only when it meets all four conditions, and the criterion is read on kappa computed so.
+Kappa and the raw agreement are given on the 41 and on the eight in dispute. Given as well, and
+deciding nothing: the number of witnesses each reader called undecidable, by condition, and kappa
+and the raw agreement on the witnesses that neither reader called undecidable.
+"""
+
+limits = [
+    "Kappa on few items is unstable: on the eight, one label changed moves it far; and it is undefined when a reader, or both, gives every witness the same label, since the agreement expected by chance is then 1.",
+    "The criterion of a reader may vary between its four batches, since no conversation sees the others; the order is the same for both readers, so both meet each witness in the same batch and place.",
+    "Each witness shows its diff with the whole function or block around each change, not the whole files of its base: condition 2 is judged only with those functions, their docstrings and the documents that the diff touches, and a reader cannot see an issue the commit references.",
+    "The search of the web is off and the prompt asks not to use anything outside the text, but what a model may remember of these public projects cannot be ruled out.",
+]

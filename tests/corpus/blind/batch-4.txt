@@ -1,0 +1,4682 @@
+You are labelling, one by one, commits of three open-source Python projects: cachetools, mdformat and python-semver. Each commit is a witness, named W01 to W41; this batch is 4 of 4 and holds W31 to W41.
+
+Use only the text of this message. Do not search the web, do not open any link, do not run any tool, and do not use anything you may remember about these projects, these commits or any earlier labelling of them. When what is shown is not enough to decide, say so rather than guess.
+
+Apply this rule and nothing else:
+
+**The rule.** A witness is isolated when its change outside the tests is the fix of a behaviour and
+nothing else: not a feature, a refactor, a deprecation, the removal of something supported, a
+release or a change of the tooling.
+
+**How a witness is decided to be a fix, by reading, in the corpus.** Four conditions, each read in
+the commit and in its base; a witness is isolated when it meets all four, and its label names the
+first it fails:
+
+1. **The interface exists at the base.** The tests it turns green use only names, parameters,
+   options and formats of files that the base already has. A test that fails at the base because
+   one of them is missing means the witness adds a feature.
+2. **The base is wrong.** At the base, what those tests check is wrong in one of three ways:
+   - it contradicts what the project already said: its documentation, its docstrings or types, an
+     issue that the commit references, or another behaviour of the same interface;
+   - it is an error the project does not handle, an unexpected exception or a hang, on a valid
+     input;
+   - it breaks an external specification that the project declares it follows, such as SemVer 2.0
+     for python-semver or CommonMark for mdformat.
+
+   If none holds and the base documented the old behaviour as intended, or as unspecified, the
+   witness changes a behaviour; it does not fix one.
+3. **Nothing is taken away.** The change removes no supported behaviour, adds no deprecation and is
+   not only a change of the version or of the packaging.
+4. **Nothing else comes with it.** The diff outside the tests holds only the fix; a fix that comes
+   with a feature, a refactor or tooling is tangled, and not isolated.
+
+The message of the commit, or a label "fix" in its pull request, supports the reading but does not
+decide it.
+
+Answer with one line per witness of this batch, in the order shown, and nothing after the list:
+
+W07 | isolated | - | one sentence on why
+W08 | not-isolated | 3 | one sentence on why
+W09 | undecidable | 2 | one sentence on what is missing
+
+`not-isolated` names the first of the four conditions that the witness fails. `undecidable` names the first condition that cannot be decided with what is shown; use it only when no condition is seen to fail. Each witness shows the message of the commit, the files it changes with their counts, and its diff with the whole function or block around each change; the content of the files uv.lock and poetry.lock is left out, and only their counts are shown.
+
+Batch 4 of 4, order drawn with the seed 1362315757.
+
+
+======== W31 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: bc41390f388d88114e8529b17fe145c5af390cbb
+
+--- Message
+Fix comparison with subclasses
+
+--- Files
+ src/semver/version.py  |  2 +-
+ tests/test_subclass.py | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+--- Diff
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 2f1f8cb..0ff5b9f 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -38,17 +38,17 @@ T_cmp = TypeVar("T_cmp", tuple, str, int)
+ def _comparator(operator: Comparator) -> Comparator:
+     """Wrap a Version binary op method in a type-check."""
+ 
+     @wraps(operator)
+     def wrapper(self: "Version", other: Comparable) -> bool:
+         comparable_types = (
+-            Version,
++            type(self),
+             dict,
+             tuple,
+             list,
+             *String.__args__,  # type: ignore
+         )
+         if not isinstance(other, comparable_types):
+             return NotImplemented
+         return operator(self, other)
+ 
+     return wrapper
+diff --git a/tests/test_subclass.py b/tests/test_subclass.py
+index b33f496..0d39000 100644
+--- a/tests/test_subclass.py
++++ b/tests/test_subclass.py
+@@ -1,4 +1,5 @@
+ from semver import Version
++import pytest
+ 
+ 
+ def test_subclass_from_versioninfo():
+@@ -51,3 +52,20 @@ def test_replace_from_subclass():
+     dev_version = version.replace(prerelease="dev.0")
+ 
+     assert str(dev_version) == "v1.1.0-dev.0"
++
++
++def test_compare_with_subclass():
++    class SemVerSubclass(Version):
++        pass
++
++    with pytest.raises(TypeError):
++        SemVerSubclass.parse("1.0.0").compare(Version.parse("1.0.0"))
++    assert Version.parse("1.0.0").compare(SemVerSubclass.parse("1.0.0")) == 0
++
++    assert (
++        SemVerSubclass.parse("1.0.0").__eq__(Version.parse("1.0.0")) is NotImplemented
++    )
++    assert Version.parse("1.0.0").__eq__(SemVerSubclass.parse("1.0.0")) is True
++
++    assert SemVerSubclass.parse("1.0.0") == Version.parse("1.0.0")
++    assert Version.parse("1.0.0") == SemVerSubclass.parse("1.0.0")
+
+
+======== W32 ========
+Project: cachetools (github.com/tkem/cachetools)
+Commit: 41e4b1616a292e26ebac3c5f68a8c5d5e43edc68
+
+--- Message
+Fix @cached stacking behavior.
+
+--- Files
+ src/cachetools/_cached.py | 15 +++++++++++++--
+ tests/test_cached.py      | 15 +++++++++++++++
+ tests/test_func.py        | 18 ++++++++++++++++++
+ 3 files changed, 46 insertions(+), 2 deletions(-)
+
+--- Diff
+diff --git a/src/cachetools/_cached.py b/src/cachetools/_cached.py
+index cfe26a7..00c57fc 100644
+--- a/src/cachetools/_cached.py
++++ b/src/cachetools/_cached.py
+@@ -8,50 +8,55 @@ import functools
+ import warnings
+ 
+ # At least for now, the implementation prefers clarity and performance
+ # over ease of maintenance, thus providing separate wrappers for
+ # all valid combinations of decorator parameters lock, condition and
+ # info.
++#
++# Each wrapper calls functools.update_wrapper() before setting its own
++# attributes, so func.__dict__ cannot override wrapper state, e.g. when
++# stacking decorators.
+ 
+ 
+ def _condition_info(func, cache, key, lock, cond, info):
+     hits = misses = 0
+     pending = set()
+ 
+     def wrapper(*args, **kwargs):
+         nonlocal hits, misses
+         k = key(*args, **kwargs)
+         with lock:
+             cond.wait_for(lambda: k not in pending)
+             try:
+                 result = cache[k]
+                 hits += 1
+                 return result
+             except KeyError:
+                 pending.add(k)
+                 misses += 1
+         try:
+             v = func(*args, **kwargs)
+             with lock:
+                 try:
+                     cache[k] = v
+                 except ValueError:
+                     pass  # value too large
+                 return v
+         finally:
+             with lock:
+                 pending.remove(k)
+                 cond.notify_all()
+ 
+     def cache_clear():
+         nonlocal hits, misses
+         with lock:
+             cache.clear()
+             hits = misses = 0
+ 
+     def cache_info():
+         with lock:
+             return info(hits, misses)
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     wrapper.cache_info = cache_info
+     return wrapper
+@@ -60,36 +65,37 @@ def _condition_info(func, cache, key, lock, cond, info):
+ def _locked_info(func, cache, key, lock, info):
+     hits = misses = 0
+ 
+     def wrapper(*args, **kwargs):
+         nonlocal hits, misses
+         k = key(*args, **kwargs)
+         with lock:
+             try:
+                 result = cache[k]
+                 hits += 1
+                 return result
+             except KeyError:
+                 misses += 1
+         v = func(*args, **kwargs)
+         with lock:
+             try:
+                 # In case of a race condition, i.e. if another thread
+                 # stored a value for this key while we were calling
+                 # func(), prefer the cached value.
+                 return cache.setdefault(k, v)
+             except ValueError:
+                 return v  # value too large
+ 
+     def cache_clear():
+         nonlocal hits, misses
+         with lock:
+             cache.clear()
+             hits = misses = 0
+ 
+     def cache_info():
+         with lock:
+             return info(hits, misses)
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     wrapper.cache_info = cache_info
+     return wrapper
+@@ -98,30 +104,31 @@ def _locked_info(func, cache, key, lock, info):
+ def _unlocked_info(func, cache, key, info):
+     hits = misses = 0
+ 
+     def wrapper(*args, **kwargs):
+         nonlocal hits, misses
+         k = key(*args, **kwargs)
+         try:
+             result = cache[k]
+             hits += 1
+             return result
+         except KeyError:
+             misses += 1
+         v = func(*args, **kwargs)
+         try:
+             cache[k] = v
+         except ValueError:
+             pass  # value too large
+         return v
+ 
+     def cache_clear():
+         nonlocal hits, misses
+         cache.clear()
+         hits = misses = 0
+ 
+     def cache_info():
+         return info(hits, misses)
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     wrapper.cache_info = cache_info
+     return wrapper
+@@ -130,15 +137,16 @@ def _unlocked_info(func, cache, key, info):
+ def _uncached_info(func, info):
+     misses = 0
+ 
+     def wrapper(*args, **kwargs):
+         nonlocal misses
+         misses += 1
+         return func(*args, **kwargs)
+ 
+     def cache_clear():
+         nonlocal misses
+         misses = 0
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     wrapper.cache_info = lambda: info(0, misses)
+     return wrapper
+@@ -147,32 +155,33 @@ def _uncached_info(func, info):
+ def _condition(func, cache, key, lock, cond):
+     pending = set()
+ 
+     def wrapper(*args, **kwargs):
+         k = key(*args, **kwargs)
+         with lock:
+             cond.wait_for(lambda: k not in pending)
+             try:
+                 result = cache[k]
+                 return result
+             except KeyError:
+                 pending.add(k)
+         try:
+             v = func(*args, **kwargs)
+             with lock:
+                 try:
+                     cache[k] = v
+                 except ValueError:
+                     pass  # value too large
+                 return v
+         finally:
+             with lock:
+                 pending.remove(k)
+                 cond.notify_all()
+ 
+     def cache_clear():
+         with lock:
+             cache.clear()
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     return wrapper
+ 
+@@ -180,25 +189,26 @@ def _condition(func, cache, key, lock, cond):
+ def _locked(func, cache, key, lock):
+     def wrapper(*args, **kwargs):
+         k = key(*args, **kwargs)
+         with lock:
+             try:
+                 return cache[k]
+             except KeyError:
+                 pass  # key not found
+         v = func(*args, **kwargs)
+         with lock:
+             try:
+                 # In case of a race condition, i.e. if another thread
+                 # stored a value for this key while we were calling
+                 # func(), prefer the cached value.
+                 return cache.setdefault(k, v)
+             except ValueError:
+                 return v  # value too large
+ 
+     def cache_clear():
+         with lock:
+             cache.clear()
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = cache_clear
+     return wrapper
+ 
+@@ -206,17 +216,18 @@ def _locked(func, cache, key, lock):
+ def _unlocked(func, cache, key):
+     def wrapper(*args, **kwargs):
+         k = key(*args, **kwargs)
+         try:
+             return cache[k]
+         except KeyError:
+             pass  # key not found
+         v = func(*args, **kwargs)
+         try:
+             cache[k] = v
+         except ValueError:
+             pass  # value too large
+         return v
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = lambda: cache.clear()
+     return wrapper
+ 
+@@ -224,7 +235,8 @@ def _unlocked(func, cache, key):
+ def _uncached(func):
+     def wrapper(*args, **kwargs):
+         return func(*args, **kwargs)
+ 
++    functools.update_wrapper(wrapper, func)
+     wrapper.cache_clear = lambda: None
+     return wrapper
+ 
+@@ -232,38 +244,37 @@ def _uncached(func):
+ def _wrapper(func, cache, key, lock=None, cond=None, info=None):
+     if cache is None:
+         warnings.warn(
+             "@cachetools.cached(cache=None) is deprecated",
+             DeprecationWarning,
+             stacklevel=3,
+         )
+ 
+     if info is not None:
+         if cache is None:
+             wrapper = _uncached_info(func, info)
+         elif cond is not None and lock is not None:
+             wrapper = _condition_info(func, cache, key, lock, cond, info)
+         elif cond is not None:
+             wrapper = _condition_info(func, cache, key, cond, cond, info)
+         elif lock is not None:
+             wrapper = _locked_info(func, cache, key, lock, info)
+         else:
+             wrapper = _unlocked_info(func, cache, key, info)
+     else:
+         if cache is None:
+             wrapper = _uncached(func)
+         elif cond is not None and lock is not None:
+             wrapper = _condition(func, cache, key, lock, cond)
+         elif cond is not None:
+             wrapper = _condition(func, cache, key, cond, cond)
+         elif lock is not None:
+             wrapper = _locked(func, cache, key, lock)
+         else:
+             wrapper = _unlocked(func, cache, key)
+         wrapper.cache_info = None
+ 
+     wrapper.cache = cache
+     wrapper.cache_key = key
+     wrapper.cache_lock = lock if lock is not None else cond
+     wrapper.cache_condition = cond
+-
+-    return functools.update_wrapper(wrapper, func)
++    return wrapper
+diff --git a/tests/test_cached.py b/tests/test_cached.py
+index e6c2587..71e63d5 100644
+--- a/tests/test_cached.py
++++ b/tests/test_cached.py
+@@ -226,177 +226,192 @@ class DecoratorTestMixin(SimplifiedTestCaseProtocol):
+ class CacheWrapperTest(unittest.TestCase, DecoratorTestMixin):
+     def cache(self, minsize):
+         return cachetools.Cache(maxsize=minsize)
+ 
+     def test_decorator_info(self):
+         cache = self.cache(2)
+         wrapper = cachetools.cached(cache, info=True)(self.func)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(wrapper(1), 1)
+         self.assertEqual(wrapper.cache_info(), (0, 2, 2, 2))
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(wrapper.cache_info(), (1, 2, 2, 2))
+         wrapper.cache_clear()
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+ 
+     def test_decorator_lock_info(self):
+         cache = self.cache(2)
+         lock = CountedLock()
+         wrapper = cachetools.cached(cache, lock=lock, info=True)(self.func)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 1)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 3)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(lock.count, 4)
+         self.assertEqual(wrapper(1), 1)
+         self.assertEqual(lock.count, 6)
+         self.assertEqual(wrapper.cache_info(), (0, 2, 2, 2))
+         self.assertEqual(lock.count, 7)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 8)
+         self.assertEqual(wrapper.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(lock.count, 9)
+         wrapper.cache_clear()
+         self.assertEqual(lock.count, 10)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 11)
+ 
+     def test_decorator_cond_info(self):
+         cache = self.cache(2)
+         lock = cond = CountedCondition()
+         wrapper = cachetools.cached(cache, condition=cond, info=True)(self.func)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 1)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 4)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(lock.count, 5)
+         self.assertEqual(wrapper(1), 1)
+         self.assertEqual(lock.count, 8)
+         self.assertEqual(wrapper.cache_info(), (0, 2, 2, 2))
+         self.assertEqual(lock.count, 9)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 10)
+         self.assertEqual(wrapper.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(lock.count, 11)
+         wrapper.cache_clear()
+         self.assertEqual(lock.count, 12)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 13)
+ 
+     def test_decorator_lock_cond_info(self):
+         cache = self.cache(2)
+         lock = CountedLock()
+         cond = CountedCondition()
+         wrapper = cachetools.cached(cache, lock=lock, condition=cond, info=True)(
+             self.func
+         )
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 1)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 4)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(lock.count, 5)
+         self.assertEqual(wrapper(1), 1)
+         self.assertEqual(lock.count, 8)
+         self.assertEqual(wrapper.cache_info(), (0, 2, 2, 2))
+         self.assertEqual(lock.count, 9)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(lock.count, 10)
+         self.assertEqual(wrapper.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(lock.count, 11)
+         wrapper.cache_clear()
+         self.assertEqual(lock.count, 12)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(lock.count, 13)
+ 
++    def test_stacked_decorators(self):
++        inner_cache = self.cache(2)
++        outer_cache = self.cache(2)
++        inner_wrapper = cachetools.cached(inner_cache, info=True)(self.func)
++        outer_wrapper = cachetools.cached(outer_cache, info=True)(inner_wrapper)
++        self.assertIs(outer_wrapper.__wrapped__, inner_wrapper)
++        self.assertIs(outer_wrapper.cache, outer_cache)
++        self.assertEqual(outer_wrapper(0), 0)
++        self.assertEqual(outer_wrapper(0), 0)
++        self.assertEqual(outer_wrapper.cache_info(), (1, 1, 2, 1))
++        self.assertEqual(inner_wrapper.cache_info(), (0, 1, 2, 1))
++        outer_wrapper.cache_clear()
++        self.assertEqual(len(outer_cache), 0)
++        self.assertEqual(len(inner_cache), 1)
++
+     def test_zero_size_cache_decorator(self):
+         cache = self.cache(0)
+         wrapper = cachetools.cached(cache)(self.func)
+ 
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(len(cache), 0)
+ 
+     def test_zero_size_cache_decorator_lock(self):
+         cache = self.cache(0)
+         lock = CountedLock()
+         wrapper = cachetools.cached(cache, lock=lock)(self.func)
+ 
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(lock.count, 2)
+ 
+     def test_zero_size_cache_decorator_cond(self):
+         cache = self.cache(0)
+         lock = cond = CountedCondition()
+         wrapper = cachetools.cached(cache, condition=cond)(self.func)
+ 
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(lock.count, 3)
+ 
+     def test_zero_size_cache_decorator_info(self):
+         cache = self.cache(0)
+         wrapper = cachetools.cached(cache, info=True)(self.func)
+ 
+         self.assertEqual(wrapper.cache_info(), (0, 0, 0, 0))
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 0, 0))
+ 
+     def test_zero_size_cache_decorator_lock_info(self):
+         cache = self.cache(0)
+         lock = CountedLock()
+         wrapper = cachetools.cached(cache, lock=lock, info=True)(self.func)
+ 
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 0, 0))
+         self.assertEqual(lock.count, 1)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(lock.count, 3)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 0, 0))
+         self.assertEqual(lock.count, 4)
+ 
+     def test_zero_size_cache_decorator_cond_info(self):
+         cache = self.cache(0)
+         lock = cond = CountedCondition()
+         wrapper = cachetools.cached(cache, condition=cond, info=True)(self.func)
+ 
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 0, 0))
+         self.assertEqual(lock.count, 1)
+         self.assertEqual(wrapper(0), 0)
+         self.assertEqual(len(cache), 0)
+         self.assertEqual(lock.count, 4)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 0, 0))
+         self.assertEqual(lock.count, 5)
+ 
+     def test_decorator_method(self):
+         """Though it is not encouraged, like functools.lru_cache, the
+         @cached decorator may be used on methods, too.
+ 
+         """
+ 
+         class Cached:
+             @cachetools.cached(self.cache(2), key=cachetools.keys.methodkey, info=True)
+             def get(self, value):
+                 return value
+ 
+         cached = Cached()
+         self.assertEqual(cached.get(1), 1)  # type: ignore
+         self.assertEqual(cached.get(1), 1)  # type: ignore
+         self.assertEqual(Cached.get(cached, 1), 1)
+         self.assertEqual(cached.get.cache_info(), (2, 1, 2, 1))
+         self.assertEqual(Cached.get.cache_info(), (2, 1, 2, 1))
+         cached.get.cache_clear()
+         self.assertEqual(cached.get.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(Cached.get.cache_info(), (0, 0, 2, 0))
+diff --git a/tests/test_func.py b/tests/test_func.py
+index a8019e0..95ee223 100644
+--- a/tests/test_func.py
++++ b/tests/test_func.py
+@@ -10,128 +10,146 @@ from . import SimplifiedTestCaseProtocol
+ class DecoratorTestMixin(SimplifiedTestCaseProtocol):
+     DECORATOR: Callable[..., Any]
+ 
+     def decorator(self, maxsize, **kwargs):
+         return self.DECORATOR(maxsize, **kwargs)
+ 
+     def test_decorator(self):
+         cached = self.decorator(maxsize=2)(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": 2, "typed": False})
+         self.assertEqual(cached.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (1, 1, 2, 1))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (2, 1, 2, 1))
+ 
+     def test_decorator_clear(self):
+         cached = self.decorator(maxsize=2)(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": 2, "typed": False})
+         self.assertEqual(cached.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 2, 1))
+         cached.cache_clear()
+         self.assertEqual(cached.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 2, 1))
+ 
+     def test_decorator_nocache(self):
+         cached = self.decorator(maxsize=0)(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": 0, "typed": False})
+         self.assertEqual(cached.cache_info(), (0, 0, 0, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 0, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 2, 0, 0))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (0, 3, 0, 0))
+ 
+     def test_decorator_unbound(self):
+         cached = self.decorator(maxsize=None)(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": None, "typed": False})
+         self.assertEqual(cached.cache_info(), (0, 0, None, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, None, 1))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (1, 1, None, 1))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (2, 1, None, 1))
+ 
+     def test_decorator_typed(self):
+         cached = self.decorator(maxsize=2, typed=True)(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": 2, "typed": True})
+         self.assertEqual(cached.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (1, 1, 2, 1))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (2, 2, 2, 2))
+ 
+     def test_decorator_user_function(self):
+         cached = self.decorator(lambda n: n)
+         self.assertEqual(cached.cache_parameters(), {"maxsize": 128, "typed": False})
+         self.assertEqual(cached.cache_info(), (0, 0, 128, 0))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (0, 1, 128, 1))
+         self.assertEqual(cached(1), 1)
+         self.assertEqual(cached.cache_info(), (1, 1, 128, 1))
+         self.assertEqual(cached(1.0), 1.0)
+         self.assertEqual(cached.cache_info(), (2, 1, 128, 1))
+ 
+     def test_decorator_needs_rlock(self):
+         """This will deadlock on a cache that uses a regular lock.
+         https://github.com/python/cpython/blob/3.13/Lib/test/test_functools.py#L1791
+ 
+         """
+ 
+         cached = self.decorator(lambda n: n)
+ 
+         class RecursiveEquals:
+             def __init__(self, use_cache):
+                 self._use_cache = use_cache
+ 
+             def __hash__(self):
+                 return hash(self._use_cache)
+ 
+             def __eq__(self, other):
+                 if self._use_cache:
+                     # This call will happen while the cache-lock is held,
+                     # requiring a reentrant lock to avoid deadlock.
+                     cached(self)
+                 return self._use_cache == other._use_cache
+ 
+         # Prime the cache.
+         cached(RecursiveEquals(False))
+         cached(RecursiveEquals(True))
+         # Then do a call which will cause a deadlock with a non-reentrant lock.
+         self.assertEqual(cached(RecursiveEquals(True)), RecursiveEquals(True))
+ 
+     def test_decorator_method(self):
+         """Though it is not encouraged, like functools.lru_cache, the
+         cachetools.func decorators may be used on methods, too.
+ 
+         """
+ 
+         decorator = self.decorator(maxsize=2)
+ 
+         class Cached:
+             @decorator
+             def get(self, n):
+                 return n
+ 
+         cached = Cached()
+         self.assertEqual(cached.get(1), 1)
+         self.assertEqual(cached.get(1), 1)
+         self.assertEqual(Cached.get(cached, 1), 1)
+         self.assertEqual(cached.get.cache_info(), (2, 1, 2, 1))
+         self.assertEqual(Cached.get.cache_info(), (2, 1, 2, 1))
+         cached.get.cache_clear()
+         self.assertEqual(cached.get.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(Cached.get.cache_info(), (0, 0, 2, 0))
+ 
++    def test_stacked_decorators(self):
++        inner_wrapper = self.decorator(maxsize=2)(lambda n: n)
++        outer_wrapper = self.decorator(maxsize=3, typed=True)(inner_wrapper)
++        self.assertIs(outer_wrapper.__wrapped__, inner_wrapper)
++        self.assertEqual(
++            inner_wrapper.cache_parameters(), {"maxsize": 2, "typed": False}
++        )
++        self.assertEqual(
++            outer_wrapper.cache_parameters(), {"maxsize": 3, "typed": True}
++        )
++        self.assertEqual(outer_wrapper(1), 1)
++        self.assertEqual(outer_wrapper(1), 1)
++        self.assertEqual(outer_wrapper.cache_info(), (1, 1, 3, 1))
++        self.assertEqual(inner_wrapper.cache_info(), (0, 1, 2, 1))
++        outer_wrapper.cache_clear()
++        self.assertEqual(outer_wrapper.cache_info(), (0, 0, 3, 0))
++        self.assertEqual(inner_wrapper.cache_info(), (0, 1, 2, 1))
++
+ 
+ class FIFODecoratorTest(unittest.TestCase, DecoratorTestMixin):
+     DECORATOR = staticmethod(cachetools.func.fifo_cache)
+
+
+======== W33 ========
+Project: cachetools (github.com/tkem/cachetools)
+Commit: a6f073a71633373bdec6d40d39bbef3383ce022a
+
+--- Message
+Drop support for @cached(cache=None).
+
+--- Files
+ docs/index.rst              |  8 +++-----
+ src/cachetools/__init__.py  |  5 +++++
+ src/cachetools/__init__.pyi |  8 ++++----
+ src/cachetools/_cached.py   | 44 ++------------------------------------------
+ tests/test_cached.py        | 73 ++++++++++++++++++++++++++++++++++++++++++++-----------------------------
+ 5 files changed, 58 insertions(+), 80 deletions(-)
+
+--- Diff
+diff --git a/docs/index.rst b/docs/index.rst
+index 6b9d6c8..b3f691e 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -298,413 +298,411 @@ function and method calls.  This can save time when a function is
+ often called with the same arguments:
+ 
+ .. doctest::
+ 
+    >>> @cached(cache={})
+    ... def fib(n):
+    ...     'Compute the nth number in the Fibonacci sequence'
+    ...     return n if n < 2 else fib(n - 1) + fib(n - 2)
+ 
+    >>> fib(42)
+    267914296
+ 
+ .. decorator:: cached(cache, key=cachetools.keys.hashkey, lock=None, condition=None, info=False)
+ 
+    Decorator to wrap a function with a memoizing callable that saves
+    results in a cache.
+ 
+    The `cache` argument specifies a cache object to store previous
+    function arguments and return values.  Note that `cache` need not
+    be an instance of the cache implementations provided by the
+    :mod:`cachetools` module.  :func:`cached` will work with any
+    mutable mapping type, including plain :class:`dict` and
+    :class:`weakref.WeakValueDictionary`.
+ 
+    `key` specifies a function that will be called with the same
+    positional and keyword arguments as the wrapped function itself,
+    and which has to return a suitable cache key.  Since caches are
+    mappings, the object returned by `key` must be hashable.  The
+    default is to call :func:`cachetools.keys.hashkey`.
+ 
+    If `lock` is not :const:`None`, it must specify an object
+    implementing the `context manager`_ protocol.  Any access to the
+    cache will then be nested in a ``with lock:`` statement.  This can
+    be used for synchronizing thread access to the cache by providing a
+    :class:`threading.Lock` or :class:`threading.RLock` instance, for
+    example.
+ 
+    .. note::
+ 
+       The `lock` context manager is used only to guard access to the
+       cache object.  The underlying wrapped function will be called
+       outside the `with` statement to allow concurrent execution, and
+       therefore must be `thread-safe`_ by itself.
+ 
+    If `condition` is not :const:`None`, it must specify a `condition
+    variable`_, i.e. an object providing :meth:`wait()`,
+    :meth:`wait_for()`, :meth:`notify()` and :meth:`notify_all()`
+    methods as defined by :class:`threading.Condition`.  Using a
+    `condition` variable will prevent concurrent execution of the
+    wrapped function with *identical* parameters, or cache keys.
+    Instead, a calling thread will check if an identical function call
+    is already executing, and will then wait for the pending call to
+    finish.  The executing thread will notify any waiting threads as
+    soon as the function completes, which will then return the cached
+    function result.
+ 
+    .. note::
+ 
+       Although providing a `lock` alone is generally sufficient to
+       make :func:`cached` `thread-safe`_, it may still be subject to
+       `cache stampede`_ issues under high load, depending on your
+       actual use case.  Providing a `condition` variable will mitigate
+       these situations, but will incur a performance penalty.
+ 
+    If no separate `lock` parameter is provided, `condition` must also
+    implement the `context manager`_ protocol, and will also be used to
+    guard access to the cache.
+ 
+    .. note::
+ 
+       Even though `lock` and `condition` can be passed separately,
+       the condition variable must be associated with the lock that
+       guards the cache.  In practice, when using
+       :class:`threading.Lock` and :class:`threading.Condition`, the
+       condition variable must be created with the corresponding lock,
+       e.g. ``condition=threading.Condition(lock)``; an unrelated
+       :class:`threading.Condition` will raise :exc:`RuntimeError`.
+ 
+    The decorator's `cache`, `key`, `lock` and `condition` parameters
+    are also available as :attr:`cache`, :attr:`cache_key`,
+    :attr:`cache_lock` and :attr:`cache_condition` attributes of the
+    memoizing wrapper function.  These can be used for clearing the
+    cache or invalidating individual cache items, for example.
+ 
+    .. testcode::
+ 
+       # 640K should be enough for anyone...
+       @cached(cache=LRUCache(maxsize=640*1024, getsizeof=len), lock=threading.Lock())
+       def get_pep(num):
+           'Retrieve text of a Python Enhancement Proposal'
+           url = 'https://peps.python.org/pep-%04d/' % num
+           with urllib.request.urlopen(url) as s:
+               return s.read()
+ 
+       # remove (pop) an individual cached PEP from the cache
+       key = get_pep.cache_key(42)
+       with get_pep.cache_lock:
+           get_pep.cache.pop(key, None)
+ 
+    For the common use case of clearing or invalidating the cache, the
+    decorator also provides a :meth:`cache_clear()` function which
+    takes care of locking automatically, if needed:
+ 
+    .. testcode::
+ 
+       # no need for get_pep.cache_lock here
+       get_pep.cache_clear()
+ 
+    If `info` is set to :const:`True`, the wrapped function is
+    instrumented with a :func:`cache_info()` function that returns a
+    named tuple showing `hits`, `misses`, `maxsize` and `currsize`, to
+    help measure the effectiveness of the cache.
+ 
+    .. note::
+ 
+       This will incur a small performance penalty, so it has to be
+       enabled explicitly.
+ 
+    .. doctest::
+ 
+       >>> @cached(cache=LRUCache(maxsize=32), info=True)
+       ... def get_pep(num):
+       ...     url = 'https://peps.python.org/pep-%04d/' % num
+       ...     with urllib.request.urlopen(url) as s:
+       ...         return s.read()
+ 
+       >>> for n in 8, 290, 308, 320, 8, 218, 320, 279, 289, 320, 9991:
+       ...     pep = get_pep(n)
+ 
+       >>> get_pep.cache_info()
+       CacheInfo(hits=3, misses=8, maxsize=32, currsize=8)
+ 
+    The original underlying function is accessible through the
+    :attr:`__wrapped__` attribute.  This can be used for introspection
+    or for bypassing the cache.
+ 
+    It is also possible to use a single shared cache object with
+    multiple functions.  However, care must be taken that different
+    cache keys are generated for each function, even for identical
+    function arguments:
+ 
+    .. doctest::
+       :options: +ELLIPSIS
+ 
+       >>> from cachetools.keys import hashkey
+       >>> from functools import partial
+ 
+       >>> # shared cache for integer sequences
+       >>> numcache = {}
+ 
+       >>> # compute Fibonacci numbers
+       >>> @cached(numcache, key=partial(hashkey, 'fib'))
+       ... def fib(n):
+       ...     return n if n < 2 else fib(n - 1) + fib(n - 2)
+ 
+       >>> # compute Lucas numbers
+       >>> @cached(numcache, key=partial(hashkey, 'luc'))
+       ... def luc(n):
+       ...     return 2 - n if n < 2 else luc(n - 1) + luc(n - 2)
+ 
+       >>> fib(42)
+       267914296
+       >>> luc(42)
+       599074578
+       >>> sorted(numcache.items())
+       [..., (('fib', 42), 267914296), ..., (('luc', 42), 599074578)]
+ 
+ 
+    Function invocations are *not* cached if any exceptions are raised.
+    To cache some (or all) calls raising exceptions, additional
+    function wrappers may be introduced which wrap exceptions as
+    regular function results for caching purposes:
+ 
+    .. testcode::
+ 
+       @cached(cache=LRUCache(maxsize=10), info=True)
+       def _get_pep_wrapped(num):
+           url = "https://peps.python.org/pep-%04d/" % num
+           try:
+               with urllib.request.urlopen(url) as s:
+                   return s.read()
+           except urllib.error.HTTPError as e:
+               # note that only HTTPError instances are cached
+               return e
+ 
+       def get_pep(num):
+           "Retrieve text of a Python Enhancement Proposal"
+ 
+           res = _get_pep_wrapped(num)
+           if isinstance(res, Exception):
+               raise res
+           else:
+               return res
+ 
+       try:
+           get_pep(100_000_000)
+       except Exception as e:
+           print(e, "-", _get_pep_wrapped.cache_info())
+ 
+       try:
+           get_pep(100_000_000)
+       except Exception as e:
+           print(e, "-", _get_pep_wrapped.cache_info())
+ 
+ 
+    Curiously, default function arguments are not quite handled as one
+    might expect, and also the use of positional vs. keyword arguments
+    may lead to surprising results.  In the example below, `foo()`,
+    `foo(1)` and `foo(a=1)` are treated as different function
+    invocations, with separately cached results:
+ 
+    .. doctest::
+ 
+       >>> @cached(LRUCache(maxsize=100))
+       ... def foo(a=1):
+       ...     print(f"foo({a}) called")
+       ...
+       >>> foo()
+       foo(1) called
+       >>> foo()
+       >>> foo(1)
+       foo(1) called
+       >>> foo(1)
+       >>> foo(a=1)
+       foo(1) called
+       >>> foo(a=1)
+ 
+    If consistent behavior is required, a private helper function may
+    be introduced to avoid ambiguities, e.g.:
+ 
+    .. doctest::
+ 
+       >>> def foo(a=1):
+       ...     return _foo(a)
+       ...
+       >>> @cached(LRUCache(maxsize=100))
+       ... def _foo(a):
+       ...     print(f"_foo({a}) called")
+       ...
+       >>> foo()
+       _foo(1) called
+       >>> foo()
+       >>> foo(1)
+       >>> foo(a=1)
+ 
+-   .. deprecated:: 7.2
++   .. versionchanged:: 8.0
+ 
+-      Passing :const:`None` as `cache` parameter is deprecated, and
+-      support will be removed in the next major version.  This is
+-      mainly for consistency with :func:`cachedmethod`, which no
+-      longer supports returning :const:`None` from `cache(self)`.
++      Passing :const:`None` as `cache` parameter is no longer
++      supported, and now raises a :exc:`TypeError`.
+ 
+ 
+ .. decorator:: cachedmethod(cache, key=cachetools.keys.methodkey, lock=None, condition=None, info=False)
+ 
+    Decorator to wrap an instance method with a memoizing callable that
+    saves results in a cache.
+ 
+    The main difference between this and the :func:`cached` function
+    decorator is that `cache`, `lock` and `condition` are not objects
+    but functions.  These will be called with `self` as their sole
+    argument to retrieve the cache, lock and condition objects for the
+    respective instance.
+ 
+    .. note::
+ 
+       As with :func:`cached`, the context manager obtained by calling
+       `lock(self)` will only guard access to the cache itself.  It is
+       the user's responsibility to handle concurrent calls to the
+       underlying wrapped method in a multithreaded environment.
+       Likewise, a condition variable returned by `condition(self)`
+       must be associated with a lock returned by `lock(self)`.
+ 
+    Similarly to the :func:`cached` function decorator, the `cache`,
+    `key`, `lock` and `condition` parameters are also available as
+    :attr:`cache`, :attr:`cache_key`, :attr:`cache_lock` and
+    :attr:`cache_condition` attributes of the wrapped instance method.
+    A :meth:`cache_clear()` function will also be provided, as well as
+    an optional :meth:`cache_info()` function reporting per-instance
+    cache statistics.
+ 
+    Also, mostly for efficiency, this decorator requires that the
+    :attr:`__dict__` attribute on each instance be a mutable mapping.
+    This means it will not work with some types, such as those that
+    specify :attr:`__slots__` without including :attr:`__dict__` as one
+    of the defined slots.
+ 
+    One advantage of :func:`cachedmethod` over the :func:`cached`
+    function decorator is that cache properties such as `maxsize` can
+    be set at runtime:
+ 
+    .. doctest::
+ 
+       >>> class CachedPEPs:
+       ...     def __init__(self, cachesize):
+       ...         self.cache = LRUCache(maxsize=cachesize)
+       ...         self.lock = threading.Lock()
+       ...
+       ...     @cachedmethod(lambda self: self.cache, lock=lambda self: self.lock, info=True)
+       ...     def get(self, num):
+       ...         """Retrieve text of a Python Enhancement Proposal"""
+       ...         url = 'https://peps.python.org/pep-%04d/' % num
+       ...         with urllib.request.urlopen(url) as s:
+       ...             return s.read()
+ 
+       >>> peps = CachedPEPs(cachesize=32)
+       >>> for n in 8, 290, 308, 320, 8, 218, 320, 279, 289, 320, 9991:
+       ...     pep = peps.get(n)
+ 
+       >>> peps.get.cache_info()
+       CacheInfo(hits=3, misses=8, maxsize=32, currsize=8)
+ 
+       >>> # remove an individual cached PEP from the cache
+       >>> key = peps.get.cache_key(320)
+       >>> with peps.get.cache_lock:
+       ...     del peps.get.cache[key]
+ 
+       >>> peps.get.cache_info()
+       CacheInfo(hits=3, misses=8, maxsize=32, currsize=7)
+ 
+       >>> # remove all cached PEPs and clear cache info
+       >>> peps.get.cache_clear()
+ 
+       >>> peps.get.cache_info()
+       CacheInfo(hits=0, misses=0, maxsize=32, currsize=0)
+ 
+    The `key` function will be called as `key(self, *args, **kwargs)`
+    to retrieve a suitable cache key.  Note that the default `key`
+    function, :func:`cachetools.keys.methodkey`, ignores its first
+    implicit argument, i.e. `self`.  This is mostly for historical
+    reasons, but also ensures that `self` does not have to be hashable.
+ 
+    You may provide a different `key` function,
+    e.g. :func:`cachetools.keys.hashkey`, if you need `self` to be part
+    of the cache key.
+ 
+    When using a shared cache for multiple methods, be aware that
+    different cache keys must be created for each method even when
+    function arguments are the same, just as with the :func:`cached`
+    decorator:
+ 
+    .. testcode::
+ 
+       from cachetools.keys import methodkey
+       from functools import partial
+ 
+       class CachedReferences:
+ 
+           def __init__(self, cachesize):
+               self.cache = LRUCache(maxsize=cachesize)
+ 
+           @cachedmethod(lambda self: self.cache, key=partial(methodkey, method='pep'))
+           def get_pep(self, num):
+               """Retrieve text of a Python Enhancement Proposal"""
+               url = 'https://peps.python.org/pep-%04d/' % num
+               with urllib.request.urlopen(url) as s:
+                   return s.read()
+ 
+           @cachedmethod(lambda self: self.cache, key=partial(methodkey, method='rfc'))
+           def get_rfc(self, num):
+               """Retrieve text of an IETF Request for Comments"""
+               url = 'https://www.rfc-editor.org/rfc/rfc%d.txt' % num
+               with urllib.request.urlopen(url) as s:
+                   return s.read()
+ 
+       docs = CachedReferences(cachesize=100)
+       print("PEP #20: %s" % docs.get_pep(20))
+       print("RFC #20: %s" % docs.get_rfc(20))
+       assert len(docs.cache) == 2
+ 
+    .. testoutput::
+       :hide:
+       :options: +ELLIPSIS
+ 
+       PEP #20: ...
+       RFC #20: ...
+ 
+    Note how keyword arguments are used with :func:`functools.partial`
+    to create distinct cache keys, to avoid issues with
+    :func:`~cachetools.keys.methodkey` skipping its initial `self` argument.
+ 
+    .. versionchanged:: 7.0
+ 
+       Added the `info` option for reporting per-instance cache
+       statistics.
+ 
+       :func:`cachedmethod` attributes (:attr:`cache`,
+       :attr:`cache_lock`, etc.) are now implemented as properties for
+       instance methods, and are finally officially supported.
+ 
+       Require :attr:`__dict__` to be a mutable mapping to support
+       per-instance :meth:`cache_info()`.
+ 
+       Returning :const:`None` from `cache(self)` is no longer supported.
+ 
+    .. versionchanged:: 8.0
+ 
+       Using :func:`cachedmethod` with :func:`classmethod` is no longer
+       supported, and now raises a :exc:`TypeError`.  This is mostly due to
+       the fact that chaining descriptors, i.e. using descriptors with
+       :func:`classmethod`, was deprecated in Python 3.11 and removed in
+       Python 3.13.
+ 
+       Using :func:`cachedmethod` with an instance that does not
+       provide a mutable :attr:`__dict__` attribute is no longer
+       supported, and now raises a :exc:`TypeError`.
+ 
+ 
+ *****************************************************************
+ :mod:`cachetools.keys` --- Key functions for memoizing decorators
+ *****************************************************************
+ 
+ .. module:: cachetools.keys
+diff --git a/src/cachetools/__init__.py b/src/cachetools/__init__.py
+index ffe3035..c67c44d 100644
+--- a/src/cachetools/__init__.py
++++ b/src/cachetools/__init__.py
+@@ -750,29 +750,34 @@ _CacheInfo = collections.namedtuple(
+ def cached(cache, key=keys.hashkey, lock=None, condition=None, info=False):
+     """Decorator to wrap a function with a memoizing callable that saves
+     results in a cache.
+ 
+     """
+     from ._cached import _wrapper
+ 
++    # TODO: require cache to be an instance of collections.abc.Mapping,
++    # as with @cachedmethod if info=True?
++    if cache is None:  # no longer supported since v8.0.0
++        raise TypeError("cache must not be None")
++
+     def decorator(func):
+         if info:
+             if isinstance(cache, Cache):
+ 
+                 def make_info(hits, misses):
+                     return _CacheInfo(hits, misses, cache.maxsize, cache.currsize)
+ 
+             elif isinstance(cache, collections.abc.Mapping):
+ 
+                 def make_info(hits, misses):
+                     return _CacheInfo(hits, misses, None, len(cache))
+ 
+             else:
+ 
+                 def make_info(hits, misses):
+                     return _CacheInfo(hits, misses, 0, 0)
+ 
+             return _wrapper(func, cache, key, lock, condition, info=make_info)
+         else:
+             return _wrapper(func, cache, key, lock, condition)
+ 
+     return decorator
+diff --git a/src/cachetools/__init__.pyi b/src/cachetools/__init__.pyi
+index 4da56f2..cbb416c 100644
+--- a/src/cachetools/__init__.pyi
++++ b/src/cachetools/__init__.pyi
+@@ -156,28 +156,28 @@ class _AbstractCondition(AbstractContextManager[Any], Protocol):
+ @type_check_only
+ class _cached_wrapper(Generic[_P, _R]):
+     __wrapped__: Callable[_P, _R]
+     __name__: str
+     __qualname__: str
+     __doc__: str | None
+-    cache: MutableMapping[Any, Any] | None
++    cache: MutableMapping[Any, Any]
+     cache_key: Callable[..., Any] = ...
+     cache_lock: AbstractContextManager[Any] | None = None
+     cache_condition: _AbstractCondition | None = None
+     @overload  # class access, e.g. Cls.method
+     def __get__(
+         self, obj: None, objtype: type | None = None
+     ) -> _cached_wrapper[_P, _R]: ...
+     @overload  # instance access binds the first parameter
+     def __get__(
+         self: _cached_wrapper[Concatenate[_S, _Q], _R],
+         obj: _S,
+         objtype: type | None = None,
+     ) -> _cached_wrapper[_Q, _R]: ...
+     @overload  # fallback, e.g. when wrapped by @staticmethod or @classmethod
+     def __get__(
+         self, obj: object, objtype: type | None = None
+     ) -> _cached_wrapper[_P, _R]: ...
+     def __call__(self, /, *args: _P.args, **kwargs: _P.kwargs) -> _R: ...
+     def cache_clear(self) -> None: ...
+ 
+ @type_check_only
+@@ -202,28 +202,28 @@ class _cached_wrapper_info(_cached_wrapper[_P, _R]):
+ 
+ @overload
+ def cached(
+-    cache: MutableMapping[_KT, Any] | None,
++    cache: MutableMapping[_KT, Any],
+     key: Callable[..., _KT] = ...,
+     lock: AbstractContextManager[Any] | None = None,
+     condition: _AbstractCondition | None = None,
+     info: Literal[False] = ...,
+ ) -> Callable[[Callable[_P, _R]], _cached_wrapper[_P, _R]]: ...
+ @overload
+ def cached(
+-    cache: MutableMapping[_KT, Any] | None,
++    cache: MutableMapping[_KT, Any],
+     key: Callable[..., _KT] = ...,
+     lock: AbstractContextManager[Any] | None = None,
+     condition: _AbstractCondition | None = None,
+     *,
+     info: Literal[True],
+ ) -> Callable[[Callable[_P, _R]], _cached_wrapper_info[_P, _R]]: ...
+ @overload
+ def cached(
+-    cache: MutableMapping[_KT, Any] | None,
++    cache: MutableMapping[_KT, Any],
+     key: Callable[..., _KT],
+     lock: AbstractContextManager[Any] | None,
+     condition: _AbstractCondition | None,
+     info: Literal[True],
+ ) -> Callable[[Callable[_P, _R]], _cached_wrapper_info[_P, _R]]: ...
+ 
+ @type_check_only
+diff --git a/src/cachetools/_cached.py b/src/cachetools/_cached.py
+index 73257c3..1d7addc 100644
+--- a/src/cachetools/_cached.py
++++ b/src/cachetools/_cached.py
+@@ -5,13 +5,12 @@
+ __all__ = ()
+ 
+ import functools
+-import warnings
+ 
+ # At least for now, the implementation prefers clarity and performance
+ # over ease of maintenance, thus providing separate wrappers for
+ # all valid combinations of decorator parameters lock, condition and
+ # info.
+ #
+ # Each wrapper calls functools.update_wrapper() before setting its own
+ # attributes, so func.__dict__ cannot override wrapper state, e.g. when
+ # stacking decorators.
+@@ -136,24 +135,6 @@ def _unlocked_info(func, cache, key, info):
+     return wrapper
+ 
+ 
+-def _uncached_info(func, info):
+-    misses = 0
+-
+-    def wrapper(*args, **kwargs):
+-        nonlocal misses
+-        misses += 1
+-        return func(*args, **kwargs)
+-
+-    def cache_clear():
+-        nonlocal misses
+-        misses = 0
+-
+-    functools.update_wrapper(wrapper, func)
+-    wrapper.cache_clear = cache_clear
+-    wrapper.cache_info = lambda: info(0, misses)
+-    return wrapper
+-
+-
+ def _condition(func, cache, key, lock, cond):
+     pending = set()
+ 
+@@ -236,48 +217,27 @@ def _unlocked(func, cache, key):
+     return wrapper
+ 
+ 
+-def _uncached(func):
+-    def wrapper(*args, **kwargs):
+-        return func(*args, **kwargs)
+-
+-    functools.update_wrapper(wrapper, func)
+-    wrapper.cache_clear = lambda: None
+-    return wrapper
+-
+-
+ def _wrapper(func, cache, key, lock=None, cond=None, info=None):
+-    if cache is None:
+-        warnings.warn(
+-            "@cachetools.cached(cache=None) is deprecated",
+-            DeprecationWarning,
+-            stacklevel=3,
+-        )
+-
+     if info is not None:
+-        if cache is None:
+-            wrapper = _uncached_info(func, info)
+-        elif cond is not None and lock is not None:
++        if cond is not None and lock is not None:
+             wrapper = _condition_info(func, cache, key, lock, cond, info)
+         elif cond is not None:
+             wrapper = _condition_info(func, cache, key, cond, cond, info)
+         elif lock is not None:
+             wrapper = _locked_info(func, cache, key, lock, info)
+         else:
+             wrapper = _unlocked_info(func, cache, key, info)
+     else:
+-        if cache is None:
+-            wrapper = _uncached(func)
+-        elif cond is not None and lock is not None:
++        if cond is not None and lock is not None:
+             wrapper = _condition(func, cache, key, lock, cond)
+         elif cond is not None:
+             wrapper = _condition(func, cache, key, cond, cond)
+         elif lock is not None:
+             wrapper = _locked(func, cache, key, lock)
+         else:
+             wrapper = _unlocked(func, cache, key)
+-
+     wrapper.cache = cache
+     wrapper.cache_key = key
+     wrapper.cache_lock = lock if lock is not None else cond
+     wrapper.cache_condition = cond
+     return wrapper
+diff --git a/tests/test_cached.py b/tests/test_cached.py
+index 4b747fc..5aff73c 100644
+--- a/tests/test_cached.py
++++ b/tests/test_cached.py
+@@ -1,5 +1,4 @@
+ import unittest
+-import warnings
+ 
+ import cachetools
+ import cachetools.keys
+@@ -476,44 +475,60 @@ class DictWrapperTest(unittest.TestCase, DecoratorTestMixin):
+         self.assertEqual(wrapper.cache_info(), (0, 0, None, 0))
+ 
+ 
+-class NoneWrapperTest(unittest.TestCase):
+-    def func(self, *args, **kwargs):
+-        return args + tuple(kwargs.items())
++class NonMappingWrapperTest(unittest.TestCase, DecoratorTestMixin):
++    class NonMappingCache:
++        """Duck-typed cache that is not a `collections.abc.Mapping` instance."""
+ 
+-    def test_decorator(self):
+-        with warnings.catch_warnings(record=True) as w:
+-            wrapper = cachetools.cached(None)(self.func)
+-            self.assertIs(w[0].category, DeprecationWarning)
++        def __init__(self):
++            self.__data = {}
+ 
+-        self.assertEqual(wrapper(0), (0,))
+-        self.assertEqual(wrapper(1), (1,))
+-        self.assertEqual(wrapper(1, foo="bar"), (1, ("foo", "bar")))
++        def __contains__(self, key):
++            return key in self.__data
+ 
+-    def test_decorator_attributes(self):
+-        with warnings.catch_warnings(record=True) as w:
+-            wrapper = cachetools.cached(None)(self.func)
+-            self.assertIs(w[0].category, DeprecationWarning)
++        def __getitem__(self, key):
++            return self.__data[key]
+ 
+-        self.assertIs(wrapper.cache, None)
+-        self.assertIs(wrapper.cache_key, cachetools.keys.hashkey)
+-        self.assertIs(wrapper.cache_lock, None)
++        def __setitem__(self, key, value):
++            self.__data[key] = value
+ 
+-    def test_decorator_clear(self):
+-        with warnings.catch_warnings(record=True) as w:
+-            wrapper = cachetools.cached(None)(self.func)
+-            self.assertIs(w[0].category, DeprecationWarning)
++        def __len__(self):
++            return len(self.__data)
+ 
+-        wrapper.cache_clear()  # no-op
++        def setdefault(self, key, value=None):
++            return self.__data.setdefault(key, value)
+ 
+-    def test_decorator_info(self):
+-        with warnings.catch_warnings(record=True) as w:
+-            wrapper = cachetools.cached(None, info=True)(self.func)
+-            self.assertIs(w[0].category, DeprecationWarning)
++        def clear(self):
++            self.__data.clear()
++
++    def cache(self, minsize):
++        return self.NonMappingCache()
+ 
++    def test_decorator_info(self):
++        # neither maxsize nor currsize can be determined for non-mappings
++        cache = self.cache(2)
++        wrapper = cachetools.cached(cache, info=True)(self.func)  # type: ignore
+         self.assertEqual(wrapper.cache_info(), (0, 0, 0, 0))
+-        self.assertEqual(wrapper(0), (0,))
++        self.assertEqual(wrapper(0), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 1, 0, 0))
+-        self.assertEqual(wrapper(1), (1,))
++        self.assertEqual(wrapper(1), 1)
+         self.assertEqual(wrapper.cache_info(), (0, 2, 0, 0))
++        self.assertEqual(wrapper(0), 0)
++        self.assertEqual(wrapper.cache_info(), (1, 2, 0, 0))
+         wrapper.cache_clear()
++        self.assertEqual(len(cache), 0)
+         self.assertEqual(wrapper.cache_info(), (0, 0, 0, 0))
++
++
++class InvalidCacheTest(unittest.TestCase):
++    def func(self, *args, **kwargs):
++        return args + tuple(kwargs.items())
++
++    def test_decorator(self):
++        # passing cache=None is no longer supported since v8.0.0
++        with self.assertRaisesRegex(TypeError, "None"):
++            cachetools.cached(None)  # type: ignore
++
++    def test_decorator_info(self):
++        # passing cache=None is no longer supported since v8.0.0
++        with self.assertRaisesRegex(TypeError, "None"):
++            cachetools.cached(None, info=True)  # type: ignore
+
+
+======== W34 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: 37ae009c7cacab8f1a87157ca2b484b8e18a0a78
+
+--- Message
+fix: validate and match prerelease token prefixes (#489)
+
+* fix: validate and match prerelease token prefixes
+* docs: add prerelease token fix changelog
+
+--- Files
+ changelog.d/pr489.bugfix.rst |  3 +++
+ src/semver/version.py        | 16 +++++++++++++---
+ tests/test_bump.py           | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 64 insertions(+), 4 deletions(-)
+
+--- Diff
+diff --git a/changelog.d/pr489.bugfix.rst b/changelog.d/pr489.bugfix.rst
+new file mode 100644
+index 0000000..0965c14
+--- /dev/null
++++ b/changelog.d/pr489.bugfix.rst
+@@ -0,0 +1,3 @@
++``Version.next_version`` now validates used prerelease tokens and matches token
++families literally. Invalid tokens raise ``ValueError``. Dotted prefixes advance
++correctly while existing qualifier chains and legacy counters are preserved.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 6727446..7ead382 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -433,292 +433,302 @@ class Version:
+         >>> ver = semver.Version.parse("3.4.5-rc.1+build.9")
+         >>> ver.bump_build()
+         Version(major=3, minor=4, patch=5, prerelease='rc.1', \
+ build='build.10')
+         >>> str(semver.Version.parse("3.4.5-rc.1+alpha").bump_build())
+         '3.4.5-rc.1+alpha.0'
+         """
+         cls = type(self)
+         if self._build is not None:
+             build = self._build
+         elif token == "":
+             build = "0"
+         elif token is None:
+             build = "build.0"
+         else:
+             token = str(token)
+             cls._validate_identifiers(token, cls._BUILD_IDENTIFIER, "build token")
+             build = token + ".0"
+ 
+         build = cls._increment_string(build)
+         if build == self._build:
+             # _increment_string leaves a build without any digits
+             # unchanged. Raise it nevertheless by appending ".0",
+             # analogous to _increment_prerelease (see :gh:`460`).
+             build += ".0"
+         return cls(self._major, self._minor, self._patch, self._prerelease, build)
+ 
+     def compare(self, other: Comparable) -> int:
+         """
+         Compare self with other.
+ 
+         :param other: the second version
+         :return: The return value is negative if ver1 < ver2,
+              zero if ver1 == ver2 and strictly positive if ver1 > ver2
+ 
+         >>> Version.parse("1.0.0").compare("2.0.0")
+         -1
+         >>> Version.parse("2.0.0").compare("1.0.0")
+         1
+         >>> Version.parse("2.0.0").compare("2.0.0")
+         0
+         """
+         cls = type(self)
+         if isinstance(other, String.__args__):  # type: ignore
+             other = cls.parse(other)
+         elif isinstance(other, dict):
+             other = cls(**other)
+         elif isinstance(other, (tuple, list)):
+             other = cls(*other)
+         elif not isinstance(other, cls):
+             raise TypeError(
+                 f"Expected str, bytes, dict, tuple, list, or {cls.__name__} instance, "
+                 f"but got {type(other)}"
+             )
+ 
+         v1 = self.to_tuple()[:3]
+         v2 = other.to_tuple()[:3]
+         x = _cmp(v1, v2)
+         if x:
+             return x
+ 
+         rc1, rc2 = self.prerelease, other.prerelease
+         rccmp = self._nat_cmp(rc1, rc2)
+ 
+         if not rccmp:
+             return 0
+         if not rc1:
+             return 1
+         elif not rc2:
+             return -1
+ 
+         return rccmp
+ 
+     def next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
+         """
+         Determines next version, preserving natural order.
+ 
+         .. versionadded:: 2.10.0
+ 
+         This function is taking prereleases into account.
+         The "major", "minor", and "patch" raises the respective parts like
+         the ``bump_*`` functions. The real difference is using the
+         "prerelease" part. It gives you the next patch version of the
+         prerelease, for example:
+ 
+         >>> str(semver.Version.parse("0.1.4").next_version("prerelease"))
+         '0.1.5-rc.1'
+ 
+         :param part: One of "major", "minor", "patch", or "prerelease"
+         :param prerelease_token: prefix string of prerelease, defaults to 'rc'
+         :return: new object with the appropriate part raised
+         """
+         cls = type(self)
+         # "build" is currently not used, that's why we use [:-1]
+         validparts = cls.NAMES[:-1]
+         if part not in validparts:
+             raise ValueError(
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+         if version.prerelease and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)
+         ):
+             return version.replace(prerelease=None, build=None)
+ 
+         # Only check the main parts:
+         if part in cls.NAMES[:3]:
+             return getattr(version, "bump_" + part)()
+         else:
+             if version.prerelease and prerelease_token:
++                prerelease_token = str(prerelease_token)
++                cls._validate_identifiers(
++                    prerelease_token,
++                    cls._PRERELEASE_IDENTIFIER,
++                    "prerelease token",
++                )
+                 # Handle old-style prereleases like "rc3" (no dot separator)
+-                match = re.match(f"^{prerelease_token}(\\d+)$", version.prerelease)
++                match = re.fullmatch(
++                    rf"{re.escape(prerelease_token)}(\d+)", version.prerelease
++                )
+                 if match:
+                     num = int(match.group(1))
+                     return version.replace(
+                         prerelease=f"{prerelease_token}{num + 1}", build=None
+                     )
+ 
+-                current_token = version.prerelease.split(".")[0]
+-                if current_token != prerelease_token:
++                if not (
++                    version.prerelease == prerelease_token
++                    or version.prerelease.startswith(prerelease_token + ".")
++                ):
+                     return version.replace(prerelease=f"{prerelease_token}.1", build=None)
+             return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+ 
+     @_comparator
+     def __eq__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) == 0
+ 
+     @_comparator
+     def __ne__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) != 0
+ 
+     @_comparator
+     def __lt__(self, other: Comparable) -> bool:
+         return self.compare(other) < 0
+ 
+     @_comparator
+     def __le__(self, other: Comparable) -> bool:
+         return self.compare(other) <= 0
+ 
+     @_comparator
+     def __gt__(self, other: Comparable) -> bool:
+         return self.compare(other) > 0
+ 
+     @_comparator
+     def __ge__(self, other: Comparable) -> bool:
+         return self.compare(other) >= 0
+ 
+     def __getitem__(
+         self, index: Union[int, slice]
+     ) -> Union[int, Optional[str], Tuple[Union[int, str], ...]]:
+         """
+         self.__getitem__(index) <==> self[index] Implement getitem.
+ 
+         If the part  requested is undefined, or a part of the range requested
+         is undefined, it will throw an index error.
+         Negative indices are not supported.
+ 
+         :param index: a positive integer indicating the
+                offset or a :func:`slice` object
+         :raises IndexError: if index is beyond the range or a part is None
+         :return: the requested part of the version at position index
+ 
+         >>> ver = semver.Version.parse("3.4.5")
+         >>> ver[0], ver[1], ver[2]
+         (3, 4, 5)
+         """
+         if isinstance(index, int):
+             index = slice(index, index + 1)
+         index = cast(slice, index)
+ 
+         if (
+             isinstance(index, slice)
+             and (index.start is not None and index.start < 0)
+             or (index.stop is not None and index.stop < 0)
+         ):
+             raise IndexError("Version index cannot be negative")
+ 
+         part = tuple(
+             filter(lambda p: p is not None, cast(Iterable, self.to_tuple()[index]))
+         )
+ 
+         if len(part) == 1:
+             return part[0]
+         elif not part:
+             raise IndexError("Version part undefined")
+         return part
+ 
+     def __repr__(self) -> str:
+         s = ", ".join("%s=%r" % (key, val) for key, val in self.to_dict().items())
+         return "%s(%s)" % (type(self).__name__, s)
+ 
+     def __str__(self) -> str:
+         version = "%d.%d.%d" % (self.major, self.minor, self.patch)
+         if self.prerelease:
+             version += "-%s" % self.prerelease
+         if self.build:
+             version += "+%s" % self.build
+         return version
+ 
+     def __hash__(self) -> int:
+         return hash(self.to_tuple()[:4])
+ 
+     def finalize_version(self) -> "Version":
+         """
+         Remove any prerelease and build metadata from the version.
+ 
+         :return: a new instance with the finalized version string
+ 
+         >>> str(semver.Version.parse('1.2.3-rc.5').finalize_version())
+         '1.2.3'
+         """
+         cls = type(self)
+         return cls(self.major, self.minor, self.patch)
+ 
+     def match(self, match_expr: str) -> bool:
+         """
+         Compare self to match a match expression.
+ 
+         :param match_expr: optional operator and version; valid operators are
+               ``<``   smaller than
+               ``>``   greater than
+               ``>=``  greator or equal than
+               ``<=``  smaller or equal than
+               ``==``  equal
+               ``!=``  not equal
+         :return: True if the expression matches the version, otherwise False
+ 
+         >>> semver.Version.parse("2.0.0").match(">=1.0.0")
+         True
+         >>> semver.Version.parse("1.0.0").match(">1.0.0")
+         False
+         >>> semver.Version.parse("4.0.4").match("4.0.4")
+         True
+         """
+         prefix = match_expr[:2]
+         if prefix in (">=", "<=", "==", "!="):
+             match_version = match_expr[2:]
+         elif prefix and prefix[0] in (">", "<"):
+             prefix = prefix[0]
+             match_version = match_expr[1:]
+         elif match_expr and match_expr[0] in "0123456789":
+             prefix = "=="
+             match_version = match_expr
+         else:
+             raise ValueError(
+                 "match_expr parameter should be in format <op><ver>, "
+                 "where <op> is one of "
+                 "['<', '>', '==', '<=', '>=', '!=']. "
+                 "You provided: %r" % match_expr
+             )
+ 
+         possibilities_dict = {
+             ">": (1,),
+             "<": (-1,),
+             "==": (0,),
+             "!=": (-1, 1),
+             ">=": (0, 1),
+             "<=": (-1, 0),
+         }
+ 
+         possibilities = possibilities_dict[prefix]
+         cmp_res = self.compare(match_version)
+ 
+         return cmp_res in possibilities
+ 
+     @classmethod
+     def parse(
+         cls: Type[T], version: String, optional_minor_and_patch: bool = False
+     ) -> T:
+         """
+         Parse version string to a Version instance.
+ 
+         .. versionchanged:: 2.11.0
+            Changed method from static to classmethod to
+            allow subclasses.
+         .. versionchanged:: 3.0.0
+            Added optional parameter ``optional_minor_and_patch`` to allow
+            optional minor and patch parts.
+ 
+         :param version: version string
+         :param optional_minor_and_patch: if set to true, the version string to parse \
+            can contain optional minor and patch parts. Optional parts are set to zero.
+            By default (False), the version string to parse has to follow the semver
+            specification.
+         :return: a new :class:`Version` instance
+         :raises ValueError: if version is invalid
+         :raises TypeError: if version contains the wrong type
+ 
+         >>> semver.Version.parse('3.4.5-pre.2+build.4')
+         Version(major=3, minor=4, patch=5, \
+diff --git a/tests/test_bump.py b/tests/test_bump.py
+index fcbedf4..767d38f 100644
+--- a/tests/test_bump.py
++++ b/tests/test_bump.py
+@@ -1,11 +1,12 @@
+ import pytest
+ 
+ from semver import (
++    Version,
+     bump_build,
+     bump_major,
+     bump_minor,
+     bump_patch,
+     bump_prerelease,
+     compare,
+     parse_version_info,
+ )
+@@ -151,16 +152,62 @@ def test_should_bump_prerelease(version, token, expected, expected_compare):
+ def test_should_ignore_build_on_prerelease_bump():
+     assert bump_prerelease("3.4.5-rc.1+build.4") == "3.4.5-rc.2"
+ 
+ 
++@pytest.mark.parametrize(
++    "version,token,expected",
++    [
++        ("1.2.3-alpha.beta.1+build.7", "alpha.beta", "1.2.3-alpha.beta.2"),
++        ("1.2.3-alpha.beta.gamma.1", "alpha", "1.2.3-alpha.beta.gamma.2"),
++        ("1.2.3-rc3", "rc", "1.2.3-rc4"),
++        ("1.2.3-rc.3", "rc", "1.2.3-rc.4"),
++        ("1.2.3-alphaXbeta9", "alpha.beta", "1.2.3-alpha.beta.1"),
++    ],
++)
++def test_next_version_matches_literal_prerelease_token_family(
++    version, token, expected
++):
++    original = Version.parse(version)
++    result = original.next_version("prerelease", token)
++    assert str(result) == expected
++    assert Version.parse(str(result)).to_tuple() == result.to_tuple()
++    assert str(original) == version
++
++
++@pytest.mark.parametrize(
++    "token", ["[", "rc.", "rc+build", "rc..next", "rc.01", "01", "ré"]
++)
++def test_next_version_rejects_invalid_prerelease_token(token):
++    with pytest.raises(ValueError):
++        Version.parse("1.2.3-rc.1").next_version("prerelease", token)
++
++
++@pytest.mark.parametrize("token", [None, ""])
++def test_next_version_preserves_empty_token_semantics(token):
++    version = Version.parse("1.2.3-alpha.beta.1")
++    assert str(version.next_version("prerelease", token)) == "1.2.3-alpha.beta.2"
++
++
++@pytest.mark.parametrize(
++    "part,token,expected",
++    [
++        ("major", "rc.", "2.0.0"),
++        ("minor", "rc+build", "1.3.0"),
++        ("patch", "rc..next", "1.2.4"),
++    ],
++)
++def test_next_version_ignores_token_for_main_parts(part, token, expected):
++    assert str(Version.parse("1.2.3").next_version(part, token)) == expected
++
++
+ @pytest.mark.parametrize(
+     "version,expected",
+     [
+         ("3.4.5-rc.1+build.9", "3.4.5-rc.1+build.10"),
+         ("3.4.5-rc.1+0009.dev", "3.4.5-rc.1+0010.dev"),
+         ("3.4.5-rc.1", "3.4.5-rc.1+build.1"),
+         ("3.4.5", "3.4.5+build.1"),
+     ],
+ )
+ def test_should_bump_build(version, expected):
+     assert bump_build(version) == expected
+-    assert compare(version, expected) == 0
+\ No newline at end of file
++    assert compare(version, expected) == 0
+
+
+======== W35 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: 9ef41316dbe85f7d0fae6e396c45a1bbf69ebb29
+
+--- Message
+Preserve version order when legacy prerelease counters roll over (#500)
+
+Advance the patch version when incrementing an old-style prerelease counter
+would otherwise produce a lower version, while preserving the token and
+incremented counter. Keep the existing patch for increments that already
+move forward.
+
+Add regression coverage for counter rollovers, build metadata, custom tokens,
+and repeated bumps; document the behavior in the changelog.
+
+--- Files
+ changelog.d/499.bugfix.rst              |  5 +++++
+ src/semver/version.py                   | 13 ++++++++++++-
+ tests/test_issue484.py                  |  6 ++++--
+ tests/test_next_version_legacy_order.py | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 67 insertions(+), 3 deletions(-)
+
+--- Diff
+diff --git a/changelog.d/499.bugfix.rst b/changelog.d/499.bugfix.rst
+new file mode 100644
+index 0000000..5678212
+--- /dev/null
++++ b/changelog.d/499.bugfix.rst
+@@ -0,0 +1,5 @@
++``Version.next_version("prerelease")`` now advances the patch version when
++incrementing an old-style prerelease counter would produce an older version.
++For example, ``1.2.3-rc9`` becomes ``1.2.4-rc10``. The legacy token and
++incremented counter are preserved; increments that already move forward keep
++the current patch version.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index f3f2739..e9933c6 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -433,313 +433,324 @@ class Version:
+         >>> ver = semver.Version.parse("3.4.5-rc.1+build.9")
+         >>> ver.bump_build()
+         Version(major=3, minor=4, patch=5, prerelease='rc.1', \
+ build='build.10')
+         >>> str(semver.Version.parse("3.4.5-rc.1+alpha").bump_build())
+         '3.4.5-rc.1+alpha.0'
+         """
+         cls = type(self)
+         if self._build is not None:
+             build = self._build
+         elif token == "":
+             build = "0"
+         elif token is None:
+             build = "build.0"
+         else:
+             token = str(token)
+             cls._validate_identifiers(token, cls._BUILD_IDENTIFIER, "build token")
+             build = token + ".0"
+ 
+         build = cls._increment_string(build)
+         if build == self._build:
+             # _increment_string leaves a build without any digits
+             # unchanged. Raise it nevertheless by appending ".0",
+             # analogous to _increment_prerelease (see :gh:`460`).
+             build += ".0"
+         return cls(self._major, self._minor, self._patch, self._prerelease, build)
+ 
+     def compare(self, other: Comparable) -> int:
+         """
+         Compare self with other.
+ 
+         :param other: the second version
+         :return: The return value is negative if ver1 < ver2,
+              zero if ver1 == ver2 and strictly positive if ver1 > ver2
+ 
+         >>> Version.parse("1.0.0").compare("2.0.0")
+         -1
+         >>> Version.parse("2.0.0").compare("1.0.0")
+         1
+         >>> Version.parse("2.0.0").compare("2.0.0")
+         0
+         """
+         cls = type(self)
+         if isinstance(other, String.__args__):  # type: ignore
+             other = cls.parse(other)
+         elif isinstance(other, dict):
+             other = cls(**other)
+         elif isinstance(other, (tuple, list)):
+             other = cls(*other)
+         elif not isinstance(other, cls):
+             raise TypeError(
+                 f"Expected str, bytes, dict, tuple, list, or {cls.__name__} instance, "
+                 f"but got {type(other)}"
+             )
+ 
+         v1 = self.to_tuple()[:3]
+         v2 = other.to_tuple()[:3]
+         x = _cmp(v1, v2)
+         if x:
+             return x
+ 
+         rc1, rc2 = self.prerelease, other.prerelease
+         rccmp = self._nat_cmp(rc1, rc2)
+ 
+         if not rccmp:
+             return 0
+         if not rc1:
+             return 1
+         elif not rc2:
+             return -1
+ 
+         return rccmp
+ 
+     def next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
+         """
+         Determines next version, preserving natural order.
+ 
+         .. versionadded:: 2.10.0
+ 
+         This function is taking prereleases into account.
+         The "major", "minor", and "patch" raises the respective parts like
+         the ``bump_*`` functions. The real difference is using the
+         "prerelease" part. It gives you the next patch version of the
+         prerelease, for example:
+ 
+         >>> str(semver.Version.parse("0.1.4").next_version("prerelease"))
+         '0.1.5-rc.1'
+ 
+         Switching to an earlier prerelease token advances the patch version
+         so the result remains greater than the original version:
+ 
+         >>> str(semver.Version.parse("1.2.3-rc.1").next_version("prerelease", "alpha"))
+         '1.2.4-alpha.1'
+ 
++        Old-style counters also advance the patch version if incrementing
++        the counter would move backwards under SemVer's lexical ordering:
++
++        >>> str(semver.Version.parse("1.2.3-rc9").next_version("prerelease"))
++        '1.2.4-rc10'
++
+         :param part: One of "major", "minor", "patch", or "prerelease"
+         :param prerelease_token: prefix string of prerelease, defaults to 'rc'
+         :return: new object with the appropriate part raised
+         """
+         cls = type(self)
+         # "build" is currently not used, that's why we use [:-1]
+         validparts = cls.NAMES[:-1]
+         if part not in validparts:
+             raise ValueError(
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+         if version.prerelease and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)
+         ):
+             return version.replace(prerelease=None, build=None)
+ 
+         # Only check the main parts:
+         if part in cls.NAMES[:3]:
+             return getattr(version, "bump_" + part)()
+         else:
+             if version.prerelease and prerelease_token:
+                 prerelease_token = str(prerelease_token)
+                 cls._validate_identifiers(
+                     prerelease_token,
+                     cls._PRERELEASE_IDENTIFIER,
+                     "prerelease token",
+                 )
+                 # Handle old-style prereleases like "rc3" (no dot separator)
+                 match = re.fullmatch(
+                     rf"{re.escape(prerelease_token)}(\d+)", version.prerelease
+                 )
+                 if match:
+                     num = int(match.group(1))
+-                    return version.replace(
++                    candidate = version.replace(
+                         prerelease=f"{prerelease_token}{num + 1}", build=None
+                     )
++                    if candidate > version:
++                        return candidate
++                    return candidate.bump_patch().replace(
++                        prerelease=candidate.prerelease
++                    )
+ 
+                 if not (
+                     version.prerelease == prerelease_token
+                     or version.prerelease.startswith(prerelease_token + ".")
+                 ):
+                     candidate = version.replace(
+                         prerelease=f"{prerelease_token}.1", build=None
+                     )
+                     if candidate > version:
+                         return candidate
+                     return version.bump_patch().bump_prerelease(prerelease_token)
+             return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+ 
+     @_comparator
+     def __eq__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) == 0
+ 
+     @_comparator
+     def __ne__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) != 0
+ 
+     @_comparator
+     def __lt__(self, other: Comparable) -> bool:
+         return self.compare(other) < 0
+ 
+     @_comparator
+     def __le__(self, other: Comparable) -> bool:
+         return self.compare(other) <= 0
+ 
+     @_comparator
+     def __gt__(self, other: Comparable) -> bool:
+         return self.compare(other) > 0
+ 
+     @_comparator
+     def __ge__(self, other: Comparable) -> bool:
+         return self.compare(other) >= 0
+ 
+     def __getitem__(
+         self, index: Union[int, slice]
+     ) -> Union[int, Optional[str], Tuple[Union[int, str], ...]]:
+         """
+         self.__getitem__(index) <==> self[index] Implement getitem.
+ 
+         If the part  requested is undefined, or a part of the range requested
+         is undefined, it will throw an index error.
+         Negative indices are not supported.
+ 
+         :param index: a positive integer indicating the
+                offset or a :func:`slice` object
+         :raises IndexError: if index is beyond the range or a part is None
+         :return: the requested part of the version at position index
+ 
+         >>> ver = semver.Version.parse("3.4.5")
+         >>> ver[0], ver[1], ver[2]
+         (3, 4, 5)
+         """
+         if isinstance(index, int):
+             index = slice(index, index + 1)
+         index = cast(slice, index)
+ 
+         if (
+             isinstance(index, slice)
+             and (index.start is not None and index.start < 0)
+             or (index.stop is not None and index.stop < 0)
+         ):
+             raise IndexError("Version index cannot be negative")
+ 
+         part = tuple(
+             filter(lambda p: p is not None, cast(Iterable, self.to_tuple()[index]))
+         )
+ 
+         if len(part) == 1:
+             return part[0]
+         elif not part:
+             raise IndexError("Version part undefined")
+         return part
+ 
+     def __repr__(self) -> str:
+         s = ", ".join("%s=%r" % (key, val) for key, val in self.to_dict().items())
+         return "%s(%s)" % (type(self).__name__, s)
+ 
+     def __str__(self) -> str:
+         version = "%d.%d.%d" % (self.major, self.minor, self.patch)
+         if self.prerelease:
+             version += "-%s" % self.prerelease
+         if self.build:
+             version += "+%s" % self.build
+         return version
+ 
+     def __hash__(self) -> int:
+         return hash(self.to_tuple()[:4])
+ 
+     def finalize_version(self) -> "Version":
+         """
+         Remove any prerelease and build metadata from the version.
+ 
+         :return: a new instance with the finalized version string
+ 
+         >>> str(semver.Version.parse('1.2.3-rc.5').finalize_version())
+         '1.2.3'
+         """
+         cls = type(self)
+         return cls(self.major, self.minor, self.patch)
+ 
+     def match(self, match_expr: str) -> bool:
+         """
+         Compare self to match a match expression.
+ 
+         :param match_expr: optional operator and version; valid operators are
+               ``<``   smaller than
+               ``>``   greater than
+               ``>=``  greator or equal than
+               ``<=``  smaller or equal than
+               ``==``  equal
+               ``!=``  not equal
+         :return: True if the expression matches the version, otherwise False
+ 
+         >>> semver.Version.parse("2.0.0").match(">=1.0.0")
+         True
+         >>> semver.Version.parse("1.0.0").match(">1.0.0")
+         False
+         >>> semver.Version.parse("4.0.4").match("4.0.4")
+         True
+         """
+         prefix = match_expr[:2]
+         if prefix in (">=", "<=", "==", "!="):
+             match_version = match_expr[2:]
+         elif prefix and prefix[0] in (">", "<"):
+             prefix = prefix[0]
+             match_version = match_expr[1:]
+         elif match_expr and match_expr[0] in "0123456789":
+             prefix = "=="
+             match_version = match_expr
+         else:
+             raise ValueError(
+                 "match_expr parameter should be in format <op><ver>, "
+                 "where <op> is one of "
+                 "['<', '>', '==', '<=', '>=', '!=']. "
+                 "You provided: %r" % match_expr
+             )
+ 
+         possibilities_dict = {
+             ">": (1,),
+             "<": (-1,),
+             "==": (0,),
+             "!=": (-1, 1),
+             ">=": (0, 1),
+             "<=": (-1, 0),
+         }
+ 
+         possibilities = possibilities_dict[prefix]
+         cmp_res = self.compare(match_version)
+ 
+         return cmp_res in possibilities
+ 
+     @classmethod
+     def parse(
+         cls: Type[T], version: String, optional_minor_and_patch: bool = False
+     ) -> T:
+         """
+         Parse version string to a Version instance.
+ 
+         .. versionchanged:: 2.11.0
+            Changed method from static to classmethod to
+            allow subclasses.
+         .. versionchanged:: 3.0.0
+            Added optional parameter ``optional_minor_and_patch`` to allow
+            optional minor and patch parts.
+ 
+         :param version: version string
+         :param optional_minor_and_patch: if set to true, the version string to parse \
+            can contain optional minor and patch parts. Optional parts are set to zero.
+            By default (False), the version string to parse has to follow the semver
+            specification.
+         :return: a new :class:`Version` instance
+         :raises ValueError: if version is invalid
+         :raises TypeError: if version contains the wrong type
+ 
+         >>> semver.Version.parse('3.4.5-pre.2+build.4')
+         Version(major=3, minor=4, patch=5, \
+diff --git a/tests/test_issue484.py b/tests/test_issue484.py
+index d4df956..c0caf49 100644
+--- a/tests/test_issue484.py
++++ b/tests/test_issue484.py
+@@ -31,9 +31,11 @@ def test_issue_484_rc3_to_rc4():
+ 
+ 
+ def test_issue_484_rc9_to_rc10():
+-    """Ensure numeric bumping works across digit boundaries."""
++    """Keep the legacy counter while ensuring digit rollover moves forward."""
+     v = Version.parse("1.2.3-rc9")
+-    assert str(v.next_version("prerelease")) == "1.2.3-rc10"
++    result = v.next_version("prerelease")
++    assert str(result) == "1.2.4-rc10"
++    assert result > v
+ 
+ 
+ def test_issue_484_dot_style_unchanged():
+diff --git a/tests/test_next_version_legacy_order.py b/tests/test_next_version_legacy_order.py
+new file mode 100644
+index 0000000..9372822
+--- /dev/null
++++ b/tests/test_next_version_legacy_order.py
+@@ -0,0 +1,46 @@
++"""Legacy prerelease counters must not make next_version move backwards."""
++
++import pytest
++
++from semver import Version
++
++
++@pytest.mark.parametrize(
++    "current,token,expected",
++    [
++        ("1.2.3-rc9", "rc", "1.2.4-rc10"),
++        ("1.2.3-rc99", "rc", "1.2.4-rc100"),
++        ("1.2.3-rc999+build.7", "rc", "1.2.4-rc1000"),
++        ("1.2.3-beta9", "beta", "1.2.4-beta10"),
++        ("1.2.3-alpha.beta9", "alpha.beta", "1.2.4-alpha.beta10"),
++        ("1.2.3-0rc9", "0rc", "1.2.4-0rc10"),
++        ("0.0.0-rc9", "rc", "0.0.1-rc10"),
++        ("1.2.3-rc8", "rc", "1.2.3-rc9"),
++        ("1.2.3-rc98", "rc", "1.2.3-rc99"),
++        ("1.2.3-rc099", "rc", "1.2.3-rc100"),
++        ("1.2.3-rc09", "rc", "1.2.3-rc10"),
++        ("1.2.3-rc.9", "rc", "1.2.3-rc.10"),
++    ],
++)
++def test_next_legacy_counter_preserves_order(current, token, expected):
++    original = Version.parse(current)
++    result = original.next_version("prerelease", token)
++    assert str(result) == expected
++    assert result > original
++    assert result.build is None
++    assert Version.parse(str(result)).to_tuple() == result.to_tuple()
++    assert str(original) == current
++
++
++def test_repeated_legacy_bumps_preserve_order_and_subclass():
++    class Release(Version):
++        pass
++
++    current = Release.parse("1.2.3-rc8+build.7")
++    for expected in ("1.2.3-rc9", "1.2.4-rc10", "1.2.4-rc11"):
++        result = current.next_version("prerelease")
++        assert isinstance(result, Release)
++        assert str(result) == expected
++        assert result > current
++        assert result.build is None
++        current = result
+
+
+======== W36 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: 8c0a3f7d80b98962b9db2861a02a035af831b2ac
+
+--- Message
+Fix #484: Increment old-style prerelease with dot (#485)
+
+Fix `next_version` to correctly increment old-style prerelease
+versions without a dot separator (for example `rc3`).
+Previously, calling `next_version("prerelease")` on such versions
+would reset the prerelease number to 1 instead of incrementing it.
+
+--- Files
+ changelog.d/484.bugfix.rst |  1 +
+ src/semver/version.py      |  8 +++++++-
+ tests/test_issue484.py     | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+
+--- Diff
+diff --git a/changelog.d/484.bugfix.rst b/changelog.d/484.bugfix.rst
+new file mode 100644
+index 0000000..c19205e
+--- /dev/null
++++ b/changelog.d/484.bugfix.rst
+@@ -0,0 +1 @@
++Fix :meth:`~semver.Version.next_version` to correctly increment old-style prerelease versions without a dot separator (for example ``rc3``). Previously, calling ``next_version("prerelease")`` on such versions would reset the prerelease number to 1 instead of incrementing it.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 2c9a0c0..af0cc3f 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -431,284 +431,290 @@ class Version:
+         >>> ver = semver.Version.parse("3.4.5-rc.1+build.9")
+         >>> ver.bump_build()
+         Version(major=3, minor=4, patch=5, prerelease='rc.1', \
+ build='build.10')
+         >>> str(semver.Version.parse("3.4.5-rc.1+alpha").bump_build())
+         '3.4.5-rc.1+alpha.0'
+         """
+         cls = type(self)
+         if self._build is not None:
+             build = self._build
+         elif token == "":
+             build = "0"
+         elif token is None:
+             build = "build.0"
+         else:
+             token = str(token)
+             cls._validate_identifiers(token, cls._BUILD_IDENTIFIER, "build token")
+             build = token + ".0"
+ 
+         build = cls._increment_string(build)
+         if build == self._build:
+             # _increment_string leaves a build without any digits
+             # unchanged. Raise it nevertheless by appending ".0",
+             # analogous to _increment_prerelease (see :gh:`460`).
+             build += ".0"
+         return cls(self._major, self._minor, self._patch, self._prerelease, build)
+ 
+     def compare(self, other: Comparable) -> int:
+         """
+         Compare self with other.
+ 
+         :param other: the second version
+         :return: The return value is negative if ver1 < ver2,
+              zero if ver1 == ver2 and strictly positive if ver1 > ver2
+ 
+         >>> Version.parse("1.0.0").compare("2.0.0")
+         -1
+         >>> Version.parse("2.0.0").compare("1.0.0")
+         1
+         >>> Version.parse("2.0.0").compare("2.0.0")
+         0
+         """
+         cls = type(self)
+         if isinstance(other, String.__args__):  # type: ignore
+             other = cls.parse(other)
+         elif isinstance(other, dict):
+             other = cls(**other)
+         elif isinstance(other, (tuple, list)):
+             other = cls(*other)
+         elif not isinstance(other, cls):
+             raise TypeError(
+                 f"Expected str, bytes, dict, tuple, list, or {cls.__name__} instance, "
+                 f"but got {type(other)}"
+             )
+ 
+         v1 = self.to_tuple()[:3]
+         v2 = other.to_tuple()[:3]
+         x = _cmp(v1, v2)
+         if x:
+             return x
+ 
+         rc1, rc2 = self.prerelease, other.prerelease
+         rccmp = self._nat_cmp(rc1, rc2)
+ 
+         if not rccmp:
+             return 0
+         if not rc1:
+             return 1
+         elif not rc2:
+             return -1
+ 
+         return rccmp
+ 
+     def next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
+         """
+         Determines next version, preserving natural order.
+ 
+         .. versionadded:: 2.10.0
+ 
+         This function is taking prereleases into account.
+         The "major", "minor", and "patch" raises the respective parts like
+         the ``bump_*`` functions. The real difference is using the
+         "prerelease" part. It gives you the next patch version of the
+         prerelease, for example:
+ 
+         >>> str(semver.Version.parse("0.1.4").next_version("prerelease"))
+         '0.1.5-rc.1'
+ 
+         :param part: One of "major", "minor", "patch", or "prerelease"
+         :param prerelease_token: prefix string of prerelease, defaults to 'rc'
+         :return: new object with the appropriate part raised
+         """
+         cls = type(self)
+         # "build" is currently not used, that's why we use [:-1]
+         validparts = cls.NAMES[:-1]
+         if part not in validparts:
+             raise ValueError(
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+         if version.prerelease and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)
+         ):
+             return version.replace(prerelease=None, build=None)
+ 
+         # Only check the main parts:
+         if part in cls.NAMES[:3]:
+             return getattr(version, "bump_" + part)()
+         else:
+-            if version.prerelease is not None and prerelease_token:
++            if version.prerelease and prerelease_token:
++                # Handle old-style prereleases like "rc3" (no dot separator)
++                match = re.match(f"^{prerelease_token}(\\d+)$", version.prerelease)
++                if match:
++                    num = int(match.group(1))
++                    return version.replace(prerelease=f"{prerelease_token}{num + 1}")
++
+                 current_token = version.prerelease.split(".")[0]
+                 if current_token != prerelease_token:
+                     return version.replace(prerelease=f"{prerelease_token}.1", build=None)
+             return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+ 
+     @_comparator
+     def __eq__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) == 0
+ 
+     @_comparator
+     def __ne__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) != 0
+ 
+     @_comparator
+     def __lt__(self, other: Comparable) -> bool:
+         return self.compare(other) < 0
+ 
+     @_comparator
+     def __le__(self, other: Comparable) -> bool:
+         return self.compare(other) <= 0
+ 
+     @_comparator
+     def __gt__(self, other: Comparable) -> bool:
+         return self.compare(other) > 0
+ 
+     @_comparator
+     def __ge__(self, other: Comparable) -> bool:
+         return self.compare(other) >= 0
+ 
+     def __getitem__(
+         self, index: Union[int, slice]
+     ) -> Union[int, Optional[str], Tuple[Union[int, str], ...]]:
+         """
+         self.__getitem__(index) <==> self[index] Implement getitem.
+ 
+         If the part  requested is undefined, or a part of the range requested
+         is undefined, it will throw an index error.
+         Negative indices are not supported.
+ 
+         :param index: a positive integer indicating the
+                offset or a :func:`slice` object
+         :raises IndexError: if index is beyond the range or a part is None
+         :return: the requested part of the version at position index
+ 
+         >>> ver = semver.Version.parse("3.4.5")
+         >>> ver[0], ver[1], ver[2]
+         (3, 4, 5)
+         """
+         if isinstance(index, int):
+             index = slice(index, index + 1)
+         index = cast(slice, index)
+ 
+         if (
+             isinstance(index, slice)
+             and (index.start is not None and index.start < 0)
+             or (index.stop is not None and index.stop < 0)
+         ):
+             raise IndexError("Version index cannot be negative")
+ 
+         part = tuple(
+             filter(lambda p: p is not None, cast(Iterable, self.to_tuple()[index]))
+         )
+ 
+         if len(part) == 1:
+             return part[0]
+         elif not part:
+             raise IndexError("Version part undefined")
+         return part
+ 
+     def __repr__(self) -> str:
+         s = ", ".join("%s=%r" % (key, val) for key, val in self.to_dict().items())
+         return "%s(%s)" % (type(self).__name__, s)
+ 
+     def __str__(self) -> str:
+         version = "%d.%d.%d" % (self.major, self.minor, self.patch)
+         if self.prerelease:
+             version += "-%s" % self.prerelease
+         if self.build:
+             version += "+%s" % self.build
+         return version
+ 
+     def __hash__(self) -> int:
+         return hash(self.to_tuple()[:4])
+ 
+     def finalize_version(self) -> "Version":
+         """
+         Remove any prerelease and build metadata from the version.
+ 
+         :return: a new instance with the finalized version string
+ 
+         >>> str(semver.Version.parse('1.2.3-rc.5').finalize_version())
+         '1.2.3'
+         """
+         cls = type(self)
+         return cls(self.major, self.minor, self.patch)
+ 
+     def match(self, match_expr: str) -> bool:
+         """
+         Compare self to match a match expression.
+ 
+         :param match_expr: optional operator and version; valid operators are
+               ``<``   smaller than
+               ``>``   greater than
+               ``>=``  greator or equal than
+               ``<=``  smaller or equal than
+               ``==``  equal
+               ``!=``  not equal
+         :return: True if the expression matches the version, otherwise False
+ 
+         >>> semver.Version.parse("2.0.0").match(">=1.0.0")
+         True
+         >>> semver.Version.parse("1.0.0").match(">1.0.0")
+         False
+         >>> semver.Version.parse("4.0.4").match("4.0.4")
+         True
+         """
+         prefix = match_expr[:2]
+         if prefix in (">=", "<=", "==", "!="):
+             match_version = match_expr[2:]
+         elif prefix and prefix[0] in (">", "<"):
+             prefix = prefix[0]
+             match_version = match_expr[1:]
+         elif match_expr and match_expr[0] in "0123456789":
+             prefix = "=="
+             match_version = match_expr
+         else:
+             raise ValueError(
+                 "match_expr parameter should be in format <op><ver>, "
+                 "where <op> is one of "
+                 "['<', '>', '==', '<=', '>=', '!=']. "
+                 "You provided: %r" % match_expr
+             )
+ 
+         possibilities_dict = {
+             ">": (1,),
+             "<": (-1,),
+             "==": (0,),
+             "!=": (-1, 1),
+             ">=": (0, 1),
+             "<=": (-1, 0),
+         }
+ 
+         possibilities = possibilities_dict[prefix]
+         cmp_res = self.compare(match_version)
+ 
+         return cmp_res in possibilities
+ 
+     @classmethod
+     def parse(
+         cls: Type[T], version: String, optional_minor_and_patch: bool = False
+     ) -> T:
+         """
+         Parse version string to a Version instance.
+ 
+         .. versionchanged:: 2.11.0
+            Changed method from static to classmethod to
+            allow subclasses.
+         .. versionchanged:: 3.0.0
+            Added optional parameter ``optional_minor_and_patch`` to allow
+            optional minor and patch parts.
+ 
+         :param version: version string
+         :param optional_minor_and_patch: if set to true, the version string to parse \
+            can contain optional minor and patch parts. Optional parts are set to zero.
+            By default (False), the version string to parse has to follow the semver
+            specification.
+         :return: a new :class:`Version` instance
+         :raises ValueError: if version is invalid
+         :raises TypeError: if version contains the wrong type
+ 
+         >>> semver.Version.parse('3.4.5-pre.2+build.4')
+         Version(major=3, minor=4, patch=5, \
+diff --git a/tests/test_issue484.py b/tests/test_issue484.py
+new file mode 100644
+index 0000000..47d04b4
+--- /dev/null
++++ b/tests/test_issue484.py
+@@ -0,0 +1,33 @@
++"""Regression test for issue #484: next_version with old-style prereleases."""
++
++from semver import Version
++
++
++def test_issue_484_rc3_to_rc4():
++    """Old-style prerelease 'rc3' should bump to 'rc4', not reset to 'rc.1'."""
++    v = Version.parse("0.1.2-rc3")
++    assert str(v.next_version("prerelease")) == "0.1.2-rc4"
++
++
++def test_issue_484_rc9_to_rc10():
++    """Ensure numeric bumping works across digit boundaries."""
++    v = Version.parse("1.2.3-rc9")
++    assert str(v.next_version("prerelease")) == "1.2.3-rc10"
++
++
++def test_issue_484_dot_style_unchanged():
++    """Dot-separated prereleases should still work as before."""
++    v = Version.parse("0.1.2-rc.3")
++    assert str(v.next_version("prerelease")) == "0.1.2-rc.4"
++
++
++def test_issue_484_different_token():
++    """A different prerelease token should still reset to rc.1."""
++    v = Version.parse("1.2.3-alpha1")
++    assert str(v.next_version("prerelease")) == "1.2.3-rc.1"
++
++
++def test_issue_484_custom_token():
++    """Custom prerelease token should be respected."""
++    v = Version.parse("1.2.3-beta2")
++    assert str(v.next_version("prerelease", "beta")) == "1.2.3-beta3"
+
+
+======== W37 ========
+Project: cachetools (github.com/tkem/cachetools)
+Commit: b34643f37174751df37016899f4e7f5f6b189012
+
+--- Message
+Fix @cachedmethod class access with receiver as keyword argument.
+
+--- Files
+ src/cachetools/_descriptor.py | 28 ++++++++++++++++++++++++----
+ tests/test_cachedmethod.py    | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 4 deletions(-)
+
+--- Diff
+diff --git a/src/cachetools/_descriptor.py b/src/cachetools/_descriptor.py
+index 596483a..6942d30 100644
+--- a/src/cachetools/_descriptor.py
++++ b/src/cachetools/_descriptor.py
+@@ -103,24 +103,44 @@ class _MethodDescriptor:
+ class _Unbound:
+     """Callable returned on class access.
+ 
+     Deliberately not a function: unittest.mock.create_autospec() only strips
+     the receiver from plain functions found in the class dict, so a function
+     here would leave the receiver in an autospec'd instance's signature.
+     """
+ 
+     def __init__(self, descriptor):
+         functools.update_wrapper(self, descriptor.__wrapped__)
+         self.__descriptor = descriptor
++        self.__receiver = None  # name of the wrapped method's first parameter
+ 
+     # Receiver is taken from *args so autospec'd instances accept any call,
+     # as they did before class access returned a callable.
+     def __call__(self, /, *args, **kwargs):
+-        if not args:
+-            msg = "Cannot call @cachedmethod through the class without an instance"
+-            raise TypeError(msg)
+-        obj, *args = args
++        if args:
++            obj, *args = args
++        else:
++            obj = self.__pop_receiver(kwargs)
+         return self.__descriptor.__get__(obj)(*args, **kwargs)
+ 
++    def __pop_receiver(self, kwargs):
++        # the receiver may also be passed by keyword, as for a plain function
++        if self.__receiver is None:
++            import inspect
++
++            self.__receiver = ""
++            try:
++                param = next(iter(inspect.signature(self).parameters.values()))
++            except (ValueError, StopIteration):
++                pass  # no signature, or no parameters at all
++            else:
++                if param.kind is param.POSITIONAL_OR_KEYWORD:
++                    self.__receiver = param.name
++        try:
++            return kwargs.pop(self.__receiver)
++        except KeyError:
++            msg = "Cannot call @cachedmethod through the class without an instance"
++            raise TypeError(msg) from None
++
+ 
+ class _ClassMethodDescriptor(_MethodDescriptor):
+     """Descriptor base class supporting deprecated @classmethod use."""
+diff --git a/tests/test_cachedmethod.py b/tests/test_cachedmethod.py
+index 3d08e53..f1638a5 100644
+--- a/tests/test_cachedmethod.py
++++ b/tests/test_cachedmethod.py
+@@ -782,66 +782,101 @@ class NoneMethodTest(unittest.TestCase):
+ class UnboundMethodTest(unittest.TestCase):
+     def test_class_call(self):
+         cached = Cached(Cache(2))
+         self.assertEqual(Cached.get(cached, 1), 0)
+         self.assertEqual(cached.get(1), 0)
+         self.assertEqual(Cached.get(cached, 2), 1)
+         self.assertEqual(cached.get(2), 1)
+         self.assertEqual(cached.count, 2)
+         other = Cached(Cache(2), count=10)
+         self.assertEqual(Cached.get(other, 1), 10)
+         self.assertEqual(cached.get(1), 0)
+ 
+     def test_class_call_info(self):
+         cached = Cached(Cache(2))
+         self.assertEqual(Cached.get_info(cached, 1), 0)
+         self.assertEqual(cached.get_info(1), 0)
+         self.assertEqual(Cached.get_info(cached, 2), 1)
+         self.assertEqual(cached.get_info(2), 1)
+         self.assertEqual(cached.count, 2)
+         self.assertEqual(cached.get_info.cache_info(), (2, 2, 2, 2))
+         other = Cached(Cache(2), count=10)
+         self.assertEqual(Cached.get_info(other, 1), 10)
+         self.assertEqual(cached.get_info(1), 0)
+ 
+     def test_base_class_call(self):
+         cached = Unhashable(Cache(2))
+         self.assertEqual(Cached.get(cached, 1), 0)
+         self.assertEqual(cached.get(1), 0)
+         self.assertEqual(cached.count, 1)
+ 
+     def test_class_call_without_instance(self):
+         with self.assertRaises(TypeError):
+             Cached.get()  # type: ignore
+ 
++    def test_class_call_keyword_receiver(self):
++        cached = Cached(Cache(2))
++        self.assertEqual(Cached.get(self=cached, value=1), 0)  # type: ignore
++        self.assertEqual(Cached.get(cached, value=1), 0)
++        self.assertEqual(Cached.get(self=cached, value=2), 1)  # type: ignore
++        self.assertEqual(cached.count, 2)
++        with self.assertRaises(TypeError):
++            Cached.get(value=1)
++
++        class Named:
++            def __init__(self, cache):
++                self.cache = cache
++
++            @cachedmethod(lambda this: this.cache)
++            def get(this, value):
++                return value
++
++            @cachedmethod(lambda self: self.cache)
++            def get_posonly(self, /, value):
++                return value
++
++            @cachedmethod(lambda self: self.cache)  # type: ignore
++            def get_noargs():
++                return 42
++
++        named = Named(Cache(2))
++        self.assertEqual(Named.get(this=named, value=1), 1)  # type: ignore
++        self.assertEqual(Named.get(named, value=1), 1)
++        with self.assertRaises(TypeError):
++            Named.get(self=named, value=1)  # type: ignore
++        with self.assertRaises(TypeError):
++            Named.get_posonly(self=named, value=1)  # type: ignore
++        with self.assertRaises(TypeError):
++            Named.get_noargs()
++
+     def test_class_access_identity(self):
+         self.assertIs(Cached.get, Cached.get)
+         self.assertIs(Cached.get_info, Cached.get_info)
+         self.assertIs(Unhashable.get, Cached.get)
+         self.assertIsNot(Cached.get, Cached.get_info)
+ 
+     def test_wrapped_method(self):
+         cached = Cached(Cache(2))
+         self.assertIs(Cached.get.__wrapped__, cached.get.__wrapped__)
+         self.assertEqual(Cached.get.__name__, "get")
+         self.assertEqual(Cached.get.__qualname__, "Cached.get")
+         self.assertEqual(Cached.get.__wrapped__(cached, 1), 0)
+         self.assertEqual(Cached.get.__wrapped__(cached, 1), 1)
+         self.assertEqual(len(cached.cache), 0)
+ 
+     def test_autospec_no_warnings(self):
+         import unittest.mock
+ 
+         with warnings.catch_warnings(record=True) as w:
+             warnings.simplefilter("always")
+             unittest.mock.create_autospec(Cached, instance=True)
+         self.assertEqual(len(w), 0)
+ 
+     def test_autospec_call(self):
+         import unittest.mock
+ 
+         mock = unittest.mock.create_autospec(Cached, instance=True)
+         mock.get.return_value = 42
+         self.assertEqual(mock.get(1), 42)
+         mock.get.assert_called_with(1)
+         self.assertEqual(mock.get(value=1), 42)
+         mock.get.assert_called_with(value=1)
+
+
+======== W38 ========
+Project: mdformat (github.com/hukkin/mdformat)
+Commit: 062ad6d0e00b18942944c50857b949f2e19a07c1
+
+--- Message
+add: `--no-validate` option to skip AST safety check (#496)
+
+* fix(#50): add --no-validate
+
+* refactor: use `dest=validate`
+
+Co-authored-by: Taneli Hukkinen <3275109+hukkin@users.noreply.github.com>
+
+* refactor: finish renaming the stored value to validate
+
+* test: add patch to unit test
+
+* docs: add 'validate' to documentation
+
+* docs: re-generate help on Python 3.13.1
+
+* test: add valid configuration test
+
+* fix: allow override
+
+* Apply suggestions from code review
+
+Co-authored-by: Taneli Hukkinen <3275109+hukkin@users.noreply.github.com>
+
+* ci: apply formatting
+
+---------
+
+Co-authored-by: Taneli Hukkinen <3275109+hukkin@users.noreply.github.com>
+
+--- Files
+ README.md                        | 21 +++++++++++++--------
+ docs/users/configuration_file.md |  1 +
+ src/mdformat/_cli.py             | 23 +++++++++++++++++------
+ src/mdformat/_conf.py            |  4 ++++
+ tests/test_cli.py                | 13 +++++++++++++
+ tests/test_config_file.py        | 20 ++++++++++++++++++++
+ 6 files changed, 68 insertions(+), 14 deletions(-)
+
+--- Diff
+diff --git a/README.md b/README.md
+index a562a55..4682e1a 100644
+--- a/README.md
++++ b/README.md
+@@ -93,9 +93,10 @@ If a file is not properly formatted, the exit code will be non-zero.
+ 
+ ```console
+ foo@bar:~$ mdformat --help
+-usage: mdformat [-h] [--check] [--version] [--number] [--wrap {keep,no,INTEGER}]
+-                [--end-of-line {lf,crlf,keep}] [--exclude PATTERN]
+-                [--extensions EXTENSION] [--codeformatters LANGUAGE]
++usage: mdformat [-h] [--check] [--no-validate] [--version] [--number]
++                [--wrap {keep,no,INTEGER}] [--end-of-line {lf,crlf,keep}]
++                [--exclude PATTERN] [--extensions EXTENSION]
++                [--codeformatters LANGUAGE]
+                 [paths ...]
+ 
+ CommonMark compliant Markdown formatter
+@@ -106,19 +107,23 @@ positional arguments:
+ options:
+   -h, --help            show this help message and exit
+   --check               do not apply changes to files
++  --no-validate         do not validate that the rendered HTML is consistent
+   --version             show program's version number and exit
+   --number              apply consecutive numbering to ordered lists
+   --wrap {keep,no,INTEGER}
+                         paragraph word wrap mode (default: keep)
+   --end-of-line {lf,crlf,keep}
+                         output file line ending mode (default: lf)
+-  --exclude PATTERN     exclude files that match the Unix-style glob pattern (multiple allowed)
++  --exclude PATTERN     exclude files that match the Unix-style glob pattern
++                        (multiple allowed)
+   --extensions EXTENSION
+-                        require and enable an extension plugin (multiple allowed) (use
+-                        `--no-extensions` to disable) (default: all enabled)
++                        require and enable an extension plugin (multiple
++                        allowed) (use `--no-extensions` to disable) (default:
++                        all enabled)
+   --codeformatters LANGUAGE
+-                        require and enable a code formatter plugin (multiple allowed)
+-                        (use `--no-codeformatters` to disable) (default: all enabled)
++                        require and enable a code formatter plugin (multiple
++                        allowed) (use `--no-codeformatters` to disable)
++                        (default: all enabled)
+ ```
+ 
+ The `--exclude` option is only available on Python 3.13+.
+diff --git a/docs/users/configuration_file.md b/docs/users/configuration_file.md
+index 31dfc3b..d21dd2f 100644
+--- a/docs/users/configuration_file.md
++++ b/docs/users/configuration_file.md
+@@ -20,13 +20,14 @@ Command line interface arguments take precedence over the configuration file.
+ wrap = "keep"         # options: {"keep", "no", INTEGER}
+ number = false        # options: {false, true}
+ end_of_line = "lf"    # options: {"lf", "crlf", "keep"}
++validate = true       # options: {false, true}
+ # extensions = [      # options: a list of enabled extensions (default: all installed are enabled)
+ #     "gfm",
+ #     "toc",
+ # ]
+ # codeformatters = [  # options: a list of enabled code formatter languages (default: all installed are enabled)
+ #     "python",
+ #     "json",
+ # ]
+ 
+ # Python 3.13+ only:
+diff --git a/src/mdformat/_cli.py b/src/mdformat/_cli.py
+index 6f6744f..17c6632 100644
+--- a/src/mdformat/_cli.py
++++ b/src/mdformat/_cli.py
+@@ -25,149 +25,153 @@ class RendererWarningPrinter(logging.Handler):
+ def run(cli_args: Sequence[str]) -> int:  # noqa: C901
+     arg_parser = make_arg_parser(
+         mdformat.plugins._PARSER_EXTENSION_DISTS,
+         mdformat.plugins._CODEFORMATTER_DISTS,
+         mdformat.plugins.PARSER_EXTENSIONS,
+     )
+     cli_opts = {
+         k: v for k, v in vars(arg_parser.parse_args(cli_args)).items() if v is not None
+     }
+     cli_core_opts, cli_plugin_opts = separate_core_and_plugin_opts(cli_opts)
+ 
+     if not cli_opts["paths"]:
+         print_paragraphs(["No files have been passed in. Doing nothing."])
+         return 0
+ 
+     try:
+         file_paths = resolve_file_paths(cli_opts["paths"])
+     except InvalidPath as e:
+         arg_parser.error(f'File "{e.path}" does not exist.')
+ 
+     format_errors_found = False
+     renderer_warning_printer = RendererWarningPrinter()
+     for path in file_paths:
+         try:
+             toml_opts, toml_path = read_toml_opts(path.parent if path else Path.cwd())
+         except InvalidConfError as e:
+             print_error(str(e))
+             return 1
+ 
+         opts: Mapping = {**DEFAULT_OPTS, **toml_opts, **cli_core_opts}
+         for plugin_id, plugin_opts in cli_plugin_opts.items():
+             if plugin_id in opts["plugin"]:
+                 opts["plugin"][plugin_id] |= plugin_opts
+             else:
+                 opts["plugin"][plugin_id] = plugin_opts
+ 
+         if sys.version_info >= (3, 13):  # pragma: >=3.13 cover
+             if is_excluded(path, opts["exclude"], toml_path, "exclude" in cli_opts):
+                 continue
+         else:  # pragma: <3.13 cover
+             if "exclude" in toml_opts:
+                 print_error(
+                     "'exclude' patterns are only available on Python 3.13+.",
+                     paragraphs=[
+                         "Please remove the 'exclude' list from your .mdformat.toml"
+                         " or upgrade Python version."
+                     ],
+                 )
+                 return 1
+ 
+         try:
+             enabled_parserplugins = (
+                 mdformat.plugins.PARSER_EXTENSIONS
+                 if opts["extensions"] is None
+                 else {
+                     k: mdformat.plugins.PARSER_EXTENSIONS[k] for k in opts["extensions"]
+                 }
+             )
+         except KeyError as e:
+             print_error(
+                 "Invalid extension required.",
+                 paragraphs=[
+                     f"The required {e.args[0]!r} extension is not available. "
+                     "Please install a plugin that adds the extension, "
+                     "or remove it from required extensions."
+                 ],
+             )
+             return 1
+         try:
+             enabled_codeformatters = (
+                 mdformat.plugins.CODEFORMATTERS
+                 if opts["codeformatters"] is None
+                 else {
+                     k: mdformat.plugins.CODEFORMATTERS[k]
+                     for k in opts["codeformatters"]
+                 }
+             )
+         except KeyError as e:
+             print_error(
+                 "Invalid code formatter required.",
+                 paragraphs=[
+                     f"The required {e.args[0]!r} code formatter language "
+                     "is not available. "
+                     "Please install a plugin "
+                     "that adds support for the language, "
+                     "or remove it from required languages."
+                 ],
+             )
+             return 1
+         if path:
+             path_str = str(path)
+             # Unlike `path.read_text(encoding="utf-8")`, this preserves
+             # line ending type.
+             original_str = path.read_bytes().decode()
+         else:
+             path_str = "-"
+             original_str = sys.stdin.read()
+ 
+         formatted_str = mdformat.text(
+             original_str,
+             options=opts,
+             extensions=enabled_parserplugins,
+             codeformatters=enabled_codeformatters,
+             _first_pass_contextmanager=log_handler_applied(
+                 mdformat.renderer.LOGGER, renderer_warning_printer
+             ),
+             _filename=path_str,
+         )
+         newline = detect_newline_type(original_str, opts["end_of_line"])
+         formatted_str = formatted_str.replace("\n", newline)
+ 
+         if opts["check"]:
+             if formatted_str != original_str:
+                 format_errors_found = True
+                 print_error(f'File "{path_str}" is not formatted.')
+         else:
+             changes_ast = any(
+                 getattr(plugin, "CHANGES_AST", False)
+                 for plugin in enabled_parserplugins.values()
+             )
+-            if not changes_ast and not is_md_equal(
+-                original_str,
+-                formatted_str,
+-                options=opts,
+-                extensions=enabled_parserplugins,
+-                codeformatters=enabled_codeformatters,
++            if (
++                opts["validate"]
++                and not changes_ast
++                and not is_md_equal(
++                    original_str,
++                    formatted_str,
++                    options=opts,
++                    extensions=enabled_parserplugins,
++                    codeformatters=enabled_codeformatters,
++                )
+             ):
+                 print_error(
+                     f'Could not format "{path_str}".',
+                     paragraphs=[
+                         "Formatted Markdown renders to different HTML than input Markdown. "  # noqa: E501
+                         "This is a bug in mdformat or one of its installed plugins. "
+                         "Please retry without any plugins installed. "
+                         "If this error persists, "
+                         "report an issue including the input Markdown "
+                         "on https://github.com/hukkin/mdformat/issues. "
+                         "If not, "
+                         "report an issue on the malfunctioning plugin's issue tracker.",
+                     ],
+                 )
+                 return 1
+             if path:
+                 if formatted_str != original_str:
+                     path.write_bytes(formatted_str.encode())
+             else:
+                 sys.stdout.buffer.write(formatted_str.encode())
+     if format_errors_found:
+         return 1
+     return 0
+@@ -185,102 +189,109 @@ def validate_wrap_arg(value: str) -> str | int:
+ def make_arg_parser(
+     parser_extension_dists: Mapping[str, tuple[str, list[str]]],
+     codeformatter_dists: Mapping[str, tuple[str, list[str]]],
+     parser_extensions: Mapping[str, mdformat.plugins.ParserExtensionInterface],
+ ) -> argparse.ArgumentParser:
+     epilog = get_plugin_info_str(parser_extension_dists, codeformatter_dists)
+     parser = argparse.ArgumentParser(
+         description="CommonMark compliant Markdown formatter",
+         epilog=(epilog if epilog else None),
+         formatter_class=argparse.RawDescriptionHelpFormatter,
+     )
+     parser.add_argument("paths", nargs="*", help="files to format")
+     parser.add_argument(
+         "--check", action="store_true", help="do not apply changes to files"
+     )
++    parser.add_argument(
++        "--no-validate",
++        action="store_const",
++        const=False,
++        dest="validate",
++        help="do not validate that the rendered HTML is consistent",
++    )
+     version_str = f"mdformat {mdformat.__version__}"
+     plugin_version_str = get_plugin_version_str(
+         {**parser_extension_dists, **codeformatter_dists}
+     )
+     if plugin_version_str:
+         version_str += f" ({plugin_version_str})"
+     parser.add_argument("--version", action="version", version=version_str)
+     parser.add_argument(
+         "--number",
+         action="store_const",
+         const=True,
+         help="apply consecutive numbering to ordered lists",
+     )
+     parser.add_argument(
+         "--wrap",
+         type=validate_wrap_arg,
+         metavar="{keep,no,INTEGER}",
+         help="paragraph word wrap mode (default: keep)",
+     )
+     parser.add_argument(
+         "--end-of-line",
+         choices=("lf", "crlf", "keep"),
+         help="output file line ending mode (default: lf)",
+     )
+     if sys.version_info >= (3, 13):  # pragma: >=3.13 cover
+         parser.add_argument(
+             "--exclude",
+             action="append",
+             metavar="PATTERN",
+             help="exclude files that match the Unix-style glob pattern "
+             "(multiple allowed)",
+         )
+     extensions_group = parser.add_mutually_exclusive_group()
+     extensions_group.add_argument(
+         "--extensions",
+         action="append",
+         metavar="EXTENSION",
+         help="require and enable an extension plugin "
+         "(multiple allowed) "
+         "(use `--no-extensions` to disable) "
+         "(default: all enabled)",
+     )
+     extensions_group.add_argument(
+         "--no-extensions",
+         action="store_const",
+         const=(),
+         dest="extensions",
+         help=argparse.SUPPRESS,
+     )
+     codeformatters_group = parser.add_mutually_exclusive_group()
+     codeformatters_group.add_argument(
+         "--codeformatters",
+         action="append",
+         metavar="LANGUAGE",
+         help="require and enable a code formatter plugin "
+         "(multiple allowed) "
+         "(use `--no-codeformatters` to disable) "
+         "(default: all enabled)",
+     )
+     codeformatters_group.add_argument(
+         "--no-codeformatters",
+         action="store_const",
+         const=(),
+         dest="codeformatters",
+         help=argparse.SUPPRESS,
+     )
+     for plugin in parser_extensions.values():
+         if hasattr(plugin, "add_cli_options"):
+             import warnings
+ 
+             plugin_file, plugin_line = get_source_file_and_line(plugin)
+             warnings.warn_explicit(
+                 "`mdformat.plugins.ParserExtensionInterface.add_cli_options`"
+                 " is deprecated."
+                 " Please use `add_cli_argument_group`.",
+                 DeprecationWarning,
+                 filename=plugin_file,
+                 lineno=plugin_line,
+             )
+             plugin.add_cli_options(parser)
+     for plugin_id, plugin in parser_extensions.items():
+         if hasattr(plugin, "add_cli_argument_group"):
+             group = parser.add_argument_group(title=f"{plugin_id} plugin")
+             plugin.add_cli_argument_group(group)
+             for action in group._group_actions:
+                 action.dest = f"plugin.{plugin_id}.{action.dest}"
+     return parser
+diff --git a/src/mdformat/_conf.py b/src/mdformat/_conf.py
+index 132e99c..3642956 100644
+--- a/src/mdformat/_conf.py
++++ b/src/mdformat/_conf.py
+@@ -9,9 +9,10 @@ from mdformat._compat import tomllib
+ DEFAULT_OPTS = {
+     "wrap": "keep",
+     "number": False,
+     "end_of_line": "lf",
++    "validate": True,
+     "exclude": [],
+     "plugin": {},
+     "extensions": None,
+     "codeformatters": None,
+ }
+@@ -51,38 +52,41 @@ def read_toml_opts(conf_dir: Path) -> tuple[Mapping, Path | None]:
+ def _validate_values(opts: Mapping, conf_path: Path) -> None:  # noqa: C901
+     if "wrap" in opts:
+         wrap_value = opts["wrap"]
+         if not (
+             (isinstance(wrap_value, int) and wrap_value > 1)
+             or wrap_value in {"keep", "no"}
+         ):
+             raise InvalidConfError(f"Invalid 'wrap' value in {conf_path}")
+     if "end_of_line" in opts:
+         if opts["end_of_line"] not in {"crlf", "lf", "keep"}:
+             raise InvalidConfError(f"Invalid 'end_of_line' value in {conf_path}")
++    if "validate" in opts:
++        if not isinstance(opts["validate"], bool):
++            raise InvalidConfError(f"Invalid 'validate' value in {conf_path}")
+     if "number" in opts:
+         if not isinstance(opts["number"], bool):
+             raise InvalidConfError(f"Invalid 'number' value in {conf_path}")
+     if "exclude" in opts:  # pragma: >=3.13 cover
+         if not isinstance(opts["exclude"], list):
+             raise InvalidConfError(f"Invalid 'exclude' value in {conf_path}")
+         for pattern in opts["exclude"]:
+             if not isinstance(pattern, str):
+                 raise InvalidConfError(f"Invalid 'exclude' value in {conf_path}")
+     if "plugin" in opts:
+         if not isinstance(opts["plugin"], dict):
+             raise InvalidConfError(f"Invalid 'plugin' value in {conf_path}")
+         for plugin_conf in opts["plugin"].values():
+             if not isinstance(plugin_conf, dict):
+                 raise InvalidConfError(f"Invalid 'plugin' value in {conf_path}")
+     if "extensions" in opts:
+         if not isinstance(opts["extensions"], list):
+             raise InvalidConfError(f"Invalid 'extensions' value in {conf_path}")
+         for extension in opts["extensions"]:
+             if not isinstance(extension, str):
+                 raise InvalidConfError(f"Invalid 'extensions' value in {conf_path}")
+     if "codeformatters" in opts:
+         if not isinstance(opts["codeformatters"], list):
+             raise InvalidConfError(f"Invalid 'codeformatters' value in {conf_path}")
+         for lang in opts["codeformatters"]:
+             if not isinstance(lang, str):
+                 raise InvalidConfError(f"Invalid 'codeformatters' value in {conf_path}")
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index e4f3d3f..220b450 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -345,6 +345,19 @@ def test_eol__check_keep_crlf(tmp_path):
+     assert run((str(file_path), "--check", "--end-of-line=keep")) == 1
+ 
+ 
++def test_cli_no_validate(tmp_path):
++    file_path = tmp_path / "test.md"
++    content = "1. ordered"
++    file_path.write_text(content)
++
++    with patch("mdformat.renderer._context.get_list_marker_type", return_value="?"):
++        assert run((str(file_path),)) == 1
++        assert file_path.read_text() == content
++
++        assert run((str(file_path), "--no-validate")) == 0
++        assert file_path.read_text() == "1? ordered\n"
++
++
+ def test_get_plugin_info_str():
+     info = get_plugin_info_str(
+         {"mdformat-tables": ("0.1.0", ["tables"])},
+diff --git a/tests/test_config_file.py b/tests/test_config_file.py
+index 0c6ad02..4f5ec01 100644
+--- a/tests/test_config_file.py
++++ b/tests/test_config_file.py
+@@ -50,28 +50,29 @@ def test_invalid_conf_key(tmp_path, capsys):
+ def test_invalid_toml(tmp_path, capsys):
+     config_path = tmp_path / ".mdformat.toml"
+     config_path.write_text("]invalid TOML[")
+ 
+     file_path = tmp_path / "test_markdown.md"
+     file_path.write_text("some markdown\n")
+ 
+     assert run((str(file_path),)) == 1
+     captured = capsys.readouterr()
+     assert "Invalid TOML syntax" in captured.err
+ 
+ 
+ @pytest.mark.parametrize(
+     "conf_key, bad_conf",
+     [
+         ("wrap", "wrap = -3"),
+         ("end_of_line", "end_of_line = 'lol'"),
++        ("validate", "validate = 'off'"),
+         ("number", "number = 0"),
+         ("exclude", "exclude = '**'"),
+         ("exclude", "exclude = ['1',3]"),
+         ("plugin", "plugin = []"),
+         ("plugin", "plugin.gfm = {}\nplugin.myst = 1"),
+         ("codeformatters", "codeformatters = 'python'"),
+         ("extensions", "extensions = 'gfm'"),
+         ("codeformatters", "codeformatters = ['python', 1]"),
+         ("extensions", "extensions = ['gfm', 1]"),
+     ],
+ )
+@@ -149,3 +150,22 @@ def test_empty_exclude(tmp_path, capsys):
+ 
+     assert run((str(tmp_path),)) == 0
+     assert file1_path.read_text() == FORMATTED_MARKDOWN
++
++
++def test_conf_no_validate(tmp_path):
++    file_path = tmp_path / "file.md"
++    content = "1. ordered"
++    file_path.write_text(content)
++
++    with mock.patch(
++        "mdformat.renderer._context.get_list_marker_type",
++        return_value="?",
++    ):
++        assert run_with_clear_cache((str(file_path),)) == 1
++        assert file_path.read_text() == content
++
++        config_path = tmp_path / ".mdformat.toml"
++        config_path.write_text("validate = false")
++
++        assert run_with_clear_cache((str(file_path),)) == 0
++        assert file_path.read_text() == "1? ordered\n"
+
+
+======== W39 ========
+Project: cachetools (github.com/tkem/cachetools)
+Commit: 36d4e87f3fd6ec557323e150dcb40123312f2730
+
+--- Message
+Forward "pending" keyword argument in cached methods.
+
+Co-authored-by: Thomas Kemmer <tkemmer@computer.org>
+
+--- Files
+ src/cachetools/_cachedmethod.py |  2 +-
+ tests/test_cachedmethod.py      | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+--- Diff
+diff --git a/src/cachetools/_cachedmethod.py b/src/cachetools/_cachedmethod.py
+index 971a94f..665cf41 100644
+--- a/src/cachetools/_cachedmethod.py
++++ b/src/cachetools/_cachedmethod.py
+@@ -180,49 +180,49 @@ def _unlocked_info(method, cache, key, info):
+ def _condition(method, cache, key, lock, cond):
+     # backward-compatible weakref dictionary for Python >= 3.13
+     pending = weakref.WeakKeyDictionary()
+ 
+-    def wrapper(self, pending, *args, **kwargs):
++    def wrapper(self, pending, /, *args, **kwargs):
+         c = cache(self)
+         k = key(self, *args, **kwargs)
+         with lock(self):
+             cond(self).wait_for(lambda: k not in pending)
+             try:
+                 return c[k]
+             except KeyError:
+                 pending.add(k)
+         try:
+             v = method(self, *args, **kwargs)
+             with lock(self):
+                 try:
+                     c[k] = v
+                 except ValueError:
+                     pass  # value too large
+                 return v
+         finally:
+             with lock(self):
+                 pending.remove(k)
+                 cond(self).notify_all()
+ 
+     def cache_clear(self):
+         c = cache(self)
+         with lock(self):
+             c.clear()
+ 
+     def classmethod_wrapper(self, *args, **kwargs):
+         p = pending.setdefault(self, set())
+         return wrapper(self, p, *args, **kwargs)
+ 
+     class Descriptor(_ClassMethodDescriptor):
+         class Wrapper(_WrapperBase):
+             def __init__(self, obj):
+                 super().__init__(obj, method, cache, key, lock, cond)
+                 self.__pending = set()
+ 
+             def __call__(self, *args, **kwargs):
+                 return wrapper(self._obj, self.__pending, *args, **kwargs)
+ 
+             # objtype: backward-compatible @classmethod handling with Python < 3.13
+             def cache_clear(self, _objtype=None):
+                 return cache_clear(self._obj)
+ 
+     return Descriptor(classmethod_wrapper, cache_clear)
+diff --git a/tests/test_cachedmethod.py b/tests/test_cachedmethod.py
+index c02538f..3d08e53 100644
+--- a/tests/test_cachedmethod.py
++++ b/tests/test_cachedmethod.py
+@@ -529,183 +529,205 @@ class MethodDecoratorTestMixin(SimplifiedTestCaseProtocol):
+ class CacheMethodTest(unittest.TestCase, MethodDecoratorTestMixin):
+     def cache(self, minsize, **kwargs):
+         return Cache(maxsize=minsize, **kwargs)
+ 
+     def test_nospace(self):
+         cached = Cached(self.cache(0))
+ 
+         self.assertEqual(cached.get(0), 0)
+         self.assertEqual(cached.get(1), 1)
+         self.assertEqual(cached.get(1), 2)
+         self.assertEqual(cached.get(1.0), 3)
+         self.assertEqual(cached.get(1.0), 4)
+ 
+         self.assertEqual(cached.get_typed(0), 5)
+         self.assertEqual(cached.get_typed(1), 6)
+         self.assertEqual(cached.get_typed(1.0), 7)
+ 
+         self.assertEqual(cached.get_info(0), 8)
+         self.assertEqual(cached.get_info(1), 9)
+         self.assertEqual(cached.get_info(1.0), 10)
+ 
+     def test_lock_nospace(self):
+         cached = Cached(self.cache(0))
+ 
+         self.assertEqual(cached.get_lock(0), 0)
+         self.assertEqual(cached.lock.count, 2)
+         self.assertEqual(cached.get_lock(1), 1)
+         self.assertEqual(cached.lock.count, 4)
+         self.assertEqual(cached.get_lock(1), 2)
+         self.assertEqual(cached.lock.count, 6)
+         self.assertEqual(cached.get_lock(1.0), 3)
+         self.assertEqual(cached.lock.count, 8)
+         self.assertEqual(cached.get_lock(1.0), 4)
+         self.assertEqual(cached.lock.count, 10)
+ 
+         self.assertEqual(cached.get_lock_info(0), 5)
+         self.assertEqual(cached.lock.count, 12)
+         self.assertEqual(cached.get_lock_info(1), 6)
+         self.assertEqual(cached.lock.count, 14)
+         self.assertEqual(cached.get_lock_info(1.0), 7)
+         self.assertEqual(cached.lock.count, 16)
+ 
+     def test_cond_nospace(self):
+         cached = Cached(self.cache(0))
+ 
+         self.assertEqual(cached.get_cond(0), 0)
+         self.assertEqual(cached.cond.count, 3)
+         self.assertEqual(cached.cond.wait_count, 1)
+         self.assertEqual(cached.cond.notify_count, 1)
+         self.assertEqual(cached.get_cond(1), 1)
+         self.assertEqual(cached.cond.count, 6)
+         self.assertEqual(cached.cond.wait_count, 2)
+         self.assertEqual(cached.cond.notify_count, 2)
+         self.assertEqual(cached.get_cond(1), 2)
+         self.assertEqual(cached.cond.count, 9)
+         self.assertEqual(cached.cond.wait_count, 3)
+         self.assertEqual(cached.cond.notify_count, 3)
+         self.assertEqual(cached.get_cond(1.0), 3)
+         self.assertEqual(cached.cond.count, 12)
+         self.assertEqual(cached.cond.wait_count, 4)
+         self.assertEqual(cached.cond.notify_count, 4)
+         self.assertEqual(cached.get_cond(1.0), 4)
+         self.assertEqual(cached.cond.count, 15)
+         self.assertEqual(cached.cond.wait_count, 5)
+         self.assertEqual(cached.cond.notify_count, 5)
+ 
+         self.assertEqual(cached.get_cond_info(0), 5)
+         self.assertEqual(cached.cond.count, 18)
+         self.assertEqual(cached.cond.wait_count, 6)
+         self.assertEqual(cached.cond.notify_count, 6)
+         self.assertEqual(cached.get_cond_info(1), 6)
+         self.assertEqual(cached.cond.count, 21)
+         self.assertEqual(cached.cond.wait_count, 7)
+         self.assertEqual(cached.cond.notify_count, 7)
+         self.assertEqual(cached.get_cond(1.0), 7)
+         self.assertEqual(cached.cond.count, 24)
+         self.assertEqual(cached.cond.wait_count, 8)
+         self.assertEqual(cached.cond.notify_count, 8)
+ 
+     def test_shared_cache(self):
+         cache = self.cache(2)
+         cached1 = Cached(cache)
+         cached2 = Cached(cache)
+ 
+         self.assertEqual(cached1.get_info.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(cached2.get_info.cache_info(), (0, 0, 2, 0))
+ 
+         # hits/misses are counted by instance
+         self.assertEqual(cached1.get_info(0), 0)
+         self.assertEqual(cached1.get_info.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(cached2.get_info.cache_info(), (0, 0, 2, 1))
+ 
+         # default methodkey discards "self", so results will be shared
+         # across instances
+         self.assertEqual(cached2.get_info(0), 0)
+         self.assertEqual(cached1.get_info.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(cached2.get_info.cache_info(), (1, 0, 2, 1))
+         self.assertEqual(cached1.get_info(0), 0)
+         self.assertEqual(cached1.get_info.cache_info(), (1, 1, 2, 1))
+         self.assertEqual(cached2.get_info.cache_info(), (1, 0, 2, 1))
+         self.assertEqual(cached1.get_info(1), 1)
+         self.assertEqual(cached1.get_info.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(cached2.get_info.cache_info(), (1, 0, 2, 2))
+         self.assertEqual(cached2.get_info(1), 1)
+         self.assertEqual(cached1.get_info.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(cached2.get_info.cache_info(), (2, 0, 2, 2))
+ 
+     def test_value_too_large(self):
+         cache = self.cache(1, getsizeof=lambda x: x)
+         cached = Cached(cache)
+         self.assertEqual(cached.get(0), 0)
+         self.assertIn(0, cache.values())
+         self.assertEqual(cached.get(1), 1)
+         self.assertIn(1, cache.values())
+         self.assertEqual(cached.get(2), 2)
+         self.assertNotIn(2, cache.values())
+ 
+     def test_undecorated_override(self):
+         class Child(Cached):
+             def get_info(self, value):  # type: ignore
+                 return super().get_info(value) + 1
+ 
+         cache = self.cache(2)
+         cached = Child(cache)
+         self.assertEqual(cached.get_info(0), 1)
+         self.assertEqual(cached.get_info(0), 1)
+         self.assertEqual(super(Child, cached).get_info(0), 0)
+         self.assertEqual(cached.get_info(1), 2)
+         self.assertEqual(super(Child, cached).get_info(1), 1)
+         self.assertNotIn("get_info", vars(cached))
+         self.assertEqual(super(Child, cached).get_info.cache_info(), (3, 2, 2, 2))
+ 
+     def test_decorated_override(self):
+         class Child(Cached):
+             def __init__(self, base_cache, child_cache):
+                 super().__init__(base_cache)
+                 self.child_cache = child_cache
+ 
+             @cachedmethod(lambda self: self.child_cache, info=True)
+             def get_info(self, value):
+                 return super().get_info(value) + 1
+ 
+         cached = Child(self.cache(2), self.cache(2))
+         self.assertEqual(cached.get_info(0), 1)
+         self.assertEqual(cached.get_info(0), 1)
+         self.assertEqual(super(Child, cached).get_info(0), 0)
+         self.assertEqual(cached.get_info(1), 2)
+         self.assertEqual(super(Child, cached).get_info(1), 1)
+         self.assertIn("get_info", vars(cached))
+         self.assertEqual(cached.get_info.cache_info(), (1, 2, 2, 2))
+         self.assertEqual(super(Child, cached).get_info.cache_info(), (2, 2, 2, 2))
+         cached.get_info.cache_clear()
+         self.assertEqual(cached.get_info.cache_info(), (0, 0, 2, 0))
+         self.assertEqual(super(Child, cached).get_info.cache_info(), (2, 2, 2, 2))
+         self.assertEqual(cached.get_info(0), 1)
+         self.assertEqual(cached.get_info.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(super(Child, cached).get_info.cache_info(), (3, 2, 2, 2))
+         super(Child, cached).get_info.cache_clear()
+         self.assertEqual(cached.get_info.cache_info(), (0, 1, 2, 1))
+         self.assertEqual(super(Child, cached).get_info.cache_info(), (0, 0, 2, 0))
+ 
+     def test_multilevel_override(self):
+         class Child(Cached):
+             @cachedmethod(lambda self: self.cache, key=keys.typedmethodkey)
+             def get_typed(self, value):
+                 return super().get_typed(float(value)) + 1
+ 
+         class GrandChild(Child):
+             @cachedmethod(lambda self: self.cache, key=keys.typedmethodkey, info=True)
+             def get_typed(self, value):
+                 return super().get_typed(int(value)) + 1
+ 
+         cache = self.cache(5)  # shared cache, but different key types
+         cached = GrandChild(cache)
+         self.assertEqual(cached.get_typed("0"), 2)
+         self.assertEqual(cached.get_typed("0"), 2)
+         self.assertEqual(cached.get_typed.cache_info(), (1, 1, 5, 3))
+         self.assertEqual(super(GrandChild, cached).get_typed(0), 1)
+         self.assertEqual(super(Child, cached).get_typed(0.0), 0)
+ 
++    def test_cond_pending_keyword(self):
++        # Up until cachetools v7.2.4, @cachedmethod with condition and
++        # info=False raised a TypeError when the wrapped method
++        # received a valid "pending" keyword argument.
++        for info in (False, True):
++            with self.subTest(info=info):
++
++                class Pending(Cached):
++                    @cachedmethod(
++                        lambda obj: obj.cache,
++                        condition=lambda obj: obj.cond,
++                        info=info,
++                    )
++                    def get_pending(self, pending):
++                        return self.get(pending)
++
++                cached = Pending(self.cache(2))
++                self.assertEqual(cached.get_pending(pending=0), 0)
++                self.assertEqual(cached.get_pending(pending=0), 0)
++                cached.get_pending.cache_clear()
++                self.assertEqual(cached.get_pending(pending=0), 1)
++
+ 
+ class DictMethodTest(unittest.TestCase, MethodDecoratorTestMixin):
+     def cache(self, minsize, **_kwargs):
+
+
+======== W40 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: cc4ae0755098dfd52e0ee197c2099ef207079fbe
+
+--- Message
+Change version to 3.0.3
+
+* Allow uvx to be executed by tox
+* Adjust building semver section
+* Rework release procedure with uv
+* Add restview to `pyproject.toml`
+* Mention PEP 639 in `pyproject.toml`
+* Update Changelog
+* Extend `.readthedocs.yaml` with jobs
+
+--- Files
+ .readthedocs.yaml              |  12 +++++++++---
+ CHANGELOG.rst                  |  87 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ changelog.d/pr435.doc.rst      |   7 -------
+ changelog.d/pr436.doc.rst      |   3 ---
+ changelog.d/pr447.internal.rst |  15 ---------------
+ docs/build-semver.rst          |  53 +++++++++++------------------------------------------
+ docs/usage/semver-version.rst  |   2 +-
+ pyproject.toml                 |   6 ++++--
+ release-procedure.md           | 124 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------
+ src/semver/__about__.py        |   2 +-
+ tox.ini                        |   1 +
+ uv.lock                        |  29 ++++++++++++++++++++++++-----
+ 12 files changed, 210 insertions(+), 131 deletions(-)
+
+--- Diff
+diff --git a/.readthedocs.yaml b/.readthedocs.yaml
+index 33e3e3a..626c2a5 100644
+--- a/.readthedocs.yaml
++++ b/.readthedocs.yaml
+@@ -8,13 +8,19 @@ version: 2
+ # Set the version of Python and other tools you might need
+ build:
+   os: ubuntu-22.04
+   tools:
+     python: "3.11"
++  jobs:
++    pre_install:
++      # - curl -LsSf https://astral.sh/uv/install.sh | sh
++      - pip install uv
++      - uv export --only-group docs --no-hashes --no-color > requirements-docs.txt
++    post_install:
++      - pip install -r requirements-docs.txt
++    pre_build:
++      - make -C docs html
+ 
+ # Build documentation in the docs/ directory with Sphinx
+ sphinx:
+   configuration: docs/conf.py
+ 
+-python:
+-  install:
+-    - requirements: docs/requirements.txt
+diff --git a/CHANGELOG.rst b/CHANGELOG.rst
+index 2281f16..97a5f89 100644
+--- a/CHANGELOG.rst
++++ b/CHANGELOG.rst
+@@ -18,11 +18,96 @@ This section covers the changes between major version 2 and version 3.
+ 
+ .. towncrier release notes start
+ 
++Version 3.0.3
++=============
++
++:Released: 2025-01-18
++:Maintainer: Tom Schraitle
++
++
++Bug Fixes
++---------
++
++* :pr:`453`: The check in ``_comparator`` does not match the check in :meth:`Version.compare`. 
++  This breaks comparision with subclasses.
++
++
++
++Improved Documentation
++----------------------
++
++* :pr:`435`: Several small improvements for documentation:
++
++  * Add meta description to improve SEO
++  * Use canonicals on ReadTheDocs (commit 87f639f)
++  * Pin versions for reproducable doc builds (commit 03fb990)
++  * Add missing :file:`.readthedocs.yaml` file (commit ec9348a)
++  * Correct some smaller issues when building (commit f65feab)
++
++* :pr:`436`: Move search box more at the top. This makes it easier for
++  users as if the TOC is long, the search box isn't visible
++  anymore.
++
++
++
++Features
++--------
++
++* :pr:`439`: Improve type hints to fix TODOs
++
++
++
++Internal Changes
++----------------
++
++* :pr:`440`: Update workflow file
++
++* :pr:`446`: Add Python 3.13 to GitHub Actions
++
++* :pr:`447`: Modernize project configs with :file:`pyproject.toml` and
++  use Astral's uv command.
++
++  * In :file:`pyproject.toml`:
++
++    * Move all project related data from :file:`setup.cfg` to :file:`pyproject.toml`
++    * Use new dependency group from :pep:`735`
++    * Consolidate flake8, isort, pycodestyle with ruff
++    * Split towncrier config type "trivial" into "trivial" and "internal"
++
++  * Create config file for ruff (:file:`.ruff.toml`)
++  * Create config file for pytest (:file:`.pytest.ini`)
++  * Simplify :file:`tox.ini` and remove old stuff
++  * Document installation with new :command:`uv` command
++  * Simplify Sphinx config with :func:`find_version()`
++  * Update the authors
++  * Use :command:`uv` in GitHub Action :file:`python-testing.yml` workflow
++
++* Update :file:`release-procedure.md`.
++
++* :pr:`451`: Turn our Markdown issue templates into YAML
++
++
++Trivial Changes
++---------------
++
++* :pr:`438`: Replace organization placeholder in license
++
++* :pr:`445`: Improve private :func:`_nat_cmp` method:
++
++  * Remove obsolete else.
++  * Find a better way to identify digits without the :mod:`re` module.
++  * Fix docstring in :meth:`Version.compare`
++
++
++
++----
++
++
+ Version 3.0.2
+ =============
+ 
+ :Released: 2023-10-09
+-:Maintainer:
++:Maintainer: Tom Schraitle
+ 
+ 
+ Bug Fixes
+diff --git a/changelog.d/pr435.doc.rst b/changelog.d/pr435.doc.rst
+deleted file mode 100644
+index 87925c3..0000000
+--- a/changelog.d/pr435.doc.rst
++++ /dev/null
+@@ -1,7 +0,0 @@
+-Several small improvements for documentation:
+-
+-* Add meta description to improve SEO
+-* Use canonicals on ReadTheDocs (commit 87f639f)
+-* Pin versions for reproducable doc builds (commit 03fb990)
+-* Add missing :file:`.readthedocs.yaml` file (commit ec9348a)
+-* Correct some smaller issues when building (commit f65feab)
+diff --git a/changelog.d/pr436.doc.rst b/changelog.d/pr436.doc.rst
+deleted file mode 100644
+index 5f07836..0000000
+--- a/changelog.d/pr436.doc.rst
++++ /dev/null
+@@ -1,3 +0,0 @@
+-Move search box more at the top. This makes it easier for
+-users as if the TOC is long, the search box isn't visible
+-anymore.
+diff --git a/changelog.d/pr447.internal.rst b/changelog.d/pr447.internal.rst
+deleted file mode 100644
+index 2f1e367..0000000
+--- a/changelog.d/pr447.internal.rst
++++ /dev/null
+@@ -1,15 +0,0 @@
+-Modernize project configs with :file:`pyproject.toml`
+-
+-* In :file:`pyproject.toml`:
+-  * Move all project related data from :file:`setup.cfg` to :file:`pyproject.toml`
+-  * Use new dependency group from :pep:`735`
+-  * Consolidate flake8, isort, pycodestyle with ruff
+-  * Split towncrier config type "trivial" into "trivial" and
+-    "internal"
+-* Create config file for ruff (:file:`.ruff.toml`)
+-* Create config file for pytest (:file:`.pytest.ini`)
+-* Simplify :file:`tox.ini` and remove old stuff
+-* Document installation with new :command:`uv` command
+-* Simplify Sphinx config with :func:`find_version()`
+-* Update the authors
+-* Use :command:`uv` in GitHub Action :file:`python-testing.yml` workflow
+diff --git a/docs/build-semver.rst b/docs/build-semver.rst
+index b5626d2..9c0441d 100644
+--- a/docs/build-semver.rst
++++ b/docs/build-semver.rst
+@@ -3,62 +3,31 @@
+ Building semver
+ ===============
+ 
+ .. meta::
+    :description lang=en:
+       Building semver
+ 
+-.. _PEP 517: https://www.python.org/dev/peps/pep-0517/
+-.. _PEP 621: https://www.python.org/dev/peps/pep-0621/
+-.. _A Practical Guide to Setuptools and Pyproject.toml: https://godatadriven.com/blog/a-practical-guide-to-setuptools-and-pyproject-toml/
+-.. _Declarative config: https://setuptools.rtfd.io/en/latest/userguide/declarative_config.html
++.. _Installing uv: https://docs.astral.sh/uv/getting-started/installation/
+ 
+ 
+-This project changed slightly its way how it is built. The reason for this
+-was to still support the "traditional" way with :command:`setup.py`,
+-but at the same time try out the newer way with :file:`pyproject.toml`.
+-As Python 3.6 got deprecated, this project does support from now on only
+-:file:`pyproject.toml`.
++This project changed its way how it is built over time. We used to have
++a :file:`setup.py` file, but switched to a :file:`pyproject.toml` setup.
+ 
++The build process is managed by :command:`uv` command.
+ 
+-Background information
+-----------------------
++You need:
+ 
+-Skip this section and head over to :ref:`build-pyproject-build` if you just
+-want to know how to build semver.
+-This section gives some background information how this project is set up.
++* Python 3.7 or newer.
+ 
+-The traditional way with :command:`setup.py` in this project uses a
+-`Declarative config`_. With this approach, the :command:`setup.py` is
+-stripped down to its bare minimum and all the metadata is stored in
+-:file:`setup.cfg`.
++* The :mod:`setuptools` module version 61 or newer which is used as
++  a build backend.
+ 
+-The new :file:`pyproject.toml` contains only information about the build backend, currently setuptools.build_meta. The idea is taken from
+-`A Practical Guide to Setuptools and Pyproject.toml`_.
+-Setuptools-specific configuration keys as defined in `PEP 621`_ are currently
+-not used.
++* The command :command:`uv` from Astral. Refer to the section
++  `Installing uv`_  for more information.
+ 
+ 
+-.. _build-pyproject-build:
+-
+-Building with pyproject-build
+------------------------------
+-
+-To build semver you need:
+-
+-* The :mod:`build` module which implements the `PEP 517`_ build
+-  frontend.
+-  Install it with::
+-
+-        pip install build
+-
+-  Some Linux distributions has already packaged it. If you prefer
+-  to use the module with your package manager, search for
+-  :file:`python-build` or :file:`python3-build` and install it.
+-
+-* The command :command:`pyproject-build` from the :mod:`build` module.
+-
+ To build semver, run::
+ 
+-    pyproject-build
++    uv build
+ 
+ After the command is finished, you can find two files in the :file:`dist` folder: a ``.tar.gz`` and a ``.whl`` file.
+\ No newline at end of file
+diff --git a/docs/usage/semver-version.rst b/docs/usage/semver-version.rst
+index 5116529..df04a74 100644
+--- a/docs/usage/semver-version.rst
++++ b/docs/usage/semver-version.rst
+@@ -4,4 +4,4 @@ Getting the Version of semver
+ To know the version of semver itself, use the following construct::
+ 
+    >>> semver.__version__
+-   '3.0.3-alpha.1'
++   '3.0.3'
+diff --git a/pyproject.toml b/pyproject.toml
+index 6c9cb93..3398628 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -7,7 +7,6 @@
+ 
+ [build-system]
+ requires = [
+-  # sync with setup.py until we discard non-pep-517/518
+   "setuptools>=61",
+   # "setuptools-scm>=8",
+ ]
+@@ -19,6 +18,8 @@ requires-python = ">=3.7"
+ name = "semver"
+ description = "Python helper for Semantic Versioning (https://semver.org)"
+ readme = "README.rst"
++# PEP 639
++# licence = "BSD-2-Clause"
+ # readme.content-type = "text/x-rst"
+ license = { file = "LICENSE.txt" }
+ authors = [
+@@ -33,21 +34,21 @@ dynamic = ["version",]
+ classifiers = [
+     "Environment :: Web Environment",
+     "Intended Audience :: Developers",
+     "Development Status :: 5 - Production/Stable",
+-    "License :: OSI Approved :: BSD License",
++    # "License :: OSI Approved :: BSD License",
+     "Operating System :: OS Independent",
+     "Programming Language :: Python :: 3",
+     "Programming Language :: Python :: 3.7",
+     "Programming Language :: Python :: 3.8",
+     "Programming Language :: Python :: 3.9",
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
+     "Programming Language :: Python :: 3.13",
+     "Programming Language :: Python :: 3.14",
+     "Topic :: Software Development :: Libraries :: Python Modules",
+ ]
+ 
+ 
+ [project.urls]
+ "GitHub Homepage" = "https://github.com/python-semver/python-semver"
+@@ -88,10 +89,11 @@ changelog = [
+   "towncrier",
+ ]
+ docs = [
+   # Required in .readthedocs.yaml
+   "sphinx",  # ==7.0.1
+   "sphinx-argparse",  # ==0.4.0
+   "sphinx-autodoc-typehints",  # ==1.24.0
++  "restview",
+ ]
+ devel = [
+   {include-group = "typing"},
+diff --git a/release-procedure.md b/release-procedure.md
+index 4225bfd..f6c7c37 100644
+--- a/release-procedure.md
++++ b/release-procedure.md
+@@ -3,120 +3,142 @@
+ The following procedures gives a short overview of what steps are needed to
+ create a new release.
+ 
+-## Prepare the Release
++## Prepare your environment
+ 
+-1. Verify:
++1. Create your API tokens:
+ 
+-   * all issues for a new release are closed: <https://github.com/python-semver/python-semver/issues>.
++   1. From the [PyPI test server](https://test.pypi.org/manage/account/token/).
+ 
+-   * that all pull requests that should be included in this release are merged: <https://github.com/python-semver/python-semver/pulls>.
++   1. From the official [PyPI server](https://test.pypi.org/manage/account/token/).
+ 
+-   * that continuous integration for latest build was passing:
+-     <https://github.com/python-semver/python-semver/actions>.
++   1. Save both tokens it in a safe place like your password manager.
++
++1. Create a file `~/.pypirc` with file mode 0600 and the following minimal content:
++
++       # Protect the file with chmod 0600 ~/.pypirc
++       [distutils]
++       index-servers =
++            test-semver
++            semver
++
++       [test-semver]
++       repository = https://test.pypi.org/legacy/
++       username = __token__
++       password = <YOUR_TEST_API_TOKEN>
++
++       [semver]
++       repository = https://pypi.org/legacy/
++       username = __token__
++       password = <YOUR_API_TOKEN>
++
++1. Install uv as shown in Astral's [Installing uv](https://docs.astral.sh/uv/getting-started/installation/) documentation.
++
++1. Update the project's environment:
++
++       uv sync --group devel
++
++1. Activate your environment:
++
++       source .venv/bin/activate
++
++## Prepare the Release
+ 
+ 1. Create a new branch `release/<VERSION>`.
+ 
+-1. If one or several supported Python versions have been removed or added, verify that the 3 following files have been updated:
+-   * `setup.cfg`
++1. If one or several supported **Python** versions have been removed or added, verify that the following files have been updated:
++   * `pyproject.toml` (look into the key `project.requires-python` and `project.classifiers`)
+    * `tox.ini`
+    * `.git/workflows/pythonpackage.yml`
+    * `CITATION.cff`
+ 
+-1. Verify that the version has been updated and follow
+-   <https://semver.org>:
++1. Verify that:
++
++   * the version has been updated and follow <https://semver.org>:
++        * `src/semver/__about__.py`
++        * `docs/usage/semver-version.rst`
++
++   * all issues for a new release are closed: <https://github.com/python-semver/python-semver/issues>.
+ 
+-   * `src/semver/__about__.py`
+-   * `docs/usage/semver-version.rst`
++   * all pull requests that should be included in this release are merged: <https://github.com/python-semver/python-semver/pulls>.
++
++   * continuous integration for latest build was passing:
++     <https://github.com/python-semver/python-semver/actions>.
+ 
+ 1. Add eventually new contributor(s) to [CONTRIBUTORS](https://github.com/python-semver/python-semver/blob/master/CONTRIBUTORS).
+ 
++1. Create the changelog:
+ 
+-1. Check if all changelog entries are created. If some are missing, [create them](https://python-semver.readthedocs.io/en/latest/development.html#adding-a-changelog-entry).
++    1. Check if all changelog entries are created. If some are missing, [create them](https://python-semver.readthedocs.io/en/latest/development.html#adding-a-changelog-entry).
+ 
+-1. Show the new draft [CHANGELOG](https://github.com/python-semver/python-semver/blob/master/CHANGELOG.rst) entry for the latest release with:
++    1. Show the new draft [CHANGELOG](https://github.com/python-semver/python-semver/blob/master/CHANGELOG.rst) entry for the latest release with:
+ 
+-       $ tox -e changelog
++           uvx tox r -e changelog
+ 
+-   Check the output. If you are not happy, update the files in the
+-   `changelog.d/` directory.
+-   If everything is okay, build the new `CHANGELOG` with:
++    1. Check the output. If you are not happy, update the files in the
++    `changelog.d/` directory.
++    If everything is okay, build the new `CHANGELOG` with:
+ 
+-       $ tox -e changelog -- build
++           uvx tox r -e changelog -- build
+ 
+ 1. Build the documentation and check the output:
+ 
+-       $ tox -e docs
++       uvx tox r -e docs
+ 
+ 1. Commit all changes, push, and create a pull request.
+ 
+ 
+ ## Create the New Release
+ 
+-1. Ensure that long description ([README.rst](https://github.com/python-semver/python-semver/blob/master/README.rst)) can be correctly rendered by Pypi using `restview --long-description`
++1. Ensure that long description ([README.rst](https://github.com/python-semver/python-semver/blob/master/README.rst)) can be correctly rendered by Pypi using `uvx restview -b README.rst`
+ 
+ 1. Clean up your local Git repository. Be careful,
+    as it **will remove all files** which are not
+    versioned by Git:
+ 
+-       $ git clean -xfd
++       git clean -xfd
+ 
+    Before you create your distribution files, clean
+    the directory too:
+ 
+-       $ rm dist/*
++       rm dist/*
+ 
+ 1. Create the distribution files (wheel and source):
+ 
+-       $ tox -e prepare-dist
++       uvx tox r -e prepare-dist
+ 
+ 1. Upload the wheel and source to TestPyPI first:
+ 
+-    ```bash    
+-    $ twine upload --repository-url https://test.pypi.org/legacy/  dist/*
+-    ```
++       twine upload --verbose --repository test-semver dist/*
+ 
+-   If you have a `~/.pypirc` with a `testpypi` section, the upload can be
+-   simplified:
+-
+-       $ twine upload --repository testpypi dist/*
++   (Normally you would do it with `uv publish`, but for some unknown reason it didn't work for me.)
+ 
+ 1. Check if everything is okay with the wheel.
+    Check also the web site `https://test.pypi.org/project/<VERSION>/`
+ 
++# Finish the release
++
+ 1. If everything looks fine, merge the pull request.
+ 
+ 1. Upload to PyPI:
+ 
+-    ```bash
+-    $ git clean -xfd
+-    $ tox -e prepare-dist
+-    $ twine upload dist/*
+-    ```
++       $ git clean -xfd
++       $ tox r -e prepare-dist
++       $ twine upload --verbose --repository semver dist/*
+ 
+ 1. Go to https://pypi.org/project/semver/ to verify that new version is online and the page is rendered correctly.
+ 
+-# Finish the release
+-
+ 1. Create a tag:
+ 
+-    ```bash
+-    $ git tag -a x.y.z
+-    ```
++       git tag -a x.y.z
+ 
+-   It's recommended to use the generated Tox output
+-   from the Changelog.
++   It's recommended to use the generated Tox output from the Changelog.
+ 
+ 1. Push the tag:
+ 
+-    ```bash
+-    $ git push origin x.y.z
+-    ```
++       git push origin x.y.z
+ 
+-1. In [GitHub Release page](https://github.com/python-semver/python-semver/release)
+-   document the new release.
+-   Select the tag from the last step and copy the
+-   content of the tag description into the release
+-   description.
++1. In [GitHub Release page](https://github.com/python-semver/python-semver/release) document the new release.
++   Select the tag from the last step and copy the content of the tag description into the release description.
+ 
+ 1. Announce it in <https://github.com/python-semver/python-semver/discussions/categories/announcements>.
+ 
+diff --git a/src/semver/__about__.py b/src/semver/__about__.py
+index 697372f..d971e03 100644
+--- a/src/semver/__about__.py
++++ b/src/semver/__about__.py
+@@ -16,7 +16,7 @@ of the semver specifictation, author, maintainers, and description.
+ """
+ 
+ #: Semver version
+-__version__ = "3.0.3-alpha.1"
++__version__ = "3.0.3"
+ 
+ #: Original semver author
+ __author__ = "Kostiantyn Rybnikov"
+diff --git a/tox.ini b/tox.ini
+index 74918c4..5c9db17 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -63,6 +63,7 @@ skip_install = true
+ allowlist_externals =
+     make
+     echo
++    uvx
+ commands =
+     uvx make -C docs html
+ commands_post =
+
+
+======== W41 ========
+Project: python-semver (github.com/python-semver/python-semver)
+Commit: 9f6894daaf62d55fc37cece10948e7e1cc3dc369
+
+--- Message
+Fix Version subscripts to honor __index__ (#508)
+
+Use `operator.index` for direct indices and slice bounds so Version
+subscripts accept objects implementing Python's integer index protocol.
+
+--- Files
+ changelog.d/pr508.bugfix.rst |  2 ++
+ src/semver/version.py        | 21 ++++++++++++---------
+ tests/test_index.py          | 22 ++++++++++++++++++++++
+ 3 files changed, 36 insertions(+), 9 deletions(-)
+
+--- Diff
+diff --git a/changelog.d/pr508.bugfix.rst b/changelog.d/pr508.bugfix.rst
+new file mode 100644
+index 0000000..bf98475
+--- /dev/null
++++ b/changelog.d/pr508.bugfix.rst
+@@ -0,0 +1,2 @@
++``Version`` subscripts now accept objects implementing ``__index__`` and raise
++``TypeError`` for invalid key types.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index c3e5a73..0b5f2f2 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -1,20 +1,22 @@
+ """Version handling by a semver compatible version class."""
+ 
++import operator
+ import re
+ from functools import wraps
+ from typing import (
+     Any,
+     ClassVar,
+     Dict,
+     Iterable,
+     Optional,
+     Pattern,
+     SupportsInt,
++    SupportsIndex,
+     Tuple,
+     Union,
+     cast,
+     Callable,
+     Collection,
+     Type,
+     TypeVar,
+ )
+@@ -433,324 +435,325 @@ class Version:
+         >>> ver = semver.Version.parse("3.4.5-rc.1+build.9")
+         >>> ver.bump_build()
+         Version(major=3, minor=4, patch=5, prerelease='rc.1', \
+ build='build.10')
+         >>> str(semver.Version.parse("3.4.5-rc.1+alpha").bump_build())
+         '3.4.5-rc.1+alpha.0'
+         """
+         cls = type(self)
+         if self._build is not None:
+             build = self._build
+         elif token == "":
+             build = "0"
+         elif token is None:
+             build = "build.0"
+         else:
+             token = str(token)
+             cls._validate_identifiers(token, cls._BUILD_IDENTIFIER, "build token")
+             build = token + ".0"
+ 
+         build = cls._increment_string(build)
+         if build == self._build:
+             # _increment_string leaves a build without any digits
+             # unchanged. Raise it nevertheless by appending ".0",
+             # analogous to _increment_prerelease (see :gh:`460`).
+             build += ".0"
+         return cls(self._major, self._minor, self._patch, self._prerelease, build)
+ 
+     def compare(self, other: Comparable) -> int:
+         """
+         Compare self with other.
+ 
+         :param other: the second version
+         :return: The return value is negative if ver1 < ver2,
+              zero if ver1 == ver2 and strictly positive if ver1 > ver2
+ 
+         >>> Version.parse("1.0.0").compare("2.0.0")
+         -1
+         >>> Version.parse("2.0.0").compare("1.0.0")
+         1
+         >>> Version.parse("2.0.0").compare("2.0.0")
+         0
+         """
+         cls = type(self)
+         if isinstance(other, String.__args__):  # type: ignore
+             other = cls.parse(other)
+         elif isinstance(other, dict):
+             other = cls(**other)
+         elif isinstance(other, (tuple, list)):
+             other = cls(*other)
+         elif not isinstance(other, cls):
+             raise TypeError(
+                 f"Expected str, bytes, dict, tuple, list, or {cls.__name__} instance, "
+                 f"but got {type(other)}"
+             )
+ 
+         v1 = self.to_tuple()[:3]
+         v2 = other.to_tuple()[:3]
+         x = _cmp(v1, v2)
+         if x:
+             return x
+ 
+         rc1, rc2 = self.prerelease, other.prerelease
+         rccmp = self._nat_cmp(rc1, rc2)
+ 
+         if not rccmp:
+             return 0
+         if not rc1:
+             return 1
+         elif not rc2:
+             return -1
+ 
+         return rccmp
+ 
+     def next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
+         """
+         Determines next version, preserving natural order.
+ 
+         .. versionadded:: 2.10.0
+ 
+         This function is taking prereleases into account.
+         The "major", "minor", and "patch" raises the respective parts like
+         the ``bump_*`` functions. The real difference is using the
+         "prerelease" part. It gives you the next patch version of the
+         prerelease, for example:
+ 
+         >>> str(semver.Version.parse("0.1.4").next_version("prerelease"))
+         '0.1.5-rc.1'
+ 
+         Switching to an earlier prerelease token advances the patch version
+         so the result remains greater than the original version:
+ 
+         >>> str(semver.Version.parse("1.2.3-rc.1").next_version("prerelease", "alpha"))
+         '1.2.4-alpha.1'
+ 
+         Old-style counters also advance the patch version if incrementing
+         the counter would move backwards under SemVer's lexical ordering:
+ 
+         >>> str(semver.Version.parse("1.2.3-rc9").next_version("prerelease"))
+         '1.2.4-rc10'
+ 
+         :param part: One of "major", "minor", "patch", or "prerelease"
+         :param prerelease_token: prefix string of prerelease, defaults to 'rc'
+         :return: new object with the appropriate part raised
+         """
+         cls = type(self)
+         # "build" is currently not used, that's why we use [:-1]
+         validparts = cls.NAMES[:-1]
+         if part not in validparts:
+             raise ValueError(
+                 f"Invalid part. Expected one of {validparts}, but got {part!r}"
+             )
+         version = self
+         if version.prerelease and (
+             part == "patch"
+             or (part == "minor" and version.patch == 0)
+             or (part == "major" and version.minor == version.patch == 0)
+         ):
+             return version.replace(prerelease=None, build=None)
+ 
+         # Only check the main parts:
+         if part in cls.NAMES[:3]:
+             return getattr(version, "bump_" + part)()
+         else:
+             if version.prerelease and prerelease_token:
+                 prerelease_token = str(prerelease_token)
+                 cls._validate_identifiers(
+                     prerelease_token,
+                     cls._PRERELEASE_IDENTIFIER,
+                     "prerelease token",
+                 )
+                 # Handle old-style prereleases like "rc3" (no dot separator)
+                 match = re.fullmatch(
+                     rf"{re.escape(prerelease_token)}(\d+)", version.prerelease
+                 )
+                 if match:
+                     num = int(match.group(1))
+                     candidate = version.replace(
+                         prerelease=f"{prerelease_token}{num + 1}", build=None
+                     )
+                     if candidate > version:
+                         return candidate
+                     return candidate.bump_patch().replace(
+                         prerelease=candidate.prerelease
+                     )
+ 
+                 if not (
+                     version.prerelease == prerelease_token
+                     or version.prerelease.startswith(prerelease_token + ".")
+                 ):
+                     candidate = version.replace(
+                         prerelease=f"{prerelease_token}.1", build=None
+                     )
+                     if candidate > version:
+                         return candidate
+                     return version.bump_patch().bump_prerelease(prerelease_token)
+             return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+ 
+     @_comparator
+     def __eq__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) == 0
+ 
+     @_comparator
+     def __ne__(self, other: Comparable) -> bool:  # type: ignore
+         return self.compare(other) != 0
+ 
+     @_comparator
+     def __lt__(self, other: Comparable) -> bool:
+         return self.compare(other) < 0
+ 
+     @_comparator
+     def __le__(self, other: Comparable) -> bool:
+         return self.compare(other) <= 0
+ 
+     @_comparator
+     def __gt__(self, other: Comparable) -> bool:
+         return self.compare(other) > 0
+ 
+     @_comparator
+     def __ge__(self, other: Comparable) -> bool:
+         return self.compare(other) >= 0
+ 
+     def __getitem__(
+-        self, index: Union[int, slice]
++        self, index: Union[SupportsIndex, slice]
+     ) -> Union[int, Optional[str], Tuple[Union[int, str], ...]]:
+         """
+         self.__getitem__(index) <==> self[index] Implement getitem.
+ 
+         If the part  requested is undefined, or a part of the range requested
+         is undefined, it will throw an index error.
+         Negative indices are not supported.
+ 
+         :param index: a positive integer indicating the
+                offset or a :func:`slice` object
+         :raises IndexError: if index is beyond the range or a part is None
+         :return: the requested part of the version at position index
+ 
+         >>> ver = semver.Version.parse("3.4.5")
+         >>> ver[0], ver[1], ver[2]
+         (3, 4, 5)
+         """
+-        if isinstance(index, int):
+-            index = slice(index, index + 1)
+-        index = cast(slice, index)
++        if isinstance(index, slice):
++            start = None if index.start is None else operator.index(index.start)
++            stop = None if index.stop is None else operator.index(index.stop)
++            index = slice(start, stop, index.step)
++        else:
++            start = operator.index(index)
++            stop = start + 1
++            index = slice(start, stop)
+ 
+-        if (
+-            isinstance(index, slice)
+-            and (index.start is not None and index.start < 0)
+-            or (index.stop is not None and index.stop < 0)
+-        ):
++        if (start is not None and start < 0) or (stop is not None and stop < 0):
+             raise IndexError("Version index cannot be negative")
+ 
+         part = tuple(
+             filter(lambda p: p is not None, cast(Iterable, self.to_tuple()[index]))
+         )
+ 
+         if len(part) == 1:
+             return part[0]
+         elif not part:
+             raise IndexError("Version part undefined")
+         return part
+ 
+     def __repr__(self) -> str:
+         s = ", ".join("%s=%r" % (key, val) for key, val in self.to_dict().items())
+         return "%s(%s)" % (type(self).__name__, s)
+ 
+     def __str__(self) -> str:
+         version = "%d.%d.%d" % (self.major, self.minor, self.patch)
+         if self.prerelease:
+             version += "-%s" % self.prerelease
+         if self.build:
+             version += "+%s" % self.build
+         return version
+ 
+     def __hash__(self) -> int:
+         return hash(self.to_tuple()[:4])
+ 
+     def finalize_version(self) -> "Version":
+         """
+         Remove any prerelease and build metadata from the version.
+ 
+         :return: a new instance with the finalized version string
+ 
+         >>> str(semver.Version.parse('1.2.3-rc.5').finalize_version())
+         '1.2.3'
+         """
+         cls = type(self)
+         return cls(self.major, self.minor, self.patch)
+ 
+     def match(self, match_expr: str) -> bool:
+         """
+         Compare self to match a match expression.
+ 
+         :param match_expr: optional operator and version; valid operators are
+               ``<``   smaller than
+               ``>``   greater than
+               ``>=``  greator or equal than
+               ``<=``  smaller or equal than
+               ``==``  equal
+               ``!=``  not equal
+         :return: True if the expression matches the version, otherwise False
+ 
+         >>> semver.Version.parse("2.0.0").match(">=1.0.0")
+         True
+         >>> semver.Version.parse("1.0.0").match(">1.0.0")
+         False
+         >>> semver.Version.parse("4.0.4").match("4.0.4")
+         True
+         """
+         prefix = match_expr[:2]
+         if prefix in (">=", "<=", "==", "!="):
+             match_version = match_expr[2:]
+         elif prefix and prefix[0] in (">", "<"):
+             prefix = prefix[0]
+             match_version = match_expr[1:]
+         elif match_expr and match_expr[0] in "0123456789":
+             prefix = "=="
+             match_version = match_expr
+         else:
+             raise ValueError(
+                 "match_expr parameter should be in format <op><ver>, "
+                 "where <op> is one of "
+                 "['<', '>', '==', '<=', '>=', '!=']. "
+                 "You provided: %r" % match_expr
+             )
+ 
+         possibilities_dict = {
+             ">": (1,),
+             "<": (-1,),
+             "==": (0,),
+             "!=": (-1, 1),
+             ">=": (0, 1),
+             "<=": (-1, 0),
+         }
+ 
+         possibilities = possibilities_dict[prefix]
+         cmp_res = self.compare(match_version)
+ 
+         return cmp_res in possibilities
+ 
+     @classmethod
+     def parse(
+         cls: Type[T], version: String, optional_minor_and_patch: bool = False
+     ) -> T:
+         """
+         Parse version string to a Version instance.
+ 
+         .. versionchanged:: 2.11.0
+            Changed method from static to classmethod to
+            allow subclasses.
+         .. versionchanged:: 3.0.0
+            Added optional parameter ``optional_minor_and_patch`` to allow
+            optional minor and patch parts.
+ 
+         :param version: version string
+         :param optional_minor_and_patch: if set to true, the version string to parse \
+            can contain optional minor and patch parts. Optional parts are set to zero.
+            By default (False), the version string to parse has to follow the semver
+            specification.
+         :return: a new :class:`Version` instance
+         :raises ValueError: if version is invalid
+         :raises TypeError: if version contains the wrong type
+ 
+         >>> semver.Version.parse('3.4.5-pre.2+build.4')
+         Version(major=3, minor=4, patch=5, \
+diff --git a/tests/test_index.py b/tests/test_index.py
+index 79e4502..d053b30 100644
+--- a/tests/test_index.py
++++ b/tests/test_index.py
+@@ -93,3 +93,25 @@ def test_version_info_should_throw_index_error_when_negative_index(version, inde
+     version_info = Version.parse(version)
+     with pytest.raises(IndexError, match=r"Version index cannot be negative"):
+         version_info[index]
++
++
++class Index:
++    def __init__(self, value):
++        self.value = value
++
++    def __index__(self):
++        return self.value
++
++
++def test_version_accepts_index_protocol():
++    version = Version.parse("1.2.3")
++    assert version[Index(1)] == 2
++    assert version[Index(0):Index(2)] == (1, 2)
++    with pytest.raises(IndexError):
++        version[Index(-1)]
++
++
++@pytest.mark.parametrize("key", [None, "1", 1.0])
++def test_invalid_version_index_type(key):
++    with pytest.raises(TypeError):
++        Version.parse("1.2.3")[key]

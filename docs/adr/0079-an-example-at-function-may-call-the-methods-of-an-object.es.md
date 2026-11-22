@@ -1,7 +1,7 @@
-<!-- translation-of: 0079-an-example-at-function-may-call-the-methods-of-an-object.md sha256:6f36e810681127e3 -->
+<!-- translation-of: 0079-an-example-at-function-may-call-the-methods-of-an-object.md sha256:977a7c1fdec06ea1 -->
 # ADR-0079 · Un ejemplo en function puede llamar a los métodos de un objeto
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

@@ -49,7 +49,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.md) | A milestone may open an increment of a later module | Accepted |
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.md) | A contract is read by strict rules of its own, and every problem is reported | Accepted |
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.md) | Directives in a contract are marked with a dollar sign | Accepted, amended by 0039 |
-| [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted |
+| [0039](0039-what-a-contract-of-the-first-version-may-say.md) | What a contract of the first version may say, and what its check decides | Accepted, amended by 0079 |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.md) | Commands exit with a code for each verdict | Accepted |
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.md) | The environment of a verified project is a Dockerfile, and its pack proves itself | Accepted, amended by 0043 and 0060 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.md) | A port of the project repository composes the trees that are built | Accepted, amended by 0044 |
@@ -89,4 +89,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) | A relation runs on the visible examples of its requirement | Accepted |
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Accepted |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md) | The job corpus is split into four parts and a job that gathers them | Accepted |
-| [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Proposed |
+| [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |

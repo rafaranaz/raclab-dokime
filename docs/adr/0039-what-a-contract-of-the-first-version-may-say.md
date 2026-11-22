@@ -1,6 +1,6 @@
 # ADR-0039 · What a contract of the first version may say, and what its check decides
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md)
 
 ## Context
 

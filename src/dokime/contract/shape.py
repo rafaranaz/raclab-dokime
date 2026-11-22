@@ -6,9 +6,10 @@ from dataclasses import dataclass
 
 from dokime.contract import ears
 from dokime.contract.directives import Resolver
-from dokime.contract.expectations import AnyValue, Contains, Expected, FullMatch, Json
+from dokime.contract.expectations import AnyValue, Contains, Expected, FullMatch, Json, Repr
 from dokime.contract.model import Example, HeldOut, Relation, Requirement, Step
 from dokime.contract.notes import Notes
+from dokime.core.observation import REPR_LIMIT
 from dokime.core.reading import Path, Value
 from dokime.core.verdicts import Verdict
 
@@ -130,6 +131,18 @@ _HELD_OUT: Mapping[str, Field] = {
         lambda value: isinstance(value, str) and _DIGEST.fullmatch(value) is not None,
     ),
 }
+
+
+def _is_name_of_python(value: object) -> bool:
+    return isinstance(value, str) and value.isidentifier()
+
+
+def _is_public(name: str) -> bool:
+    """A name that does not start with an underscore, or a dunder name."""
+    dunder = len(name) > 4 and name.startswith("__") and name.endswith("__")
+    return dunder or not name.startswith("_")
+
+
 _STEP: Mapping[str, Field] = {
     "input": Field("a mapping", _is_mapping),
     "expect": Field("a mapping", _is_mapping),
@@ -138,6 +151,7 @@ _INPUT: Mapping[str, Mapping[str, Field]] = {
     "function": {
         "args": Field("a list of values", _is_list, mandatory=False),
         "kwargs": Field("a mapping of values", _is_mapping, mandatory=False),
+        "call": Field("a name of Python", _is_name_of_python, mandatory=False),
     },
     "cli": {
         "args": Field("a list of texts", _is_texts, mandatory=False),
@@ -303,6 +317,7 @@ def example(notes: Notes, item: Value, path: Path) -> Example | None:
             _step(notes, step, (*path, "steps", index), boundary)
             for index, step in enumerate(steps)
         ]
+        _no_call_first(notes, steps, path)
     if len(notes.findings) > before:
         return None
     description = fields.get("description")
@@ -330,6 +345,49 @@ def _files_inside(notes: Notes, files: Expected, path: Path) -> None:
             notes.add("path-outside-directory", message, path)
 
 
+def _no_call_first(notes: Notes, steps: list[Value], path: Path) -> None:
+    first = steps[0] if steps else None
+    given = first.get("input") if isinstance(first, dict) else None
+    if isinstance(given, dict) and "call" in given:
+        message = "the first step calls the target; a later step names a method with 'call'"
+        notes.add("call-in-first-step", message, (*path, "steps", 0))
+
+
+def _calls_and_reprs(
+    notes: Notes, inputs: dict[str, Expected], expects: dict[str, Expected], path: Path
+) -> None:
+    """Note a call of a name that is not public, and a `$repr` that is out of place, holds a
+    memory address or is longer than an observation keeps (ADR-0079)."""
+    call = inputs.get("call")
+    if isinstance(call, str) and call.isidentifier() and not _is_public(call):
+        message = f"'call' names {call!r}, which is not public; a dunder method is"
+        notes.add("call-not-public", message, (*path, "input", "call"))
+    for key, value in expects.items():
+        whole = key == "returns" and isinstance(value, Repr)
+        if not whole and _holds_repr(value):
+            message = "$repr is the whole of 'returns', the repr of a value that JSON cannot hold"
+            notes.add("repr-out-of-place", message, (*path, "expect"))
+    returns = expects.get("returns")
+    if not isinstance(returns, Repr):
+        return
+    if " at 0x" in returns.text:
+        message = "$repr holds a memory address, ' at 0x', which differs in each run"
+        notes.add("repr-with-address", message, (*path, "expect"))
+    if len(returns.text) > REPR_LIMIT:
+        message = f"$repr has {len(returns.text)} characters; an observation keeps {REPR_LIMIT}"
+        notes.add("repr-too-long", message, (*path, "expect"))
+
+
+def _holds_repr(value: Expected) -> bool:
+    if isinstance(value, Repr):
+        return True
+    if isinstance(value, dict):
+        return any(_holds_repr(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_holds_repr(item) for item in value)
+    return False
+
+
 def _step(notes: Notes, item: Value, path: Path, boundary: str) -> Step | None:
     fields = _mapping(notes, item, path, "a step")
     if fields is None:
@@ -351,6 +409,7 @@ def _step(notes: Notes, item: Value, path: Path, boundary: str) -> Step | None:
         return None
     check_fields(notes, inputs, (*path, "input"), _INPUT[boundary])
     check_fields(notes, expects, (*path, "expect"), _EXPECT[boundary])
+    _calls_and_reprs(notes, inputs, expects, path)
     if boundary == "cli":
         for part, values in (("input", inputs), ("expect", expects)):
             _files_inside(notes, values.get("files"), (*path, part, "files"))

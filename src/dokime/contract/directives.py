@@ -13,6 +13,7 @@ from dokime.contract.expectations import (
     Expected,
     FullMatch,
     Json,
+    Repr,
     Unordered,
 )
 from dokime.contract.notes import Notes
@@ -168,6 +169,13 @@ def _unordered(resolver: Resolver, mapping: dict[str, Value], path: Path, _: boo
     )
 
 
+def _repr(resolver: Resolver, mapping: dict[str, Value], path: Path, _: bool) -> Expected:
+    text = mapping["$repr"]
+    if not isinstance(text, str):
+        return resolver.wrong_value("$repr", "a text", path)
+    return Repr(text)
+
+
 def _any(resolver: Resolver, mapping: dict[str, Value], path: Path, _: bool) -> Expected:
     kind = mapping["$any"]
     if kind not in ("uuid", "timestamp") or not isinstance(kind, str):
@@ -184,4 +192,5 @@ _DIRECTIVES: dict[str, _Directive] = {
     "$approx": _Directive(_approx, parameters=("tolerance",)),
     "$unordered": _Directive(_unordered),
     "$any": _Directive(_any),
+    "$repr": _Directive(_repr),
 }

@@ -1,0 +1,26 @@
+# The result of the blind reading (CORPUS-078, CORPUS-079), recomputed by the tests from the answers
+# and read against the criterion of criterion.toml, recorded before the reading. An undecidable
+# counts as not isolated; the last label counts when a reader corrects itself.
+
+# The criterion: kappa on the 41 above 0.57.
+[all]
+witnesses = 41
+alike = 38
+kappa = 0.8534
+
+# Every witness has the same label for both readers, not isolated: kappa is undefined.
+[eight]
+witnesses = 8
+alike = 8
+kappa = "undefined"
+
+# What decides nothing.
+[[undecidable]]
+reader = "B"
+witness = "W29"
+condition = 2
+
+[decided]
+witnesses = 40
+alike = 37
+kappa = 0.85

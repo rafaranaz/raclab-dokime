@@ -1,4 +1,4 @@
-# SDD-EARS: CONTRACT-102 CONTRACT-107 CONTRACT-108 CONTRACT-109
+# SDD-EARS: CONTRACT-082 CONTRACT-102 CONTRACT-107 CONTRACT-108 CONTRACT-109
 import pytest
 
 from dokime.contract.expectations import Repr, holds
@@ -38,3 +38,20 @@ def test_a_repr_longer_than_an_observation_keeps_is_a_finding() -> None:
 @pytest.mark.parametrize("observed", ["x", 1, None, ["x"], {"x": 1}])
 def test_a_repr_holds_for_no_value_of_json(observed: object) -> None:
     assert not holds(Repr("x"), observed)
+
+
+def test_an_exact_value_and_a_repr_for_the_same_inputs_contradict() -> None:
+    other = """\
+  - id: E-0004
+    requirement: keep-empty-invoices
+    case: empty
+    boundary: function
+    target: billing.totals:invoice_total
+    origin: human
+    steps:
+      - input: {args: [[]]}
+        expect: {returns: {$repr: "Total(0)"}}
+"""
+    finding = only(seeded("\nrelations:", f"\n{other}\nrelations:"), "contradictory-examples")
+    assert "E-0003" in finding.message
+    assert "E-0004" in finding.message

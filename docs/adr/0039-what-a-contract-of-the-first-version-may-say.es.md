@@ -1,7 +1,7 @@
-<!-- translation-of: 0039-what-a-contract-of-the-first-version-may-say.md sha256:d739b3e2a5596e51 -->
+<!-- translation-of: 0039-what-a-contract-of-the-first-version-may-say.md sha256:4c01715fae4c697e -->
 # ADR-0039 · Qué puede decir un contrato de la primera versión, y qué decide su comprobación
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md)
 
 ## Contexto
 

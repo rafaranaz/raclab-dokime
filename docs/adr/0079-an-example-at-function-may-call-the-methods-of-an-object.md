@@ -1,6 +1,6 @@
 # ADR-0079 · An example at function may call the methods of an object
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

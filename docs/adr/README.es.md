@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:c05ef57b9fffc9ff -->
+<!-- translation-of: README.md sha256:8450b5cce19e3d64 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -51,7 +51,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0036](0036-a-milestone-may-open-an-increment-of-a-later-module.es.md) | Un hito puede abrir un incremento de un módulo posterior | Aceptada |
 | [0037](0037-a-contract-is-read-by-strict-rules-of-its-own.es.md) | Un contrato se lee con reglas estrictas propias, y se informa de todos los problemas | Aceptada |
 | [0038](0038-directives-in-a-contract-are-marked-with-a-dollar.es.md) | Las directivas de un contrato se marcan con un signo de dólar | Aceptada, enmendada por el 0039 |
-| [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada |
+| [0039](0039-what-a-contract-of-the-first-version-may-say.es.md) | Qué puede decir un contrato de la primera versión, y qué decide su comprobación | Aceptada, enmendada por el 0079 |
 | [0040](0040-commands-exit-with-a-code-for-each-verdict.es.md) | Las órdenes salen con un código por cada veredicto | Aceptada |
 | [0041](0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md) | El entorno de un proyecto verificado es un Dockerfile, y su pack se prueba a sí mismo | Aceptada, enmendada por el 0043 y el 0060 |
 | [0042](0042-a-port-of-the-project-repository-composes-the-trees-that-are-built.es.md) | Un puerto del repositorio del proyecto compone los árboles que se construyen | Aceptada, enmendada por el 0044 |
@@ -91,4 +91,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Aceptada |
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) | El corpus no se ejecuta en una pull request que solo cambia texto | Aceptada |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md) | El job corpus se reparte en cuatro trozos y un job que los reúne | Aceptada |
-| [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Propuesta |
+| [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Aceptada |

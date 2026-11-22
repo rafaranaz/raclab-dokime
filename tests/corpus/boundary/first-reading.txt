@@ -1,0 +1,86 @@
+===== Reader: the session that builds the work | Options: tests/corpus/boundary/options.toml | Date: 2026-11-22
+
+W02 | a | does-not-fit | The tests check the repr of a decorated function and of a cached method, and pickle and copy a decorated function, all of which need a function defined and decorated, which option a does not allow.
+W02 | b | fits | A session can define and decorate the function and the method, and check their repr and that pickling and copying return the same object.
+W02 | c | does-not-fit | A fixture can give the decorated function and its repr, but the identity after pickle and copy needs the object passed to pickle and copy, and option c passes only values of JSON.
+W02 | d | does-not-fit | No module function called with values of JSON returns the repr of a decorated function or pickles one.
+W05 | a | does-not-fit | The test checks that two accesses to a decorated method of a class give the same object, which needs a class defined and decorated.
+W05 | b | fits | A session can define the class and check the identity of two accesses with "is".
+W05 | c | does-not-fit | A step expects a value or an exception, and identity between the results of two steps cannot be expected by value or by repr.
+W05 | d | does-not-fit | Identity of class attributes is not a call of a module function with values of JSON.
+W07 | a | fits | Version(1, 0, 0) builds the object and its __eq__ called with a malformed list or mapping raises TypeError from __init__ at the base and returns NotImplemented, compared by its repr, after the change.
+W07 | b | fits | A session can compare a Version with each malformed collection and expect False or TypeError.
+W07 | c | fits | As in option a, which option c includes.
+W07 | d | does-not-fit | The changed code is the comparison operators of Version, which no module function called with values of JSON reaches.
+W09 | a | does-not-fit | The test checks a DeprecationWarning on reading a module constant, and option a observes the return or the exception of calls, not warnings nor attribute reads.
+W09 | b | fits | A session can read the constant under warnings.catch_warnings and expect the DeprecationWarning.
+W09 | c | does-not-fit | A fixture would have to read the constant and catch the warning itself, so the fixture would be the test and not an object to call.
+W09 | d | does-not-fit | Reading a module constant is not a call, and warnings are not observed.
+W13 | a | fits | cachetools.keys:methodkey called with "x" and self=1 raises TypeError at the base and returns a key after the change, which is not JSON and is compared by its repr.
+W13 | b | fits | A session can call the key functions with self as a keyword and compare the keys.
+W13 | c | fits | As in option a, which option c includes.
+W13 | d | does-not-fit | The key returned after the change is not a value of JSON, so it cannot be expected with returns.
+W14 | a | fits | LFUCache(maxsize=3) builds the object, and calls of __setitem__, __getitem__, __contains__ and __len__ with values of JSON give the evictions the tests check.
+W14 | b | fits | A session can build the cache, insert and read items and check membership.
+W14 | c | fits | As in option a, which option c includes.
+W14 | d | does-not-fit | The behaviour is on the state of an LFUCache instance across calls, which one call of a module function does not hold.
+W15 | a | does-not-fit | The fixed function is is_md_equal of mdformat._util, a private module, and at the command line it is reached only with a code formatter plugin installed.
+W15 | b | does-not-fit | A session could import the private module, but the definition of fits asks for a target the project offers to its users.
+W15 | c | does-not-fit | A fixture does not make the private function a target the project offers, and the pack installs no code formatter plugin.
+W15 | d | does-not-fit | The target is a function of a private module.
+W19 | a | does-not-fit | The tests count the calls of wait on a condition passed to a decorated function or method, which needs a condition class and a decorated function defined.
+W19 | b | fits | A session can define the counting condition and the decorated function and check the count, though it checks how the code waits more than what it returns.
+W19 | c | does-not-fit | The count is read from the condition passed into the decorator, and option c passes only values of JSON and calls methods of the object of the example.
+W19 | d | does-not-fit | The number of waits is not the return of a call of a module function.
+W21 | a | does-not-fit | The test needs a custom cache class and a function decorated with it to read cache_info.
+W21 | b | fits | A session can define the custom cache and the decorated function and check cache_info after each call.
+W21 | c | fits | A fixture can give the function decorated with the custom cache, and calls of it and of its cache_info give the counts, compared by repr.
+W21 | d | does-not-fit | The behaviour needs a decorated function and its state across calls.
+W22 | a | does-not-fit | The test builds a mock with create_autospec from a class with a decorated method, which needs the class and the mock defined.
+W22 | b | fits | A session can build the autospec mock, set its return value and call the method by position and by keyword.
+W22 | c | fits | A fixture can give the autospec mock with its return value, and calls of its get method with values of JSON return it after the change and raise TypeError at the base.
+W22 | d | does-not-fit | A mock of a class is not a module function called with values of JSON.
+W23 | a | does-not-fit | The warnings appear only when a parser extension plugin with CLI options is installed, and option a observes neither warnings nor an installed plugin.
+W23 | b | fits | A session can register the plugin, patch the renderer and run the command line entry point under pytest.warns as the test does.
+W23 | c | does-not-fit | It needs the registry of plugins and the renderer patched, which is a change of the environment and not an object to call.
+W23 | d | does-not-fit | The plugin is not installed in the pack and the warnings are not observed at function.
+W26 | a | does-not-fit | The tests turn green only by calling run with cache_toml=False, a parameter that exists only for tests.
+W26 | b | does-not-fit | The definition of fits leaves out a parameter that exists only for tests.
+W26 | c | does-not-fit | The definition of fits leaves out a parameter that exists only for tests.
+W26 | d | does-not-fit | The definition of fits leaves out a parameter that exists only for tests.
+W27 | a | does-not-fit | The tests need classes with decorated methods, __slots__ and class methods defined.
+W27 | b | fits | A session can define the classes and expect the TypeError of each call.
+W27 | c | fits | Fixtures can give instances of the classes with __slots__ and with decorated class methods, and calling their methods expects the TypeError after the change.
+W27 | d | does-not-fit | The behaviour needs classes with decorated methods.
+W28 | a | does-not-fit | The tests pickle and deep-copy an instance of a class with cached methods, which needs the class defined.
+W28 | b | fits | A session can define the class, pickle and unpickle an instance and call its cached methods.
+W28 | c | does-not-fit | Pickling needs the instance passed to pickle.dumps and pickle.loads, and option c passes only values of JSON and calls methods of the object of the example.
+W28 | d | does-not-fit | Pickling an object is not a call of a module function with values of JSON.
+W29 | a | does-not-fit | The behaviour is on the wrapper of a decorated function or method, which needs the function or the class defined.
+W29 | b | fits | A session can decorate a function and check hasattr of cache_info on the wrapper.
+W29 | c | fits | A fixture can give the wrapper, and its __getattribute__ called with "cache_info" returns None at the base and raises AttributeError after the change.
+W29 | d | does-not-fit | An attribute of a wrapper is not the return of a module function.
+W31 | a | does-not-fit | The behaviour needs a subclass of Version defined.
+W31 | b | fits | A session can define the subclass and compare instances of both classes.
+W31 | c | does-not-fit | A fixture can give the subclass, but the comparison needs a Version object as the argument, and option c passes only values of JSON.
+W31 | d | does-not-fit | Module functions and the command line build only Version objects.
+W32 | a | does-not-fit | The tests stack two cache decorators on a function, which needs the function defined and decorated.
+W32 | b | fits | A session can stack the decorators and check the wrappers, their cache_info and cache_clear.
+W32 | c | fits | A fixture can give the outer wrapper of two stacked decorators, and calls of it, of its cache_info and of its cache_clear give what the tests check, compared by repr.
+W32 | d | does-not-fit | The behaviour needs decorated functions.
+W34 | a | fits | Version.parse with the version builds the object, and its next_version called with "prerelease" and a token returns the next version, compared by its repr, or raises ValueError for an invalid token.
+W34 | b | fits | A session can call next_version with each token and compare the result.
+W34 | c | fits | As in option a, which option c includes.
+W34 | d | does-not-fit | The token is taken only by Version.next_version, and the module functions and the command line do not reach this matching.
+W37 | a | does-not-fit | The tests need a class with a decorated method, and they call it on the class with the instance as a keyword argument.
+W37 | b | fits | A session can define the class and call the method on the class with self as a keyword.
+W37 | c | does-not-fit | The call passes the instance as a keyword argument, and option c passes only values of JSON.
+W37 | d | does-not-fit | The behaviour needs a class with a decorated method.
+W39 | a | does-not-fit | The test needs a class with a cached method that takes a parameter named pending.
+W39 | b | fits | A session can define the class and call the method with pending as a keyword.
+W39 | c | fits | A fixture can give an instance of the class, and calls of get_pending with pending=0 and of its cache_clear give the results the test checks, where the base raises TypeError.
+W39 | d | does-not-fit | The behaviour needs a class with a decorated method.
+W41 | a | fits | Version.parse("1.2.3") builds the object, and its __getitem__ called with null or "1" raises AttributeError at the base and TypeError after the change; the part on objects with __index__ is not written.
+W41 | b | fits | A session can define the class with __index__ and subscript the version with it and with invalid keys.
+W41 | c | fits | As in option a, which option c includes; the part on objects with __index__ would need a fixture passed as an argument, which option c does not allow.
+W41 | d | does-not-fit | Subscripting a Version is not a call of a module function, and the command line does not index a version.

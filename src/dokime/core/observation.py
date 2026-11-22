@@ -55,11 +55,32 @@ class Raised:
     message: str
 
 
+REPR_LIMIT = 1000
+"""The characters of the `repr` of a value that JSON cannot hold that an observation keeps."""
+
+
 @dataclass(frozen=True)
 class NotJson:
-    """A step at `function` returned a value that JSON cannot hold; the name of its type."""
+    """A step at `function` returned a value that JSON cannot hold: the name of its type and its
+    `repr`, cut to its first characters, and marked so, when it is longer than the limit
+    (ADR-0079). An adapter that did not record the `repr` leaves it as `None`."""
 
     type: str
+    representation: str | None = None
+    cut: bool = False
+
+    def __post_init__(self) -> None:
+        length = len(self.representation or "")
+        if length > REPR_LIMIT:
+            raise ValueError(f"the representation has {length} characters, more than {REPR_LIMIT}")
+        if self.cut and length < REPR_LIMIT:
+            raise ValueError(f"the representation is marked cut with only {length} characters")
+
+
+def not_json(type_name: str, representation: str) -> NotJson:
+    """The observation of a value that JSON cannot hold, with its `repr` within the limit."""
+    cut = len(representation) > REPR_LIMIT
+    return NotJson(type=type_name, representation=representation[:REPR_LIMIT], cut=cut)
 
 
 @dataclass(frozen=True)

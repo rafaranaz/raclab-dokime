@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:9acf71f8f8efea79 -->
+<!-- translation-of: ROADMAP.md sha256:737ce44ce8e42452 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -554,11 +554,49 @@ Sus límites:
   de 4, así que, aunque hubieran podido leer los contratos completos, no los usaron.
 - **El valor de una reserva con ejemplos secretos** queda para B3 y B4, que lo miden.
 
+**B2 se cerró el 2026-11-22.** La puerta `relations` ejecuta las dos relaciones del catálogo sobre
+casos derivados de los ejemplos visibles, y está construida.
+
+- [x] **B2a, la semántica:** la
+  [ADR-0076](adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) está
+  aceptada (#183).
+- [x] **B2b, la puerta, sobre dobles:** una relación que no se cumple da `relation-fails`, un
+  `FAIL` de origen `derived` que nombra el ejemplo de partida y no da ningún valor (VERIFY-184);
+  una relación sin caso de partida pregunta (VERIFY-183); un rechazo de un puerto es un `ERROR`
+  (VERIFY-186); la semilla de la auditoría y los órdenes que fallaron están en la evidencia,
+  predicado v0.4 (EVIDENCE-094, INTERFACES-189). Por el camino: el canal de una relación en
+  `contract check` (CONTRACT-095 a CONTRACT-101), `relations.permutations` en la política
+  (CORE-190) y los casos derivados en `oracle` (ORACLE-052 a ORACLE-062).
+- [x] **B2c, medido:** sobre mdformat en `b8c3561`, el arreglo de `27e2ba3` con tres relaciones
+  `idempotent` por `stdout` pasa, y el mismo arreglo con un cambio que da otro formato a un
+  documento ya formateado falla primero en `relations`, como confirmó antes el mantenedor; la
+  revisión está en `tests/corpus/review.toml`, 6 minutos, registrada antes de la primera
+  ejecución, que fue la CI de #193. La puerta está construida (#191), y el límite de sus casos de
+  partida está escrito.
+
+Sus límites:
+
+- **Solo se midió `idempotent` en `cli`.** `order-insensitive` y la frontera `function` no tienen
+  caso en el corpus; se buscan candidatos naturales en B3, y también un fallo real de idempotencia
+  de mdformat, si lo hay.
+- **El caso está construido para que solo lo vea la relación:** su condición, un bloque de código
+  de una línea de un carácter antes de un encabezado, está muy cerca de tratar el ejemplo visible
+  como caso especial. mdformat ya comprueba la idempotencia en sus propios tests, sobre la
+  especificación CommonMark, así que un fallo natural de ella lo pararía `existing-tests` antes que
+  la relación: una primera versión más amplia del cambio rompía seis de ellos.
+- **El valor de las relaciones en un proyecto cuyos tests no comprueban la relación** queda sin
+  medir, para B3.
+- **Los casos de partida son los ejemplos visibles**, los menos eficaces según los estudios de
+  pruebas metamórficas ([Segura et al., 2016](https://eprints.whiterose.ac.uk/110335/1/segura16-tse.pdf)).
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
+- **Antes de B3, el tiempo del job `corpus`:** unos 12 minutos con doce casos (11 minutos 53
+  segundos en #193); hay que medirlo por partes y repartirlo antes de que el corpus crezca a unos
+  treinta casos.
 - **Antes de B3:** los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
   parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de

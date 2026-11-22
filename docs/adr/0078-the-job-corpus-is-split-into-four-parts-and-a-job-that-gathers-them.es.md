@@ -1,7 +1,7 @@
-<!-- translation-of: 0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md sha256:9b4ead904567cd1b -->
+<!-- translation-of: 0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md sha256:83d31575b550d21a -->
 # ADR-0078 · El job corpus se reparte en cuatro trozos y un job que los reúne
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

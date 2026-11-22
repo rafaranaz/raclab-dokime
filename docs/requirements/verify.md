@@ -182,6 +182,16 @@ follow-ups and compares them; the gate observes the sources, then the follow-ups
 - **VERIFY-181** The gate shall draw the orders of each source with a seed derived from the seed of the run, the id of the relation and the id of the source, so that the same seed of the run gives the same follow-ups.
 - **VERIFY-182** If a source was not observed to the end of its step, then the gate shall give it no follow-up.
 - **VERIFY-187** If a follow-up was not observed to the end of its step, then the gate shall count it as a follow-up that does not hold.
+
+## A `repr` that was not recorded ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md))
+
+A comparison that is not recorded, because a step expects `$repr` and the zone did not record the
+`repr` of what it returned, says nothing of the change: it is an error of the harness, and the gate
+gives it before anything else it would say of the example.
+
+- **VERIFY-188** If a comparison of an example on the base is not recorded, then the gate `baseline` shall give a finding `repr-not-recorded` of the verdict `ERROR` for the example, and no other finding for it.
+- **VERIFY-189** If the comparison of an example on the tree of the change is not recorded, then the gate `visible-examples` shall give a finding `repr-not-recorded` of the verdict `ERROR` for the example, whatever its origin.
+- **VERIFY-190** If the comparison of a held-out example is not recorded, then the gate `sealed-examples` shall give a finding `repr-not-recorded` of the verdict `ERROR` that names the requirement and no value nor identifier.
 - **VERIFY-183** If no source of a relation has a follow-up, then the gate shall give a finding `relation-without-source` of the verdict `ASK`, at the line of the relation.
 - **VERIFY-184** If a follow-up does not hold, then the gate shall give one finding `relation-fails` of the verdict `FAIL` for each relation and source, at the line of the relation, whose message is the words of the oracle for the agent.
 - **VERIFY-185** When the gate gives its result, the gate shall count each follow-up compared as a check of origin `derived`, and give the seed of the run and each follow-up that did not hold, with its relation, its source and, for `order-insensitive`, its order.

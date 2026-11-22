@@ -578,9 +578,9 @@ Its limits:
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **Before B3, the time of the job `corpus`:** about 12 minutes with twelve cases (11 minutes 53
-  seconds in #193); it is to be measured by part and shared out before the corpus grows to about
-  thirty cases.
+- **Before B3, the time of the job `corpus`:** between 10 and 14 minutes in the last pull requests
+  (11 minutes 53 seconds in #193, with twelve cases); it is to be measured by part, with how much
+  it varies from one run to another, and shared out before the corpus grows to about thirty cases.
 - **Before B3:** the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
   sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that

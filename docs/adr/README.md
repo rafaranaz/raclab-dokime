@@ -87,3 +87,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Accepted |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.md) | The predicate v0.3 records the hold-out | Accepted |
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) | A relation runs on the visible examples of its requirement | Accepted |
+| [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Proposed |

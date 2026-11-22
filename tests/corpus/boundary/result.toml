@@ -1,0 +1,28 @@
+# The result of the reading of the boundary (CORPUS-083), recomputed by the tests from the two
+# readings and the resolution. For each option: the witnesses of the 21 that fit it, those of them
+# that both new readers of B3a label isolated, and how many of the 18 witnesses of the 41 that both
+# label isolated are expressible with it, today's included.
+
+[option.a]
+fits = ["W07", "W13", "W14", "W34"]
+isolated = ["W07", "W34"]
+expressible_isolated = 11
+isolated_of_41 = 18
+
+[option.b]
+fits = ["W02", "W05", "W07", "W09", "W13", "W14", "W19", "W21", "W22", "W23", "W27", "W28", "W29", "W31", "W32", "W34", "W37", "W39", "W41"]
+isolated = ["W07", "W22", "W28", "W31", "W32", "W34", "W37", "W39"]
+expressible_isolated = 17
+isolated_of_41 = 18
+
+[option.c]
+fits = ["W07", "W13", "W14", "W21", "W27", "W29", "W32", "W34", "W39"]
+isolated = ["W07", "W32", "W34", "W39"]
+expressible_isolated = 13
+isolated_of_41 = 18
+
+[option.d]
+fits = []
+isolated = []
+expressible_isolated = 9
+isolated_of_41 = 18

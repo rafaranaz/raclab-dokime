@@ -28,6 +28,8 @@ contracts refuses them with `not-supported-yet`.
 
 - **ORACLE-010** When a step expects `returns`, the expectation shall hold when the step returned a value for which it holds.
 - **ORACLE-011** If a step that expects `returns` raised an exception or returned a value that JSON cannot hold, then the comparison shall give a difference that says what the step did.
+- **ORACLE-063** When a step expects `$repr`, the comparison shall hold only for a value that JSON cannot hold whose `repr` was observed whole and is the text of `$repr` ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)).
+- **ORACLE-064** If a step that expects `$repr` returned a value of JSON, raised an exception, or returned a value whose `repr` differs, was cut or was not recorded, then the comparison shall give a difference in `returns` that says what the step did, without the `repr` observed.
 - **ORACLE-012** If a step that expects `raises` returned, then the comparison shall give a difference that says what it returned.
 
 ## The type of an exception

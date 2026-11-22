@@ -5,12 +5,14 @@ only in the parts that it expects; an expectation holds as `holds` of `contract`
 an exception is read as `pytest.raises` reads it, as the maintainer decided: a name without a
 module is the class of that name in `builtins`, a name with one is the full name it gives, and it
 holds when it is the full name of any class of the MRO observed, so `Exception` holds for any.
+A `$repr` holds only for a value that JSON cannot hold whose `repr` was observed whole and is its
+text; a difference says what the step did, never the `repr` observed (ADR-0079).
 """
 
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from dokime.contract.expectations import Expected, holds
+from dokime.contract.expectations import Expected, Repr, holds
 from dokime.contract.model import Example
 from dokime.core.observation import (
     Ending,
@@ -95,6 +97,12 @@ def _function(
         return [Difference(position, "boundary", "function", "cli")]
     if "returns" in expect:
         expected = expect["returns"]
+        if isinstance(expected, Repr):
+            return (
+                []
+                if _shown(expected, seen)
+                else [Difference(position, "returns", expected, _said(seen))]
+            )
         if not isinstance(seen, Returned):
             return [Difference(position, "returns", expected, _said(seen))]
         if not holds(expected, seen.value):
@@ -106,6 +114,11 @@ def _function(
         if not _raised(expected, seen):
             return [Difference(position, "raises", expected, _said(seen))]
     return []
+
+
+def _shown(expected: Repr, seen: StepObservation) -> bool:
+    """Say whether a value that JSON cannot hold has the `repr` expected, observed whole."""
+    return isinstance(seen, NotJson) and not seen.cut and seen.representation == expected.text
 
 
 def _raised(expected: Expected, seen: Raised) -> bool:

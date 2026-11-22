@@ -25,6 +25,11 @@ type holds when it is the full name of any class of the MRO observed. So a subcl
 holds for `TypeError`, a class of the project named `TypeError` that is not one does not, and
 `Exception` holds for any exception. A `message` has to hold as well.
 
+A `$repr` holds only for a value that JSON cannot hold whose `repr` was observed whole, not cut at
+the 1,000 characters an observation keeps, and is its text (ADR-0079). Any other step gives a
+difference in `returns` that says what it did, a value, an exception or the type of a value that
+JSON cannot hold, never the `repr` observed.
+
 ## The split into visible and held-out (ADR-0014)
 
 ```python

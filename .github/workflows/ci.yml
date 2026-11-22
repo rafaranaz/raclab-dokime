@@ -83,7 +83,7 @@ jobs:
         run: |
           start=$(date +%s)
           set +e
-          uv run pytest -p no:cacheprovider -s tests/corpus --junitxml=corpus.xml
+          uv run pytest -p no:cacheprovider -s tests/corpus --junitxml=corpus.xml --durations=0
           code=$?
           echo "pytest ended with $code in $(( $(date +%s) - start )) s" | tee -a "$GITHUB_STEP_SUMMARY"
           exit $code

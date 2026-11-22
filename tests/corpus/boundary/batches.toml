@@ -1,0 +1,13 @@
+# The batches of the second reading of B3c, with the digest of each, as given.
+
+[[batch]]
+number = 1
+file = "batch-1.txt"
+sha256 = "11f86e246879ca8ba5a3b83d29c313b26895a9056ca4ffa3b8be42acc2ebb293"
+witnesses = ["W02", "W05", "W07", "W09", "W13", "W14", "W15", "W19", "W21"]
+
+[[batch]]
+number = 2
+file = "batch-2.txt"
+sha256 = "48c801ad0f6d60aeb688f880f6d89b4e12bbceb02d1ccc2efdf482c748aba5a1"
+witnesses = ["W22", "W23", "W26", "W27", "W28", "W29", "W31", "W32", "W34", "W37", "W39", "W41"]

@@ -56,7 +56,9 @@ what the first step returned, and a value that JSON cannot hold may be expected 
 whole of `returns` ([ADR-0079](../../../docs/adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)).
 
 An example with a finding of its own is left out of the search for duplicates and contradictions.
-Two matchers for the same field are not compared with each other.
+Two matchers for the same field are not compared with each other. So two `$repr` with different texts for the
+same inputs are not found when the contract is checked, though they cannot both hold, since the
+`repr` observed is one; one of the two examples fails when the change is audited.
 
 ## When an expectation holds
 

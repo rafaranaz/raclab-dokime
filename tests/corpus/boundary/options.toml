@@ -1,0 +1,76 @@
+# The options of B3c for the boundary `function`, fixed before any reading. The 21 witnesses that
+# are not expressible today (tests/corpus/witnesses.toml) are read against each option, twice: by
+# the session that builds the work, and by the session that reviews it, which does not see the
+# first reading; the maintainer resolves the differences. An ADR then decides whether the boundary
+# is widened.
+
+fits = """
+A witness fits an option when what it fixes can be written, under that option, as examples of a
+contract that its base fails and its change passes, at a target that the project offers to its
+users: a public module, class, function or command, not a private module nor a parameter that exists
+only for tests. What the tests of the witness check is the behaviour to write.
+"""
+
+[[option]]
+id = "a"
+name = "calls on an object"
+definition = """
+An example at `function` whose first step calls a target `module:callable` with values of JSON and
+keeps what it returns as the object of the example. Each later step calls a method of that object by
+its name, dunder methods included, with values of JSON, and expects `returns` or `raises`. A value
+that is not JSON is compared by its `repr`. The example holds no code of whoever writes the
+contract: no class, function, decorator or mock is defined in it.
+"""
+
+[[option]]
+id = "b"
+name = "a session of Python"
+definition = """
+An example is a session of Python statements run in one namespace, as doctest runs a docstring, each
+with the output it expects or the exception it raises. Any code may be written in it, classes,
+decorators and mocks included.
+"""
+
+[[option]]
+id = "c"
+name = "fixtures of the pack"
+definition = """
+As option a, but a target may also be a class, a function or an object that the pack of the project
+defines in a module of its own, reviewed once with the pack and not with each contract, as the
+fixtures of FitNesse are written apart from its tables. The example stays data, and names the
+fixture as its target.
+"""
+
+[[option]]
+id = "d"
+name = "not widened"
+definition = """
+The boundary `function` of ADR-0039 as it is: each step calls one target `module:function` with
+values of JSON, `args` and `kwargs`, and expects `returns`, a value of JSON, or `raises`, the name
+of an exception and optionally its message.
+"""
+
+[[criterion]]
+id = "count"
+text = """
+How many witnesses fit each option: among the 9 that both new readers of B3a label isolated and
+that are not expressible today (W07, W15, W22, W28, W31, W32, W34, W37, W39), with W13 and W41,
+which one reader labels isolated, given apart; and, over the 41, which share of the isolated ones is
+expressible with each option.
+"""
+
+[[criterion]]
+id = "data"
+text = "Whether an example stays data, or becomes code that the maintainer reviews as a test."
+
+[[criterion]]
+id = "python"
+text = """
+Whether the option ties the format of the contract to Python. It touches decision h, the probe of a
+second language, left for the close of block B; the ADR of the boundary does not decide it in
+passing.
+"""
+
+[[criterion]]
+id = "cost"
+text = "The cost of building it: which modules, and about how many pull requests."

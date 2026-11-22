@@ -1,0 +1,15 @@
+# The attempts of the blind reading that were discarded, with the words of the maintainer.
+
+[[attempt]]
+reader = "A"
+batch = 1
+model = "Mistral (Le Chat)"
+what = "the batch was pasted, the text was cut and the model saw only its end, without the prompt; from then on each batch was attached as a file"
+reported = "Lector A, lote 1, primer intento: al pegar el lote, el texto se cortó y el modelo solo vio el final, sin el prompt. Desde entonces cada lote se adjunta como fichero."
+
+[[attempt]]
+reader = "B"
+batch = 1
+model = "DeepSeek"
+what = "the model did not get the whole batch: it answered that W05 to W10 had no text and saw W04 cut; reader B became Claude Sonnet 5.5 in the four batches"
+reported = "Lector B, lote 1, primer intento con DeepSeek: no recibió el lote entero. Respondió que de W05 a W10 no había texto y vio W04 cortado. El lector B pasó a ser Claude Sonnet 5.5 en los cuatro lotes."

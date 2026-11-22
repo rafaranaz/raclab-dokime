@@ -100,6 +100,19 @@ answers.
 - **CORPUS-078** The file `tests/corpus/blind/result.toml` shall give the kappa and the raw agreement of the two readers on isolated, over the 41 witnesses and over the eight in dispute, with an undecidable counted as not isolated and a kappa without variation given as undefined.
 - **CORPUS-079** The file `tests/corpus/blind/result.toml` shall give the undecidable labels of each reader by condition, and the kappa and the raw agreement over the witnesses that neither reader called undecidable.
 
+### The reading of the boundary
+
+B3c reads the 21 witnesses that are not expressible today against four options for the boundary
+`function`, fixed in `tests/corpus/boundary/options.toml` before any reading: by the session that
+builds the work, and by the session that reviews it, which does not see the first reading. The
+maintainer resolves the differences in `tests/corpus/boundary/resolution.toml`, and
+`tests/corpus/boundary/result.toml` keeps what the tests recompute.
+
+- **CORPUS-080** The file `tests/corpus/boundary/batches.toml` shall give each batch of the second reading the witnesses it holds and the digest of its file.
+- **CORPUS-081** The readings of `tests/corpus/boundary` shall label each witness that is not expressible today once for each option of `options.toml`.
+- **CORPUS-082** The file `tests/corpus/boundary/resolution.toml` shall resolve each witness and option that the two readings label apart, and no other, by a precision of `options.toml`.
+- **CORPUS-083** The file `tests/corpus/boundary/result.toml` shall give, for each option, the witnesses that fit it, among them those that both new readers of B3a label isolated, and how many of the isolated witnesses of the 41 are expressible with it.
+
 ### The patches apply
 
 - **CORPUS-040** When the tests of the corpus are asked for, the test of each case shall check with `git apply --check` that its patch applies on its base, in a clone of its project.

@@ -13,9 +13,12 @@ from pathlib import Path, PurePosixPath
 from dokime.core.observation import (
     ExampleObservation,
     ExampleRequest,
+    NotJson,
     ObservationLimits,
     Raised,
     Returned,
+    StepObservation,
+    not_json,
 )
 from dokime.core.outcomes import Outcome, Report, ReportLimits
 from dokime.core.repository import (
@@ -123,7 +126,8 @@ class AuditedDouble:
 class ObserverDouble:
     """The port that observes, in memory: each example returns what `answers.json` of the project
     says, a mapping from the example to the value, or a list of them, one for each call in turn; an
-    example it does not name raises."""
+    example it does not name raises. A value `{"not_json": type}` is a value that JSON cannot hold,
+    with its `repr` when the mapping has `repr`."""
 
     calls: list[tuple[dict[str, str], tuple[ExampleRequest, ...]]] = field(default_factory=list)
     refusal: RefusalError | None = None
@@ -149,7 +153,7 @@ class ObserverDouble:
             ExampleObservation(
                 example=request.example,
                 steps=tuple(
-                    Returned(value=answers[request.example])
+                    _answered(answers[request.example])
                     if request.example in answers
                     else Raised(
                         type="KeyError",
@@ -162,6 +166,13 @@ class ObserverDouble:
             )
             for request in requests
         )
+
+
+def _answered(value: object) -> StepObservation:
+    if isinstance(value, dict) and "not_json" in value:
+        kind = str(value["not_json"])
+        return not_json(kind, str(value["repr"])) if "repr" in value else NotJson(type=kind)
+    return Returned(value=value)
 
 
 @dataclass

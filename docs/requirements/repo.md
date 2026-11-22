@@ -93,6 +93,36 @@ report, so that the job cannot pass without self-checking every project
 - **REPO-133** When the report of the corpus is checked, the corpus check shall write the duration of each self-check that ran.
 - **REPO-134** If the report of the corpus cannot be read, then the corpus check shall fail with a line that names the report.
 
+### The parts of the job corpus (`tools/corpus_parts.py`, `tools/check_corpus_parts.py`)
+
+The tests of the corpus run in four parts at once, and the job `corpus` gathers them
+([ADR-0078](../adr/0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md)).
+The parts plugin, loaded with `-p tools.corpus_parts`, keeps in a run the tests of the part that
+`--corpus-part` names; the parts check, run by the job `corpus`, reads what each part left.
+
+- **REPO-161** The parts plugin shall give each test of the corpus a part: `a` to the audits of the cases of mdformat, `b` to those of python-semver and cachetools, `c` to the tests of the hold-out by hand and of the sealed run, and `d` to every other test.
+- **REPO-162** When the tests of the corpus are collected with `--corpus-part`, the parts plugin shall deselect every test of another part.
+- **REPO-163** If `--corpus-part` names no part, then the parts plugin shall stop the run with an error that names what it was given.
+- **REPO-164** If a part did not end in `success`, then the parts check shall fail with a line that names the part and how it ended.
+- **REPO-165** If a part ran the corpus and left no readable JUnit report, then the parts check shall fail with a line that names the part.
+- **REPO-166** If the tests in the reports of the parts are not as many as the tests of one collection of the corpus, then the parts check shall fail with a line that gives both numbers.
+- **REPO-167** If some parts ran the corpus and others did not, then the parts check shall fail with a line that names the parts that did not run it.
+- **REPO-168** When no part ran the corpus, the parts check shall pass with a line that says that the corpus did not run.
+
+### A pull request of text (`tools/corpus_changes.py`)
+
+On a pull request that changes only text, the parts do not run the tests of the corpus
+([ADR-0077](../adr/0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md)).
+The changes check is the first step of each part; it writes whether the corpus runs to the outputs
+of the step and why to the summary of the job.
+
+- **REPO-169** When every file that a pull request changes is a Markdown file under `docs/` and none is under `docs/requirements/`, the changes check shall say that the corpus does not run, with the list of the files.
+- **REPO-170** If a pull request changes any other file, or no file, then the changes check shall say that the corpus runs.
+- **REPO-171** The changes check shall list the files with renames turned off, so that a file moved names both of its paths.
+- **REPO-172** If the changed files cannot be listed, then the changes check shall say that the corpus runs, with the reason.
+- **REPO-173** When the event is not a pull request, the changes check shall say that the corpus runs.
+- **REPO-174** The tests of `tests/corpus` shall name no path under `docs/`.
+
 ## The pack of this repository (`.dokime/`, [ADR-0041](../adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md))
 
 A4 audits the pull requests of this repository, so dokime has a pack of its own, written by the

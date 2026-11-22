@@ -81,6 +81,7 @@ comparison with what is observed uses the same rules.
 - **CONTRACT-067** When an expectation is `$any: uuid`, the expectation shall hold for an observed text that is a UUID.
 - **CONTRACT-068** When an expectation is `$any: timestamp`, the expectation shall hold for an observed text that is a date and a time in ISO 8601.
 - **CONTRACT-069** When an expectation is `$json`, the expectation shall hold for an observed text that is JSON whose value satisfies the expectation inside it.
+- **CONTRACT-102** When an expectation is `$repr`, the expectation shall hold for no value of JSON, since it is the `repr` of a value that JSON cannot hold ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)).
 
 ## Coverage
 
@@ -128,6 +129,19 @@ than one argument.
 - **CONTRACT-099** If a relation `idempotent` at `function` has no `over` and an example of its requirement at its target gives more than one argument, then the checker shall report a finding with the code `relation-needs-over`, with the line of the relation.
 - **CONTRACT-100** If the `over` of a relation at `function` is neither `args[N]`, with N a natural number, nor the name of a keyword argument, or names no argument that an example of its requirement at its target gives, then the checker shall report a finding with the code `bad-over`, with the line of the relation.
 - **CONTRACT-101** If the `over` of a relation `order-insensitive` at `cli` is neither `stdin` nor the name of a file of the input of an example of its requirement at its target, or a relation `idempotent` at `cli` has an `over`, then the checker shall report a finding with the code `bad-over`, with the line of the relation.
+
+### Calls on an object ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md))
+
+A later step of an example at `function` may name a method with `call`, which is called on what the
+first step returned; a value that JSON cannot hold may be expected by its `repr` with `$repr`.
+
+- **CONTRACT-103** The checker shall accept in the input of a step at `function` a field `call`, the name of a method.
+- **CONTRACT-104** If the first step of an example has `call`, then the checker shall report a finding with the code `call-in-first-step`.
+- **CONTRACT-105** If `call` is not a name of Python, then the checker shall report a finding with the code `wrong-type`.
+- **CONTRACT-106** If `call` starts with an underscore and does not start and end with two, then the checker shall report a finding with the code `call-not-public`.
+- **CONTRACT-107** If `$repr` is not the whole of the `returns` of a step, then the checker shall report a finding with the code `repr-out-of-place`.
+- **CONTRACT-108** If the text of `$repr` holds ` at 0x`, then the checker shall report a finding with the code `repr-with-address`.
+- **CONTRACT-109** If the text of `$repr` has more than 1,000 characters, then the checker shall report a finding with the code `repr-too-long`.
 
 ## Tables of fields
 

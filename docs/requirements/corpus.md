@@ -87,6 +87,19 @@ uses the contract of its good case.
 
 - **CORPUS-075** The file `tests/corpus/intents.toml` shall give each good case, by its key, an intent sentence and its source: `issue:` or `pr:` and the address, `commit:` and the full name of the commit, or `maintainer`.
 
+### The blind reading of the witnesses
+
+The test of ADR-0074 in B3a: two new readers label the 41 witnesses again with its four conditions
+only, each batch in a conversation of its own, in an order drawn with a seed. Its criterion, how an
+undecidable counts and its limits were recorded in `tests/corpus/blind/criterion.toml` before the
+reading; its result is kept in `tests/corpus/blind/result.toml`, which the tests recompute from the
+answers.
+
+- **CORPUS-076** The file `tests/corpus/blind/draw.toml` shall give each witness of the measurement the id that its seed draws, and each batch the digest of its file.
+- **CORPUS-077** The answers of `tests/corpus/blind/answers` shall give each reader one label for each witness, the last when an answer labels a witness twice.
+- **CORPUS-078** The file `tests/corpus/blind/result.toml` shall give the kappa and the raw agreement of the two readers on isolated, over the 41 witnesses and over the eight in dispute, with an undecidable counted as not isolated and a kappa without variation given as undefined.
+- **CORPUS-079** The file `tests/corpus/blind/result.toml` shall give the undecidable labels of each reader by condition, and the kappa and the raw agreement over the witnesses that neither reader called undecidable.
+
 ### The patches apply
 
 - **CORPUS-040** When the tests of the corpus are asked for, the test of each case shall check with `git apply --check` that its patch applies on its base, in a clone of its project.

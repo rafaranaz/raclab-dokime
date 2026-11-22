@@ -46,25 +46,42 @@ jobs:
       - name: Tests and coverage
         run: uv run pytest --cov
 
-  corpus:
+  corpus-part:
     # The packs and the cases of the corpus at the commits of their projects, with the network
-    # (ADR-0052).
-    name: corpus
+    # (ADR-0052), in four parts at once (ADR-0078); a pull request of text does not run them
+    # (ADR-0077). The job corpus below gathers the parts.
+    name: corpus (${{ matrix.part }})
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [a, b, c, d]
     defaults:
       run:
         # With a shell named, GitHub runs bash with -eo pipefail; without one it runs bash -e, and
         # the gate below would end with the code of tee.
         shell: bash
+    env:
+      PART: ${{ matrix.part }}
     steps:
       - uses: actions/checkout@v7
         with:
-          # The tests of the cases read their history, and refuse a shallow clone.
+          # The tests of the cases read their history, and refuse a shallow clone; the changes
+          # check reads the base of the pull request.
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v7
       - name: Install locked dependencies
         run: uv sync --locked
+      - name: Whether this pull request runs the corpus
+        id: changes
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          uv run python -m tools.corpus_changes --event "$EVENT" --base "$BASE" --head HEAD \
+            --output "$GITHUB_OUTPUT" --summary "$GITHUB_STEP_SUMMARY"
       - name: Clone each project of the corpus with its whole history
+        if: steps.changes.outputs.run == 'true'
         run: |
           clones="$RUNNER_TEMP/corpus"
           mkdir -p "$clones"
@@ -76,20 +93,76 @@ jobs:
             git clone --quiet "$address" "$clones/$name"
           done
           echo "DOKIME_CORPUS_CLONES=$clones" >> "$GITHUB_ENV"
-      - name: Run the tests of the corpus, its self-checks and its cases
-        id: self-check
+      - name: Run the tests of the corpus of this part
+        if: steps.changes.outputs.run == 'true'
         env:
           DOKIME_CORPUS: "1"
         run: |
           start=$(date +%s)
           set +e
-          uv run pytest -p no:cacheprovider -s tests/corpus --junitxml=corpus.xml --durations=0
+          uv run pytest -p no:cacheprovider -p tools.corpus_parts --corpus-part "$PART" -s \
+            tests/corpus --junitxml=corpus.xml --durations=0
           code=$?
-          echo "pytest ended with $code in $(( $(date +%s) - start )) s" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "part $PART: pytest ended with $code in $(( $(date +%s) - start )) s on $(nproc) cores" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
           exit $code
       - name: Every project was self-checked and passed
-        if: always()
+        if: always() && steps.changes.outputs.run == 'true' && matrix.part == 'd'
         run: uv run python -m tools.check_corpus --report corpus.xml | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Leave what this part did for the job corpus
+        if: always()
+        env:
+          RAN: ${{ steps.changes.outputs.run == 'true' }}
+          STATUS: ${{ job.status }}
+        run: |
+          mkdir -p "parts/$PART"
+          echo "$RAN" > "parts/$PART/ran"
+          echo "$STATUS" > "parts/$PART/status"
+          if [ -f corpus.xml ]; then cp corpus.xml "parts/$PART/corpus.xml"; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: corpus-part-${{ matrix.part }}
+          path: parts
+          if-no-files-found: error
+
+  corpus:
+    # The required check of the corpus: it fails unless the four parts ended in success and,
+    # when they ran the corpus, held as many tests as one collection of it (ADR-0078).
+    name: corpus
+    needs: corpus-part
+    if: always()
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: corpus-part-*
+          path: parts
+          merge-multiple: true
+      - name: One collection of the corpus
+        run: uv run pytest -p no:cacheprovider --collect-only -q tests/corpus > collection.txt
+      - name: Every part ended in success and the parts ran the whole corpus
+        env:
+          PARTS: ${{ needs.corpus-part.result }}
+        run: |
+          results=()
+          for part in a b c d; do
+            results+=("--result=$part=$(cat "parts/$part/status" 2>/dev/null || echo nothing)")
+          done
+          uv run python -m tools.check_corpus_parts --parts parts --collection collection.txt \
+            "${results[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$PARTS" != success ]; then
+            echo "[corpus] the parts ended in $PARTS" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
   governance:
     name: governance checks

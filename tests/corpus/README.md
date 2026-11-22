@@ -75,6 +75,18 @@ hand:
 $ python -m tests.corpus.witnesses python-semver ../python-semver 25
 ```
 
+## The blind reading of the witnesses
+
+`blind/` is the test of ADR-0074 in B3a: two new readers label the 41 witnesses again with its four
+conditions only, each batch in a conversation of its own, without a project, memory or the search of
+the web. `draw.toml` keeps the seed of the order, the witness of each id and the digest of each
+batch; `batch-*.txt` are the batches as they were given, each with its prompt; `criterion.toml` the
+criterion, how an undecidable counts and the limits, recorded before the reading; `answers/` each
+answer as it was copied, `discarded.toml` the attempts that did not get the whole batch, and
+`result.toml` the result. The tests demand that the order is the one its seed draws, that each batch
+is the file that was given, that each answer labels the witnesses of its batch, and that the result
+is the one the answers give.
+
 ## The hold-out by hand
 
 `holdout-by-hand/` is B0, the hold-out of ADR-0014 tested by hand before B1 builds it. It keeps

@@ -73,6 +73,20 @@ a milestone names: those of A3, and `breaks-a-relation` for B2.
 - **CORPUS-073** The file `tests/corpus/pending.toml` shall list the cases that have not run yet, each a case of the corpus, and may list none.
 - **CORPUS-074** When the tests of the corpus are asked for, the test of the audit of the cases shall leave out each case that `tests/corpus/pending.toml` lists.
 
+### The intent of each contract
+
+Each good case has an intent sentence: what someone would say before writing any example, for a
+later experiment where a model writes the contract from it. It is taken from the project of the
+case, quoted as it is, from the title of its issue, else of its pull request, else the message of
+its commit; when none is usable, the maintainer writes it before seeing the examples, and an entry
+for a case whose contract the maintainer had already seen says so. A sentence is one or two
+sentences, and holds no concrete value of the inputs or of the outputs of the examples, nor the name
+of a test, though it may name the behaviour or the error it asks for; a quotation that holds such a
+value is not usable, and the entry may say why a source was skipped. A bad case has none, since it
+uses the contract of its good case.
+
+- **CORPUS-075** The file `tests/corpus/intents.toml` shall give each good case, by its key, an intent sentence and its source: `issue:` or `pr:` and the address, `commit:` and the full name of the commit, or `maintainer`.
+
 ### The patches apply
 
 - **CORPUS-040** When the tests of the corpus are asked for, the test of each case shall check with `git apply --check` that its patch applies on its base, in a clone of its project.

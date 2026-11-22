@@ -539,11 +539,48 @@ Its limits:
   4, so even if they could have read the whole contracts, they did not use them.
 - **The value of a hold-out with secret examples** is left to B3 and B4, which measure it.
 
+**B2 closed on 2026-11-22.** The gate `relations` runs the two relations of the catalogue on
+follow-ups of the visible examples, and is built.
+
+- [x] **B2a, the semantics:**
+  [ADR-0076](adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) is accepted
+  (#183).
+- [x] **B2b, the gate, on doubles:** a relation that does not hold gives `relation-fails`, a `FAIL`
+  of origin `derived` that names the source example and gives no value (VERIFY-184); a relation
+  without a source asks (VERIFY-183); a refusal of a port is an `ERROR` (VERIFY-186); the seed of
+  the audit and the orders that failed are in the evidence, predicate v0.4 (EVIDENCE-094,
+  INTERFACES-189). On the way: the channel of a relation in `contract check` (CONTRACT-095 to
+  CONTRACT-101), `relations.permutations` in the policy (CORE-190), and the follow-ups in `oracle`
+  (ORACLE-052 to ORACLE-062).
+- [x] **B2c, measured:** on mdformat at `b8c3561`, the fix of `27e2ba3` with three relations
+  `idempotent` through `stdout` passes, and the same fix with a change that formats an already
+  formatted document otherwise fails first at `relations`, as the maintainer confirmed before;
+  the review is in `tests/corpus/review.toml`, 6 minutes, recorded before the first run, which
+  was the CI of #193. The gate is built (#191), and the limit of its sources is written.
+
+Its limits:
+
+- **Only `idempotent` at `cli` was measured.** `order-insensitive` and the boundary `function`
+  have no case in the corpus; natural candidates are looked for in B3, and so is a real failure of
+  idempotence of mdformat, if there is one.
+- **The case is built so that only the relation sees it:** its condition, a code block of one line
+  of one character before a heading, is close to special-casing the visible example. mdformat
+  already checks idempotence in its own tests, on the CommonMark specification, so a natural
+  failure of it would stop at `existing-tests` before the relation: a first, wider version of the
+  change broke six of them.
+- **The value of the relations in a project whose tests do not check the relation** is left
+  unmeasured, for B3.
+- **The sources are the visible examples**, the least effective by the studies of metamorphic
+  testing ([Segura et al., 2016](https://eprints.whiterose.ac.uk/110335/1/segura16-tse.pdf)).
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
+- **Before B3, the time of the job `corpus`:** about 12 minutes with twelve cases (11 minutes 53
+  seconds in #193); it is to be measured by part and shared out before the corpus grows to about
+  thirty cases.
 - **Before B3:** the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
   sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that

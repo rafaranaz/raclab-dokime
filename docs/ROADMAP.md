@@ -614,14 +614,47 @@ Its limits:
   whole files of its base, so condition 2 was judged with less than the base; and what a model
   remembers of these public projects cannot be ruled out.
 
+**B3b closed on 2026-11-22.** The job `corpus` runs in four parts at once, and a pull request of
+text does not run it: the wait for the corpus fell from about 12 minutes to about 5 (#203).
+
+- [x] **Measured by part:** four runs with `--durations=0`, in #197, twice in #198 and in #199, gave
+  between 699 and 703 seconds of pytest in three and 911 in the fourth, 30 % slower in every part
+  alike, which points to the runner; the audit of a case costs about 47 seconds in mdformat and
+  about 14 in python-semver.
+- [x] **Shared out:**
+  [ADR-0078](adr/0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md)
+  splits the job into the audit of mdformat, that of python-semver and cachetools, the hold-out by
+  hand with the sealed run, and the rest, which is the complement of the others; the job `corpus`
+  fails unless the four parts end in `success` and hold the tests of one collection.
+  [ADR-0077](adr/0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) skips
+  the corpus on a pull request that changes only Markdown files under `docs/` outside
+  `docs/requirements/`, with a step in each part, and runs it whole on a push to `main`. Both
+  amend ADR-0052.
+- [x] **The first run with the split**, on `2e927e9`: pytest took 250 seconds in part a, 117 in b,
+  260 in c and 205 in d, and the parts ran 6, 6, 11 and 223 tests, the 246 of one collection; the
+  job `corpus` that gathers them took 18 seconds, and the wait from the start of the parts to its
+  end was 4 minutes 54 seconds, against about 12 before. Each part ran on 4 cores; the setting up,
+  the cloning and the rest added 10 to 15 seconds to each, the clone alone 1 to 2.
+- [x] **The skip, tested:** a probe pull request that changed only a Markdown file under `docs/`,
+  against the branch of the split, had the four parts say "the corpus did not run: the pull
+  request only changes text" with the file listed, and the job `corpus` passed; it was closed
+  without merging.
+
+Its limits:
+
+- **Part c is now the longest**, 260 seconds against the 196 that the hold-out and the sealed run
+  took inside the single job; one run does not say whether that is the runner. A part above 6
+  minutes in three runs in a row is split again without another ADR.
+- **`lint, types and tests` is now the longest job of CI**, 6 minutes 42 seconds in that run, so a
+  shorter corpus no longer shortens the wait for a pull request.
+- **On a pull request of text, a failure of the corpus that does not come from the change** shows
+  only on the push to `main`, or on the next push if the concurrency of CI cancels that run.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **Before B3, the time of the job `corpus`:** between 10 and 14 minutes in the last pull requests
-  (11 minutes 53 seconds in #193, with twelve cases); it is to be measured by part, with how much
-  it varies from one run to another, and shared out before the corpus grows to about thirty cases.
 - **Before B3:** the cases that the review of the corpus left for it, held out and on the coverage
   of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
   sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that

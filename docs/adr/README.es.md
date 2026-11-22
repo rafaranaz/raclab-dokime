@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:b4984e6dbd898057 -->
+<!-- translation-of: README.md sha256:c05ef57b9fffc9ff -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -91,3 +91,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Aceptada |
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) | El corpus no se ejecuta en una pull request que solo cambia texto | Aceptada |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md) | El job corpus se reparte en cuatro trozos y un job que los reúne | Aceptada |
+| [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Propuesta |

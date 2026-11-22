@@ -50,7 +50,14 @@ class Json:
     value: "Expected"
 
 
-type Matcher = Contains | FullMatch | Approx | Unordered | AnyValue | Json
+@dataclass(frozen=True)
+class Repr:
+    """The observed value is not JSON, and its `repr` is this text (ADR-0079)."""
+
+    text: str
+
+
+type Matcher = Contains | FullMatch | Approx | Unordered | AnyValue | Json | Repr
 type Expected = bool | int | float | str | list[Expected] | dict[str, Expected] | Matcher | None
 
 
@@ -59,9 +66,10 @@ _TIMESTAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2
 
 
 def holds(expected: Expected, observed: object) -> bool:
-    """Say whether an expectation holds for an observed value.
+    """Say whether an expectation holds for an observed value of JSON.
 
-    An exact value holds for an equal value of the same type, so 1 is neither 1.0 nor true.
+    An exact value holds for an equal value of the same type, so 1 is neither 1.0 nor true. A
+    `$repr` holds for no value of JSON: it is the `repr` of a value that JSON cannot hold.
     """
     if isinstance(expected, dict):
         return (
@@ -83,6 +91,8 @@ def holds(expected: Expected, observed: object) -> bool:
         return _is_number(observed) and abs(observed - expected.number) <= expected.tolerance
     if isinstance(expected, Contains | FullMatch | AnyValue):
         return isinstance(observed, str) and _holds_for_text(expected, observed)
+    if isinstance(expected, Repr):
+        return False
     return type(expected) is type(observed) and expected == observed
 
 
@@ -92,7 +102,9 @@ def is_exact(expected: Expected) -> bool:
         return all(is_exact(value) for value in expected.values())
     if isinstance(expected, list):
         return all(is_exact(item) for item in expected)
-    return not isinstance(expected, Contains | FullMatch | Approx | Unordered | AnyValue | Json)
+    return not isinstance(
+        expected, Contains | FullMatch | Approx | Unordered | AnyValue | Json | Repr
+    )
 
 
 def identical(one: Expected, other: Expected) -> bool:

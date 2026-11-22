@@ -36,6 +36,8 @@ each part of a contract and the directives are listed in the
 | `unknown-directive`, `several-directives`, `directive-parameter`, `directive-value`, `matcher-in-input` | `FAIL` | A directive that is not in the table, or is not written as the table states |
 | `duplicate-example` | `FAIL` | Two examples with the same boundary, target and steps |
 | `contradictory-examples` | `FAIL` | Two examples that expect, for the same inputs, what cannot both hold |
+| `call-in-first-step`, `call-not-public` | `FAIL` | A `call` in the first step of an example, or a `call` of a name that starts with an underscore and is not a dunder (ADR-0079) |
+| `repr-out-of-place`, `repr-with-address`, `repr-too-long` | `FAIL` | A `$repr` that is not the whole of `returns`, holds a memory address, ` at 0x`, or has more than the 1,000 characters an observation keeps (ADR-0079) |
 | `relation-target-ambiguous`, `relation-needs-via`, `relation-via-not-allowed`, `relation-needs-over`, `bad-over` | `FAIL` | A relation whose channel is not declared where it has to be, is declared where it is not allowed, or names no input of its examples (ADR-0076) |
 | `requirement-without-example`, `only-model-examples` | `ASK` | A requirement that no example approved by a person supports |
 | `relation-without-example` | `ASK` | A relation whose target no visible example of its requirement has, so that nothing tells its boundary nor feeds it |
@@ -49,6 +51,10 @@ example gives, and `idempotent` needs it when an example gives more than one arg
 an unknown requirement, the channels are not checked, so that a relation does not lose a source it
 has.
 
+At `function`, a step after the first may name a public method with `call`, which is called on
+what the first step returned, and a value that JSON cannot hold may be expected with `$repr` as the
+whole of `returns` ([ADR-0079](../../../docs/adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)).
+
 An example with a finding of its own is left out of the search for duplicates and contradictions.
 Two matchers for the same field are not compared with each other.
 
@@ -56,7 +62,8 @@ Two matchers for the same field are not compared with each other.
 
 `holds` says whether what an example expects holds for what was observed. An exact value holds
 only for an equal value of the same type; the matchers are `Contains`, `FullMatch`, `Approx`,
-`Unordered`, `AnyValue` and `Json`.
+`Unordered`, `AnyValue`, `Json` and `Repr`, which holds for no value of JSON, since it is the `repr`
+of a value that JSON cannot hold; the oracle compares it with the `repr` observed.
 
 ```python
 from dokime.contract.expectations import Approx, holds

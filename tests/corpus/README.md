@@ -87,6 +87,18 @@ answer as it was copied, `discarded.toml` the attempts that did not get the whol
 is the file that was given, that each answer labels the witnesses of its batch, and that the result
 is the one the answers give.
 
+## The reading of the boundary
+
+`boundary/` is the reading of B3c: the 21 witnesses that are not expressible today, read against
+four options for the boundary `function`. `options.toml` keeps what fits means, the four options and
+the criteria to compare them, recorded before any reading, and two precisions decided after both
+readings; `first-reading.txt` is the reading of the session that builds the work,
+`second-reading.txt` that of the session that reviews it, made from `batch-*.txt` without seeing
+the first; `resolution.toml` the labels of the maintainer where they differ, and `result.toml` what
+each option lets fit. The tests demand that each batch is the file that was given, that each reading
+labels each witness once for each option, that the resolution covers the pairs read apart and no
+other, and that the result is the one the readings give.
+
 ## The hold-out by hand
 
 `holdout-by-hand/` is B0, the hold-out of ADR-0014 tested by hand before B1 builds it. It keeps

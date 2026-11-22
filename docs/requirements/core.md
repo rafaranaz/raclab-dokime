@@ -299,7 +299,7 @@ self-check uses.
 
 | Boundary | What a step observes |
 |---|---|
-| `function` | The value returned, of any type that JSON holds, decimals included; or the exception raised, with the name of its class, its full name (module and qualified name), the full names of the classes of its MRO and its message; or the name of the type of a value returned that JSON cannot hold |
+| `function` | The value returned, of any type that JSON holds, decimals included; or the exception raised, with the name of its class, its full name (module and qualified name), the full names of the classes of its MRO and its message; or the name of the type of a value returned that JSON cannot hold, with its `repr` up to 1,000 characters ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)) |
 | `cli` | The exit code, the standard output, the standard error and the files the command wrote, by name, as texts |
 
 - **CORE-160** The port that observes shall offer one operation: observe the examples of a list of requests in an image, with the directory of the project and the limits of observation.
@@ -314,6 +314,9 @@ self-check uses.
 - **CORE-169** When an adapter of the port that observes refuses an operation, the port shall raise the refusal of CORE-072.
 - **CORE-170** When the process of an example crashed, the observation of the example shall carry the signal that ended it, or its exit code, when they are known.
 - **CORE-171** If an observation that did not crash carries a signal or an exit code, then the observation shall be rejected with an error that names the field.
+- **CORE-191** When a step at `function` returns a value that JSON cannot hold, the observation of the step shall carry the `repr` of the value, whole when it has 1,000 characters or fewer.
+- **CORE-192** If the `repr` of a value that JSON cannot hold has more than 1,000 characters, then the observation of the step shall keep the first 1,000 and a mark that it was cut.
+- **CORE-193** If the observation of a value that JSON cannot hold carries a `repr` of more than 1,000 characters, or a mark that it was cut on a `repr` of fewer, then the observation shall be rejected with an error that names the field.
 
 ## The sealed store ([ADR-0072](../adr/0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md), [ADR-0073](../adr/0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md))
 

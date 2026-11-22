@@ -1,0 +1,28 @@
+# The intent of each contract of the corpus (CORPUS-075): what someone would say before writing any
+# example, for a later experiment where a model writes the contract from it. One entry for each
+# good case, by its key; a bad case uses the contract of its good case.
+#
+# Taken from the project of the case, quoted as it is: the title of its issue (source "issue:"),
+# else of its pull request ("pr:"), else the message of its commit ("commit:"). When none is usable,
+# the maintainer writes it before seeing the examples (source "maintainer"), and an entry for a case
+# whose contract the maintainer had already seen has seen_contract = true. A sentence holds no
+# concrete value of the inputs or of the outputs of the examples, nor the name of a test, though it
+# may name the behaviour or the error it asks for; "skipped" says why a source was not used.
+
+["mdformat/format-a-blank-paragraph-between-blocks"]
+intent = "fix: an error on empty paragraph surrounded by non-paragraphs"
+source = "pr:https://github.com/hukkin/mdformat/pull/474"
+skipped = "issue:https://github.com/hukkin/mdformat/issues/353 is not used: its title names the em space, the character of the input of an example"
+
+["mdformat/formats-a-blank-paragraph-the-same-twice"]
+intent = "fix: an error on empty paragraph surrounded by non-paragraphs"
+source = "pr:https://github.com/hukkin/mdformat/pull/474"
+skipped = "issue:https://github.com/hukkin/mdformat/issues/353 is not used: its title names the em space, the character of the input of an example"
+
+["python-semver/nextver-bumps-build-only-versions"]
+intent = "fix: next_version should bump version for build-only versions"
+source = "pr:https://github.com/python-semver/python-semver/pull/469"
+
+["python-semver/replace-keeps-the-constructor-error"]
+intent = "Preserve constructor TypeError in Version.replace"
+source = "pr:https://github.com/python-semver/python-semver/pull/501"

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:6493ffefbf2f2448 -->
+<!-- translation-of: ROADMAP.md sha256:eb69286c23522448 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -630,14 +630,48 @@ Sus límites:
   ficheros completos de su base, así que la condición 2 se juzgó con menos que la base; y no se
   puede descartar lo que un modelo recuerde de estos proyectos públicos.
 
+**B3b se cerró el 2026-11-22.** El job `corpus` se ejecuta en cuatro trozos a la vez, y una pull
+request de texto no lo ejecuta: la espera del corpus bajó de unos 12 minutos a unos 5 (#203).
+
+- [x] **Medido por partes:** cuatro ejecuciones con `--durations=0`, en #197, dos en #198 y en
+  #199, dieron entre 699 y 703 segundos de pytest en tres y 911 en la cuarta, un 30 % más lenta en
+  todas las partes por igual, lo que apunta al runner; la auditoría de un caso cuesta unos 47
+  segundos en mdformat y unos 14 en python-semver.
+- [x] **Repartido:** la
+  [ADR-0078](adr/0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md)
+  reparte el job en la auditoría de mdformat, la de python-semver y cachetools, la reserva a mano
+  con la ejecución sellada, y el resto, que es el complemento de los demás; el job `corpus` falla
+  salvo que los cuatro trozos acaben en `success` y contengan los tests de una colección. La
+  [ADR-0077](adr/0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) salta
+  el corpus en una pull request que solo cambia ficheros Markdown bajo `docs/` fuera de
+  `docs/requirements/`, con un paso en cada trozo, y lo ejecuta entero en un push a `main`. Las dos
+  enmiendan la ADR-0052.
+- [x] **La primera ejecución con el reparto**, sobre `2e927e9`: pytest tardó 250 segundos en el
+  trozo a, 117 en el b, 260 en el c y 205 en el d, y los trozos ejecutaron 6, 6, 11 y 223 tests,
+  los 246 de una colección; el job `corpus` que los reúne tardó 18 segundos, y la espera desde el
+  inicio de los trozos hasta su final fue de 4 minutos 54 segundos, frente a unos 12 antes. Cada
+  trozo corrió en 4 núcleos; la preparación, el clonado y el resto añadieron de 10 a 15 segundos a
+  cada uno, el clonado solo de 1 a 2.
+- [x] **El salto, probado:** una pull request de prueba que solo cambiaba un fichero Markdown bajo
+  `docs/`, contra la rama del reparto, hizo que los cuatro trozos dijeran «the corpus did not run:
+  the pull request only changes text» con el fichero en la lista, y el job `corpus` pasó; se cerró
+  sin fusionarla.
+
+Sus límites:
+
+- **El trozo c es ahora el más largo**, 260 segundos frente a los 196 que tardaban la reserva y la
+  ejecución sellada dentro del job único; una ejecución no dice si es el runner. Un trozo que pase
+  de 6 minutos en tres ejecuciones seguidas se vuelve a partir sin otra ADR.
+- **`lint, types and tests` es ahora el job más largo de la CI**, 6 minutos 42 segundos en esa
+  ejecución, así que un corpus más corto ya no acorta la espera de una pull request.
+- **En una pull request de texto, un fallo del corpus que no viene del cambio** solo se ve en el
+  push a `main`, o en el push siguiente si la concurrencia de la CI cancela esa ejecución.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Antes de B3, el tiempo del job `corpus`:** entre 10 y 14 minutos en las últimas pull requests
-  (11 minutos 53 segundos en #193, con doce casos); hay que medirlo por partes, con cuánto varía de
-  una ejecución a otra, y repartirlo antes de que el corpus crezca a unos treinta casos.
 - **Antes de B3:** los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
   parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de

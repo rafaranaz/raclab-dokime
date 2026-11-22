@@ -29,7 +29,9 @@ The gates of a change that arrives already made, and their aggregation. The requ
   that already holds asks. With the patch, an example that does not hold is a `FAIL`, or an `ASK`
   when its origin is `model` (ADR-0013). A finding names the example, its requirement and up to five
   differences, each value quoted within 200 characters. A refusal of a port is the `ERROR` of its
-  finding.
+  finding. Before all of that, a comparison that is not recorded, because a step expects `$repr`
+  and the zone did not record the `repr` of what it returned, is `repr-not-recorded`, an `ERROR`
+  and the only finding of its example: it says nothing of the change (ADR-0079).
 
 - `existing_tests(pack, contract, policy, base, patch, dockerfile, repository, runtime)`: the gate
   `existing-tests`. The tests run on the base `baseline.runs` times; a test counts as passing in
@@ -135,6 +137,8 @@ result = sealed_examples(
 - **A held-out example that fails** is `sealed-example-fails`, a `FAIL`, or
   `sealed-model-example-fails`, an `ASK`, for one whose origin is `model`, with the words of the
   oracle for the agent: the requirement and the classes of the failure, never a value, an input or
-  an identifier.
+  an identifier. A held-out comparison that is not recorded is `repr-not-recorded`, an `ERROR`
+  that names the requirement alone. The canary expects a text, never a `$repr`, so its comparison
+  is always recorded.
 - **Where the key is not**, the gate is not applicable with the reason `NOT_HERE`, "the key is not
   here". The flow of the audit runs the gate only after `visible-examples` passed.

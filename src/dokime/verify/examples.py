@@ -38,6 +38,8 @@ _SHOWN = 5
 _QUOTED = 200
 """The characters of a value that a finding quotes."""
 
+NOT_RECORDED = "the repr of a value that JSON cannot hold was not recorded"
+
 
 def baseline(
     contract: Contract,
@@ -64,6 +66,9 @@ def baseline(
         return observed
     findings, unstable = [], []
     for example, comparisons in zip(contract.examples, observed, strict=True):
+        if not all(comparison.recorded for comparison in comparisons):
+            findings.append(not_recorded(example))
+            continue
         if len({comparison.holds for comparison in comparisons}) > 1:
             failing = next(comparison for comparison in comparisons if not comparison.holds)
             findings.append(_finding("example-varies-on-base", Verdict.ASK, example, failing))
@@ -110,6 +115,9 @@ def visible_examples(
         return observed
     findings = []
     for example, (comparison,) in zip(contract.examples, observed, strict=True):
+        if not comparison.recorded:
+            findings.append(not_recorded(example))
+            continue
         if comparison.holds:
             continue
         if example.origin == "model":
@@ -159,6 +167,18 @@ def request_of(example: Example) -> ExampleRequest:
         boundary=Boundary(example.boundary),
         target=example.target,
         inputs=tuple(dict(step.input) for step in example.steps),
+    )
+
+
+def not_recorded(example: Example, message: str | None = None) -> Finding:
+    """The error of a comparison that the zone did not record all of: it says nothing of the
+    change, since a step expected `$repr` and the `repr` of what it returned was not recorded."""
+    said = f"the example {example.id} of {example.requirement}: {NOT_RECORDED}"
+    return Finding(
+        code="repr-not-recorded",
+        message=said if message is None else message,
+        verdict=Verdict.ERROR,
+        lines=(example.line,),
     )
 
 

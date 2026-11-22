@@ -54,7 +54,7 @@ from dokime.core.runtime import Digest
 from dokime.core.verdicts import Verdict
 from dokime.oracle.holdout import Split, feedback, split
 from dokime.packs.model import Pack
-from dokime.verify.examples import _observe
+from dokime.verify.examples import NOT_RECORDED, _observe, not_recorded
 from dokime.verify.published import example_items, published
 from dokime.verify.result import GateResult, checks_of
 from dokime.verify.trees import change_tree
@@ -306,6 +306,13 @@ def sealed_examples(
     lines = {h.id: h.line for h in contract.held_out}
     findings = []
     for example, (comparison,) in zip(held, comparisons, strict=True):
+        if not comparison.recorded:
+            message = (
+                f"the requirement {example.requirement} has a held-out example: {NOT_RECORDED}"
+            )
+            found = not_recorded(example, message)
+            findings.append(replace(found, lines=(lines[example.id],)))
+            continue
         if comparison.holds:
             continue
         model = example.origin == "model"

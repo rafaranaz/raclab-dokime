@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:bba70f505d9008c4 -->
+<!-- translation-of: ROADMAP.md sha256:6493ffefbf2f2448 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -468,8 +468,8 @@ testigo está aislado cuando es un arreglo y nada más
 | B3a La prueba de la ADR-0074 | Los 41 testigos etiquetados de nuevo por dos lectores nuevos, a ciegas entre sí y respecto a las lecturas anteriores, solo con las cuatro condiciones; los ocho en disputa mezclados y sin marcar | `corpus` | El criterio se registra antes de la lectura: la hipótesis de la ADR-0074 se cumple si κ sobre los 41 supera 0,57, lo medido al cierre del bloque A, y si no, la frontera de *aislado* se vuelve a discutir. Cada lector es un agente nuevo en una conversación propia del mantenedor, fuera de cualquier proyecto y sin memoria, con el mismo paquete y nada más. En esto la prueba se aparta de la ADR-0074, que nombra a la sesión que revisa el trabajo como segundo lector: esa sesión conoce el debate y las etiquetas de `tests/corpus/witnesses.toml`, y ya hizo una lectura de los 41, así que no es ciega; si la ADR-0074 se enmienda se decide en la pull request de la lectura; el paquete con su digest, el prompt y cada respuesta en su propio commit; un test da κ y el acuerdo bruto sobre los 41 y sobre los ocho, con el límite de κ con pocos elementos escrito: inestable, e indefinido si no hay variación |
 | B3b El tiempo del job `corpus` | El job medido por partes, y repartido | `repo` | El job se ejecuta con `--durations` en varias pull requests, para medir cada parte y su variación; una ADR que enmienda la [ADR-0052](adr/0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) decide cómo se reparte; el reparto está en CI antes de añadir ningún caso |
 | B3c La frontera | Cuántos de los 41 testigos cabrían con cada forma de escribir ejemplos que construyen objetos y llaman métodos | `corpus` | Los 21 testigos que no son expresables, releídos frente a cada opción, y una ADR decide si se amplía la frontera `function`; los casos que caben hoy en `cli` y en `function` no la esperan |
-| B3d Los casos | Unos dieciocho casos nuevos, hacia unos treinta | `corpus` | Cada caso bueno, también los de A y B, tiene una frase de intención en `tests/corpus/intents.toml`, tomada de su proyecto o escrita por el mantenedor antes de los ejemplos; los casos nuevos llegan en unos cinco grupos de tres o cuatro, un caso bueno y sus malos, cada uno revisado por el mantenedor antes de ejecutarse: los casos apuntados más abajo para B3, casos de las dos técnicas de trampa que el bloque A no cubre, la comparación sobrecargada y el estado entre llamadas, y candidatos naturales para `order-insensitive` y para la frontera `function`; una pull request saca de `tests/corpus/pending.toml` todos los grupos revisados |
-| B3e `bench` | `bench` calculando las métricas del corpus | `bench` | Los falsos aceptados por etiqueta, los falsos rechazados, la tasa de preguntas, el valor de la reserva y la estabilidad, calculados sobre el corpus |
+| B3d Los casos | Unos dieciocho casos nuevos, hacia unos treinta | `corpus` | Cada caso bueno, también los de A y B, tiene una frase de intención en `tests/corpus/intents.toml`, tomada de su proyecto o escrita por el mantenedor antes de los ejemplos; los casos nuevos llegan en unos cinco grupos de tres o cuatro, un caso bueno y sus malos, cada uno revisado por el mantenedor antes de ejecutarse: los casos apuntados más abajo para B3, casos de las dos técnicas de trampa que el bloque A no cubre, la comparación sobrecargada y el estado entre llamadas, y candidatos naturales para `order-insensitive` y para la frontera `function`, y un gemelo de `nextver-bumps-build-only-versions` en python-semver a partir de un testigo que los dos lectores de B3a etiqueten como aislado; una pull request saca de `tests/corpus/pending.toml` todos los grupos revisados |
+| B3e `bench` | `bench` calculando las métricas del corpus | `bench` | Los falsos aceptados por etiqueta, los falsos rechazados, la tasa de preguntas, el valor de la reserva y la estabilidad, calculados sobre el corpus, con y sin los casos buenos cuyo testigo la lectura ciega de B3a etiqueta como no aislado |
 | B4 Cierre | El criterio de salida del bloque medido, y la versión 0.2 | Ninguno nuevo | Ningún falso aceptado en las cuatro técnicas de trampa; el valor de la reserva medido; la hipótesis de que la reserva por caso caza el sobreajuste resuelta en un sentido u otro; si la puerta sellada corre en CI, decidido por una ADR en un sentido u otro, como pide la ADR-0073, que puede concluir que no; la nota de cierre, y la versión 0.2 con su etiqueta y su Release, publicadas aunque el resultado sea malo |
 
 **B0 se cerró el 2026-11-19**, hecho a mano sobre copias de los tres contratos buenos del corpus,
@@ -592,6 +592,43 @@ Sus límites:
   medir, para B3.
 - **Los casos de partida son los ejemplos visibles**, los menos eficaces según los estudios de
   pruebas metamórficas ([Segura et al., 2016](https://eprints.whiterose.ac.uk/110335/1/segura16-tse.pdf)).
+
+**B3a se cerró el 2026-11-22.** La hipótesis de la ADR-0074 se cumple: solo con sus cuatro
+condiciones, dos lectores nuevos etiquetan igual 38 de los 41 testigos en *aislado*, κ 0,85, frente
+al 0,57 de las dos lecturas del bloque A (#198, `tests/corpus/blind/`).
+
+- [x] **El criterio antes de la lectura:** κ sobre los 41 por encima de 0,57, un indecidible contado
+  como no aislado, y los límites, registrados y subidos antes de cualquier conversación; una regla
+  posterior, decidida tras la respuesta del lector A al lote 3 y antes del lote 4 o de calcular
+  nada, cuenta la última etiqueta de un lector que se corrige.
+- [x] **Los lectores:** dos agentes nuevos, Mistral (Le Chat) y Claude Sonnet 5.5, cada lote de unos
+  diez testigos en una conversación propia del mantenedor, sin proyecto, sin memoria y sin búsqueda
+  web, con el lote adjunto como fichero. Esto se aparta de la ADR-0074, que nombraba como segundo
+  lector a la sesión que revisa el trabajo, como dice la fila de B3a; la ADR-0074 no se enmienda.
+  Dos primeros intentos del lote 1 no recibieron el lote entero y se registran como descartados.
+- [x] **El resultado:** 38 de 41, κ 0,8534; con la primera etiqueta del testigo en que el lector A
+  se corrigió, 37 de 41 y κ 0,8038, todavía por encima. Los dos lectores etiquetan como no aislados
+  los ocho en disputa, la etiqueta de la primera lectura de A en los ocho, así que κ sobre ellos es
+  indefinida. Difieren en tres testigos, los tres en la condición 2, y un indecidible está también
+  en la condición 2: lo que queda de la frontera es si la base está mal, lo que depende de lo que
+  un lector ve de ella.
+- [x] **El testigo de un caso bueno leído de otra forma:** los dos lectores nuevos etiquetan el
+  testigo de `nextver-bumps-build-only-versions`, `4e09ef0e`, como no aislado en la condición 2,
+  porque su base documentaba el resultado antiguo como intencionado. El caso se mantiene con su
+  etiqueta y su veredicto, porque una etiqueta no cambia una vez que el caso se ha ejecutado
+  (ADR-0055) y B0 y B1 lo usan; `witnesses.toml` no cambia; `bench` da sus métricas con y sin esos
+  casos, y B3d añade un gemelo a partir de un testigo que los dos lectores etiqueten como aislado.
+
+Sus límites:
+
+- **Las respuestas se registran con las líneas de cada lote unidas y sin las comillas invertidas del
+  original**, tal como se copiaron; las etiquetas y los textos se conservan.
+- **Los lectores son modelos de dos proveedores**, mientras que el 0,57 del bloque A se midió entre
+  dos lecturas de un mismo tipo de modelo; el acuerdo mide también la cercanía entre los dos
+  modelos.
+- **Cada testigo se mostró con su diff y las funciones completas alrededor de cada cambio**, no los
+  ficheros completos de su base, así que la condición 2 se juzgó con menos que la base; y no se
+  puede descartar lo que un modelo recuerde de estos proyectos públicos.
 
 ### Queda por decidir
 

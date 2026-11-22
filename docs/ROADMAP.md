@@ -455,8 +455,8 @@ witness is isolated when it is a fix and nothing else
 | B3a The test of ADR-0074 | The 41 witnesses labelled again by two new readers, blind to each other and to the earlier readings, with the four conditions only; the eight in dispute mixed in and unmarked | `corpus` | The criterion is recorded before the reading: the hypothesis of ADR-0074 holds if κ on the 41 is above 0.57, as measured at the close of block A, and otherwise the boundary of *isolated* is discussed again. Each reader is a new agent in a conversation of its own of the maintainer, outside any project and without memory, with the same package and nothing else. This departs from ADR-0074, which names the session that reviews the work as the second reader: that session knows the debate and the labels of `tests/corpus/witnesses.toml`, and already made a reading of the 41, so it is not blind; whether ADR-0074 is amended is decided in the pull request of the reading; the package with its digest, the prompt and each answer in its own commit; a test gives κ and the raw agreement on the 41 and on the eight, with the limit of κ on few items written: unstable, and undefined without variation |
 | B3b The time of the job `corpus` | The job measured by part, and shared out | `repo` | The job runs with `--durations` in several pull requests, so that each part and its variation are measured; an ADR that amends [ADR-0052](adr/0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) decides how it is shared out; the split is in CI before any case is added |
 | B3c The boundary | How many of the 41 witnesses each way of writing examples that build objects and call methods would let fit | `corpus` | The 21 witnesses that are not expressible read again against each option, and an ADR decides whether the boundary `function` is widened; the cases that fit `cli` and `function` today do not wait for it |
-| B3d The cases | About eighteen new cases, towards about thirty | `corpus` | Each good case, those of A and B as well, has an intent sentence in `tests/corpus/intents.toml`, taken from its project or written by the maintainer before the examples; the new cases come in about five groups of three or four, a good case and its bad ones, each reviewed by the maintainer before it runs: the cases noted below for B3, cases of the two cheating techniques that block A does not cover, overloaded comparison and state between calls, and natural candidates for `order-insensitive` and for the boundary `function`; one pull request takes every reviewed group out of `tests/corpus/pending.toml` |
-| B3e `bench` | `bench` computing the metrics of the corpus | `bench` | False accepts per label, false rejects, the rate of questions, the value of the hold-out and stability, computed on the corpus |
+| B3d The cases | About eighteen new cases, towards about thirty | `corpus` | Each good case, those of A and B as well, has an intent sentence in `tests/corpus/intents.toml`, taken from its project or written by the maintainer before the examples; the new cases come in about five groups of three or four, a good case and its bad ones, each reviewed by the maintainer before it runs: the cases noted below for B3, cases of the two cheating techniques that block A does not cover, overloaded comparison and state between calls, and natural candidates for `order-insensitive` and for the boundary `function`, and a twin of `nextver-bumps-build-only-versions` in python-semver from a witness that both readers of B3a label isolated; one pull request takes every reviewed group out of `tests/corpus/pending.toml` |
+| B3e `bench` | `bench` computing the metrics of the corpus | `bench` | False accepts per label, false rejects, the rate of questions, the value of the hold-out and stability, computed on the corpus, with and without the good cases whose witness the blind reading of B3a labels not isolated |
 | B4 Close | The exit criterion of the block measured, and version 0.2 | None new | No false accept on the four cheating techniques; the value of the hold-out measured; the hypothesis that holding out by case catches overfitting resolved either way; whether the sealed gate runs in CI decided by an ADR either way, as ADR-0073 asks, which may conclude that it does not; the closing note, and version 0.2 with its tag and its Release, published even if the result is bad |
 
 **B0 closed on 2026-11-19**, done by hand on copies of the three good contracts of the corpus, with
@@ -576,6 +576,43 @@ Its limits:
   unmeasured, for B3.
 - **The sources are the visible examples**, the least effective by the studies of metamorphic
   testing ([Segura et al., 2016](https://eprints.whiterose.ac.uk/110335/1/segura16-tse.pdf)).
+
+**B3a closed on 2026-11-22.** The hypothesis of ADR-0074 holds: with its four conditions only,
+two new readers label alike 38 of the 41 witnesses on *isolated*, κ 0.85, against the 0.57 of the
+two readings of block A (#198, `tests/corpus/blind/`).
+
+- [x] **The criterion before the reading:** κ on the 41 above 0.57, an undecidable counted as not
+  isolated, and the limits, recorded and pushed before any conversation; a later rule, decided
+  after the answer of reader A to batch 3 and before batch 4 or any computation, counts the last
+  label of a reader who corrects itself.
+- [x] **The readers:** two new agents, Mistral (Le Chat) and Claude Sonnet 5.5, each batch of about
+  ten witnesses in a conversation of its own of the maintainer, without a project, memory or the
+  search of the web, the batch attached as a file. This departs from ADR-0074, which named the
+  session that reviews the work as the second reader, as the row of B3a says; ADR-0074 is not
+  amended. Two first attempts at batch 1 did not get the whole batch and are recorded as
+  discarded.
+- [x] **The result:** 38 of 41, κ 0.8534; with the first label of the witness where reader A
+  corrected itself, 37 of 41 and κ 0.8038, still above. Both readers label the eight in dispute not
+  isolated, the label of the first reading of A in all eight, so κ on them is undefined. They
+  differ on three witnesses, all at condition 2, and one undecidable is at condition 2 as well:
+  what is left of the boundary is whether the base is wrong, which depends on what a reader sees
+  of it.
+- [x] **The witness of a good case read otherwise:** both new readers label the witness of
+  `nextver-bumps-build-only-versions`, `4e09ef0e`, not isolated at condition 2, since its base
+  documented the old result as intended. The case is kept with its label and its verdict, since a
+  label does not change once a case has run (ADR-0055) and B0 and B1 use it; `witnesses.toml` is
+  not changed; `bench` gives its metrics with and without such cases, and B3d adds a twin from a
+  witness both readers label isolated.
+
+Its limits:
+
+- **The answers are recorded with the lines of each batch joined and without the backquotes of the
+  original**, as they were copied; the labels and the texts are kept.
+- **The readers are models of two providers**, while the 0.57 of block A was measured between two
+  readings by the same kind of model; the agreement measures as well how close the two models are.
+- **Each witness was shown with its diff and the whole functions around each change**, not the
+  whole files of its base, so condition 2 was judged with less than the base; and what a model
+  remembers of these public projects cannot be ruled out.
 
 ### Still to decide
 

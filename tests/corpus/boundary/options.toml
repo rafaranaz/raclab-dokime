@@ -74,3 +74,23 @@ passing.
 [[criterion]]
 id = "cost"
 text = "The cost of building it: which modules, and about how many pull requests."
+
+# Two precisions decided by the maintainer after the two readings, to resolve their differences:
+# the second reading found that option c did not say what a fixture may hold (W02, W22, W28,
+# W37), and the readings read W41 apart on whether a part of a fix is enough.
+
+[[precision]]
+id = "fixture"
+text = """
+A fixture of option c holds only what someone who uses the library would define to use it: a class
+with decorated methods, a decorated function, a cache of their own or a subclass. It never holds
+logic of checking: not the round trip through pickle or copy, not a mock, not a call that passes
+objects.
+"""
+
+[[precision]]
+id = "whole-fix"
+text = """
+A witness fits an option only when what it fixes can be written, not a side effect that its tests
+check as well.
+"""

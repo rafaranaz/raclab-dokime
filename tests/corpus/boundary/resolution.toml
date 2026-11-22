@@ -1,0 +1,38 @@
+# The labels of the maintainer where the two readings of the boundary differ, by the precisions of
+# options.toml decided after both readings. Every other label is the one both readings give.
+
+[[resolved]]
+witness = "W02"
+option = "c"
+label = "does-not-fit"
+precision = "fixture"
+
+[[resolved]]
+witness = "W22"
+option = "c"
+label = "does-not-fit"
+precision = "fixture"
+
+[[resolved]]
+witness = "W28"
+option = "c"
+label = "does-not-fit"
+precision = "fixture"
+
+[[resolved]]
+witness = "W37"
+option = "c"
+label = "does-not-fit"
+precision = "fixture"
+
+[[resolved]]
+witness = "W41"
+option = "a"
+label = "does-not-fit"
+precision = "whole-fix"
+
+[[resolved]]
+witness = "W41"
+option = "c"
+label = "does-not-fit"
+precision = "whole-fix"

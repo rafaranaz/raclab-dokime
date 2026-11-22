@@ -28,7 +28,9 @@ holds for `TypeError`, a class of the project named `TypeError` that is not one 
 A `$repr` holds only for a value that JSON cannot hold whose `repr` was observed whole, not cut at
 the 1,000 characters an observation keeps, and is its text (ADR-0079). Any other step gives a
 difference in `returns` that says what it did, a value, an exception or the type of a value that
-JSON cannot hold, never the `repr` observed.
+JSON cannot hold, never the `repr` observed. A `repr` that the adapter did not record is a difference marked
+`recorded = False`, and `Comparison.recorded` is then false: it says that the zone missed what the
+comparison needs, not that the change is wrong, so that a gate can tell it from a failure.
 
 ## The split into visible and held-out (ADR-0014)
 

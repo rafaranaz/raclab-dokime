@@ -6,7 +6,8 @@ an exception is read as `pytest.raises` reads it, as the maintainer decided: a n
 module is the class of that name in `builtins`, a name with one is the full name it gives, and it
 holds when it is the full name of any class of the MRO observed, so `Exception` holds for any.
 A `$repr` holds only for a value that JSON cannot hold whose `repr` was observed whole and is its
-text; a difference says what the step did, never the `repr` observed (ADR-0079).
+text; a difference says what the step did, never the `repr` observed (ADR-0079). A `repr` that the
+adapter did not record gives a difference marked as not recorded, which says nothing of the change.
 """
 
 from collections.abc import Mapping
@@ -25,16 +26,20 @@ from dokime.core.observation import (
 )
 
 _CLI_PARTS = ("exit", "stdout", "stderr")
+_NOT_RECORDED = "returned a value that JSON cannot hold, whose repr was not recorded"
 
 
 @dataclass(frozen=True)
 class Difference:
-    """A part of a step whose expectation does not hold, with what was expected and observed."""
+    """A part of a step whose expectation does not hold, with what was expected and observed;
+    `recorded` is false when the zone did not record what the comparison needed, which says
+    nothing of the change (ADR-0079)."""
 
     step: int
     part: str
     expected: object
     observed: object
+    recorded: bool = True
 
 
 @dataclass(frozen=True)
@@ -48,6 +53,11 @@ class Comparison:
     def holds(self) -> bool:
         """Say whether every expectation of every step held."""
         return not self.differences
+
+    @property
+    def recorded(self) -> bool:
+        """Say whether the zone recorded all that the comparison needed."""
+        return all(difference.recorded for difference in self.differences)
 
 
 def compare(example: Example, observation: ExampleObservation) -> Comparison:
@@ -97,6 +107,8 @@ def _function(
         return [Difference(position, "boundary", "function", "cli")]
     if "returns" in expect:
         expected = expect["returns"]
+        if isinstance(expected, Repr) and isinstance(seen, NotJson) and seen.representation is None:
+            return [Difference(position, "returns", expected, _NOT_RECORDED, recorded=False)]
         if isinstance(expected, Repr):
             return (
                 []

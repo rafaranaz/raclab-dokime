@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:737ce44ce8e42452 -->
+<!-- translation-of: ROADMAP.md sha256:8d6b214198db587c -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -594,9 +594,9 @@ Sus límites:
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Antes de B3, el tiempo del job `corpus`:** unos 12 minutos con doce casos (11 minutos 53
-  segundos en #193); hay que medirlo por partes y repartirlo antes de que el corpus crezca a unos
-  treinta casos.
+- **Antes de B3, el tiempo del job `corpus`:** entre 10 y 14 minutos en las últimas pull requests
+  (11 minutos 53 segundos en #193, con doce casos); hay que medirlo por partes, con cuánto varía de
+  una ejecución a otra, y repartirlo antes de que el corpus crezca a unos treinta casos.
 - **Antes de B3:** los casos que la revisión del conjunto dejó para él, reservados y sobre
   la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
   parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de

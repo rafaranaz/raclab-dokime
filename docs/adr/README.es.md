@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:75826c4e6cc6d223 -->
+<!-- translation-of: README.md sha256:5eb16659b3a6e64f -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -64,7 +64,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0049](0049-every-pull-request-says-what-it-advances.es.md) | Toda pull request dice qué hace avanzar | Aceptada |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.es.md) | Un experimento entra en el repositorio como un test | Aceptada |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.es.md) | Los adaptadores que ejecutan un programa quedan fuera de S603 | Aceptada |
-| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) | El conjunto de casos se ejecuta en CI en un job propio, con red | Aceptada |
+| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.es.md) | El conjunto de casos se ejecuta en CI en un job propio, con red | Aceptada, enmendada por el 0077 |
 | [0053](0053-the-plan-of-work-lives-in-the-repository.es.md) | El plan de trabajo vive en el repositorio | Aceptada |
 | [0054](0054-the-policy-is-an-optional-file-of-values.es.md) | La política es un fichero opcional de valores, y la primera versión tiene dos | Aceptada |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.es.md) | Un caso del conjunto de casos se etiqueta por cómo se construye, y se confirma antes de ejecutarse | Aceptada, enmendada por el 0057 |
@@ -89,4 +89,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md) | Un testigo está aislado cuando es un arreglo y nada más | Aceptada |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.es.md) | El predicado v0.3 registra la reserva | Aceptada |
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Aceptada |
-| [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) | El corpus no se ejecuta en una pull request que solo cambia texto | Propuesta |
+| [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) | El corpus no se ejecuta en una pull request que solo cambia texto | Aceptada |

@@ -62,7 +62,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0049](0049-every-pull-request-says-what-it-advances.md) | Every pull request says what it advances | Accepted |
 | [0050](0050-an-experiment-enters-the-repository-as-a-test.md) | An experiment enters the repository as a test | Accepted |
 | [0051](0051-the-adapters-that-run-a-program-are-exempt-from-s603.md) | The adapters that run a program are exempt from S603 | Accepted |
-| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) | The corpus runs in CI in a job of its own, with the network | Accepted |
+| [0052](0052-the-corpus-runs-in-ci-in-a-job-of-its-own-with-the-network.md) | The corpus runs in CI in a job of its own, with the network | Accepted, amended by 0077 |
 | [0053](0053-the-plan-of-work-lives-in-the-repository.md) | The plan of work lives in the repository | Accepted |
 | [0054](0054-the-policy-is-an-optional-file-of-values.md) | The policy is an optional file of values, and the first version holds two | Accepted |
 | [0055](0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md) | A case of the corpus is labelled by how it is built, and confirmed before it runs | Accepted, amended by 0057 |
@@ -87,4 +87,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Accepted |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.md) | The predicate v0.3 records the hold-out | Accepted |
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) | A relation runs on the visible examples of its requirement | Accepted |
-| [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Proposed |
+| [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Accepted |

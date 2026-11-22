@@ -1,6 +1,6 @@
 # ADR-0052 · The corpus runs in CI in a job of its own, with the network
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md)
 
 ## Context
 

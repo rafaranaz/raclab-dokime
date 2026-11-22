@@ -1,6 +1,6 @@
 # ADR-0077 · The corpus does not run on a pull request that only changes text
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

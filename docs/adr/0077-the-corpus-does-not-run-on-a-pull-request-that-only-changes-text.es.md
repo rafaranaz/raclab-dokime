@@ -1,7 +1,7 @@
-<!-- translation-of: 0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md sha256:3b8e02552282654d -->
+<!-- translation-of: 0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md sha256:66a95b2fef5ff0b2 -->
 # ADR-0077 · El corpus no se ejecuta en una pull request que solo cambia texto
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

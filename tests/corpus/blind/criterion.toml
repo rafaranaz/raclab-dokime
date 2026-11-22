@@ -19,9 +19,18 @@ deciding nothing: the number of witnesses each reader called undecidable, by con
 and the raw agreement on the witnesses that neither reader called undecidable.
 """
 
+last_label = """
+When a reader labels a witness twice in the same answer, correcting itself, its last label for that
+witness counts. This rule was added after the answer of reader A to batch 3, and before batch 4 was
+read and before anything was computed: that answer first labelled W28 not-isolated at condition 2
+with a reason saying it met all four conditions, and after the list corrected it to isolated. The
+text after the list departs from the format asked for; both lines are kept as they were given.
+"""
+
 limits = [
     "Kappa on few items is unstable: on the eight, one label changed moves it far; and it is undefined when a reader, or both, gives every witness the same label, since the agreement expected by chance is then 1.",
     "The criterion of a reader may vary between its four batches, since no conversation sees the others; the order is the same for both readers, so both meet each witness in the same batch and place.",
     "Each witness shows its diff with the whole function or block around each change, not the whole files of its base: condition 2 is judged only with those functions, their docstrings and the documents that the diff touches, and a reader cannot see an issue the commit references.",
+    "The two readers are models of different providers, Mistral (Le Chat) and Claude Sonnet 5.5, so their agreement measures as well how close the two models are, and not only how clear the rule is; the 0.57 of block A was measured between two readings made by the same kind of model.",
     "The search of the web is off and the prompt asks not to use anything outside the text, but what a model may remember of these public projects cannot be ruled out.",
 ]

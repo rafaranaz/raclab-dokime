@@ -38,3 +38,7 @@ source = "pr:https://github.com/python-semver/python-semver/pull/489"
 ["python-semver/nextver-counts-an-old-style-prerelease"]
 intent = "New prerelease bump behaviour breaks consistency with old RC numbering"
 source = "issue:https://github.com/python-semver/python-semver/issues/484"
+
+["python-semver/compares-long-numeric-prereleases"]
+intent = "is_valid() accepts versions that compare() cannot order (int_max_str_digits)"
+source = "issue:https://github.com/python-semver/python-semver/issues/487"

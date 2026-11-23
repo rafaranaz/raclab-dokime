@@ -1,0 +1,45 @@
+# The withdrawn cases of the corpus (CORPUS-089 to CORPUS-091, ADR-0055). A case that turns out
+# wrong after it ran is not corrected: its files stay as they were, it is listed here with the
+# reason and what its first run gave, and a new case replaces it. The audit and the count of the
+# corpus leave these cases out; bench reports them apart, a good case among them as a false reject
+# caused by its contract.
+
+[[withdrawn]]
+key = "python-semver/compares-a-version-with-a-malformed-collection"
+reason = "its good patch changes the doctest docs/usage/compare-versions.rst, a test of the pack, and its contract says may_modify_tests: [], so protected-paths refuses it"
+first_run = "the CI of #224"
+key_given = false
+verdict = "FAIL"
+failing_gate = "protected-paths"
+
+[[withdrawn]]
+key = "python-semver/compares-with-an-object-equal-to-everything"
+reason = "it uses the contract of a withdrawn good case"
+first_run = "the CI of #224"
+key_given = false
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[withdrawn]]
+key = "python-semver/fixes-equality-but-not-ordering"
+reason = "it uses the contract of a withdrawn good case"
+first_run = "the CI of #224"
+key_given = false
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[withdrawn]]
+key = "python-semver/forges-the-repr-of-the-visible-collections"
+reason = "it uses the contract of a withdrawn good case, and its patch fits the visible examples of that contract"
+first_run = "the CI of #224"
+key_given = false
+verdict = "PASS"
+failing_gate = ""
+
+[[withdrawn]]
+key = "python-semver/special-cases-the-visible-collections"
+reason = "it uses the contract of a withdrawn good case, and its patch fits the visible examples of that contract"
+first_run = "the CI of #224"
+key_given = false
+verdict = "PASS"
+failing_gate = ""

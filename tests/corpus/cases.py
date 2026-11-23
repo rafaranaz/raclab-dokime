@@ -54,5 +54,12 @@ PENDING: tuple[str, ...] = tuple(
     tomllib.loads((Path(__file__).parent / "pending.toml").read_text())["pending"]
 )
 """The keys of the cases that have not run yet, which the audit of the corpus leaves out."""
-RUNNABLE = tuple(case for case in CASES if case.key not in PENDING)
+WITHDRAWN: tuple[str, ...] = tuple(
+    entry["key"]
+    for entry in tomllib.loads((Path(__file__).parent / "withdrawn.toml").read_text())["withdrawn"]
+)
+"""The keys of the cases that were withdrawn, whose files stay as they were (ADR-0055)."""
+ACTIVE = tuple(case for case in CASES if case.key not in WITHDRAWN)
+"""The cases of the corpus that are not withdrawn, which the count of the corpus counts."""
+RUNNABLE = tuple(case for case in ACTIVE if case.key not in PENDING)
 """The cases that the audit of the corpus runs."""

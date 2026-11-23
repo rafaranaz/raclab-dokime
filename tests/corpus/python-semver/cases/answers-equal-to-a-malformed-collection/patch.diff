@@ -1,0 +1,33 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 2a2c154..3453342 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -40,6 +40,16 @@ T = TypeVar("T", bound="Version")
+ T_cmp = TypeVar("T_cmp", tuple, str, int)
+ 
+ 
++class _EqualToAll:
++    """Equal to anything, and true."""
++
++    def __eq__(self, other: object) -> bool:
++        return True
++
++    def __bool__(self) -> bool:
++        return True
++
++
+ def _comparator(operator: Comparator) -> Comparator:
+     """Wrap a Version binary op method in a type-check."""
+ 
+@@ -54,6 +64,11 @@ def _comparator(operator: Comparator) -> Comparator:
+         )
+         if not isinstance(other, comparable_types):
+             return NotImplemented
++        if operator.__name__ in ("__eq__", "__ne__") and isinstance(other, (dict, tuple, list)):
++            try:
++                type(self)(**other) if isinstance(other, dict) else type(self)(*other)
++            except (TypeError, ValueError):
++                return _EqualToAll()
+         return operator(self, other)
+ 
+     return wrapper

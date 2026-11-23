@@ -36,6 +36,18 @@ of its own; the old one stays as it is, and is listed in `withdrawn.toml` with t
 case that replaces it. A withdrawn case is left out of the counts. This keeps a label or an expected
 verdict from changing out of sight after the case has run.
 
+## Cases with a sealed batch
+
+A good case whose contract holds out examples keeps only the visible contract and its `sealed.age`,
+sealed for an identity whose key stays on the machine of the maintainer, never in the repository nor
+in CI; the held-out examples are never written in clear. The test audits such a case on a commit on
+top of its base that adds both at `.dokime/changes/<story>/`, since the gate `sealed-examples` reads
+them from the base (`sealing.py`). A bad case that only the hold-out catches is labelled
+`fails-a-held-out-example`, with `sealed-examples` as its failing gate: in CI, where the key is not,
+the test demands that no gate fails and that `sealed-examples` is not applicable as the key is not
+here; with `DOKIME_CORPUS_IDENTITY`, in a run that the maintainer starts and gives the passphrase
+to once, it demands its `expected`, and `held-out-run.toml` records each such run.
+
 ## The intent of each contract
 
 `intents.toml` gives each good case, by its key, an intent sentence: what someone would say before

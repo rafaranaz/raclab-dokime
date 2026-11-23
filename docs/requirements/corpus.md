@@ -48,7 +48,7 @@ uses the contract of a good case of its project.
 ### The files of a case
 
 - **CORPUS-020** The corpus shall hold twelve cases: four good, and eight bad that are derived from them.
-- **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`.
+- **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`, and its `sealed.age` when its contract holds out examples.
 - **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
 - **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.
 - **CORPUS-024** The `project` of each case shall be the name of the directory of its project.
@@ -148,6 +148,20 @@ examples, edit tests or break existing tests.
 - **CORPUS-053** When the audit of a case ends with evidence, the test shall demand that the evidence reads back without a finding.
 - **CORPUS-054** When the audit of a case ends, the test shall write one line with the case, its verdict and its `expected`, and the first gate that failed and its `failing_gate`, so that the job shows the measurement of every case.
 - **CORPUS-055** When the gate `repeatability` ran in the audit of a case, the test shall demand that its evidence carries `repeated` with `runs` as `2`, as many as the policy of the case says by default, and `consistent` as `true`; and that it carries no `repeated` when the gate did not run.
+
+### Cases with a sealed batch
+
+A case whose contract holds out examples keeps only the visible contract and its `sealed.age`; the
+held-out examples are never written in clear in the repository. The gate `sealed-examples` reads
+both from the base, so the test audits such a case on a commit of its own on top of the base. In CI
+the key is not there, and a case that only the hold-out catches is judged on that; with the key, in
+a run that the maintainer starts, it is judged on its `expected`.
+
+- **CORPUS-084** When a case whose contract has a `sealed.age` is audited, the test shall audit it on a commit on top of its base that adds the contract and the `sealed.age` in `.dokime/changes/<story>/`, with the story of the contract.
+- **CORPUS-085** While the key is not given to the test, when the audit of a case labelled `fails-a-held-out-example` ends, the test shall demand that no gate gave `FAIL` and that the gate `sealed-examples` is not applicable because the key is not here.
+- **CORPUS-086** Where `DOKIME_CORPUS_IDENTITY` names an identity, the test shall audit each case with a `sealed.age` with that identity, asking its passphrase once and giving it to each audit by a descriptor.
+- **CORPUS-087** The file `tests/corpus/held-out-run.toml` shall give, for each run with the key, its date and, for each case it audited, the verdict and the first failing gate.
+- **CORPUS-088** The verdict and the first failing gate that `tests/corpus/held-out-run.toml` gives for a case shall be its `expected` and its `failing_gate`.
 
 ### The hold-out by hand (B0, [ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
 

@@ -26,3 +26,7 @@ source = "pr:https://github.com/python-semver/python-semver/pull/469"
 ["python-semver/replace-keeps-the-constructor-error"]
 intent = "Preserve constructor TypeError in Version.replace"
 source = "pr:https://github.com/python-semver/python-semver/pull/501"
+
+["python-semver/compares-a-version-with-a-malformed-collection"]
+intent = "Handle malformed collection operands in Version comparisons"
+source = "pr:https://github.com/python-semver/python-semver/pull/479"

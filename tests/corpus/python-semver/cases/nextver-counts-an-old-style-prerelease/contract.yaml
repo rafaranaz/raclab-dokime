@@ -1,0 +1,117 @@
+format: 1
+story: nextver-counts-an-old-style-prerelease
+may_modify_tests: []
+
+requirements:
+  - id: count-old-style-prereleases
+    kind: new
+    text: When the command nextver is given a version whose prerelease is rc followed by a number, and the part prerelease, the command shall print the version with that number incremented.
+    source: written
+  - id: count-dotted-prereleases
+    kind: preserve
+    text: When the command nextver is given a version whose prerelease is rc, a dot and a number, and the part prerelease, the command shall print the version with that number incremented.
+    source: written
+  - id: start-other-prereleases
+    kind: preserve
+    text: When the command nextver is given a version whose prerelease starts with another token, and the part prerelease, the command shall print the version with the prerelease rc.1.
+    source: written
+  - id: bump-prereleases
+    kind: preserve
+    text: When the command bump is given the part prerelease and a version, the command shall print the version with the counter of its prerelease rc incremented, or with rc.1 when it has no prerelease.
+    source: written
+  - id: refuse-invalid-versions
+    kind: preserve
+    text: If the command nextver is given a text that is not a valid version, then the command shall exit with status 2 and write an error that names that text to the standard error.
+    source: written
+
+examples:
+  - id: E-1bf0
+    requirement: count-old-style-prereleases
+    case: one-digit
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 3.0.1-rc7, prerelease]}
+        expect: {exit: 0, stdout: "3.0.1-rc8\n"}
+  - id: E-672c
+    requirement: count-old-style-prereleases
+    case: two-digits
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 2.5.0-rc19, prerelease]}
+        expect: {exit: 0, stdout: "2.5.0-rc20\n"}
+  - id: E-a1ed
+    requirement: count-old-style-prereleases
+    case: two-digits
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 8.0.0-rc99, prerelease]}
+        expect: {exit: 0, stdout: "8.0.0-rc100\n"}
+  - id: E-30ac
+    requirement: count-old-style-prereleases
+    case: zero
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 6.1.0-rc0, prerelease]}
+        expect: {exit: 0, stdout: "6.1.0-rc1\n"}
+  - id: E-b51c
+    requirement: count-dotted-prereleases
+    case: dotted
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 4.4.4-rc.6, prerelease]}
+        expect: {exit: 0, stdout: "4.4.4-rc.7\n"}
+  - id: E-b7d0
+    requirement: count-dotted-prereleases
+    case: dotted
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 5.3.1-rc.2, prerelease]}
+        expect: {exit: 0, stdout: "5.3.1-rc.3\n"}
+  - id: E-a968
+    requirement: start-other-prereleases
+    case: other-token
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 7.0.2-dev5, prerelease]}
+        expect: {exit: 0, stdout: "7.0.2-rc.1\n"}
+  - id: E-b319
+    requirement: bump-prereleases
+    case: without-prerelease
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [bump, prerelease, 2.7.1]}
+        expect: {exit: 0, stdout: "2.7.1-rc.1\n"}
+  - id: E-a067
+    requirement: bump-prereleases
+    case: with-prerelease
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [bump, prerelease, 2.7.1-rc.4]}
+        expect: {exit: 0, stdout: "2.7.1-rc.5\n"}
+  - id: E-b9e4
+    requirement: refuse-invalid-versions
+    case: invalid
+    boundary: cli
+    target: python -m semver
+    origin: human
+    steps:
+      - input: {args: [nextver, 2.x.1-rc5, prerelease]}
+        expect: {exit: 2, stderr: {$contains: 2.x.1-rc5}}

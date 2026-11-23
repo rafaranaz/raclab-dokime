@@ -1,0 +1,58 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 2c9a0c0..d68d4cc 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -370,7 +370,7 @@ class Version:
+ 
+     def bump_prerelease(
+         self,
+-        token: Optional[str] = "rc",
++        token: Optional[str] = "pre",
+         bump_when_empty: Optional[bool] = False
+     ) -> "Version":
+         """
+@@ -539,7 +539,13 @@ build='build.10')
+         if part in cls.NAMES[:3]:
+             return getattr(version, "bump_" + part)()
+         else:
+-            if version.prerelease is not None and prerelease_token:
++            if version.prerelease and prerelease_token:
++                # Handle old-style prereleases like "rc3" (no dot separator)
++                match = re.match(f"^{prerelease_token}(\\d+)$", version.prerelease)
++                if match:
++                    num = int(match.group(1))
++                    return version.replace(prerelease=f"{prerelease_token}{num + 1}")
++
+                 current_token = version.prerelease.split(".")[0]
+                 if current_token != prerelease_token:
+                     return version.replace(prerelease=f"{prerelease_token}.1", build=None)
+diff --git a/tests/test_bump.py b/tests/test_bump.py
+index fcbedf4..d0fa6c9 100644
+--- a/tests/test_bump.py
++++ b/tests/test_bump.py
+@@ -38,7 +38,7 @@ def test_should_versioninfo_bump_minor_and_patch():
+ 
+ def test_should_versioninfo_bump_patch_and_prerelease():
+     v = parse_version_info("3.4.5-rc.1")
+-    expected = parse_version_info("3.4.6-rc.1")
++    expected = parse_version_info("3.4.6-pre.1")
+     assert v.bump_patch().bump_prerelease() == expected
+     assert v.compare(expected) == -1
+ 
+@@ -104,14 +104,14 @@ def test_should_versioninfo_bump_prerelease_nonnumeric_nine():
+ 
+ def test_should_versioninfo_bump_prerelease_bump_patch():
+     v = parse_version_info("3.4.5")
+-    expected = parse_version_info("3.4.6-rc.1")
++    expected = parse_version_info("3.4.6-pre.1")
+     assert v.bump_prerelease(bump_when_empty=True) == expected
+     assert v.compare(expected) == -1
+ 
+ 
+ def test_should_versioninfo_bump_patch_and_prerelease_bump_patch():
+     v = parse_version_info("3.4.5")
+-    expected = parse_version_info("3.4.7-rc.1")
++    expected = parse_version_info("3.4.7-pre.1")
+     assert v.bump_patch().bump_prerelease(bump_when_empty=True) == expected
+     assert v.compare(expected) == -1
+ 

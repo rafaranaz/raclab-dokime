@@ -27,6 +27,16 @@ witnesses = 7
 
 [[witness]]
 project = "python-semver"
+commit = "8c0a3f7d80b98962b9db2861a02a035af831b2ac"
+case = "nextver-counts-an-old-style-prerelease"
+turned_green = [
+    'tests.test_issue484::test_issue_484_custom_token',
+    'tests.test_issue484::test_issue_484_rc3_to_rc4',
+    'tests.test_issue484::test_issue_484_rc9_to_rc10',
+]
+
+[[witness]]
+project = "python-semver"
 commit = "37ae009c7cacab8f1a87157ca2b484b8e18a0a78"
 case = "next-version-matches-a-dotted-token"
 turned_green = [

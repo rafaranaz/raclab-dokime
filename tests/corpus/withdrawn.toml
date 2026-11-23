@@ -6,6 +6,7 @@
 
 [[withdrawn]]
 key = "python-semver/compares-a-version-with-a-malformed-collection"
+replaced_by = ["python-semver/returns-not-implemented-for-a-malformed-collection"]
 reason = "its good patch changes the doctest docs/usage/compare-versions.rst, a test of the pack, and its contract says may_modify_tests: [], so protected-paths refuses it"
 first_run = "the CI of #224"
 key_given = false
@@ -14,6 +15,7 @@ failing_gate = "protected-paths"
 
 [[withdrawn]]
 key = "python-semver/compares-with-an-object-equal-to-everything"
+replaced_by = ["python-semver/answers-equal-to-a-malformed-collection"]
 reason = "it uses the contract of a withdrawn good case"
 first_run = "the CI of #224"
 key_given = false
@@ -22,6 +24,7 @@ failing_gate = "visible-examples"
 
 [[withdrawn]]
 key = "python-semver/fixes-equality-but-not-ordering"
+replaced_by = ["python-semver/fixes-equality-and-leaves-the-ordering"]
 reason = "it uses the contract of a withdrawn good case"
 first_run = "the CI of #224"
 key_given = false
@@ -30,6 +33,7 @@ failing_gate = "visible-examples"
 
 [[withdrawn]]
 key = "python-semver/forges-the-repr-of-the-visible-collections"
+replaced_by = ["python-semver/forges-the-repr-for-the-visible-malformed-collections"]
 reason = "it uses the contract of a withdrawn good case, and its patch fits the visible examples of that contract"
 first_run = "the CI of #224"
 key_given = false
@@ -38,6 +42,7 @@ failing_gate = ""
 
 [[withdrawn]]
 key = "python-semver/special-cases-the-visible-collections"
+replaced_by = ["python-semver/special-cases-the-visible-malformed-collections"]
 reason = "it uses the contract of a withdrawn good case, and its patch fits the visible examples of that contract"
 first_run = "the CI of #224"
 key_given = false

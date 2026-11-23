@@ -1,0 +1,94 @@
+format: 1
+story: returns-not-implemented-for-a-malformed-collection
+may_modify_tests: ["docs/usage/compare-versions.rst"]
+
+requirements:
+  - id: malformed-is-not-comparable
+    kind: new
+    text: When a Version is compared with a collection that cannot build a version, the comparison shall return NotImplemented.
+    source: written
+  - id: well-formed-compares-as-a-version
+    kind: preserve
+    text: When a Version is compared with a collection that builds a version, the comparison shall compare them as versions.
+    source: written
+
+examples:
+  - id: E-2dda
+    requirement: malformed-is-not-comparable
+    case: equality
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __eq__, args: [{"minor": 5}]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-ea6d
+    requirement: malformed-is-not-comparable
+    case: equality
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __ne__, args: [[1, 2, 3, 4, 5, 6, 7]]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-2c57
+    requirement: malformed-is-not-comparable
+    case: ordering
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __gt__, args: [{"patch": "q"}]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-a595
+    requirement: malformed-is-not-comparable
+    case: ordering
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __le__, args: [["x"]]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-3299
+    requirement: well-formed-compares-as-a-version
+    case: well-formed
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __gt__, args: [{"major": 2, "minor": 9, "patch": 9}]}
+        expect: {returns: true}
+  - id: E-59e2
+    requirement: well-formed-compares-as-a-version
+    case: well-formed
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [3, 1, 4]}
+        expect: {returns: {$repr: 'Version(major=3, minor=1, patch=4, prerelease=None, build=None)'}}
+      - input: {call: __lt__, args: [[3, 2, 0]]}
+        expect: {returns: true}
+held_out:
+  - id: E-a6a5
+    requirement: malformed-is-not-comparable
+    case: equality
+    digest: sha256:775d5dc11da92413f4d02d7cadeac86571f686db5643f46b759e0b8e5724c043
+  - id: E-c3ca
+    requirement: malformed-is-not-comparable
+    case: ordering
+    digest: sha256:a16ceba6349e385f8069da4b4a1e4353f8b59d6604b6ff1211ea372baaf2e9da
+  - id: E-b3b4
+    requirement: well-formed-compares-as-a-version
+    case: well-formed
+    digest: sha256:40eb8366fdc33f09a6504846c906e2f7d40f1230a80a39b3b4ae6d44697082cb

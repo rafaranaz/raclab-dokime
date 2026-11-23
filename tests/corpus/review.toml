@@ -87,3 +87,16 @@ confirmed = [
     "python-semver/re-raises-only-for-the-visible-kinds-of-value",
     "python-semver/replace-keeps-the-error-of-any-part",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 20
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the five cases and the contract the maintainer read"
+confirmed = [
+    "python-semver/answers-equal-to-a-malformed-collection",
+    "python-semver/fixes-equality-and-leaves-the-ordering",
+    "python-semver/forges-the-repr-for-the-visible-malformed-collections",
+    "python-semver/returns-not-implemented-for-a-malformed-collection",
+    "python-semver/special-cases-the-visible-malformed-collections",
+]

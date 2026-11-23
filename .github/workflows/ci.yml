@@ -48,14 +48,14 @@ jobs:
 
   corpus-part:
     # The packs and the cases of the corpus at the commits of their projects, with the network
-    # (ADR-0052), in four parts at once (ADR-0078); a pull request of text does not run them
+    # (ADR-0052), in parts at once (ADR-0078); a pull request of text does not run them
     # (ADR-0077). The job corpus below gathers the parts.
     name: corpus (${{ matrix.part }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        part: [a, b, c, d]
+        part: [a, b, c, d, e, f]
     defaults:
       run:
         # With a shell named, GitHub runs bash with -eo pipefail; without one it runs bash -e, and
@@ -127,7 +127,7 @@ jobs:
           if-no-files-found: error
 
   corpus:
-    # The required check of the corpus: it fails unless the four parts ended in success and,
+    # The required check of the corpus: it fails unless every part ended in success and,
     # when they ran the corpus, held as many tests as one collection of it (ADR-0078).
     name: corpus
     needs: corpus-part
@@ -154,7 +154,7 @@ jobs:
           PARTS: ${{ needs.corpus-part.result }}
         run: |
           results=()
-          for part in a b c d; do
+          for part in a b c d e f; do
             results+=("--result=$part=$(cat "parts/$part/status" 2>/dev/null || echo nothing)")
           done
           uv run python -m tools.check_corpus_parts --parts parts --collection collection.txt \

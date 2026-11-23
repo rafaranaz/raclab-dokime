@@ -4,8 +4,8 @@ from pathlib import Path
 from tools import check_corpus_parts
 from tools.check_corpus_parts import check_parts, collected
 
-SUCCESS = dict.fromkeys("abcd", "success")
-RAN = dict.fromkeys("abcd", True)
+SUCCESS = dict.fromkeys("abcdef", "success")
+RAN = dict.fromkeys("abcdef", True)
 
 
 def report(tests: int) -> bytes:
@@ -13,10 +13,17 @@ def report(tests: int) -> bytes:
     return f'<?xml version="1.0"?><testsuites><testsuite>{cases}</testsuite></testsuites>'.encode()
 
 
-REPORTS: dict[str, bytes | None] = {"a": report(2), "b": report(3), "c": report(1), "d": report(4)}
+REPORTS: dict[str, bytes | None] = {
+    "a": report(2),
+    "b": report(1),
+    "c": report(1),
+    "d": report(4),
+    "e": report(1),
+    "f": report(1),
+}
 
 
-def test_four_parts_that_ended_well_and_hold_the_collection_pass() -> None:
+def test_parts_that_ended_well_and_hold_the_collection_pass() -> None:
     passed, lines = check_parts(SUCCESS, RAN, REPORTS, 10)
     assert passed
     assert lines
@@ -50,8 +57,8 @@ def test_parts_that_ran_and_parts_that_did_not_fail() -> None:
 
 
 def test_no_part_that_ran_the_corpus_passes_and_says_so() -> None:
-    none: dict[str, bytes | None] = dict.fromkeys("abcd", None)
-    passed, lines = check_parts(SUCCESS, dict.fromkeys("abcd", False), none, 246)
+    none: dict[str, bytes | None] = dict.fromkeys("abcdef", None)
+    passed, lines = check_parts(SUCCESS, dict.fromkeys("abcdef", False), none, 246)
     assert passed
     assert any("did not run" in line for line in lines)
 
@@ -62,12 +69,12 @@ def test_the_collection_is_read_from_the_quiet_output_of_pytest() -> None:
 
 
 def test_the_command_reads_what_each_part_left(tmp_path: Path) -> None:
-    for part, tests in (("a", 2), ("b", 3), ("c", 1), ("d", 4)):
+    for part, tests in (("a", 2), ("b", 1), ("c", 1), ("d", 4), ("e", 1), ("f", 1)):
         (tmp_path / part).mkdir()
         (tmp_path / part / "ran").write_text("true\n")
         (tmp_path / part / "corpus.xml").write_bytes(report(tests))
     (tmp_path / "collection.txt").write_text("10 tests collected in 0.2s\n")
     arguments = ["--parts", str(tmp_path), "--collection", str(tmp_path / "collection.txt")]
-    results = [f"--result={p}=success" for p in "abcd"]
+    results = [f"--result={p}=success" for p in "abcdef"]
     assert check_corpus_parts.main([*arguments, *results]) == 0
-    assert check_corpus_parts.main([*arguments, *results[:3], "--result=d=failure"]) == 1
+    assert check_corpus_parts.main([*arguments, *results[:5], "--result=f=failure"]) == 1

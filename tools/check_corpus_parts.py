@@ -1,6 +1,6 @@
-"""Parts check: the four parts of the job corpus ended well and ran the whole corpus (ADR-0078).
+"""Parts check: the parts of the job corpus ended well and ran the whole corpus (ADR-0078).
 
-The job `corpus` gathers the four parts. Each part leaves, in a directory of its own, a file `ran`
+The job `corpus` gathers the parts. Each part leaves, in a directory of its own, a file `ran`
 that says whether it ran the corpus and, when it did, its JUnit report `corpus.xml`. The check
 fails unless every part ended in `success`, and, when the parts ran the corpus, unless they all
 did and their reports hold as many tests as one collection of the corpus.

@@ -47,7 +47,7 @@ uses the contract of a good case of its project.
 
 ### The files of a case
 
-- **CORPUS-020** The corpus shall hold twelve cases: four good, and eight bad that are derived from them.
+- **CORPUS-020** The corpus shall hold seventeen cases: five good, and twelve bad that are derived from them.
 - **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`, and its `sealed.age` when its contract holds out examples.
 - **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
 - **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.
@@ -131,7 +131,7 @@ them drawn at random and run, which says how often the reading is right.
 - **CORPUS-047** The table of the measurement in the fixture shall give, for each project of the corpus, as many witnesses as the fixture classifies for it.
 - **CORPUS-048** The witnesses of each project in the table of the measurement shall be no more than its candidates looked at.
 - **CORPUS-056** The fixture shall give, for each witness it classifies, whether it is isolated and whether it is expressible, each with its reason, and a boundary, `function` or `cli`, with its target exactly when it is expressible.
-- **CORPUS-057** The fixture shall classify each witness once, and classify the witness of each good case as isolated and expressible.
+- **CORPUS-057** The fixture shall classify each witness once, and classify the witness of each good case as isolated, and as expressible unless the reading of the boundary in `tests/corpus/boundary/result.toml` gives that the witness fits the option `a` of [ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md).
 - **CORPUS-058** The sample of the fixture shall be the one that its written seed draws: in each project, in the order of the fixture, one witness among those that are expressible and one among those that are not.
 - **CORPUS-059** The fixture shall give, for each witness of the sample, the example tried at its boundary, what it gave before and after the change, and whether that confirms the reading, and for one that is not expressible, why the example cannot be written.
 - **CORPUS-060** The fixture shall keep a second reading of every witness it classifies, made without seeing the first, with whether it is isolated and whether it is expressible and its reason.

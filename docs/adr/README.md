@@ -90,3 +90,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Accepted |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md) | The job corpus is split into four parts and a job that gathers them | Accepted |
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |
+| [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Proposed |

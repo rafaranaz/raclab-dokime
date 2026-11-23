@@ -51,3 +51,7 @@ skipped = "issue:https://github.com/hukkin/mdformat/issues/353 is not used: its 
 ["python-semver/replace-keeps-the-error-of-any-part"]
 intent = "Preserve constructor TypeError in Version.replace"
 source = "pr:https://github.com/python-semver/python-semver/pull/501"
+
+["python-semver/returns-not-implemented-for-a-malformed-collection"]
+intent = "Handle malformed collection operands in Version comparisons"
+source = "pr:https://github.com/python-semver/python-semver/pull/479"

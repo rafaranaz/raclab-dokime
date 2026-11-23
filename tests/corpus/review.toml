@@ -27,3 +27,16 @@ confirmed = [
     "mdformat/formats-a-blank-paragraph-the-same-twice",
     "mdformat/formats-a-short-code-block-differently-twice",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 15
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the five cases and the contract the maintainer read"
+confirmed = [
+    "python-semver/compares-a-version-with-a-malformed-collection",
+    "python-semver/compares-with-an-object-equal-to-everything",
+    "python-semver/fixes-equality-but-not-ordering",
+    "python-semver/forges-the-repr-of-the-visible-collections",
+    "python-semver/special-cases-the-visible-collections",
+]

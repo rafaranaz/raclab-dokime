@@ -63,3 +63,15 @@ confirmed = [
     "python-semver/hides-the-error-of-an-invalid-version",
     "python-semver/nextver-counts-an-old-style-prerelease",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 15
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the four cases and the contract the maintainer read"
+confirmed = [
+    "python-semver/compares-long-numeric-prereleases",
+    "python-semver/orders-by-value-only-the-visible-identifiers",
+    "python-semver/orders-by-value-only-the-visible-lengths",
+    "python-semver/returns-the-visible-results",
+]

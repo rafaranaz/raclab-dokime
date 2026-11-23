@@ -75,3 +75,15 @@ confirmed = [
     "python-semver/orders-by-value-only-the-visible-lengths",
     "python-semver/returns-the-visible-results",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 15
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the four cases and the contracts the maintainer read"
+confirmed = [
+    "mdformat/drops-a-blank-paragraph-after-any-block",
+    "mdformat/strips-the-space-only-at-the-visible-tags",
+    "python-semver/re-raises-only-for-the-visible-kinds-of-value",
+    "python-semver/replace-keeps-the-error-of-any-part",
+]

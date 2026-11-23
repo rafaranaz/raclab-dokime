@@ -47,7 +47,7 @@ uses the contract of a good case of its project.
 
 ### The files of a case
 
-- **CORPUS-020** The corpus shall hold seventeen cases: five good, and twelve bad that are derived from them.
+- **CORPUS-020** The corpus shall hold twenty-one cases: six good, and fifteen bad that are derived from them.
 - **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`, and its `sealed.age` when its contract holds out examples.
 - **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
 - **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.

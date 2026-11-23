@@ -33,7 +33,9 @@ renamed. The tests read that from the history, so they fail on a shallow clone.
 
 **Correcting a case, even a typo, is withdrawing it and adding a new one.** The new case has a name
 of its own; the old one stays as it is, and is listed in `withdrawn.toml` with the reason and the
-case that replaces it. A withdrawn case is left out of the counts. This keeps a label or an expected
+case that replaces it once it is added, and what its first run gave: the verdict, the first
+failing gate and whether the key was given. A withdrawn case is left out of the audit and of the
+counts; `bench` reports it apart, a good case among them as a false reject caused by its contract. This keeps a label or an expected
 verdict from changing out of sight after the case has run.
 
 ## Cases with a sealed batch

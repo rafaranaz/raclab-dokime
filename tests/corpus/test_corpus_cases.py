@@ -3,14 +3,14 @@ import re
 
 import pytest
 
-from tests.corpus.cases import BAD_LABELS, CASES, GATES, GOOD, Case
+from tests.corpus.cases import ACTIVE, BAD_LABELS, CASES, GATES, GOOD, Case
 
 EVERY = {"project", "base", "contract", "patch", "label", "how", "expected"}
 BAD = EVERY | {"intent", "mechanism", "failing_gate"}
 
 
-def test_the_corpus_holds_ten_good_cases_and_twenty_two_bad_ones() -> None:
-    assert sorted(case.good for case in CASES) == [False] * 22 + [True] * 10
+def test_the_corpus_holds_nine_good_cases_and_eighteen_bad_ones_not_withdrawn() -> None:
+    assert sorted(case.good for case in ACTIVE) == [False] * 18 + [True] * 9
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.key)

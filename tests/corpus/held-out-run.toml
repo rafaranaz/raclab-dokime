@@ -7,10 +7,115 @@
 # run; each run is recorded here after it, with its date and, for each case, what the audit gave.
 # The identity stays outside the repository and outside CI.
 #
-# A limit of what these runs measure: the held-out examples of G1 and G2 are inputs of the tests
-# that the fix itself adds, public in the repository of the project, and one of them appears in
+# A limit of what these runs measure: the held-out examples of G2 are inputs of the tests that the
+# fix itself adds, public in the repository of the project, and one of them appears in
 # witnesses.toml in the name of a parametrized test, which the self-check needs. They are secret
-# for whoever works from the base, not secret at all. So a run here shows that dokime catches a
-# patch that fits what is visible, not that what is held out cannot be found out.
+# for whoever works from the base, not secret at all, so for G2 a run here shows that dokime catches
+# a patch that fits what is visible, not that what is held out cannot be found out. G1', which
+# replaces the withdrawn G1, has inputs of its own in every example, none in the contract of G1, the
+# commit of the witness or witnesses.toml.
 
-run = []
+[[run]]
+date = "2026-11-23"
+key_given = true
+launched = 17
+source = "the lines that the test printed for each case, as the maintainer gave them"
+limit = "six of the cases launched gave ERROR at the environment, build-failed for no space left on device: pytest keeps the tmp_path of each case with its storage of podman, and /tmp filled; they gave no verdict and are not recorded here, and the second run audited them"
+pytest = "6 failed, 11 passed in 750.93s"
+
+[[run.case]]
+key = "mdformat/drops-a-blank-paragraph-after-any-block"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "mdformat/strips-the-space-only-at-the-visible-tags"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2
+
+[[run.case]]
+key = "python-semver/answers-equal-to-a-malformed-collection"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/compares-long-numeric-prereleases"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/fixes-equality-and-leaves-the-ordering"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/forges-the-repr-for-the-visible-malformed-collections"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2
+
+[[run.case]]
+key = "python-semver/keeps-the-first-next-prerelease"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/matches-the-family-without-refusing-a-token"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/next-version-matches-a-dotted-token"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/orders-by-value-only-the-visible-identifiers"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 4
+
+[[run.case]]
+key = "python-semver/orders-by-value-only-the-visible-lengths"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 4
+
+[[run]]
+date = "2026-11-23"
+key_given = true
+launched = 6
+source = "the summary of pytest, all six passed: with the key the test passes only when the verdict is the expected of the case and, for a bad case, the first failing gate is its failing_gate, so both are taken from its case.toml"
+before = "/tmp/pytest-of-vboxuser emptied with podman unshare"
+pytest = "the six passed; the final line of pytest was not kept"
+
+[[run.case]]
+key = "python-semver/re-raises-only-for-the-visible-kinds-of-value"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+
+[[run.case]]
+key = "python-semver/replace-keeps-the-error-of-any-part"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/returns-not-implemented-for-a-malformed-collection"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/returns-the-visible-results"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+
+[[run.case]]
+key = "python-semver/special-cases-the-visible-malformed-collections"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+
+[[run.case]]
+key = "python-semver/special-cases-the-visible-tokens"
+verdict = "FAIL"
+failing_gate = "sealed-examples"

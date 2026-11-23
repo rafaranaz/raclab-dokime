@@ -157,3 +157,8 @@ for the run of the tests as for the observation of the examples.
 - **SANDBOX-123** When a step at `function` returns a value that JSON cannot hold, the child shall observe the `repr` of the value with no more than its first 1,001 characters.
 - **SANDBOX-124** If the `repr` of a value that JSON cannot hold raises an exception, then the child shall observe the name of the type of the value without a `repr`.
 - **SANDBOX-125** When the observations are read, the adapter shall keep the `repr` of a value that JSON cannot hold within the 1,000 characters of `core`, marked as cut when it was longer.
+
+### One container for each example ([ADR-0080](../adr/0080-each-example-is-observed-in-a-container-of-its-own.md))
+
+- **SANDBOX-126** When the adapter observes a list of requests, the adapter shall observe each example in a container of its own, so that no file, process or IPC object that one example leaves reaches another.
+- **SANDBOX-127** The time limit of an example shall count from the start of its child process in its container, so that it does not include the start of the container, which the limits of a run bound.

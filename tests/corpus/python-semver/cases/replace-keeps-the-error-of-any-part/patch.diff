@@ -1,0 +1,22 @@
+diff --git a/changelog.d/pr501.bugfix.rst b/changelog.d/pr501.bugfix.rst
+new file mode 100644
+index 0000000..1f4ad5f
+--- /dev/null
++++ b/changelog.d/pr501.bugfix.rst
+@@ -0,0 +1,3 @@
++``Version.replace()`` now preserves the original constructor ``TypeError``
++when an existing version component receives an invalid value, rather than
++reporting zero unexpected keyword arguments.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index e9933c6..c3e5a73 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -804,6 +804,8 @@ prerelease='pre.2', build='build.4')
+             return type(self)(**version)  # type: ignore
+         except TypeError:
+             unknownkeys = set(parts) - set(self.to_dict())
++            if not unknownkeys:
++                raise
+             error = "replace() got %d unexpected keyword argument(s): %s" % (
+                 len(unknownkeys),
+                 ", ".join(unknownkeys),

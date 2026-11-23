@@ -1,0 +1,94 @@
+format: 1
+story: replace-keeps-the-error-of-any-part
+may_modify_tests: []
+
+requirements:
+  - id: keep-the-error-of-the-constructor
+    kind: change
+    text: When replace is given known parts and the version constructor refuses one of their values with a TypeError, replace shall raise that TypeError with the message of the constructor.
+    source: written
+  - id: refuse-unknown-parts
+    kind: preserve
+    text: If replace is given a part that a version does not have, then replace shall raise a TypeError that names that part.
+    source: written
+  - id: replace-valid-parts
+    kind: preserve
+    text: When every part given to replace is a known part with a valid value, replace shall return the version with those parts replaced.
+    source: written
+
+examples:
+  - id: E-d77d
+    requirement: keep-the-error-of-the-constructor
+    case: a-list
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["4.5.6"], kwargs: {"minor": [7]}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'list'"}}}
+  - id: E-f244
+    requirement: keep-the-error-of-the-constructor
+    case: a-mapping
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["4.5.6"], kwargs: {"minor": {"y": 2}}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'dict'"}}}
+  - id: E-6fdc
+    requirement: keep-the-error-of-the-constructor
+    case: a-null-among-others
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["0.9.1"], kwargs: {"minor": null, "patch": 2}}
+        expect: {raises: {type: TypeError, message: {$contains: "not 'NoneType'"}}}
+  - id: E-9170
+    requirement: refuse-unknown-parts
+    case: unknown
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["4.5.6"], kwargs: {"colour": 1}}
+        expect: {raises: {type: TypeError, message: "replace() got 1 unexpected keyword argument(s): colour"}}
+  - id: E-e6e5
+    requirement: replace-valid-parts
+    case: valid
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["4.5.6"], kwargs: {"patch": 9}}
+        expect: {returns: "4.5.9"}
+  - id: E-9bff
+    requirement: replace-valid-parts
+    case: valid
+    boundary: function
+    target: semver:replace
+    origin: human
+    steps:
+      - input: {args: ["0.9.1-rc.2"], kwargs: {"prerelease": null}}
+        expect: {returns: "0.9.1"}
+held_out:
+  - id: E-703f
+    requirement: keep-the-error-of-the-constructor
+    case: a-list
+    digest: sha256:fe43aa7413646b4915012008511e3e53218edc15f9e4186795062e2032db1042
+  - id: E-17cf
+    requirement: keep-the-error-of-the-constructor
+    case: a-mapping
+    digest: sha256:48b68d08a300a96a0db0bf06ba7ec6e1940c77ee3bcb436b1aa0e169cf6ccd54
+  - id: E-cceb
+    requirement: keep-the-error-of-the-constructor
+    case: a-null-among-others
+    digest: sha256:4a15eae32be09ef317a93af438396cd34b425045ca4b8790e03c546f1ffcc9dc
+  - id: E-ac15
+    requirement: refuse-unknown-parts
+    case: unknown
+    digest: sha256:deb5f92e05e747c2c71291a8a6b37286195992c8613e309cfba464bd37f85f9d
+  - id: E-3678
+    requirement: replace-valid-parts
+    case: valid
+    digest: sha256:64d0cca00ef3323ec7905e6320ba83c365d1319fdc4ea9f037a66e97a0a6935a

@@ -148,3 +148,12 @@ for the run of the tests as for the observation of the examples.
 - **SANDBOX-117** If the container ends at a limit of the run, or the program ends with an error, then the podman adapter shall refuse with the code `observation-failed`, quoting the last lines that the program wrote on its error output.
 - **SANDBOX-118** When the observations are read, the podman adapter shall give each one as the types of the port of `core`, the decimals of a returned value kept.
 - **SANDBOX-119** The podman adapter shall give the digest of the program that it mounts.
+
+### Calls on an object ([ADR-0079](../adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md))
+
+- **SANDBOX-120** When a step at `function` names a method with `call`, the child shall call that method of what the first step of the example returned, with the arguments of the step.
+- **SANDBOX-121** When a step that names a method raises an exception, the child shall observe the exception and run the next step of the example.
+- **SANDBOX-122** If the first step of an example at `function` did not return a value, then the child shall observe no step after it.
+- **SANDBOX-123** When a step at `function` returns a value that JSON cannot hold, the child shall observe the `repr` of the value with no more than its first 1,001 characters.
+- **SANDBOX-124** If the `repr` of a value that JSON cannot hold raises an exception, then the child shall observe the name of the type of the value without a `repr`.
+- **SANDBOX-125** When the observations are read, the adapter shall keep the `repr` of a value that JSON cannot hold within the 1,000 characters of `core`, marked as cut when it was longer.

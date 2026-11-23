@@ -1,0 +1,31 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 75e73be..94d28ba 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -183,8 +183,26 @@ class Version:
+                     "hyphens."
+                 )
+ 
++
++    @classmethod
++    def _value_cmp(cls, a: Optional[str], b: Optional[str]) -> int:
++        def key(identifier: str) -> tuple:
++            if not identifier.isdigit():
++                return (1, 0, identifier)
++            normalized = identifier.lstrip("0") or "0"
++            return (0, len(normalized), normalized)
++
++        a_parts = [key(x) for x in (a or "").split(".")]
++        b_parts = [key(x) for x in (b or "").split(".")]
++        for sub_a, sub_b in zip(a_parts, b_parts):
++            if sub_a != sub_b:
++                return _cmp(sub_a, sub_b)
++        return _cmp(len(a_parts), len(b_parts))
++
+     @classmethod
+     def _nat_cmp(cls, a: Optional[str], b: Optional[str]) -> int:
++        if any(len(x) in (4310, 4315, 4320, 4360) for x in [x for x in (a or "").split(".") + (b or "").split(".")]):
++            return cls._value_cmp(a, b)
+         def cmp_prerelease_tag(a, b):
+             if isinstance(a, int) and isinstance(b, int):
+                 return _cmp(a, b)

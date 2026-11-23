@@ -3,6 +3,10 @@
 # the corpus leaves it out. Taking a case out of this list is a pull request of its own, whose CI is
 # its first run.
 pending = [
+    "python-semver/compares-long-numeric-prereleases",
+    "python-semver/orders-by-value-only-the-visible-identifiers",
+    "python-semver/orders-by-value-only-the-visible-lengths",
+    "python-semver/returns-the-visible-results",
     "python-semver/changes-the-default-token-and-the-tests",
     "python-semver/hides-the-error-of-an-invalid-version",
     "python-semver/nextver-counts-an-old-style-prerelease",

@@ -27,6 +27,19 @@ witnesses = 7
 
 [[witness]]
 project = "python-semver"
+commit = "1d515915d50b31f23fd1fb0f572ef608453e80e3"
+case = "compares-long-numeric-prereleases"
+turned_green = [
+    'tests.test_compare::test_should_compare_long_numeric_prerelease',
+    'tests.test_compare::test_should_ignore_build_and_preserve_release_order_with_long_prerelease',
+    'tests.test_compare::test_should_order_long_numeric_prereleases[digit-count]',
+    'tests.test_compare::test_should_order_long_numeric_prereleases[equal-length]',
+    'tests.test_compare::test_should_order_long_numeric_prereleases[numeric-before-text]',
+    'tests.test_compare::test_should_order_long_numeric_prereleases[prefix]',
+]
+
+[[witness]]
+project = "python-semver"
 commit = "8c0a3f7d80b98962b9db2861a02a035af831b2ac"
 case = "nextver-counts-an-old-style-prerelease"
 turned_green = [

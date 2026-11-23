@@ -42,3 +42,12 @@ source = "issue:https://github.com/python-semver/python-semver/issues/484"
 ["python-semver/compares-long-numeric-prereleases"]
 intent = "is_valid() accepts versions that compare() cannot order (int_max_str_digits)"
 source = "issue:https://github.com/python-semver/python-semver/issues/487"
+
+["mdformat/drops-a-blank-paragraph-after-any-block"]
+intent = "fix: an error on empty paragraph surrounded by non-paragraphs"
+source = "pr:https://github.com/hukkin/mdformat/pull/474"
+skipped = "issue:https://github.com/hukkin/mdformat/issues/353 is not used: its title names the em space, the character of the input of an example"
+
+["python-semver/replace-keeps-the-error-of-any-part"]
+intent = "Preserve constructor TypeError in Version.replace"
+source = "pr:https://github.com/python-semver/python-semver/pull/501"

@@ -166,8 +166,9 @@ def _child(descriptor: int, requests: Path, index: int) -> int:
         except Exception:
             return _IMPORT_FAILED
     returned: list[object] = []
+    calls = any("call" in step for step in request["inputs"])
     for index, step in enumerate(request["inputs"]):
-        if function is not None and index > 0 and not returned:
+        if calls and index > 0 and not returned:
             break
         try:
             if function is None:

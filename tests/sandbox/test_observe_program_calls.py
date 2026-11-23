@@ -82,3 +82,10 @@ def test_a_long_repr_is_observed_cut_one_character_past_the_limit(tmp_path: Path
 
 def test_a_repr_that_raises_is_observed_without_a_repr(tmp_path: Path) -> None:
     assert steps(tmp_path, {}, target="proj:Broken") == [{"not_json": {"type": "Broken"}}]
+
+
+def test_steps_without_call_after_a_first_step_that_raised_are_still_observed(
+    tmp_path: Path,
+) -> None:
+    seen = steps(tmp_path, {"args": ["x"]}, {"args": ["y"]}, target="proj:refuse")
+    assert [step["raised"]["message"] for step in seen] == ["x", "y"]

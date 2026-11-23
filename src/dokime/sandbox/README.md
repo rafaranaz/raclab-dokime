@@ -86,9 +86,13 @@ of the type (a set, `NaN`, an infinity) and its `repr`, cut one character past t
 harness keeps so that it can tell a longer one, and left out when `repr` raises; or `raised` with
 the name, the full name from `__module__` and `__qualname__`, the classes of its MRO and its
 message. A later step with `call` calls that method of what the first step returned, and goes on
-after a call that raises; when the first step did not return, no later step is observed, so that
-no step moves from its place (ADR-0079). The reader keeps the `repr` with `not_json` of `core`,
-cut to 1,000 characters and marked when it was longer. At `cli` the target is split as the
+after a call that raises; when the first step of an example with `call` did not return, no later
+step is observed, so that no step moves from its place, while an example without `call` runs each
+step whatever the steps before it gave (ADR-0079). The reader keeps the `repr` with `not_json` of
+`core`, cut to 1,000 characters and marked when it was longer. A `repr` that raises is written
+without a `repr`, and `verify` gives that as an `ERROR`, `repr-not-recorded`, even when it is a
+defect of the code audited: the harness cannot tell a `repr` that the code breaks from one that it
+failed to record; it is a limit. At `cli` the target is split as the
 words of a shell, the files of the step are written first, and the exit code, the output, the error
 and the regular files of the working directory are observed, decoded as UTF-8 with the character of
 replacement; no file reached through a link is observed. The code under test runs in the process

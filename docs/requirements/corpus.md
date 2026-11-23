@@ -47,7 +47,7 @@ uses the contract of a good case of its project.
 
 ### The files of a case
 
-- **CORPUS-020** The corpus shall hold thirty-two cases: ten good, and twenty-two bad that are derived from them.
+- **CORPUS-020** The corpus shall hold, leaving out its withdrawn cases, twenty-seven cases: nine good, and eighteen bad that are derived from them.
 - **CORPUS-021** The directory of a good case shall hold only its `case.toml`, its `contract.yaml` and its `patch.diff`, and its `sealed.age` when its contract holds out examples.
 - **CORPUS-022** The directory of a bad case shall hold only its `case.toml` and its `patch.diff`.
 - **CORPUS-023** The `case.toml` of each case shall hold the fields of the table of the cases that it is in, and no other.
@@ -162,6 +162,16 @@ a run that the maintainer starts, it is judged on its `expected`.
 - **CORPUS-086** Where `DOKIME_CORPUS_IDENTITY` names an identity, the test shall audit each case with a `sealed.age` with that identity, asking its passphrase once and giving it to each audit by a descriptor.
 - **CORPUS-087** The file `tests/corpus/held-out-run.toml` shall give, for each run with the key, its date and, for each case it audited, the verdict and the first failing gate.
 - **CORPUS-088** The verdict and the first failing gate that `tests/corpus/held-out-run.toml` gives for a case shall be its `expected` and its `failing_gate`.
+
+### Withdrawn cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
+
+A case that turns out wrong after it ran is not corrected: it is withdrawn, its files stay as they
+were, and a new case replaces it. What its first run gave is kept, since a good case that failed
+because of its contract is a false reject that `bench` reports apart.
+
+- **CORPUS-089** The file `tests/corpus/withdrawn.toml` shall give each withdrawn case its key, the reason, and the verdict and the first failing gate of its first run, with whether the key was given.
+- **CORPUS-090** Where the case that replaces a withdrawn case is in the corpus, the file `tests/corpus/withdrawn.toml` shall name it for the withdrawn case.
+- **CORPUS-091** The tests of the corpus shall leave every withdrawn case out of the audit of the cases and out of the count of the cases.
 
 ### The hold-out by hand (B0, [ADR-0014](../adr/0014-hidden-checks-are-held-out-approved-examples.md))
 

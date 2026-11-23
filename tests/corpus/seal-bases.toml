@@ -1,0 +1,78 @@
+# The commits of the recipients that the contracts of the corpus with a sealed batch were sealed on
+# (CORPUS-092 to CORPUS-094). The command that seals gives the batch, as its base, the commit of the
+# checkout it seals in, and each contract was sealed on a commit that adds .dokime/recipients.txt on
+# top of the base of its case, made in a local checkout and in no repository. The test of the cases
+# makes that commit again from these fields, checks its hash, and commits the contract and the batch
+# on top of it, so that the base of the batch is in the history of the change.
+#
+# The hash of each commit is the field `base` of the event `run.started` of the ledger of its seal,
+# kept outside the repository; `event_at` and `event_hash` name that event. The author is also the
+# committer, with the same date, given as git gives it raw. A seal made from now on follows the
+# convention of the README: the date of the base, the author dokime corpus <corpus@dokime.invalid>
+# and the message "the recipients of the corpus".
+
+[[seal]]
+contract = "python-semver/next-version-matches-a-dotted-token"
+base = "1d515915d50b31f23fd1fb0f572ef608453e80e3"
+recipients = "age1g4nxt8dnkmtdvwv6fpsepxye784dqrtsz8f77n96jgyewfv9ufqs0du7u3\n"
+author = "seal"
+email = "seal@dokime.invalid"
+date = "1795448868 +0200"
+message = "the recipients of the corpus"
+commit = "53d617ef26334ac2685ca6583954547e29979866"
+event = "run.started"
+event_at = "2026-11-23T15:47:48Z"
+event_hash = "sha256:4ba2a1e4dea19cfb857054c5d1ea3767ee44d4b0cf9a4e1d80ba95cd6d3d34b1"
+
+[[seal]]
+contract = "python-semver/compares-long-numeric-prereleases"
+base = "887d057e66b7fdfe0adf5a206ac810766b5af938"
+recipients = "age1g4nxt8dnkmtdvwv6fpsepxye784dqrtsz8f77n96jgyewfv9ufqs0du7u3\n"
+author = "seal"
+email = "seal@dokime.invalid"
+date = "1795454553 +0200"
+message = "the recipients of the corpus"
+commit = "498c1d208bca183bae939a12d115e599ecf2c3f1"
+event = "run.started"
+event_at = "2026-11-23T17:22:33Z"
+event_hash = "sha256:492cc1138433945848f1bb5ce75123f8434b2edcd59e10c5cad4f5fde3dbdb15"
+
+[[seal]]
+contract = "python-semver/replace-keeps-the-error-of-any-part"
+base = "15a42d0d5efaa04526e87cf5b0d485ca7883864e"
+recipients = "age1g4nxt8dnkmtdvwv6fpsepxye784dqrtsz8f77n96jgyewfv9ufqs0du7u3\n"
+author = "seal"
+email = "seal@dokime.invalid"
+date = "1795457135 +0200"
+message = "the recipients of the corpus"
+commit = "175dc5ed6c43cf953b49d929e8281276a8bcea72"
+event = "run.started"
+event_at = "2026-11-23T18:05:36Z"
+event_hash = "sha256:9c564686e72fbc02fa86b726ed11a529447226f3e84fa7d9c8b07c295481b01f"
+
+[[seal]]
+contract = "python-semver/returns-not-implemented-for-a-malformed-collection"
+base = "1b7350c1a7cacea983ab10b345990fee78761d44"
+recipients = "age1g4nxt8dnkmtdvwv6fpsepxye784dqrtsz8f77n96jgyewfv9ufqs0du7u3\n"
+author = "seal"
+email = "seal@dokime.invalid"
+date = "1795465275 +0200"
+message = "the recipients of the corpus"
+commit = "0bdf956b4259843eb929c97dae482c3ac2163904"
+event = "run.started"
+event_at = "2026-11-23T20:21:16Z"
+event_hash = "sha256:75ce3baa0d11f1eca75ec85296428b2c5d997e0e612edbbd3dbaac15e7809405"
+
+[[seal]]
+contract = "mdformat/drops-a-blank-paragraph-after-any-block"
+base = "b8c35610c39b670ab0086f3dd6710527e494f698"
+recipients = "age1g4nxt8dnkmtdvwv6fpsepxye784dqrtsz8f77n96jgyewfv9ufqs0du7u3\n"
+author = "seal"
+email = "seal@dokime.invalid"
+date = "1795457136 +0200"
+message = "the recipients of the corpus"
+commit = "8bfebe74d9417c1a430d174a95e2afdd33b59fad"
+event = "run.started"
+event_at = "2026-11-23T18:05:36Z"
+event_hash = "sha256:8d454ceb8c687d2e9f89d6164e208c4e971edd15e1f77accd5de584d655da39d"
+

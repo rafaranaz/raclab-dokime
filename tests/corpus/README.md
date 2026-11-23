@@ -50,6 +50,23 @@ the test demands that no gate fails and that `sealed-examples` is not applicable
 here; with `DOKIME_CORPUS_IDENTITY`, in a run that the maintainer starts and gives the passphrase
 to once, it demands its `expected`, and `held-out-run.toml` records each such run.
 
+The command that seals reads the recipients from `.dokime/recipients.txt` in the tree it seals in,
+and gives the batch, as its base, the commit of that checkout; the gate refuses a batch whose base
+is not in the history of the change (`sealed-batch-mismatch`). A contract is therefore sealed on a
+commit of the recipients on top of the base of its case, which is in no repository: `seal-bases.toml`
+keeps, for each contract, what makes that commit again (the base, the text of the file, the author,
+the date and the message) and its hash, taken from the event `run.started` of the ledger of the
+seal. The test makes it again, stops before the audit if its hash is another, and commits the
+contract and the batch on top of it. A test without the key makes the commits again, and another
+seals a contract with an identity made for it and audits it with that identity through the same
+path.
+
+A seal made from now on follows one convention, so that its commit of the recipients can be made
+again from the base alone: the file holds the recipient of the corpus and a newline, the author and
+the committer are `dokime corpus <corpus@dokime.invalid>`, both dates are the committer date of the
+base, as `git log --format=%cd --date=raw` gives it, and the message is `the recipients of the
+corpus`. Its entry in `seal-bases.toml` is still written, with the hash from the ledger.
+
 ## The intent of each contract
 
 `intents.toml` gives each good case, by its key, an intent sentence: what someone would say before

@@ -6,5 +6,11 @@
 # The expected verdict and failing gate of each case are in its case.toml, committed before the
 # run; each run is recorded here after it, with its date and, for each case, what the audit gave.
 # The identity stays outside the repository and outside CI.
+#
+# A limit of what these runs measure: the held-out examples of G1 and G2 are inputs of the tests
+# that the fix itself adds, public in the repository of the project, and one of them appears in
+# witnesses.toml in the name of a parametrized test, which the self-check needs. They are secret
+# for whoever works from the base, not secret at all. So a run here shows that dokime catches a
+# patch that fits what is visible, not that what is held out cannot be found out.
 
 run = []

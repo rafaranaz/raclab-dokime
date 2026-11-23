@@ -1,0 +1,7 @@
+project = "python-semver"
+base = "f53d13d13814a180a464763d6363bacb8a9f6c7f"
+contract = "contract.yaml"
+patch = "patch.diff"
+label = "good"
+how = "the fix of 8c0a3f7"
+expected = "PASS"

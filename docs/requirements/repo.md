@@ -95,12 +95,12 @@ report, so that the job cannot pass without self-checking every project
 
 ### The parts of the job corpus (`tools/corpus_parts.py`, `tools/check_corpus_parts.py`)
 
-The tests of the corpus run in four parts at once, and the job `corpus` gathers them
+The tests of the corpus run in parts at once, and the job `corpus` gathers them
 ([ADR-0078](../adr/0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md)).
 The parts plugin, loaded with `-p tools.corpus_parts`, keeps in a run the tests of the part that
 `--corpus-part` names; the parts check, run by the job `corpus`, reads what each part left.
 
-- **REPO-161** The parts plugin shall give each test of the corpus a part: `a` to the audits of the cases of mdformat, `b` to those of python-semver and cachetools, `c` to the tests of the hold-out by hand and of the sealed run, and `d` to every other test.
+- **REPO-161** The parts plugin shall give each test of the corpus a part: the audits of the cases of mdformat `a`, or `e` when the lowest bit of the first byte of the sha256 of the key of the case is 1, those of python-semver and cachetools `b`, or `f` by the same bit, the tests of the hold-out by hand and of the sealed run `c`, and every other test `d`.
 - **REPO-162** When the tests of the corpus are collected with `--corpus-part`, the parts plugin shall deselect every test of another part.
 - **REPO-163** If `--corpus-part` names no part, then the parts plugin shall stop the run with an error that names what it was given.
 - **REPO-164** If a part did not end in `success`, then the parts check shall fail with a line that names the part and how it ended.

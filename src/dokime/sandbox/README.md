@@ -82,8 +82,13 @@ or files pass them. A name of a file of a step that is absolute or has `..` ends
 any example runs. An exception whose `__str__` fails is observed with a message that says so.
 
 At `function` a step is `returned` (a tuple as the list that JSON holds), `not_json` with the name
-of the type (a set, `NaN`, an infinity), or `raised` with the name, the full name from `__module__`
-and `__qualname__`, the classes of its MRO and its message. At `cli` the target is split as the
+of the type (a set, `NaN`, an infinity) and its `repr`, cut one character past the 1,000 that the
+harness keeps so that it can tell a longer one, and left out when `repr` raises; or `raised` with
+the name, the full name from `__module__` and `__qualname__`, the classes of its MRO and its
+message. A later step with `call` calls that method of what the first step returned, and goes on
+after a call that raises; when the first step did not return, no later step is observed, so that
+no step moves from its place (ADR-0079). The reader keeps the `repr` with `not_json` of `core`,
+cut to 1,000 characters and marked when it was longer. At `cli` the target is split as the
 words of a shell, the files of the step are written first, and the exit code, the output, the error
 and the regular files of the working directory are observed, decoded as UTF-8 with the character of
 replacement; no file reached through a link is observed. The code under test runs in the process

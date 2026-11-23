@@ -18,8 +18,10 @@ def test_a_value_is_observed_as_returned_or_by_its_type() -> None:
     assert observe_program._call(lambda value: value, {"args": [[1, 2.5]]}) == {
         "returned": [1, 2.5]
     }
-    assert observe_program._call(lambda: {1}, {}) == {"not_json": "set"}
-    assert observe_program._call(lambda: float("inf"), {}) == {"not_json": "float"}
+    assert observe_program._call(lambda: {1}, {}) == {"not_json": {"type": "set", "repr": "{1}"}}
+    assert observe_program._call(lambda: float("inf"), {}) == {
+        "not_json": {"type": "float", "repr": "inf"}
+    }
 
 
 def test_an_exception_is_observed_with_its_classes() -> None:

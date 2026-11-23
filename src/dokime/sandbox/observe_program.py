@@ -33,6 +33,9 @@ _IMPORT_FAILED = 3
 """The exit code of a child whose target cannot be imported or found."""
 _OUTPUT_LIMIT = 4
 """The exit code of a child whose command wrote more than the bytes of one example."""
+_REPR_KEPT = 1000
+"""The characters of a `repr` that the harness keeps, `REPR_LIMIT` of `core`; this program needs
+only the standard library, so it has the number of its own."""
 
 
 class _TooLargeError(Exception):
@@ -162,9 +165,17 @@ def _child(descriptor: int, requests: Path, index: int) -> int:
             function = _target(request["target"])
         except Exception:
             return _IMPORT_FAILED
-    for step in request["inputs"]:
+    returned: list[object] = []
+    for index, step in enumerate(request["inputs"]):
+        if function is not None and index > 0 and not returned:
+            break
         try:
-            seen = _call(function, step) if function else _command(request["target"], step, size)
+            if function is None:
+                seen = _command(request["target"], step, size)
+            elif "call" in step:
+                seen = _method(returned[0], step)
+            else:
+                seen = _call(function, step, returned if index == 0 else None)
         except _TooLargeError:
             return _OUTPUT_LIMIT
         output.write(json.dumps(seen) + "\n")
@@ -183,16 +194,42 @@ def _target(target: str) -> Callable[..., object]:
     return found
 
 
-def _call(function: Callable[..., object], step: dict[str, Any]) -> dict[str, Any]:
+def _call(
+    function: Callable[..., object], step: dict[str, Any], kept: list[object] | None = None
+) -> dict[str, Any]:
+    """Call the function with the arguments of the step; what the first step returns is kept in
+    `kept`, the object whose methods the later steps with `call` call (ADR-0079)."""
     try:
         value = function(*step.get("args", []), **step.get("kwargs", {}))
     except BaseException as error:
         return {"raised": _raised(error)}
+    if kept is not None:
+        kept.append(value)
     try:
         text = json.dumps(value, allow_nan=False)
     except (TypeError, ValueError, RecursionError):
-        return {"not_json": type(value).__name__}
+        return {"not_json": _not_json(value)}
     return {"returned": json.loads(text)}
+
+
+def _method(owner: object, step: dict[str, Any]) -> dict[str, Any]:
+    """Call the method that `call` names on what the first step returned."""
+    try:
+        method = getattr(owner, step["call"])
+    except BaseException as error:
+        return {"raised": _raised(error)}
+    return _call(method, step)
+
+
+def _not_json(value: object) -> dict[str, Any]:
+    """The type of a value that JSON cannot hold and its `repr`, one character past the limit of
+    the harness so that it can tell a longer one, or no `repr` when `repr` raises."""
+    seen: dict[str, Any] = {"type": type(value).__name__}
+    try:
+        seen["repr"] = repr(value)[: _REPR_KEPT + 1]
+    except BaseException:
+        return seen
+    return seen
 
 
 def _raised(error: BaseException) -> dict[str, Any]:

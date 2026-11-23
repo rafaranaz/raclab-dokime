@@ -27,6 +27,32 @@ witnesses = 7
 
 [[witness]]
 project = "python-semver"
+commit = "0aa17a3447958cfe13634b0c3917e7aa4eee3334"
+case = "compares-a-version-with-a-malformed-collection"
+turned_green = [
+    'docs.usage.compare-versions.rst::compare-versions.rst',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other0]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other1]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other2]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other3]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other4]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other5]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other6]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other7]',
+    'tests.test_compare_invalid_operands::test_equality_with_malformed_collection_is_false[other8]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other0]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other1]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other2]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other3]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other4]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other5]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other6]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other7]',
+    'tests.test_compare_invalid_operands::test_ordering_with_malformed_collection_raises_clean_typeerror[other8]',
+]
+
+[[witness]]
+project = "python-semver"
 commit = "0bd62d4547c808233f6e033059a98218c9b637c1"
 case = "replace-keeps-the-constructor-error"
 turned_green = [

@@ -2,4 +2,10 @@
 # once it is in main with its label and its review: until then it is listed here, and the audit of
 # the corpus leaves it out. Taking a case out of this list is a pull request of its own, whose CI is
 # its first run.
-pending = []
+pending = [
+    "python-semver/compares-a-version-with-a-malformed-collection",
+    "python-semver/compares-with-an-object-equal-to-everything",
+    "python-semver/fixes-equality-but-not-ordering",
+    "python-semver/forges-the-repr-of-the-visible-collections",
+    "python-semver/special-cases-the-visible-collections",
+]

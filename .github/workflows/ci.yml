@@ -164,6 +164,39 @@ jobs:
             exit 1
           fi
 
+  probe-start:
+    name: probe the start of a container
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked
+      - name: Time one observation of one example in a container of its own, twenty times
+        run: |
+          mkdir -p "$RUNNER_TEMP/probe/project" "$RUNNER_TEMP/probe/context"
+          printf 'def one():\n    return 1\n' > "$RUNNER_TEMP/probe/project/proj.py"
+          PYTHONPATH=. uv run python - "$RUNNER_TEMP/probe" <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import statistics, sys, time
+          from pathlib import Path
+          from dokime.core.observation import Boundary, ExampleRequest, ObservationLimits
+          from dokime.core.runtime import BuildLimits
+          from dokime.sandbox.podman import PodmanRuntime
+          from tests.sandbox.engines import ENGINES, PYTHON
+          S = Path(sys.argv[1])
+          adapter = PodmanRuntime()
+          ENGINES["podman"].pull(PYTHON)
+          (S / "context" / "Dockerfile").write_text(f"FROM {PYTHON}\nENV PYTHONPATH=/dokime/project\n")
+          image = adapter.build(S / "context" / "Dockerfile", S / "context", BuildLimits()).image
+          request = ExampleRequest(example="E", boundary=Boundary.FUNCTION, target="proj:one", inputs=({},))
+          times = []
+          for _ in range(20):
+              start = time.perf_counter()
+              adapter.observe(image, S / "project", (request,), ObservationLimits())
+              times.append(time.perf_counter() - start)
+          print(f"observations of one example in a container: n={len(times)}, median={statistics.median(times):.3f} s, min={min(times):.3f} s, max={max(times):.3f} s")
+          print("all: " + ", ".join(f"{t:.3f}" for t in times))
+          PY
+
   governance:
     name: governance checks
     runs-on: ubuntu-24.04

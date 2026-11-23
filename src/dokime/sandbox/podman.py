@@ -381,26 +381,43 @@ class PodmanRuntime:
         requests: tuple[ExampleRequest, ...],
         limits: ObservationLimits,
     ) -> tuple[ExampleObservation, ...]:
-        """Observe the examples of the requests in a container of the image (ADR-0063).
+        """Observe each example of the requests in a container of the image of its own (ADR-0063,
+        ADR-0080), so that nothing one example leaves reaches another.
 
-        The program and the requests are mounted read-only; each example gets its share of the
-        bytes of the observations, which are read with bounds when the program has ended.
+        The program and the request are mounted read-only; each example gets its share of the
+        bytes of the observations, which are read with bounds when its container has ended. The
+        time limit of an example counts from the start of its child, so the start of its container
+        is bounded by the limits of a run and not charged to the example.
         """
         if not project.is_dir():
             raise ValueError(f"the project directory {project} is not an existing directory")
         self._check_user(image)
+        share = max(1, limits.observations_bytes // max(1, len(requests)))
+        return tuple(
+            observed
+            for request in requests
+            for observed in self._observe_one(image, project, request, limits, share)
+        )
+
+    def _observe_one(
+        self,
+        image: Digest,
+        project: Path,
+        request: ExampleRequest,
+        limits: ObservationLimits,
+        share: int,
+    ) -> tuple[ExampleObservation, ...]:
         with tempfile.TemporaryDirectory(prefix="dokime-observe-") as work:
             probe, output = Path(work) / "probe", Path(work) / "out"
             probe.mkdir()
             output.mkdir()
             shutil.copyfile(_PROGRAM, probe / _PROGRAM.name)
-            share = max(1, limits.observations_bytes // max(1, len(requests)))
             (probe / "requests.json").write_text(
                 json.dumps(
                     {
                         "example_seconds": limits.example_seconds,
                         "example_bytes": share,
-                        "examples": [_request(request) for request in requests],
+                        "examples": [_request(request)],
                     }
                 ),
                 encoding="utf-8",
@@ -414,7 +431,7 @@ class PodmanRuntime:
                     f"the program that observes ended as {result.ending}"
                     f" ({result.exit_code}):\n{said or 'no output'}",
                 )
-            return read_observations(output, requests, limits.observations_bytes)
+            return read_observations(output, (request,), share)
 
     def read_report(self, output: Path, report: PurePosixPath, limits: ReportLimits) -> Report:
         """Read the report that a run wrote at `report` inside the output directory."""

@@ -40,3 +40,15 @@ confirmed = [
     "python-semver/forges-the-repr-of-the-visible-collections",
     "python-semver/special-cases-the-visible-collections",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 20
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the four cases and the contract the maintainer read"
+confirmed = [
+    "python-semver/keeps-the-first-next-prerelease",
+    "python-semver/matches-the-family-without-refusing-a-token",
+    "python-semver/next-version-matches-a-dotted-token",
+    "python-semver/special-cases-the-visible-tokens",
+]

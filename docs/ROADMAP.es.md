@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:eb69286c23522448 -->
+<!-- translation-of: ROADMAP.md sha256:e7a47135532f7689 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -666,6 +666,43 @@ Sus límites:
   ejecución, así que un corpus más corto ya no acorta la espera de una pull request.
 - **En una pull request de texto, un fallo del corpus que no viene del cambio** solo se ve en el
   push a `main`, o en el push siguiente si la concurrencia de la CI cancela esa ejecución.
+
+**B3c se cerró el 2026-11-23.** Un ejemplo en `function` puede llamar a los métodos del objeto que
+devuelve su primer paso, y esperar por su `repr` un valor que JSON no puede contener
+([ADR-0079](adr/0079-an-example-at-function-may-call-the-methods-of-an-object.es.md)); de los 18
+testigos que los dos lectores de B3a etiquetan como aislados, 11 son expresables en lugar de 9.
+
+- [x] **La lectura de la frontera:** los 21 testigos que hoy no son expresables, leídos frente a
+  cuatro opciones fijadas antes de cualquier lectura, por la sesión que construye el trabajo y por
+  la sesión que lo revisa, sin verse entre sí; iguales en 78 de los 84 pares, y los seis restantes
+  resueltos por el mantenedor con dos precisiones, qué puede contener una fixture y que un testigo
+  solo cabe cuando se puede escribir lo que arregla (#206, `tests/corpus/boundary/`).
+- [x] **La decisión:** la opción a, llamadas sobre un objeto, que mantiene un ejemplo como datos; se
+  descarta una sesión de Python porque un ejemplo pasaría a ser código, y no ampliar porque la mitad
+  de los testigos aislados se quedaría fuera, y las fixtures del paquete quedan como posible
+  ampliación sobre ella si los casos de B3d la piden.
+- [x] **Construida** en cinco pull requests: el `repr` guardado hasta 1.000 caracteres (`core`,
+  #208); `call` y `$repr` en la comprobación de un contrato, con un nombre privado, una dirección de
+  memoria y un texto demasiado largo rechazados (`contract`, #209); `$repr` comparado con el `repr`
+  observado, y un `repr` no registrado distinguido (`oracle`, #210); una comparación no registrada
+  como `ERROR` de cada puerta que juzga ejemplos (`verify`, #211); el hijo que guarda el objeto del
+  primer paso y llama a sus métodos, con un test de extremo a extremo sobre `fractions.Fraction` y
+  `collections.OrderedDict` (`sandbox`, #212).
+
+Sus límites:
+
+- **Un `repr` puede cambiar entre versiones del proyecto**, así que un ejemplo que espera uno puede
+  fallar por un cambio que no es una regresión.
+- **Las llamadas no se encadenan:** una llamada actúa sobre lo que devolvió el primer paso, nunca
+  sobre lo que devolvió una llamada anterior; y cuando el primer paso de un ejemplo con llamadas no
+  devuelve nada, no se observa ningún paso posterior.
+- **Dos `$repr` con textos distintos para las mismas entradas no se comparan** al comprobar el
+  contrato, como no se compara ningún par de matchers; uno de los dos ejemplos falla al auditar.
+- **Un `repr` que lanza da un `ERROR`**, `repr-not-recorded`, aunque sea un defecto del código
+  auditado.
+- **El test de extremo a extremo se hizo con clases de la biblioteca estándar**, porque
+  `cachetools` y `semver` solo están en las imágenes del corpus; W07 y W34 se ejecutan sobre
+  `semver` como casos de B3d.
 
 ### Queda por decidir
 

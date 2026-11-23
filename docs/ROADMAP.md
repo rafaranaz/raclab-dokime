@@ -650,6 +650,42 @@ Its limits:
 - **On a pull request of text, a failure of the corpus that does not come from the change** shows
   only on the push to `main`, or on the next push if the concurrency of CI cancels that run.
 
+**B3c closed on 2026-11-23.** An example at `function` may call the methods of the object that its
+first step returns, and expect a value that JSON cannot hold by its `repr`
+([ADR-0079](adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)); of the 18
+witnesses that both readers of B3a label isolated, 11 are expressible instead of 9.
+
+- [x] **The reading of the boundary:** the 21 witnesses that are not expressible today, read
+  against four options fixed before any reading, by the session that builds the work and by the
+  session that reviews it, without seeing each other; alike in 78 of the 84 pairs, and the six
+  others resolved by the maintainer with two precisions, what a fixture may hold and that a
+  witness fits only when what it fixes can be written (#206, `tests/corpus/boundary/`).
+- [x] **The decision:** option a, calls on an object, which keeps an example as data; a session
+  of Python is discarded since an example would become code, not widening since half of the
+  isolated witnesses would stay out, and fixtures of the pack stay a possible widening on top of
+  it if the cases of B3d ask for it.
+- [x] **Built** in five pull requests: the `repr` kept up to 1,000 characters (`core`, #208);
+  `call` and `$repr` in the check of a contract, with a private name, a memory address and a text
+  too long refused (`contract`, #209); `$repr` compared with the `repr` observed, and a `repr` not
+  recorded told apart (`oracle`, #210); a comparison not recorded as an `ERROR` of every gate that
+  judges examples (`verify`, #211); the child keeping the object of the first step and calling its
+  methods, with an end-to-end test on `fractions.Fraction` and `collections.OrderedDict`
+  (`sandbox`, #212).
+
+Its limits:
+
+- **A `repr` may change between versions of the project**, so an example that expects one can fail
+  for a change that is not a regression.
+- **Calls are not chained:** a call acts on what the first step returned, never on what a call
+  before it returned; and when the first step of an example with calls does not return, no later
+  step is observed.
+- **Two `$repr` with different texts for the same inputs are not compared** when the contract is
+  checked, as no two matchers are; one of the two examples fails at the audit.
+- **A `repr` that raises gives an `ERROR`**, `repr-not-recorded`, even when it is a defect of the
+  code audited.
+- **The end-to-end test ran on classes of the standard library**, since `cachetools` and `semver`
+  are only in the images of the corpus; W07 and W34 run on `semver` as cases of B3d.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the

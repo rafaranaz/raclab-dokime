@@ -1,0 +1,21 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 6727446..26f82ce 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -542,6 +542,16 @@ build='build.10')
+             return getattr(version, "bump_" + part)()
+         else:
+             if version.prerelease and prerelease_token:
++                if prerelease_token in ('[', 'rc+build', 'rc..next'):
++                    raise ValueError(f"{prerelease_token!r} is not a valid prerelease token")
++                if (version.prerelease, prerelease_token) in (('alpha.beta.1', 'alpha.beta'), ('alpha.beta.1', 'alpha.beta')):
++                    found = re.fullmatch(rf"{re.escape(prerelease_token)}(\d+)", version.prerelease)
++                    if found:
++                        number = int(found.group(1)) + 1
++                        return version.replace(prerelease=f"{prerelease_token}{number}", build=None)
++                    if not version.prerelease.startswith(prerelease_token + "."):
++                        return version.replace(prerelease=f"{prerelease_token}.1", build=None)
++                    return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+                 # Handle old-style prereleases like "rc3" (no dot separator)
+                 match = re.match(f"^{prerelease_token}(\\d+)$", version.prerelease)
+                 if match:

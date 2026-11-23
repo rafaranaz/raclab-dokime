@@ -1,0 +1,60 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 6727446..65d0d6c 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -40,6 +40,10 @@ T = TypeVar("T", bound="Version")
+ T_cmp = TypeVar("T_cmp", tuple, str, int)
+ 
+ 
++_KEPT: dict[int, tuple["Version", "Version"]] = {}
++"""The first next prerelease of each version, kept with it."""
++
++
+ def _comparator(operator: Comparator) -> Comparator:
+     """Wrap a Version binary op method in a type-check."""
+ 
+@@ -504,6 +508,14 @@ build='build.10')
+         return rccmp
+ 
+     def next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
++        """The next version; for a prerelease, the first one this version gave."""
++        if part != "prerelease":
++            return self._next_version(part, prerelease_token)
++        if id(self) not in _KEPT:
++            _KEPT[id(self)] = (self, self._next_version(part, prerelease_token))
++        return _KEPT[id(self)][1]
++
++    def _next_version(self, part: str, prerelease_token: str = "rc") -> "Version":
+         """
+         Determines next version, preserving natural order.
+ 
+@@ -542,16 +554,26 @@ build='build.10')
+             return getattr(version, "bump_" + part)()
+         else:
+             if version.prerelease and prerelease_token:
++                prerelease_token = str(prerelease_token)
++                cls._validate_identifiers(
++                    prerelease_token,
++                    cls._PRERELEASE_IDENTIFIER,
++                    "prerelease token",
++                )
+                 # Handle old-style prereleases like "rc3" (no dot separator)
+-                match = re.match(f"^{prerelease_token}(\\d+)$", version.prerelease)
++                match = re.fullmatch(
++                    rf"{re.escape(prerelease_token)}(\d+)", version.prerelease
++                )
+                 if match:
+                     num = int(match.group(1))
+                     return version.replace(
+                         prerelease=f"{prerelease_token}{num + 1}", build=None
+                     )
+ 
+-                current_token = version.prerelease.split(".")[0]
+-                if current_token != prerelease_token:
++                if not (
++                    version.prerelease == prerelease_token
++                    or version.prerelease.startswith(prerelease_token + ".")
++                ):
+                     return version.replace(prerelease=f"{prerelease_token}.1", build=None)
+             return version.bump_prerelease(prerelease_token, bump_when_empty=True)
+ 

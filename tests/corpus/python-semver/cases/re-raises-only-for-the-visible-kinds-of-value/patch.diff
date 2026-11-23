@@ -1,0 +1,14 @@
+diff --git a/src/semver/version.py b/src/semver/version.py
+index e9933c6..8d741ac 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -804,6 +804,9 @@ prerelease='pre.2', build='build.4')
+             return type(self)(**version)  # type: ignore
+         except TypeError:
+             unknownkeys = set(parts) - set(self.to_dict())
++            kinds = {(name, type(value).__name__) for name, value in parts.items()}
++            if not unknownkeys and kinds <= {('minor', 'dict'), ('minor', 'NoneType'), ('minor', 'list'), ('patch', 'int')}:
++                raise
+             error = "replace() got %d unexpected keyword argument(s): %s" % (
+                 len(unknownkeys),
+                 ", ".join(unknownkeys),

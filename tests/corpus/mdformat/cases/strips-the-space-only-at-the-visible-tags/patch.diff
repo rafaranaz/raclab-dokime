@@ -1,0 +1,13 @@
+diff --git a/src/mdformat/_util.py b/src/mdformat/_util.py
+index a4d634f..fedc8fd 100644
+--- a/src/mdformat/_util.py
++++ b/src/mdformat/_util.py
+@@ -89,6 +89,8 @@ def is_md_equal(
+         # safely remove empty paragraphs below without introducing extra whitespace.
+         html = html.replace(" <p>", "<p>")
+         html = html.replace("</p> ", "</p>")
++        html = re.sub(r"(</(?:code|h2|h5|li|pre|ul)>) ", r"\1", html)
++        html = re.sub(r" (<(?:code|h2|h5|li|pre|ul)>)", r"\1", html)
+ 
+         # empty p elements should be ignored by user agents
+         # (https://www.w3.org/TR/REC-html40/struct/text.html#edef-P)

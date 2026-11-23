@@ -3,6 +3,10 @@
 # the corpus leaves it out. Taking a case out of this list is a pull request of its own, whose CI is
 # its first run.
 pending = [
+    "mdformat/drops-a-blank-paragraph-after-any-block",
+    "mdformat/strips-the-space-only-at-the-visible-tags",
+    "python-semver/re-raises-only-for-the-visible-kinds-of-value",
+    "python-semver/replace-keeps-the-error-of-any-part",
     "python-semver/compares-long-numeric-prereleases",
     "python-semver/orders-by-value-only-the-visible-identifiers",
     "python-semver/orders-by-value-only-the-visible-lengths",

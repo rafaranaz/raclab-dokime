@@ -1,0 +1,64 @@
+format: 1
+story: drops-a-blank-paragraph-after-any-block
+may_modify_tests: []
+
+requirements:
+  - id: drop-a-blank-paragraph-between-blocks
+    kind: change
+    text: When the input has a paragraph of Unicode spaces only between two blocks that are not paragraphs, mdformat shall exit with status 0 and print the input without that paragraph.
+    source: written
+  - id: format-the-rest-as-before
+    kind: preserve
+    text: When the input has no paragraph of Unicode spaces only between two blocks that are not paragraphs, mdformat shall print the same text as before the change.
+    source: written
+
+examples:
+  - id: E-75ac
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: after-a-break-or-a-list
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "- i\n\n\u2009\n\n##### k\n"}
+        expect: {exit: 0, stdout: "- i\n\n##### k\n"}
+  - id: E-f0d2
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: after-code-or-a-heading
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "```py\nx = 1\n```\n\u2002\n## d\n"}
+        expect: {exit: 0, stdout: "```py\nx = 1\n```\n\n## d\n"}
+  - id: E-5edf
+    requirement: format-the-rest-as-before
+    case: unchanged
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "para\n\u3000\n# f\n"}
+        expect: {exit: 0, stdout: "para\n\n# f\n"}
+  - id: E-715c
+    requirement: format-the-rest-as-before
+    case: unchanged
+    boundary: cli
+    target: python -m mdformat
+    origin: human
+    steps:
+      - input: {args: ["-"], stdin: "***\n\n- j\n"}
+        expect: {exit: 0, stdout: "______________________________________________________________________\n\n- j\n"}
+held_out:
+  - id: E-9107
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: after-a-break-or-a-list
+    digest: sha256:c621ad4d918a6b39addfde3f2d8758ac427258ba9e393a9a91442f06a5f30cbd
+  - id: E-e1f7
+    requirement: drop-a-blank-paragraph-between-blocks
+    case: after-code-or-a-heading
+    digest: sha256:06f81390720b9a295a1c5f2452c9c316047935bdd14a31002be0f64a29a8a692
+  - id: E-62ac
+    requirement: format-the-rest-as-before
+    case: unchanged
+    digest: sha256:cbaec696a70ca392e9cbabad7d79d9a49bda7bea9a7aefbfc1421eeb5f7cbe7e

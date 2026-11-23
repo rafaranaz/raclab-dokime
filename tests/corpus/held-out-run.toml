@@ -86,9 +86,9 @@ sealed_example_fails = 4
 date = "2026-11-23"
 key_given = true
 launched = 6
-source = "the summary of pytest, all six passed: with the key the test passes only when the verdict is the expected of the case and, for a bad case, the first failing gate is its failing_gate, so both are taken from its case.toml"
+source = "the summary of pytest, without the lines that the test printed for each case: with the key the test passes only when the verdict is the expected of the case and, for a bad case, the first failing gate is its failing_gate, so both are taken from its case.toml"
 before = "/tmp/pytest-of-vboxuser emptied with podman unshare"
-pytest = "the six passed; the final line of pytest was not kept"
+pytest = "6 passed in 385.44s (0:06:25)"
 
 [[run.case]]
 key = "python-semver/re-raises-only-for-the-visible-kinds-of-value"

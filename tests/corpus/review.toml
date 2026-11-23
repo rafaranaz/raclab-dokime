@@ -52,3 +52,14 @@ confirmed = [
     "python-semver/next-version-matches-a-dotted-token",
     "python-semver/special-cases-the-visible-tokens",
 ]
+
+[[review]]
+date = "2026-11-23"
+minutes = 15
+by = "the maintainer"
+helped_by = "the session that reviews the work, whose summary of the three cases and the contract the maintainer read"
+confirmed = [
+    "python-semver/changes-the-default-token-and-the-tests",
+    "python-semver/hides-the-error-of-an-invalid-version",
+    "python-semver/nextver-counts-an-old-style-prerelease",
+]

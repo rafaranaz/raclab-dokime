@@ -1,0 +1,72 @@
+format: 1
+story: compares-a-version-with-a-malformed-collection
+may_modify_tests: []
+
+requirements:
+  - id: malformed-is-not-comparable
+    kind: new
+    text: When a Version is compared with a collection that cannot build a version, the comparison shall return NotImplemented.
+    source: written
+  - id: well-formed-compares-as-a-version
+    kind: preserve
+    text: When a Version is compared with a collection that builds a version, the comparison shall compare them as versions.
+    source: written
+
+examples:
+  - id: E-0001
+    requirement: malformed-is-not-comparable
+    case: equality
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [1, 0, 0]}
+        expect: {returns: {$repr: 'Version(major=1, minor=0, patch=0, prerelease=None, build=None)'}}
+      - input: {call: __eq__, args: [[]]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-0003
+    requirement: malformed-is-not-comparable
+    case: equality
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [1, 0, 0]}
+        expect: {returns: {$repr: 'Version(major=1, minor=0, patch=0, prerelease=None, build=None)'}}
+      - input: {call: __eq__, args: [[a]]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-0004
+    requirement: malformed-is-not-comparable
+    case: ordering
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [1, 0, 0]}
+        expect: {returns: {$repr: 'Version(major=1, minor=0, patch=0, prerelease=None, build=None)'}}
+      - input: {call: __lt__, args: [[]]}
+        expect: {returns: {$repr: NotImplemented}}
+  - id: E-0006
+    requirement: well-formed-compares-as-a-version
+    case: well-formed
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {args: [1, 0, 0]}
+        expect: {returns: {$repr: 'Version(major=1, minor=0, patch=0, prerelease=None, build=None)'}}
+      - input: {call: __eq__, args: [[1, 0, 0]]}
+        expect: {returns: true}
+held_out:
+  - id: E-0002
+    requirement: malformed-is-not-comparable
+    case: equality
+    digest: sha256:ab210244fc35efaa637ab2b030eddbfa4e99fbf8cc4a67c32d8b132a588fae04
+  - id: E-0005
+    requirement: malformed-is-not-comparable
+    case: ordering
+    digest: sha256:172bef3971ad5ce82455490a261c4f752e3db2f95e4963b441c9105865d93db5
+  - id: E-0007
+    requirement: well-formed-compares-as-a-version
+    case: well-formed
+    digest: sha256:bbf7225311ae655eb1c91d19d3cc2736275143e36500f592d320ff1e38847dc9

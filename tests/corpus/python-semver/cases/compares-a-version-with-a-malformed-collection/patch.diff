@@ -1,0 +1,61 @@
+diff --git a/changelog.d/pr479.bugfix.rst b/changelog.d/pr479.bugfix.rst
+new file mode 100644
+index 0000000..5248239
+--- /dev/null
++++ b/changelog.d/pr479.bugfix.rst
+@@ -0,0 +1 @@
++Comparing a :class:`~semver.Version` with a ``dict``, ``tuple``, or ``list`` that cannot construct a valid version (for example, an empty collection, wrong number of parts, non-numeric parts, or unknown keys) no longer raises internal errors from ``Version.__init__``. The comparison operators now return :py:const:`NotImplemented` for such operands, following the general rule for invalid comparison operand types: equality evaluates to ``False`` and ordering raises Python's standard :py:exc:`TypeError` (for example, ``'>' not supported between instances of 'Version' and 'dict'``).
+diff --git a/docs/usage/compare-versions.rst b/docs/usage/compare-versions.rst
+index 714cf8b..c3f219b 100644
+--- a/docs/usage/compare-versions.rst
++++ b/docs/usage/compare-versions.rst
+@@ -86,12 +86,17 @@ To compare two versions depends on your type:
+    >>> dict(major=1) < v
+    True
+ 
+-  If the dictionary contains unknown keys, you get a :py:exc:`python:TypeError` exception::
++  If the dictionary contains keys that cannot construct a comparable version
++  (for example, unknown keys), the comparison is not supported.  The
++  comparison operators follow the general rule for invalid comparison operand
++  types and return :py:const:`NotImplemented` (see :gh:`316`), so Python
++  raises its standard :py:exc:`python:TypeError` instead of an internal
++  conversion error::
+ 
+     >>> v > dict(major=1, unknown=42)
+     Traceback (most recent call last):
+     ...
+-    TypeError: ... got an unexpected keyword argument 'unknown'
++    TypeError: '>' not supported between instances of 'Version' and 'dict'
+ 
+ 
+ Other types cannot be compared.
+diff --git a/src/semver/version.py b/src/semver/version.py
+index 2a2c154..b10d5a6 100644
+--- a/src/semver/version.py
++++ b/src/semver/version.py
+@@ -45,8 +45,9 @@ def _comparator(operator: Comparator) -> Comparator:
+ 
+     @wraps(operator)
+     def wrapper(self: "Version", other: Comparable) -> bool:
++        cls = type(self)
+         comparable_types = (
+-            type(self),
++            cls,
+             dict,
+             tuple,
+             list,
+@@ -54,6 +55,14 @@ def _comparator(operator: Comparator) -> Comparator:
+         )
+         if not isinstance(other, comparable_types):
+             return NotImplemented
++        if isinstance(other, (dict, tuple, list)):
++            # A collection that cannot construct a comparable version is
++            # not a valid comparison operand.  Return NotImplemented
++            # instead of leaking conversion errors from __init__.
++            try:
++                other = cls(**other) if isinstance(other, dict) else cls(*other)
++            except (TypeError, ValueError):
++                return NotImplemented
+         return operator(self, other)
+ 
+     return wrapper

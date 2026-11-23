@@ -169,7 +169,7 @@ refuses a batch whose base is not in the history of the change. A contract of th
 on a commit of the recipients on top of the base of its case, which is not in the project, so the
 test makes it again, from what was recorded, before it commits the contract and the batch on top.
 
-- **CORPUS-092** The file `tests/corpus/seal-bases.toml` shall give, for each contract of the corpus with a `sealed.age`, the base, the text of `.dokime/recipients.txt`, the author, the date and the message of the commit of the recipients that it was sealed on, the hash of that commit, and the event of the ledger of the seal that the hash comes from.
+- **CORPUS-092** The file `tests/corpus/seal-bases.toml` shall give, for each contract with a `sealed.age` of a case that is not withdrawn, the base, the text of `.dokime/recipients.txt`, the author, the date and the message of the commit of the recipients that it was sealed on, the hash of that commit, and the event of the ledger of the seal that the hash comes from.
 - **CORPUS-093** If the commit of the recipients made again does not have the hash that `tests/corpus/seal-bases.toml` gives, then the test shall stop before the audit with an error that names the contract and both hashes.
 - **CORPUS-094** The tests of the corpus shall make again, without the key, the commit of the recipients of each contract that `tests/corpus/seal-bases.toml` lists, and find the hash that it gives.
 - **CORPUS-095** When the tests of the corpus audit, with an identity made for the test and on the commit that the test of the cases makes, a contract sealed with that identity on a commit of the recipients on top of a base, the tests shall demand that the gate `sealed-examples` runs without a finding.

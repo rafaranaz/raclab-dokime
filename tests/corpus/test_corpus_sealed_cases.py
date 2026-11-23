@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-084 CORPUS-085 CORPUS-086 CORPUS-087 CORPUS-088
+# SDD-EARS: CORPUS-084 CORPUS-085 CORPUS-086 CORPUS-087 CORPUS-088 CORPUS-093
 import subprocess
 import tomllib
 from pathlib import Path
@@ -11,9 +11,12 @@ from tests.corpus.sealing import (
     HELD_OUT,
     NOT_HERE,
     SEALED_GATE,
+    SealBase,
+    SealBaseMismatchError,
     judge,
     key_arguments,
     on_top,
+    recipients_commit,
     sealed_of,
 )
 
@@ -66,34 +69,59 @@ def git(directory: Path, *args: str) -> str:
     return done.stdout.strip()
 
 
-def test_a_sealed_case_is_audited_on_a_commit_that_adds_its_contract_and_batch(
-    tmp_path: Path,
-) -> None:
-    case = a_case(tmp_path)
+def a_base(tmp_path: Path) -> tuple[Path, str]:
+    """A checkout of one commit, and the commit."""
     checkout = tmp_path / "checkout"
     checkout.mkdir()
     git(checkout, "init", "--quiet")
     (checkout / "code.py").write_text("x = 1\n")
     git(checkout, "add", ".")
-    git(
-        checkout,
-        "-c",
-        "user.name=t",
-        "-c",
-        "user.email=t@example.org",
-        "commit",
-        "--quiet",
-        "-m",
-        "base",
+    git(checkout, "-c", "user.name=t", "-c", "user.email=t@example.org", "commit", "-qm", "base")
+    return checkout, git(checkout, "rev-parse", "HEAD")
+
+
+def a_seal(base: str, commit: str = "") -> SealBase:
+    return SealBase(
+        base,
+        "age1recipient\n",
+        "dokime corpus",
+        "corpus@dokime.invalid",
+        "1700000000 +0000",
+        "the recipients of the corpus",
+        commit,
     )
-    base = git(checkout, "rev-parse", "HEAD")
-    top = on_top(checkout, case)
-    assert git(checkout, "rev-parse", f"{top}^") == base
-    files = git(checkout, "diff", "--name-only", base, top).splitlines()
+
+
+def test_a_sealed_case_is_audited_on_the_commit_of_its_recipients_made_again(
+    tmp_path: Path,
+) -> None:
+    case = a_case(tmp_path)
+    checkout, base = a_base(tmp_path)
+    made = recipients_commit(checkout, a_seal(base))
+    top = on_top(checkout, case, a_seal(base, made))
+    assert git(checkout, "rev-parse", f"{top}^") == made
+    assert git(checkout, "rev-parse", f"{made}^") == base
+    assert git(checkout, "diff", "--name-only", base, made) == ".dokime/recipients.txt"
+    files = git(checkout, "diff", "--name-only", made, top).splitlines()
     assert sorted(files) == [
         ".dokime/changes/a-story/contract.yaml",
         ".dokime/changes/a-story/sealed.age",
     ]
+
+
+def test_a_commit_of_the_recipients_made_again_with_another_hash_stops_before_the_audit(
+    tmp_path: Path,
+) -> None:
+    case = a_case(tmp_path)
+    checkout, base = a_base(tmp_path)
+    made = recipients_commit(checkout, a_seal(base))
+    wrong = "0" * 40
+    with pytest.raises(SealBaseMismatchError) as stopped:
+        on_top(checkout, case, a_seal(base, wrong))
+    assert "project/a-story" in str(stopped.value)
+    assert made in str(stopped.value)
+    assert wrong in str(stopped.value)
+    assert git(checkout, "rev-parse", "HEAD") == made
 
 
 def test_without_the_key_a_held_out_case_passes_what_is_visible_and_is_not_applicable(

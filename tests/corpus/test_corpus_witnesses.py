@@ -91,13 +91,23 @@ def test_each_witness_is_classified_once() -> None:
     assert len(commits) == len(set(commits))
 
 
+def fits_calls_on_an_object() -> set[tuple[str, str]]:
+    """The witnesses that the reading of the boundary of B3c gives as fitting option a."""
+    draw = tomllib.loads((HERE / "blind" / "draw.toml").read_text())
+    result = tomllib.loads((HERE / "boundary" / "result.toml").read_text())
+    fits = set(result["option"]["a"]["fits"])
+    return {(w["project"], w["commit"]) for w in draw["witness"] if w["id"] in fits}
+
+
 def test_the_witness_of_each_good_case_is_isolated_and_expressible() -> None:
     labels = {(label["project"], label["commit"]): label for label in LABELS}
+    calls = fits_calls_on_an_object()
     for witness in WITNESSES:
-        label = labels.get((witness["project"], witness["commit"]))
+        key = (witness["project"], witness["commit"])
+        label = labels.get(key)
         assert label is not None, witness["case"]
         assert label["isolated"], witness["case"]
-        assert label["expressible"], witness["case"]
+        assert label["expressible"] or key in calls, witness["case"]
 
 
 def _drawn(seed: int) -> list[tuple[str, str]]:

@@ -9,8 +9,8 @@ EVERY = {"project", "base", "contract", "patch", "label", "how", "expected"}
 BAD = EVERY | {"intent", "mechanism", "failing_gate"}
 
 
-def test_the_corpus_holds_seven_good_cases_and_seventeen_bad_ones() -> None:
-    assert sorted(case.good for case in CASES) == [False] * 17 + [True] * 7
+def test_the_corpus_holds_eight_good_cases_and_twenty_bad_ones() -> None:
+    assert sorted(case.good for case in CASES) == [False] * 20 + [True] * 8
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case.key)

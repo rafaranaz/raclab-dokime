@@ -30,3 +30,7 @@ source = "pr:https://github.com/python-semver/python-semver/pull/501"
 ["python-semver/compares-a-version-with-a-malformed-collection"]
 intent = "Handle malformed collection operands in Version comparisons"
 source = "pr:https://github.com/python-semver/python-semver/pull/479"
+
+["python-semver/next-version-matches-a-dotted-token"]
+intent = "fix: validate and match prerelease token prefixes"
+source = "pr:https://github.com/python-semver/python-semver/pull/489"

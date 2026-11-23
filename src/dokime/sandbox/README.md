@@ -102,9 +102,13 @@ which is the limit of T1 and part of T2 of ADR-0010.
 ## The adapter that observes
 
 `PodmanRuntime.observe(image, project, requests, limits)` implements the port that observes of
-`core`. It copies the program into a directory of its own with `requests.json`, mounts it read-only
-at `/dokime/probe`, and runs `python -I -S` on it in a container with the guarantees of a run. Each
-example gets the time of one example and, as its bytes, its share of the bytes of the observations.
+`core`. For each example of the requests it copies the program into a directory of its own with a
+`requests.json` of that example, mounts it read-only at `/dokime/probe`, and runs `python -I -S` on
+it in a container of its own with the guarantees of a run, so that no file in `/tmp` or
+`/dokime/out`, no process and no IPC object that one example leaves reaches another (ADR-0080).
+Each example gets the time of one example, counted from the start of its child and not of its
+container, and, as its bytes, its share of the bytes of the observations. A container costs about
+half a second on the runner of CI.
 A container that ends at a limit, or a program that ends with an error, is refused with
 `observation-failed`, quoting what the program wrote on its error output; otherwise
 `observations.json` is read with bounds (`observations-missing`, `observations-too-large`,

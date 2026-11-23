@@ -73,7 +73,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.md) | Only the tests make a commit a candidate of the self-check | Accepted |
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.md) | The doctests of the documents are tests of the pack, and those of the docstrings are a declared limit | Accepted |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.md) | A digest is taken over a restricted canonical JSON, and a hashed record is kept in it | Accepted |
-| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Accepted |
+| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.md) | A program of sandbox observes the examples inside the zone and writes what it saw as JSON | Accepted, amended by 0080 |
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.md) | The evidence of A3 is an unsigned statement with a closed predicate | Accepted, amended by 0065, 0066 and 0069 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.md) | The evidence of A3 lists every gate of the audit flow, reached or not | Accepted |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.md) | The untrusted texts of the evidence are bounded | Accepted |
@@ -90,4 +90,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.md) | The corpus does not run on a pull request that only changes text | Accepted |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md) | The job corpus is split into four parts and a job that gathers them | Accepted |
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |
-| [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Proposed |
+| [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Accepted |

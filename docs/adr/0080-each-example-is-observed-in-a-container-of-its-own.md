@@ -1,6 +1,6 @@
 # ADR-0080 · Each example is observed in a container of its own
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

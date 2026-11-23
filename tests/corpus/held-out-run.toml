@@ -1,0 +1,10 @@
+# The runs of the audit of the cases with a sealed batch with the key (CORPUS-087, CORPUS-088),
+# which the maintainer starts on their machine, typing the passphrase in the terminal:
+#
+#   DOKIME_CORPUS=1 DOKIME_CORPUS_IDENTITY=<identity> uv run pytest -s tests/corpus/test_corpus_audit.py
+#
+# The expected verdict and failing gate of each case are in its case.toml, committed before the
+# run; each run is recorded here after it, with its date and, for each case, what the audit gave.
+# The identity stays outside the repository and outside CI.
+
+run = []

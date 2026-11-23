@@ -19,6 +19,8 @@ def test_a_case_holds_only_its_files(case: Case) -> None:
     expected = (
         ["case.toml", "contract.yaml", "patch.diff"] if case.good else ["case.toml", "patch.diff"]
     )
+    if case.good and (case.directory / "sealed.age").exists():
+        expected = sorted([*expected, "sealed.age"])
     assert names == expected
 
 

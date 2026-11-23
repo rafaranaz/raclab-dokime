@@ -12,9 +12,11 @@ BAD_LABELS = (
     "edits-tests",
     "breaks-existing-tests",
     "breaks-a-relation",
+    "fails-a-held-out-example",
 )
-"""The labels of a bad case: those of the exit criterion of A3, and that of B2."""
-GATES = ("visible-examples", "protected-paths", "existing-tests", "relations")
+"""The labels of a bad case: those of the exit criterion of A3, that of B2, and that of a case that
+only the hold-out catches (B3d)."""
+GATES = ("visible-examples", "protected-paths", "existing-tests", "relations", "sealed-examples")
 
 
 @dataclass(frozen=True)

@@ -27,6 +27,22 @@ witnesses = 7
 
 [[witness]]
 project = "python-semver"
+commit = "37ae009c7cacab8f1a87157ca2b484b8e18a0a78"
+case = "next-version-matches-a-dotted-token"
+turned_green = [
+    'tests.test_bump::test_next_version_matches_literal_prerelease_token_family[1.2.3-alpha.beta.1+build.7-alpha.beta-1.2.3-alpha.beta.2]',
+    'tests.test_bump::test_next_version_matches_literal_prerelease_token_family[1.2.3-alphaXbeta9-alpha.beta-1.2.3-alpha.beta.1]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[01]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[[]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[r\xe9]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[rc+build]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[rc..next]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[rc.01]',
+    'tests.test_bump::test_next_version_rejects_invalid_prerelease_token[rc.]',
+]
+
+[[witness]]
+project = "python-semver"
 commit = "0aa17a3447958cfe13634b0c3917e7aa4eee3334"
 case = "compares-a-version-with-a-malformed-collection"
 turned_green = [

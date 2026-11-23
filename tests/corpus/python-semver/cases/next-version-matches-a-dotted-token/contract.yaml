@@ -1,0 +1,133 @@
+format: 1
+story: next-version-matches-a-dotted-token
+may_modify_tests: []
+
+requirements:
+  - id: a-token-is-a-literal-family
+    kind: new
+    text: When the next prerelease of a version is asked for with a token, the version shall match the token as a literal, and only as a whole family of dot-separated identifiers.
+    source: written
+  - id: an-invalid-token-is-refused
+    kind: new
+    text: If the token of the next prerelease of a version is not made of valid prerelease identifiers of SemVer, then the version shall raise a ValueError.
+    source: written
+  - id: the-counters-keep-counting
+    kind: preserve
+    text: When the next prerelease of a version is asked for with a valid token, the version shall increment the counter of that token or start the token at one.
+    source: written
+
+examples:
+  - id: E-0001
+    requirement: a-token-is-a-literal-family
+    case: dotted
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: alpha.beta.1, build: build.7}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.1', build='build.7')"}}
+      - input: {call: next_version, args: [prerelease, 'alpha.beta']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.2', build=None)"}}
+  - id: E-0003
+    requirement: a-token-is-a-literal-family
+    case: dotted
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: alpha.beta.1}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.1', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'alpha.beta']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.2', build=None)"}}
+  - id: E-0004
+    requirement: an-invalid-token-is-refused
+    case: invalid
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc.1}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc.1', build=None)"}}
+      - input: {call: next_version, args: [prerelease, '[']}
+        expect: {raises: {type: ValueError}}
+  - id: E-0005
+    requirement: an-invalid-token-is-refused
+    case: invalid
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc.1}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc.1', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'rc+build']}
+        expect: {raises: {type: ValueError}}
+  - id: E-0007
+    requirement: an-invalid-token-is-refused
+    case: invalid
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc.1}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc.1', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'rc..next']}
+        expect: {raises: {type: ValueError}}
+  - id: E-0008
+    requirement: the-counters-keep-counting
+    case: counters
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc3}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc3', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'rc']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc4', build=None)"}}
+  - id: E-0009
+    requirement: the-counters-keep-counting
+    case: counters
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc.3}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc.3', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'rc']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc.4', build=None)"}}
+  - id: E-0011
+    requirement: the-counters-keep-counting
+    case: counters
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: alpha.beta.gamma.1}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.gamma.1', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'alpha']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='alpha.beta.gamma.2', build=None)"}}
+  - id: E-0012
+    requirement: the-counters-keep-counting
+    case: two-calls
+    boundary: function
+    target: semver:Version
+    origin: human
+    steps:
+      - input: {kwargs: {major: 1, minor: 2, patch: 3, prerelease: rc3}}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc3', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'rc']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='rc4', build=None)"}}
+      - input: {call: next_version, args: [prerelease, 'beta']}
+        expect: {returns: {$repr: "Version(major=1, minor=2, patch=3, prerelease='beta.1', build=None)"}}
+held_out:
+  - id: E-0002
+    requirement: a-token-is-a-literal-family
+    case: dotted
+    digest: sha256:6da1d9ac4b8f198ef963a33095f9f5cb5fcdccb078049acd21f138a956bc5e0d
+  - id: E-0006
+    requirement: an-invalid-token-is-refused
+    case: invalid
+    digest: sha256:9388c556c0dc918fbdf923370881cad7788d8c2a0074ac9d35176416a13bfcea
+  - id: E-0010
+    requirement: the-counters-keep-counting
+    case: counters
+    digest: sha256:2bf928626c2370a2b4bc7b89f58b4a8fdf8eb211bf069f707521fbe22cf91648

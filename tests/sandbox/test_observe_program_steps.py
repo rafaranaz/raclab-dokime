@@ -48,7 +48,8 @@ def test_a_tuple_is_observed_as_the_list_that_json_holds(tmp_path: Path) -> None
 def test_a_value_that_json_cannot_hold_is_observed_by_its_type(
     tmp_path: Path, target: str, kind: str
 ) -> None:
-    assert steps(tmp_path, function("E", target, {})) == [{"not_json": kind}]
+    ((only_step,),) = [steps(tmp_path, function("E", target, {}))]
+    assert only_step["not_json"]["type"] == kind
 
 
 def test_an_exception_is_observed_with_its_classes_and_its_message(tmp_path: Path) -> None:

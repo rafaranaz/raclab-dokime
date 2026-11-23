@@ -23,6 +23,7 @@ from dokime.core.observation import (
     Raised,
     Returned,
     StepObservation,
+    not_json,
 )
 from dokime.core.repository import RefusalError
 
@@ -150,7 +151,7 @@ def _texts(value: object) -> dict[str, str]:
 
 _STEPS: Mapping[str, Callable[[Any], StepObservation]] = {
     "returned": lambda value: Returned(value=value),
-    "not_json": lambda value: NotJson(type=_field({"type": value}, "type", str)),
+    "not_json": lambda value: _not_json(value),
     "raised": lambda value: Raised(
         type=_field(value, "type", str),
         qualified=_field(value, "qualified", str),
@@ -158,6 +159,16 @@ _STEPS: Mapping[str, Callable[[Any], StepObservation]] = {
         message=_field(value, "message", str),
     ),
 }
+
+
+def _not_json(value: object) -> NotJson:
+    """A value that JSON cannot hold: its type, and its `repr` within the limit of `core`."""
+    if isinstance(value, str):
+        return NotJson(type=value)
+    kind = _field(value, "type", str)
+    if not isinstance(value, dict) or "repr" not in value:
+        return NotJson(type=kind)
+    return not_json(kind, _field(value, "repr", str))
 
 
 def _strings(values: list[Any]) -> list[str]:

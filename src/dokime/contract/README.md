@@ -55,6 +55,13 @@ At `function`, a step after the first may name a public method with `call`, whic
 what the first step returned, and a value that JSON cannot hold may be expected with `$repr` as the
 whole of `returns` ([ADR-0079](../../../docs/adr/0079-an-example-at-function-may-call-the-methods-of-an-object.md)).
 
+The first step names its callable only by `target`, written `module:function` with a name of one
+part, and cannot carry a `call`. So an object that a project builds with an alternative
+constructor, a class method such as `Version.parse`, cannot be built by the first step:
+`semver:Version.parse` is refused with `wrong-type`. An example builds it with the class itself
+where the class takes the same values, as `semver:Version` with the parts given as keyword
+arguments, or not at all.
+
 An example with a finding of its own is left out of the search for duplicates and contradictions.
 Two matchers for the same field are not compared with each other. So two `$repr` with different texts for the
 same inputs are not found when the contract is checked, though they cannot both hold, since the

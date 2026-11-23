@@ -32,6 +32,18 @@ JSON cannot hold, never the `repr` observed. A `repr` that the adapter did not r
 `recorded = False`, and `Comparison.recorded` is then false: it says that the zone missed what the
 comparison needs, not that the change is wrong, so that a gate can tell it from a failure.
 
+**The limit of `$repr`.** The `repr` is produced by the code under test, inside the zone. A patch
+that returns an object whose `__repr__` gives the expected text passes a `$repr` without doing what
+is asked. For the visible inputs alone, the held-out examples catch it, as they catch any
+special-casing of what is visible; a patch that gives the expected text for every input passes the
+held-out examples too, and nothing detects it. That is the limit of ADR-0063, that the code under
+test can forge its own observation, while hostile code, T5 of ADR-0010, is out of scope; `$repr`
+makes it cheaper, since a `__repr__` is enough, and neither the name of the type would close it,
+since it is forged as easily. A value of JSON is not forged so: a class cannot derive from `bool`,
+and a subclass of `int` or `str` is written by JSON with its own value. In the cases of G1 the 392
+tests of the base pass with each of the five patches: the tests of the project do not detect the
+overloaded comparison, the visible examples do.
+
 ## The split into visible and held-out (ADR-0014)
 
 ```python

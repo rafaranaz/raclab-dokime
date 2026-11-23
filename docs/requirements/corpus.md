@@ -157,11 +157,22 @@ both from the base, so the test audits such a case on a commit of its own on top
 the key is not there, and a case that only the hold-out catches is judged on that; with the key, in
 a run that the maintainer starts, it is judged on its `expected`.
 
-- **CORPUS-084** When a case whose contract has a `sealed.age` is audited, the test shall audit it on a commit on top of its base that adds the contract and the `sealed.age` in `.dokime/changes/<story>/`, with the story of the contract.
+- **CORPUS-084** When a case whose contract has a `sealed.age` is audited, the test shall audit it, with the story of the contract, on a commit that adds the contract and the `sealed.age` in `.dokime/changes/<story>/` on top of the commit of the recipients that the contract was sealed on, made again on the base of the case.
 - **CORPUS-085** While the key is not given to the test, when the audit of a case labelled `fails-a-held-out-example` ends, the test shall demand that no gate gave `FAIL` and that the gate `sealed-examples` is not applicable because the key is not here.
 - **CORPUS-086** Where `DOKIME_CORPUS_IDENTITY` names an identity, the test shall audit each case with a `sealed.age` with that identity, asking its passphrase once and giving it to each audit by a descriptor.
 - **CORPUS-087** The file `tests/corpus/held-out-run.toml` shall give, for each run with the key, its date and, for each case it audited, the verdict and the first failing gate.
 - **CORPUS-088** The verdict and the first failing gate that `tests/corpus/held-out-run.toml` gives for a case shall be its `expected` and its `failing_gate`.
+
+The command that seals reads the recipients from `.dokime/recipients.txt` in the tree of the
+project and gives the batch, as its base, the commit of the checkout; the gate `sealed-examples`
+refuses a batch whose base is not in the history of the change. A contract of the corpus is sealed
+on a commit of the recipients on top of the base of its case, which is not in the project, so the
+test makes it again, from what was recorded, before it commits the contract and the batch on top.
+
+- **CORPUS-092** The file `tests/corpus/seal-bases.toml` shall give, for each contract of the corpus with a `sealed.age`, the base, the text of `.dokime/recipients.txt`, the author, the date and the message of the commit of the recipients that it was sealed on, the hash of that commit, and the event of the ledger of the seal that the hash comes from.
+- **CORPUS-093** If the commit of the recipients made again does not have the hash that `tests/corpus/seal-bases.toml` gives, then the test shall stop before the audit with an error that names the contract and both hashes.
+- **CORPUS-094** The tests of the corpus shall make again, without the key, the commit of the recipients of each contract that `tests/corpus/seal-bases.toml` lists, and find the hash that it gives.
+- **CORPUS-095** When the tests of the corpus audit, with an identity made for the test and on the commit that the test of the cases makes, a contract sealed with that identity on a commit of the recipients on top of a base, the tests shall demand that the gate `sealed-examples` runs without a finding.
 
 ### Withdrawn cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
 

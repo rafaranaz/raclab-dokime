@@ -1,7 +1,7 @@
-<!-- translation-of: 0080-each-example-is-observed-in-a-container-of-its-own.md sha256:16aadcf843bfb613 -->
+<!-- translation-of: 0080-each-example-is-observed-in-a-container-of-its-own.md sha256:da3e1c1ecd58a8a4 -->
 # ADR-0080 · Cada ejemplo se observa en un contenedor propio
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

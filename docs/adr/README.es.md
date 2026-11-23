@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:60856623c07070a2 -->
+<!-- translation-of: README.md sha256:c04fb4e583fc74dd -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -75,7 +75,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0060](0060-only-the-tests-make-a-commit-a-candidate-of-the-self-check.es.md) | Solo los tests hacen candidato a un commit de la autocomprobación | Aceptada |
 | [0061](0061-the-doctests-of-the-documents-are-tests-of-the-pack.es.md) | Los doctests de los documentos son tests del pack, y los de los docstrings son un límite declarado | Aceptada |
 | [0062](0062-a-digest-is-taken-over-a-restricted-canonical-json.es.md) | Una huella se toma sobre un JSON canónico restringido, y un registro con hash se guarda en él | Aceptada |
-| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Aceptada |
+| [0063](0063-a-program-of-sandbox-observes-the-examples-inside-the-zone.es.md) | Un programa de sandbox observa los ejemplos dentro de la zona y escribe lo que vio en JSON | Aceptada, enmendada por el 0080 |
 | [0064](0064-the-evidence-of-a3-is-an-unsigned-statement-with-a-closed-predicate.es.md) | La evidencia de A3 es un statement sin firmar con un predicado cerrado | Aceptada, enmendada por el 0065, el 0066 y el 0069 |
 | [0065](0065-the-evidence-of-a3-lists-every-gate-of-the-audit-flow.es.md) | La evidencia de A3 lista todas las puertas del flujo de auditoría, alcanzadas o no | Aceptada |
 | [0066](0066-the-untrusted-texts-of-the-evidence-are-bounded.es.md) | Los textos no fiables de la evidencia están acotados | Aceptada |
@@ -92,4 +92,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0077](0077-the-corpus-does-not-run-on-a-pull-request-that-only-changes-text.es.md) | El corpus no se ejecuta en una pull request que solo cambia texto | Aceptada |
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md) | El job corpus se reparte en cuatro trozos y un job que los reúne | Aceptada |
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Aceptada |
-| [0080](0080-each-example-is-observed-in-a-container-of-its-own.es.md) | Cada ejemplo se observa en un contenedor propio | Propuesta |
+| [0080](0080-each-example-is-observed-in-a-container-of-its-own.es.md) | Cada ejemplo se observa en un contenedor propio | Aceptada |

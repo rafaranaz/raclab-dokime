@@ -79,7 +79,11 @@ for each case it audits, before it judges the case (`results.py`, ADR-0081): the
 repository, the key of the case, its verdict, its first failing gate or `null`, and whether the key
 was given. `bench` computes the metrics from such files. The commit is that of `HEAD`: a run made
 with changes that are not committed gives it all the same, so a file of results is only worth its
-commit when the tree was clean; in CI it always is.
+commit when the tree was clean; in CI it always is. On a `pull_request` the job `corpus` checks out the
+merge commit that GitHub makes, so the file of results of a pull request records a commit that no
+longer exists once the pull request is merged by rebase. The figures of a version are therefore
+taken from runs on a push to `main`, where the commit is real; for stability, running the same job
+again is enough, since it reuses the same commit.
 
 ## The intent of each contract
 

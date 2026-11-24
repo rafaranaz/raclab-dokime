@@ -83,7 +83,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.md) | The evidence of a pull request goes in the summary of its job and in an artifact | Accepted |
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.md) | The harness that audits a pull request is that of its base | Accepted |
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.md) | The sealed store is encrypted with age for a list of recipients | Accepted |
-| [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md) | The key of the hold-out lives outside CI until B4 | Accepted |
+| [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md) | The key of the hold-out lives outside CI until B4 | Accepted, amended by 0082 |
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.md) | A witness is isolated when it is a fix and nothing else | Accepted |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.md) | The predicate v0.3 records the hold-out | Accepted |
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md) | A relation runs on the visible examples of its requirement | Accepted |
@@ -92,4 +92,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Accepted |
 | [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md) | bench computes the metrics from the results that the corpus writes | Accepted |
-| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md) | The sealed gate does not run in CI in block B | Proposed |
+| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md) | The sealed gate does not run in CI in block B | Accepted |

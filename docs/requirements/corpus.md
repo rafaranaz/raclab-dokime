@@ -174,6 +174,13 @@ test makes it again, from what was recorded, before it commits the contract and 
 - **CORPUS-094** The tests of the corpus shall make again, without the key, the commit of the recipients of each contract that `tests/corpus/seal-bases.toml` lists, and find the hash that it gives.
 - **CORPUS-095** When the tests of the corpus audit, with an identity made for the test and on the commit that the test of the cases makes, a contract sealed with that identity on a commit of the recipients on top of a base, the tests shall demand that the gate `sealed-examples` runs without a finding.
 
+The audit of a case is given an empty `XDG_DATA_HOME`, so that `audit` finds no identity where it
+looks for one by default; podman keeps its storage there too. One such directory serves every case
+of a session of pytest, so that the images of a part are kept once and not once for each case.
+
+- **CORPUS-096** The tests of the corpus that audit a case shall give every audit of a session of pytest the same `XDG_DATA_HOME`, a directory made empty for that session.
+- **CORPUS-097** If the `XDG_DATA_HOME` of a session holds `dokime/identity.age` when the session starts or when it ends, then the tests of the corpus shall fail, naming the file.
+
 ### Withdrawn cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
 
 A case that turns out wrong after it ran is not corrected: it is withdrawn, its files stay as they

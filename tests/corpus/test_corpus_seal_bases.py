@@ -119,7 +119,7 @@ def a_sealed_case(tmp_path: Path, checkout: Path, base: str) -> Case:
 
 
 def test_a_contract_sealed_on_a_commit_of_the_recipients_runs_its_held_out_examples(
-    tmp_path: Path,
+    tmp_path: Path, data_home: Path
 ) -> None:
     skip_unless_asked()
     require("git")
@@ -173,7 +173,7 @@ def test_a_contract_sealed_on_a_commit_of_the_recipients_runs_its_held_out_examp
             text=True,
             check=False,
             pass_fds=(secret,),
-            env={**os.environ, "XDG_DATA_HOME": str(tmp_path / "no-data-home")},
+            env={**os.environ, "XDG_DATA_HOME": str(data_home)},
             timeout=3600,
         )
     finally:

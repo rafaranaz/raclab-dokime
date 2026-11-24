@@ -67,6 +67,13 @@ the committer are `dokime corpus <corpus@dokime.invalid>`, both dates are the co
 base, as `git log --format=%cd --date=raw` gives it, and the message is `the recipients of the
 corpus`. Its entry in `seal-bases.toml` is still written, with the hash from the ledger.
 
+Each audit is given an empty `XDG_DATA_HOME`, so that `audit` finds no identity where it looks for
+one by default, and podman keeps its storage under it. One such directory serves the whole session
+of pytest (`conftest.py`, `data_home.py`): the cases of a part share the images, the session fails
+if `dokime/identity.age` is in it at its start or its end, and its end prints the space the storage
+takes. A limit: an image that comes from that storage does not show that it would build from
+nothing today; in CI each part starts from an empty one, so its first case builds cold.
+
 ## The intent of each contract
 
 `intents.toml` gives each good case, by its key, an intent sentence: what someone would say before

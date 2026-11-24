@@ -1,0 +1,23 @@
+# The run of the corpus that the figures of the close of B3e come from (ADR-0081): the push to main
+# of fd16c21, run 45451573331 of the workflow ci, in two attempts of every job, the second started
+# again by the maintainer from the web. Each file of results is the artifact corpus-results of its
+# attempt, kept here since an artifact of CI expires; bench.json is what
+# `uv run python -m dokime.bench --corpus tests/corpus --results attempt-1.jsonl --again
+# attempt-2.jsonl` wrote.
+
+commit = "fd16c2145c7257df9b3649482f42b95b34ebbbd1"
+run = 45451573331
+
+[[attempt]]
+number = 1
+file = "attempt-1.jsonl"
+artifact = 14947688746
+created_at = "2026-11-24T17:49:28Z"
+pytest_seconds = { a = 278, b = 246, c = 369, d = 202, e = 211, f = 260 }
+
+[[attempt]]
+number = 2
+file = "attempt-2.jsonl"
+artifact = 14950765811
+created_at = "2026-11-24T18:03:58Z"
+pytest_seconds = { a = 172, b = 270, c = 393, d = 292, e = 215, f = 241 }

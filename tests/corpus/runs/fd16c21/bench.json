@@ -1,0 +1,223 @@
+{
+  "commit": "fd16c2145c7257df9b3649482f42b95b34ebbbd1",
+  "key_given": false,
+  "every_case": {
+    "false_accepts": {
+      "breaks-a-relation": {
+        "k": 0,
+        "n": 1,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.7934506856227626
+        ]
+      },
+      "breaks-existing-tests": {
+        "k": 0,
+        "n": 2,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.6576197724933469
+        ]
+      },
+      "edits-tests": {
+        "k": 0,
+        "n": 3,
+        "key_given": false,
+        "interval": [
+          5.551115123125783e-17,
+          0.5614970317550454
+        ]
+      },
+      "fails-a-held-out-example": {
+        "k": 8,
+        "n": 8,
+        "key_given": false,
+        "interval": [
+          0.6755924351161198,
+          1.0
+        ]
+      },
+      "fails-a-visible-example": {
+        "k": 0,
+        "n": 8,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.32440756488388023
+        ]
+      }
+    },
+    "false_rejects": {
+      "k": 0,
+      "n": 10,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.2775327998628892
+      ]
+    },
+    "questions": {
+      "k": 0,
+      "n": 32,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.1071791982550706
+      ]
+    },
+    "errors": {
+      "k": 0,
+      "n": 32,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.1071791982550706
+      ]
+    }
+  },
+  "left_out": [
+    "python-semver/nextver-bumps-build-only-versions"
+  ],
+  "without_the_left_out": {
+    "false_accepts": {
+      "breaks-a-relation": {
+        "k": 0,
+        "n": 1,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.7934506856227626
+        ]
+      },
+      "breaks-existing-tests": {
+        "k": 0,
+        "n": 2,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.6576197724933469
+        ]
+      },
+      "edits-tests": {
+        "k": 0,
+        "n": 3,
+        "key_given": false,
+        "interval": [
+          5.551115123125783e-17,
+          0.5614970317550454
+        ]
+      },
+      "fails-a-held-out-example": {
+        "k": 8,
+        "n": 8,
+        "key_given": false,
+        "interval": [
+          0.6755924351161198,
+          1.0
+        ]
+      },
+      "fails-a-visible-example": {
+        "k": 0,
+        "n": 8,
+        "key_given": false,
+        "interval": [
+          0.0,
+          0.32440756488388023
+        ]
+      }
+    },
+    "false_rejects": {
+      "k": 0,
+      "n": 9,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.2991450484195441
+      ]
+    },
+    "questions": {
+      "k": 0,
+      "n": 31,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.11025539546043596
+      ]
+    },
+    "errors": {
+      "k": 0,
+      "n": 31,
+      "key_given": false,
+      "interval": [
+        0.0,
+        0.11025539546043596
+      ]
+    }
+  },
+  "withdrawn": [
+    {
+      "key": "python-semver/compares-a-version-with-a-malformed-collection",
+      "label": "good",
+      "verdict": "FAIL",
+      "failing_gate": "protected-paths",
+      "key_given": false,
+      "false_reject_caused_by_its_contract": true
+    },
+    {
+      "key": "python-semver/compares-with-an-object-equal-to-everything",
+      "label": "fails-a-visible-example",
+      "verdict": "FAIL",
+      "failing_gate": "visible-examples",
+      "key_given": false,
+      "false_reject_caused_by_its_contract": false
+    },
+    {
+      "key": "python-semver/fixes-equality-but-not-ordering",
+      "label": "fails-a-visible-example",
+      "verdict": "FAIL",
+      "failing_gate": "visible-examples",
+      "key_given": false,
+      "false_reject_caused_by_its_contract": false
+    },
+    {
+      "key": "python-semver/forges-the-repr-of-the-visible-collections",
+      "label": "fails-a-held-out-example",
+      "verdict": "PASS",
+      "failing_gate": null,
+      "key_given": false,
+      "false_reject_caused_by_its_contract": false
+    },
+    {
+      "key": "python-semver/special-cases-the-visible-collections",
+      "label": "fails-a-held-out-example",
+      "verdict": "PASS",
+      "failing_gate": null,
+      "key_given": false,
+      "false_reject_caused_by_its_contract": false
+    }
+  ],
+  "hold_out": {
+    "without_the_key": {
+      "k": 8,
+      "n": 8,
+      "key_given": false,
+      "interval": [
+        0.6755924351161198,
+        1.0
+      ]
+    },
+    "with_the_key": {
+      "k": 0,
+      "n": 8,
+      "key_given": true,
+      "interval": [
+        0.0,
+        0.32440756488388023
+      ]
+    },
+    "not_run_with_the_key": []
+  },
+  "changes": []
+}

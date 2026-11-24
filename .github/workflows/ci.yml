@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        part: [a, b, c, d, e, f]
+        part: [a, b, c, d, e, f, g]
     defaults:
       run:
         # With a shell named, GitHub runs bash with -eo pipefail; without one it runs bash -e, and
@@ -156,7 +156,7 @@ jobs:
           PARTS: ${{ needs.corpus-part.result }}
         run: |
           results=()
-          for part in a b c d e f; do
+          for part in a b c d e f g; do
             results+=("--result=$part=$(cat "parts/$part/status" 2>/dev/null || echo nothing)")
           done
           uv run python -m tools.check_corpus_parts --parts parts --collection collection.txt \

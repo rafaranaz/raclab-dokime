@@ -757,14 +757,63 @@ Its limits:
 - **No case of B3d has a relation:** only `idempotent` at `cli` is measured, in one case of B2;
   `order-insensitive` and the relations at `function` still have no case.
 
+**B3e closed on 2026-11-24.** `bench` computes the metrics of the corpus from the files of results
+that its runs write ([ADR-0081](adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md),
+which amends ADR-0030; #233 to #237). On the push to `main` of `fd16c21`, run twice, it gives no
+false accept and no false reject on the 32 cases, every case alike in both runs, and the
+hold-out turns the 8 false accepts of the cases that only it catches into 0
+(`tests/corpus/runs/fd16c21/`).
+
+- [x] **The results of a run:** the test of the cases writes one line of JSON for each case, with
+  the commit of the run (CORPUS-098, #234); each part of CI leaves its file, the parts check
+  demands one line for each audit, all of one commit, and the job `corpus` keeps them as the
+  artifact `corpus-results`, also when a part fails (#235); a file of a pull request records the
+  merge commit that GitHub makes, so the figures come from a push to `main` (#236).
+- [x] **`bench`:** BENCH-001 to BENCH-018 (#237). A case is accepted on `PASS` and rejected on
+  `FAIL`; `ASK` is a question and `ERROR` is counted apart; each count says whether its run had
+  the key and carries its Wilson interval of 95 %, which [Brown, Cai and DasGupta](https://projecteuclid.org/euclid.ss/1009213286)
+  advise for n of 40 or less.
+- [x] **The figures,** of the run 45451573331 on `fd16c21`, without the key:
+
+  | | Every case | Without the case of W30 |
+  |---|---|---|
+  | False rejects | 0 of 10 (0 to 0.28) | 0 of 9 (0 to 0.30) |
+  | False accepts, `fails-a-visible-example` | 0 of 8 (0 to 0.32) | the same |
+  | False accepts, `edits-tests` | 0 of 3 (0 to 0.56) | the same |
+  | False accepts, `breaks-existing-tests` | 0 of 2 (0 to 0.66) | the same |
+  | False accepts, `breaks-a-relation` | 0 of 1 (0 to 0.79) | the same |
+  | False accepts, `fails-a-held-out-example` | 8 of 8 (0.68 to 1), by design | the same |
+  | Questions, errors | 0 of 32 each (0 to 0.11) | 0 of 31 each |
+
+  The value of the hold-out: the 8 cases that only it catches are 8 false accepts without the key
+  and 0 of 8 (0 to 0.32) with it, in the run of `held-out-run.toml`.
+- [x] **Left out:** the rule of the row, a good case whose witness either blind reader labels not
+  isolated or undecidable, computed from `tests/corpus/blind/` and `witnesses.toml`, leaves out only
+  `nextver-bumps-build-only-versions`, of W30; a test checks it.
+- [x] **Withdrawn, apart:** the five cases of G1, the good one a false reject caused by its
+  contract, FAIL at `protected-paths`.
+- [x] **Stability:** the two attempts of the run, the second started again from the web by the
+  maintainer, gave the same verdict and first failing gate in the 32 cases, and the two files are
+  the same byte for byte.
+
+Its limits:
+
+- **The intervals are wide:** with these n, 0 false accepts of 1 says only that the rate is below
+  0.79, and of 8 that it is below 0.32; the counts show that nothing was missed on this corpus, not
+  a rate.
+- **Stability rests on one pair of runs** of one commit, on the same runner image; a rerun does not
+  change the code, so it measures only what varies without it.
+- **The run with the key is read from `held-out-run.toml`**, made on an earlier commit of `main`
+  that it does not record, and on the machine of the maintainer.
+- **The minutes of a person per change**, a metric of ADR-0030, are not measured; the minutes of
+  the review of each group of B3d are in `review.toml`, which is not the same thing.
+- **The held-out examples of G2 are public** in the tests of its fix, as the note of B3d says.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **Before B3e:** whether the audit of each case of the corpus keeps a storage of podman of its
-  own, which keeps the identity of the machine out of the audit but may build each image again, or
-  the cases share one, with the identity kept out another way; to be measured in CI first.
 - **At the close of block B:** a probe of a second language with Java, only at the boundary `cli`,
   in two phases: first try it without touching the code of dokime, then make three cases pass; with
   a limited time and without changing the central abstractions. The parts of dokime that depend on

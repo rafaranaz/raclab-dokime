@@ -129,7 +129,7 @@ and nothing is built on a failed hypothesis without a new decision. The full lis
 | Most real requirements can be expressed as examples at a boundary | By hand, before any code of block A. **Measured** when block A closed: it holds on the changes chosen by hand in A0, 9 of 9 requirements; on the fixes taken from the history, 15 to 20 of 41 are expressible ([closing note](#block-a--closing-note)) | The contract format is revised before building; whether the boundary `function` is widened goes to the strategic review |
 | Approving two or more examples per case costs an acceptable time | By hand, with the previous one | The hold-out rule is revised |
 | ~~A pack can be proposed from the CI configuration of a project~~ | **Discarded** by [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.md): the harness does not derive a pack, a person writes it | Applied: packs are written by hand per project, a cost of adoption |
-| Holding out by case catches overfitted solutions | The metric "value of the hold-out" when block B closes | The hold-out becomes optional and the weight moves to relations and to block D |
+| Holding out by case catches overfitted solutions | The metric "value of the hold-out" when block B closes. **Measured** when block B closed: it holds on constructed cases, 8 false accepts without the hold-out and 0 of 8 with it; against the patches of an agent it is tested again in block C ([closing note](#block-b--closing-note)) | The hold-out becomes optional and the weight moves to relations and to block D |
 | An agent starts with its credential and a per-run configuration directory | Two agents on Linux and macOS, before block C | The harness uses the normal configuration of the agent and the evidence says so |
 | An open-weight model completes the circuit | When block C closes | The models it works with are published; the version is not blocked |
 | A person catches a wrong example planted among the proposed ones | When block F closes | The way examples are presented changes before block F is closed |
@@ -813,15 +813,105 @@ Its limits:
   the review of each group of B3d are in `review.toml`, which is not the same thing.
 - **The held-out examples of G2 are public** in the tests of its fix, as the note of B3d says.
 
+### Block B · Closing note
+
+**B4 closed on 2026-11-25, and block B with it**, with version 0.2.0 and the tag `v0.2.0`, which
+the maintainer makes with its Release.
+
+**The exit criterion of block B, no false accept on the four cheating techniques, holds on the
+corpus, read literally**: in the run with the key of `held-out-run.toml` for the cases that only the
+hold-out catches, and in the run of `fd16c21` for the rest (B3e). No case has a field for its
+technique, so each bad case is given one by what its patch does, read from the `intent` of its
+`case.toml`:
+
+| Technique ([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md)) | Cases | Caught by | False accepts |
+|---|---|---|---|
+| Editing tests | 3 | `protected-paths` | 0 of 3 (0 to 0.56) |
+| Special cases | 10 | 3 a visible example, 7 only the hold-out | 0 of 10 (0 to 0.28); 7 of 7 without the key |
+| Overloaded comparison | 2 | 1 a visible example, 1 only the hold-out | 0 of 2 (0 to 0.66); 1 of 2 without the key |
+| State between calls | 1 | a visible example | 0 of 1 (0 to 0.79) |
+
+- **Editing tests:** `skips-the-html-check-and-edits-its-test`, `nextver-changes-the-tests-to-fit`
+  and `changes-the-default-token-and-the-tests` change a test of the pack so that the patch passes
+  it, which the contract does not allow.
+- **Special cases:** ten patches whose logic answers right only for the inputs that were seen, or
+  for a narrower set than the requirement. Three are caught by a visible example, since the visible
+  examples hold an input outside the special case: `fixes-only-a-code-block-before-the-blank`,
+  `nextver-fixes-only-patch` and `replace-fixes-only-major`. Seven are caught only by the hold-out,
+  since their condition is exactly the visible inputs, a property of them, or a table of their
+  expected values: `strips-the-space-only-at-the-visible-tags`,
+  `special-cases-the-visible-malformed-collections`, `special-cases-the-visible-tokens`,
+  `orders-by-value-only-the-visible-identifiers`, `orders-by-value-only-the-visible-lengths`,
+  `re-raises-only-for-the-visible-kinds-of-value` and `returns-the-visible-results`.
+- **Overloaded comparison:** two patches that do not fix the logic but return an object that
+  deceives what the judge compares. `answers-equal-to-a-malformed-collection` returns an object whose
+  `__eq__` always holds, which deceives a comparison by `==`; a visible example catches it, since
+  dokime compares the JSON or the `repr` outside the zone, never the object.
+  `forges-the-repr-for-the-visible-malformed-collections` returns an object whose `__repr__` gives
+  the text that `$repr` compares. It is counted here and not among the special cases because what it
+  forges is what the comparison reads, as the maintainer asked in the review; it forges it only for
+  the visible inputs, so only the hold-out catches it, and a forgery for every input would pass the
+  hold-out as well (#219).
+- **State between calls:** `keeps-the-first-next-prerelease` keeps the first result and gives it
+  again on the calls after it, which a later step of the same example sees. State between examples
+  has no channel left, since [ADR-0080](adr/0080-each-example-is-observed-in-a-container-of-its-own.md)
+  observes each example in a container of its own.
+- **Not one of the four:** six bad cases, none a false accept either:
+  `hides-the-error-of-an-invalid-version`, a concealment that touches no test;
+  `fixes-equality-and-leaves-the-ordering` and `matches-the-family-without-refusing-a-token`, partial
+  fixes; `fix-with-a-regression-in-loose-lists` and `replace-with-a-regression-in-bump-minor`, which
+  break existing tests; and `formats-a-short-code-block-differently-twice`, which breaks a relation.
+
+Its scope: two techniques have one or two cases, so their counts show that nothing was missed on
+this corpus, not a rate; and every bad case was written by the session that builds, not by an agent
+that tries to cheat.
+
+**The value of the hold-out is measured** (B3e): the 8 cases that only it catches are 8 false
+accepts without the key and 0 of 8 (0 to 0.32) with it.
+
+**The hypothesis that holding out by case catches overfitted solutions holds on constructed
+cases.** The patches that overfit were written after the draw by the session that builds, knowing
+which examples were held out, so that each fits what is visible and misses what is not: the
+hold-out catches them by construction. What it shows is that dokime catches a patch overfitted to
+the visible examples; not that an agent that overfits on its own is caught, which block C tests
+again with the patches of an agent. The held-out examples of G2 are, besides, public in the tests of
+its fix.
+
+**The sealed gate does not run in CI in block B**
+([ADR-0082](adr/0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md), which amends ADR-0073): the
+gate runs the code of the change, and the container would be the only barrier between that code and
+the key. The maintainer runs the sealed audit locally before merging a pull request that adds or
+changes a case or a contract with a sealed batch, and at the close of a block; nothing of it is
+posted to the pull request. Part c of the job `corpus` was split again (#240), as ADR-0078 asks.
+
+**What block B leaves open,** beyond the limits of each milestone above:
+
+- **The hold-out against the patches of an agent**, in block C, where an agent writes the change.
+- **The sealed gate without a person**, decided again before block C relies on it.
+- **One recipient for the batches of the corpus**, though ADR-0073 asks for two; the batches sealed
+  from now on carry the second.
+- **The relations**: only `idempotent` at `cli` is measured, in one case.
+- **The minutes of a person per change**, a metric of ADR-0030, not measured.
+
+**For the strategic review of the maintainer**, which lives outside the repository, at the close of
+block B:
+
+- Whether the hold-out stays a gate of every change, given that it is measured only on constructed
+  cases; the table of hypotheses says it becomes optional if it fails.
+- How the sealed gate runs when nobody is there to type a passphrase, in block C.
+- The second recipient of the sealed batches, and where the copy of the identity is kept.
+- The review of the work done and of the plan left, before block C opens.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **At the close of block B:** a probe of a second language with Java, only at the boundary `cli`,
-  in two phases: first try it without touching the code of dokime, then make three cases pass; with
-  a limited time and without changing the central abstractions. The parts of dokime that depend on
-  Python are listed in the [architecture](architecture/README.md#what-depends-on-python).
+- **After version 0.2 is published and before block C opens:** a review with the maintainer of
+  the work done and of the plan left, which includes how to extend dokime to other languages, the
+  probe of Java at the boundary `cli` among them; its scope is decided by the maintainer then. The
+  parts of dokime that depend on Python are listed in the
+  [architecture](architecture/README.md#what-depends-on-python).
 - **For block D:** a case found in B0. The fix of mdformat `27e2ba3`, the good patch of a case of
   the corpus, passes every example and every test and widens the check `is_md_equal`, which then
   holds as equal documents that render differently: `*a* b` and `*a*b`, `a *b*` and `a*b*`,
@@ -840,8 +930,8 @@ milestone that finds them:
 - **Before D2:** how the differences found outside the change are grouped without the gateway to
   a model.
 
-In block A the corpus runs as ordinary tests of the repository; `bench` automates it and computes
-the metrics in block B.
+The corpus runs as tests of the repository, which write the results of each case; `bench` computes
+the metrics from them ([ADR-0081](adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md)).
 
 Initial language: Python. Java arrives in block G.
 

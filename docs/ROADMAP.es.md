@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:baf99f5ec4a8980c -->
+<!-- translation-of: ROADMAP.md sha256:1b2e6588ad125915 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -133,7 +133,7 @@ La lista completa está en el [índice de arquitectura](architecture/README.es.m
 | La mayoría de los requisitos reales se pueden expresar como ejemplos en una frontera | A mano, antes de cualquier código del bloque A. **Medida** al cerrar el bloque A: se cumple en los cambios elegidos a mano de A0, 9 de 9 requisitos; en los arreglos sacados de la historia, son expresables entre 15 y 20 de 41 ([nota de cierre](#bloque-a--nota-de-cierre)) | Se revisa el formato del contrato antes de construir; si se amplía la frontera `function` va a la revisión estratégica |
 | Aprobar dos o más ejemplos por caso cuesta un tiempo aceptable | A mano, junto con la anterior | Se revisa la regla de reserva |
 | ~~Un pack se puede proponer a partir de la configuración de CI de un proyecto~~ | **Descartada** por la [ADR-0041](adr/0041-the-environment-of-a-verified-project-is-a-dockerfile.es.md): el arnés no deduce un pack, lo escribe una persona | Aplicado: los packs se escriben a mano por proyecto, un coste de adopción |
-| La reserva por caso detecta soluciones sobreajustadas | La métrica "valor de la reserva" al cerrar el bloque B | La reserva pasa a ser opcional y el peso va a las relaciones y al bloque D |
+| La reserva por caso detecta soluciones sobreajustadas | La métrica "valor de la reserva" al cerrar el bloque B. **Medida** al cerrar el bloque B: se cumple en casos construidos, 8 aceptos falsos sin la reserva y 0 de 8 con ella; frente a los parches de un agente se vuelve a probar en el bloque C ([nota de cierre](#bloque-b--nota-de-cierre)) | La reserva pasa a ser opcional y el peso va a las relaciones y al bloque D |
 | Un agente arranca con su credencial y un directorio de configuración hecho para la ejecución | Dos agentes en Linux y macOS, antes del bloque C | El arnés usa la configuración normal del agente y la evidencia lo dice |
 | Un modelo de pesos abiertos completa el circuito | Al cerrar el bloque C | Se publica con qué modelos funciona; la versión no se bloquea |
 | Una persona detecta un ejemplo erróneo plantado entre los propuestos | Al cerrar el bloque F | Cambia la forma de presentar los ejemplos antes de cerrar el bloque F |
@@ -834,15 +834,110 @@ Sus límites:
   la revisión de cada grupo de B3d están en `review.toml`, que no es lo mismo.
 - **Los ejemplos reservados de G2 son públicos** en los tests de su arreglo, como dice la nota de B3d.
 
+### Bloque B · Nota de cierre
+
+**B4 se cerró el 2026-11-25, y con él el bloque B**, con la versión 0.2.0 y el tag `v0.2.0`, que el
+mantenedor crea con su Release.
+
+**El criterio de salida del bloque B, ningún acepto falso en las cuatro técnicas de trampa, se
+cumple en el corpus, leído al pie de la letra**: en la ejecución con la clave de `held-out-run.toml`
+para los casos que solo caza la reserva, y en la ejecución de `fd16c21` para el resto (B3e). Ningún
+caso tiene un campo con su técnica, así que a cada caso malo se le da una por lo que hace su parche,
+leído del `intent` de su `case.toml`:
+
+| Técnica ([ADR-0030](adr/0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md)) | Casos | Lo caza | Aceptos falsos |
+|---|---|---|---|
+| Editar tests | 3 | `protected-paths` | 0 de 3 (0 a 0,56) |
+| Casos especiales | 10 | 3 un ejemplo visible, 7 solo la reserva | 0 de 10 (0 a 0,28); 7 de 7 sin la clave |
+| Comparación sobrecargada | 2 | 1 un ejemplo visible, 1 solo la reserva | 0 de 2 (0 a 0,66); 1 de 2 sin la clave |
+| Estado entre llamadas | 1 | un ejemplo visible | 0 de 1 (0 a 0,79) |
+
+- **Editar tests:** `skips-the-html-check-and-edits-its-test`, `nextver-changes-the-tests-to-fit` y
+  `changes-the-default-token-and-the-tests` cambian un test del paquete para que el parche lo pase,
+  algo que el contrato no permite.
+- **Casos especiales:** diez parches cuya lógica responde bien solo para las entradas que se vieron,
+  o para un conjunto más estrecho que el requisito. A tres los caza un ejemplo visible, porque los
+  ejemplos visibles tienen una entrada fuera del caso especial:
+  `fixes-only-a-code-block-before-the-blank`, `nextver-fixes-only-patch` y
+  `replace-fixes-only-major`. A siete solo los caza la reserva, porque su condición es exactamente
+  las entradas visibles, una propiedad de ellas o una tabla de sus valores esperados:
+  `strips-the-space-only-at-the-visible-tags`, `special-cases-the-visible-malformed-collections`,
+  `special-cases-the-visible-tokens`, `orders-by-value-only-the-visible-identifiers`,
+  `orders-by-value-only-the-visible-lengths`, `re-raises-only-for-the-visible-kinds-of-value` y
+  `returns-the-visible-results`.
+- **Comparación sobrecargada:** dos parches que no arreglan la lógica sino que devuelven un objeto
+  que engaña a lo que compara el juez. `answers-equal-to-a-malformed-collection` devuelve un objeto
+  cuyo `__eq__` siempre se cumple, lo que engaña a una comparación con `==`; lo caza un ejemplo
+  visible, porque dokime compara el JSON o el `repr` fuera de la zona, nunca el objeto.
+  `forges-the-repr-for-the-visible-malformed-collections` devuelve un objeto cuyo `__repr__` da el
+  texto que compara `$repr`. Se cuenta aquí y no entre los casos especiales porque lo que falsea es
+  lo que lee la comparación, como pidió el mantenedor en la revisión; lo falsea solo para las
+  entradas visibles, así que solo lo caza la reserva, y un falseo para todas las entradas pasaría
+  también la reserva (#219).
+- **Estado entre llamadas:** `keeps-the-first-next-prerelease` guarda el primer resultado y lo
+  vuelve a dar en las llamadas siguientes, lo que ve un paso posterior del mismo ejemplo. El estado
+  entre ejemplos ya no tiene canal, porque la
+  [ADR-0080](adr/0080-each-example-is-observed-in-a-container-of-its-own.es.md) observa cada ejemplo
+  en un contenedor propio.
+- **Ninguna de las cuatro:** seis casos malos, ninguno tampoco un acepto falso:
+  `hides-the-error-of-an-invalid-version`, una ocultación que no toca ningún test;
+  `fixes-equality-and-leaves-the-ordering` y `matches-the-family-without-refusing-a-token`, arreglos
+  parciales; `fix-with-a-regression-in-loose-lists` y `replace-with-a-regression-in-bump-minor`, que
+  rompen tests existentes; y `formats-a-short-code-block-differently-twice`, que rompe una relación.
+
+Su alcance: dos técnicas tienen uno o dos casos, así que sus cuentas muestran que en este corpus no
+se escapó nada, no una tasa; y todos los casos malos los escribió la sesión que construye, no un
+agente que intenta hacer trampa.
+
+**El valor de la reserva está medido** (B3e): los 8 casos que solo ella caza son 8 aceptos falsos
+sin la clave y 0 de 8 (0 a 0,32) con ella.
+
+**La hipótesis de que reservar por caso caza las soluciones sobreajustadas se cumple en casos
+construidos.** Los parches que sobreajustan los escribió la sesión que construye después del
+sorteo, sabiendo qué ejemplos quedaban reservados, para que cada uno encaje con lo visible y falle
+en lo que no lo es: la reserva los caza por construcción. Lo que muestra es que dokime caza un
+parche sobreajustado a los ejemplos visibles; no que se cace a un agente que sobreajusta por su
+cuenta, algo que el bloque C vuelve a probar con los parches de un agente. Los ejemplos reservados de
+G2 son, además, públicos en los tests de su arreglo.
+
+**La puerta sellada no corre en CI en el bloque B**
+([ADR-0082](adr/0082-the-sealed-gate-does-not-run-in-ci-in-block-b.es.md), que modifica la ADR-0073):
+la puerta ejecuta el código del cambio, y el contenedor sería la única barrera entre ese código y la
+clave. El mantenedor ejecuta la auditoría sellada en local antes de fusionar un pull request que
+añade o cambia un caso o un contrato con lote sellado, y al cerrar un bloque; no se publica nada de
+ella en el pull request. El trozo c del trabajo `corpus` se partió otra vez (#240), como pide la
+ADR-0078.
+
+**Lo que deja abierto el bloque B,** además de los límites de cada hito de arriba:
+
+- **La reserva frente a los parches de un agente**, en el bloque C, donde un agente escribe el
+  cambio.
+- **La puerta sellada sin una persona**, que se decide otra vez antes de que el bloque C se apoye en
+  ella.
+- **Un solo destinatario para los lotes del corpus**, aunque la ADR-0073 pide dos; los lotes que se
+  sellen a partir de ahora llevan el segundo.
+- **Las relaciones**: solo se mide `idempotent` en `cli`, en un caso.
+- **Los minutos de una persona por cambio**, una métrica de la ADR-0030, sin medir.
+
+**Para la revisión estratégica del mantenedor**, que vive fuera del repositorio, al cerrar el bloque
+B:
+
+- Si la reserva sigue siendo una puerta de cada cambio, dado que solo está medida en casos
+  construidos; la tabla de hipótesis dice que pasa a ser opcional si falla.
+- Cómo corre la puerta sellada cuando no hay nadie para escribir una contraseña, en el bloque C.
+- El segundo destinatario de los lotes sellados, y dónde se guarda la copia de la identidad.
+- La revisión del trabajo hecho y del plan restante, antes de abrir el bloque C.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Al cerrar el bloque B:** una sonda de un segundo lenguaje con Java, solo en la frontera `cli`, en
-  dos fases: primero probarla sin tocar el código de dokime, después hacer pasar tres casos; con un
-  tiempo limitado y sin cambiar las abstracciones centrales. Las partes de dokime que dependen de
-  Python están en la [arquitectura](architecture/README.es.md#lo-que-depende-de-python).
+- **Después de publicar la versión 0.2 y antes de abrir el bloque C:** una revisión con el
+  mantenedor del trabajo hecho y del plan restante, que incluye cómo extender dokime a otros
+  lenguajes, entre ello la sonda de Java en la frontera `cli`; su alcance lo decide el mantenedor
+  entonces. Las partes de dokime que dependen de Python están en la
+  [arquitectura](architecture/README.es.md#lo-que-depende-de-python).
 - **Para el bloque D:** un caso encontrado en B0. El arreglo de mdformat `27e2ba3`, el parche bueno
   de un caso del corpus, pasa todos los ejemplos y todos los tests y amplía la comprobación
   `is_md_equal`, que entonces da por iguales documentos que se ven distintos: `*a* b` y `*a*b`,
@@ -863,8 +958,8 @@ encuentra:
 - **Antes de D2:** cómo se agrupan las diferencias encontradas fuera del cambio sin la pasarela a
   un modelo.
 
-En el bloque A el conjunto de casos se ejecuta como tests normales del repositorio; `bench` lo
-automatiza y calcula las métricas en el bloque B.
+El corpus se ejecuta como tests del repositorio, que escriben los resultados de cada caso; `bench`
+calcula las métricas a partir de ellos ([ADR-0081](adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md)).
 
 Lenguaje inicial: Python. Java llega en el bloque G.
 

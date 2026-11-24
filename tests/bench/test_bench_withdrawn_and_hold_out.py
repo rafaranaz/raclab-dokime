@@ -67,3 +67,31 @@ def test_the_command_writes_the_metrics_as_json(
     assert found["without_the_left_out"]["false_rejects"]["k"] == 0
     assert found["changes"] == []
     assert [w["key"] for w in found["withdrawn"]] == ["p/good-gone", "p/bad-gone"]
+
+
+def test_the_last_run_with_the_key_of_a_case_is_the_one_that_counts(tmp_path: Path) -> None:
+    root = write_corpus(tmp_path / "corpus")
+    two_runs = (
+        '[[run]]\ndate = "d1"\n\n[[run.case]]\nkey = "p/bad-held"\nverdict = "FAIL"\n'
+        'failing_gate = "sealed-examples"\n\n'
+        '[[run]]\ndate = "d2"\n\n[[run.case]]\nkey = "p/bad-held"\nverdict = "PASS"\n'
+        'failing_gate = ""\n'
+    )
+    (root / "held-out-run.toml").write_text(two_runs)
+    held = hold_out(read_corpus(root), read_run(write_results(tmp_path / "r.jsonl", RUNNABLE)))
+    assert held.with_the_key == Count(1, 1, True)
+
+
+def test_a_case_that_never_ran_with_the_key_is_named(tmp_path: Path) -> None:
+    root = write_corpus(tmp_path / "corpus")
+    (root / "held-out-run.toml").write_text("run = []\n")
+    held = hold_out(read_corpus(root), read_run(write_results(tmp_path / "r.jsonl", RUNNABLE)))
+    assert held.with_the_key == Count(0, 0, True)
+    assert held.not_run_with_the_key == ("p/bad-held",)
+
+
+def test_a_change_of_the_first_failing_gate_alone_is_a_change(tmp_path: Path) -> None:
+    first = read_run(write_results(tmp_path / "1.jsonl", RUNNABLE))
+    path = write_results(tmp_path / "2.jsonl", RUNNABLE)
+    path.write_text(path.read_text().replace('"visible-examples"', '"existing-tests"'))
+    assert changes(first, read_run(path)) == ["p/good-two"]

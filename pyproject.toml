@@ -1,6 +1,6 @@
 [project]
 name = "raclab-dokime"
-version = "0.1.0"
+version = "0.2.0"
 description = "Verification and evidence layer around coding agents."
 readme = "README.md"
 license = "MIT"

@@ -109,6 +109,14 @@ The parts plugin, loaded with `-p tools.corpus_parts`, keeps in a run the tests 
 - **REPO-167** If some parts ran the corpus and others did not, then the parts check shall fail with a line that names the parts that did not run it.
 - **REPO-168** When no part ran the corpus, the parts check shall pass with a line that says that the corpus did not run.
 
+Each part writes the results of its audits to `results.jsonl`, one line for each case
+([ADR-0081](../adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md)),
+and leaves it with its report; the parts check compares the two and gathers the files.
+
+- **REPO-175** If a part ran the corpus and the audits of cases in its report are not the cases of the lines of its file of results, one line each, then the parts check shall fail with a line that names the part and the cases that differ.
+- **REPO-176** If the lines of the files of results of the parts do not all give the same commit, then the parts check shall fail with a line that gives the commits.
+- **REPO-177** When the parts ran the corpus and the parts check passes, the parts check shall write the lines of the files of results of every part, in the order of the parts, to the file that `--results` names.
+
 ### A pull request of text (`tools/corpus_changes.py`)
 
 On a pull request that changes only text, the parts do not run the tests of the corpus

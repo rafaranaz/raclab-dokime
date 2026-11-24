@@ -20,6 +20,7 @@ from dokime.evidence.schema import read_back
 from tests.corpus.cases import RUNNABLE, Case
 from tests.corpus.clones import clone, skip_unless_asked
 from tests.corpus.projects import PROJECTS
+from tests.corpus.results import RESULTS, append, result_line, this_commit
 from tests.corpus.sealing import (
     IDENTITY,
     NOT_HERE,
@@ -112,6 +113,10 @@ def test_a_case_gets_its_expected_verdict_at_its_gate(
     )
     for finding in document["findings"]:
         print(f"  {finding['gate']}: {finding['verdict']} {finding['code']}")
+    results = os.environ.get(RESULTS)
+    if results:
+        line = result_line(this_commit(), case.key, document["verdict"], failing, bool(identity))
+        append(Path(results), line)
     wrong = judge(case, document, key=identity is not None)
     assert wrong == [], (wrong, done.stdout + done.stderr)
     if document["evidence"] is not None:

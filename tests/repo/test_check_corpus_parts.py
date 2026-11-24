@@ -1,11 +1,13 @@
-# SDD-EARS: REPO-164 REPO-165 REPO-166 REPO-167 REPO-168
+# SDD-EARS: REPO-164 REPO-165 REPO-166 REPO-167 REPO-168 REPO-175 REPO-176 REPO-177
+import json
 from pathlib import Path
 
 from tools import check_corpus_parts
-from tools.check_corpus_parts import check_parts, collected
+from tools.check_corpus_parts import check_parts, check_results, collected
 
 SUCCESS = dict.fromkeys("abcdef", "success")
 RAN = dict.fromkeys("abcdef", True)
+COMMIT = "a" * 40
 
 
 def report(tests: int) -> bytes:
@@ -78,3 +80,70 @@ def test_the_command_reads_what_each_part_left(tmp_path: Path) -> None:
     results = [f"--result={p}=success" for p in "abcdef"]
     assert check_corpus_parts.main([*arguments, *results]) == 0
     assert check_corpus_parts.main([*arguments, *results[:5], "--result=f=failure"]) == 1
+
+
+AUDIT = "test_a_case_gets_its_expected_verdict_at_its_gate"
+
+
+def audits(*keys: str) -> bytes:
+    cases = "".join(
+        f'<testcase classname="tests.corpus.test_corpus_audit" name="{AUDIT}[{k}]" time="1"/>'
+        for k in keys
+    )
+    other = '<testcase classname="tests.corpus.test_corpus_cases" name="test_x" time="0"/>'
+    return f"<testsuites><testsuite>{cases}{other}</testsuite></testsuites>".encode()
+
+
+def lines(commit: str, *keys: str) -> str:
+    return "".join(
+        json.dumps({"commit": commit, "key": k, "verdict": "PASS", "failing_gate": None}) + "\n"
+        for k in keys
+    )
+
+
+def test_parts_whose_results_hold_one_line_for_each_audit_pass() -> None:
+    reports = {"a": audits("p/one", "p/two"), "b": audits(), "c": audits("q/three")}
+    results = {"a": lines(COMMIT, "p/one", "p/two"), "b": "", "c": lines(COMMIT, "q/three")}
+    passed, found = check_results(reports, results)
+    assert passed, found
+
+
+def test_an_audit_without_its_line_fails_naming_the_part_and_the_case() -> None:
+    reports = {"a": audits("p/one", "p/two")}
+    for written in (lines(COMMIT, "p/one"), lines(COMMIT, "p/one", "p/two", "p/two"), None):
+        passed, found = check_results(reports, {"a": written})
+        assert not passed
+        assert any("part a" in line and "p/two" in line for line in found), found
+
+
+def test_a_line_of_a_case_that_was_not_audited_fails() -> None:
+    passed, found = check_results({"a": audits("p/one")}, {"a": lines(COMMIT, "p/one", "p/x")})
+    assert not passed
+    assert any("part a" in line and "p/x" in line for line in found), found
+
+
+def test_lines_of_two_commits_fail_giving_both() -> None:
+    other = "b" * 40
+    reports = {"a": audits("p/one"), "b": audits("p/two")}
+    passed, found = check_results(
+        reports, {"a": lines(COMMIT, "p/one"), "b": lines(other, "p/two")}
+    )
+    assert not passed
+    assert any(COMMIT in line and other in line for line in found), found
+
+
+def test_the_command_gathers_the_results_of_the_parts_in_their_order(tmp_path: Path) -> None:
+    keys = {"a": ["p/a1", "p/a2"], "b": ["p/b1"], "c": [], "d": ["p/d1"], "e": [], "f": ["p/f1"]}
+    for part, found in keys.items():
+        (tmp_path / part).mkdir()
+        (tmp_path / part / "ran").write_text("true\n")
+        (tmp_path / part / "corpus.xml").write_bytes(audits(*found))
+        (tmp_path / part / "results.jsonl").write_text(lines(COMMIT, *found))
+    total = sum(len(found) + 1 for found in keys.values())
+    (tmp_path / "collection.txt").write_text(f"{total} tests collected in 0.2s\n")
+    gathered = tmp_path / "results.jsonl"
+    arguments = ["--parts", str(tmp_path), "--collection", str(tmp_path / "collection.txt")]
+    arguments += [f"--result={p}=success" for p in keys]
+    assert check_corpus_parts.main([*arguments, "--results", str(gathered)]) == 0
+    written = [json.loads(line)["key"] for line in gathered.read_text().splitlines()]
+    assert written == [k for part in "abcdef" for k in keys[part]]

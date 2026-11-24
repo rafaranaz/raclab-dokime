@@ -5,7 +5,8 @@ that says whether it ran the corpus and, when it did, its JUnit report `corpus.x
 fails unless every part ended in `success`, and, when the parts ran the corpus, unless they all
 did and their reports hold as many tests as one collection of the corpus. Each part leaves as well
 its file of results, one line for each audit of a case (ADR-0081): the check fails unless the lines
-are the audits of the report, one each, all of one commit, and gathers them with `--results`.
+are the audits of the report, one each, all of one commit, and gathers them with `--results` when
+they are, even when a part failed, so that a run where a case missed its verdict is kept too.
 """
 
 import argparse
@@ -193,11 +194,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[corpus] {arguments.collection}: cannot be read: {error}")
         return 1
     passed, lines = check_parts(results, ran, reports, collection)
-    if passed and all(ran.values()):
+    if all(ran.values()):
         written = {p: _read(arguments.parts / p / RESULTS) for p in PARTS}
-        passed, more = check_results(reports, written)
+        held, more = check_results(reports, written)
         lines += more
-        if passed and arguments.results is not None:
+        passed = passed and held
+        if held and arguments.results is not None:
             arguments.results.write_text("".join(written[p] or "" for p in PARTS))
     for line in lines:
         print(f"[corpus] {line}")

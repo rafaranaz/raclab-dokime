@@ -147,3 +147,22 @@ def test_the_command_gathers_the_results_of_the_parts_in_their_order(tmp_path: P
     assert check_corpus_parts.main([*arguments, "--results", str(gathered)]) == 0
     written = [json.loads(line)["key"] for line in gathered.read_text().splitlines()]
     assert written == [k for part in "abcdef" for k in keys[part]]
+
+
+def test_the_results_are_gathered_when_a_part_failed_and_the_check_still_fails(
+    tmp_path: Path,
+) -> None:
+    keys = {"a": ["p/a1"], "b": ["p/b1"], "c": [], "d": [], "e": [], "f": ["p/f1"]}
+    for part, found in keys.items():
+        (tmp_path / part).mkdir()
+        (tmp_path / part / "ran").write_text("true\n")
+        (tmp_path / part / "corpus.xml").write_bytes(audits(*found))
+        (tmp_path / part / "results.jsonl").write_text(lines(COMMIT, *found))
+    total = sum(len(found) + 1 for found in keys.values())
+    (tmp_path / "collection.txt").write_text(f"{total} tests collected in 0.2s\n")
+    gathered = tmp_path / "results.jsonl"
+    arguments = ["--parts", str(tmp_path), "--collection", str(tmp_path / "collection.txt")]
+    arguments += [f"--result={p}=success" for p in "abcde"] + ["--result=f=failure"]
+    assert check_corpus_parts.main([*arguments, "--results", str(gathered)]) == 1
+    written = [json.loads(line)["key"] for line in gathered.read_text().splitlines()]
+    assert written == ["p/a1", "p/b1", "p/f1"]

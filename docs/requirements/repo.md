@@ -115,7 +115,7 @@ and leaves it with its report; the parts check compares the two and gathers the 
 
 - **REPO-175** If a part ran the corpus and the audits of cases in its report are not the cases of the lines of its file of results, one line each, then the parts check shall fail with a line that names the part and the cases that differ.
 - **REPO-176** If the lines of the files of results of the parts do not all give the same commit, then the parts check shall fail with a line that gives the commits.
-- **REPO-177** When the parts ran the corpus and the parts check passes, the parts check shall write the lines of the files of results of every part, in the order of the parts, to the file that `--results` names.
+- **REPO-177** When the parts ran the corpus and their files of results hold one line for each audit, all of one commit, the parts check shall write the lines of the files of every part, in the order of the parts, to the file that `--results` names, whether or not every part ended in `success`.
 
 ### A pull request of text (`tools/corpus_changes.py`)
 

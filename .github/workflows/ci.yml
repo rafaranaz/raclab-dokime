@@ -167,7 +167,7 @@ jobs:
           fi
       # The results of every case of the run, one line each, that bench computes from (ADR-0081).
       - uses: actions/upload-artifact@v7
-        if: hashFiles('results.jsonl') != ''
+        if: always() && hashFiles('results.jsonl') != ''
         with:
           name: corpus-results
           path: results.jsonl

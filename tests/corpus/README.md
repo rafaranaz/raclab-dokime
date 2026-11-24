@@ -83,7 +83,9 @@ commit when the tree was clean; in CI it always is. On a `pull_request` the job 
 merge commit that GitHub makes, so the file of results of a pull request records a commit that no
 longer exists once the pull request is merged by rebase. The figures of a version are therefore
 taken from runs on a push to `main`, where the commit is real; for stability, running the same job
-again is enough, since it reuses the same commit.
+again is enough, since it reuses the same commit. `runs/<commit>/` keeps the files of results that a
+figure of the roadmap rests on, since an artifact of CI expires, with `run.toml`, which says where
+each comes from, and `bench.json`, what `bench` gave of them; a test computes it again.
 
 ## The intent of each contract
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:1b2e6588ad125915 -->
+<!-- translation-of: ROADMAP.md sha256:1e592e41645f3104 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -905,7 +905,10 @@ G2 son, además, públicos en los tests de su arreglo.
 la puerta ejecuta el código del cambio, y el contenedor sería la única barrera entre ese código y la
 clave. El mantenedor ejecuta la auditoría sellada en local antes de fusionar un pull request que
 añade o cambia un caso o un contrato con lote sellado, y al cerrar un bloque; no se publica nada de
-ella en el pull request. El trozo c del trabajo `corpus` se partió otra vez (#240), como pide la
+ella en el pull request. La auditoría sellada de este cierre es la ejecución con la clave de
+`held-out-run.toml`, hecha con el arnés en `51d2ff2`; desde entonces, bajo `src/dokime` solo
+cambiaron `bench` y el README de `contract` (`3a597bb`), y los tests del corpus cambiaron cómo se
+ejecutan, no lo que audita dokime, así que no se repite. El trozo c del trabajo `corpus` se partió otra vez (#240), como pide la
 ADR-0078.
 
 **Lo que deja abierto el bloque B,** además de los límites de cada hito de arriba:

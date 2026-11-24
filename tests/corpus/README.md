@@ -74,6 +74,13 @@ if `dokime/identity.age` is in it at its start or its end, and its end prints th
 takes. A limit: an image that comes from that storage does not show that it would build from
 nothing today; in CI each part starts from an empty one, so its first case builds cold.
 
+With `DOKIME_CORPUS_RESULTS` naming a file, the test of the cases appends to it one line of JSON
+for each case it audits, before it judges the case (`results.py`, ADR-0081): the commit of this
+repository, the key of the case, its verdict, its first failing gate or `null`, and whether the key
+was given. `bench` computes the metrics from such files. The commit is that of `HEAD`: a run made
+with changes that are not committed gives it all the same, so a file of results is only worth its
+commit when the tree was clean; in CI it always is.
+
 ## The intent of each contract
 
 `intents.toml` gives each good case, by its key, an intent sentence: what someone would say before

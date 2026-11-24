@@ -1,6 +1,6 @@
 # ADR-0081 · bench computes the metrics from the results that the corpus writes
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0030 · The harness is measured on a corpus with known verdicts
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md)
 
 ## Context
 

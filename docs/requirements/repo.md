@@ -100,7 +100,7 @@ The tests of the corpus run in parts at once, and the job `corpus` gathers them
 The parts plugin, loaded with `-p tools.corpus_parts`, keeps in a run the tests of the part that
 `--corpus-part` names; the parts check, run by the job `corpus`, reads what each part left.
 
-- **REPO-161** The parts plugin shall give each test of the corpus a part: the audits of the cases of mdformat `a`, or `e` when the lowest bit of the first byte of the sha256 of the key of the case is 1, those of python-semver and cachetools `b`, or `f` by the same bit, the tests of the hold-out by hand and of the sealed run `c`, and every other test `d`.
+- **REPO-161** The parts plugin shall give each test of the corpus a part: the audits of the cases of mdformat `a`, or `e` when the lowest bit of the first byte of the sha256 of the key of the case is 1, those of python-semver and cachetools `b`, or `f` by the same bit, the tests of the hold-out by hand of a contract under `tests/corpus/holdout-by-hand/mdformat/` `g`, the other tests of the hold-out by hand and those of the sealed run `c`, and every other test `d`.
 - **REPO-162** When the tests of the corpus are collected with `--corpus-part`, the parts plugin shall deselect every test of another part.
 - **REPO-163** If `--corpus-part` names no part, then the parts plugin shall stop the run with an error that names what it was given.
 - **REPO-164** If a part did not end in `success`, then the parts check shall fail with a line that names the part and how it ended.

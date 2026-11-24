@@ -92,3 +92,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Accepted |
 | [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md) | bench computes the metrics from the results that the corpus writes | Accepted |
+| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md) | The sealed gate does not run in CI in block B | Proposed |

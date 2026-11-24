@@ -188,6 +188,7 @@ of JSON for each case, with the commit of this repository that the run was made 
 files can be told to come from the same commit.
 
 - **CORPUS-098** Where `DOKIME_CORPUS_RESULTS` names a file, the test of the cases shall append to it, for each case it audits and before it judges the case, one line of JSON with the commit of this repository, the key of the case, its verdict, its first failing gate or `null`, and whether the key was given.
+- **CORPUS-099** The metrics that `tests/corpus/runs/<commit>/bench.json` keeps for a run shall be those that `bench` gives of the files of results of that run kept next to it.
 
 ### Withdrawn cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
 

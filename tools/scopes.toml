@@ -72,6 +72,10 @@ paths = ["tests/corpus/**", "docs/requirements/corpus.md"]
 description = "Compare what the zone observed of an example with what the example expects; later, split the visible from the sealed examples and apply relations."
 paths = ["src/dokime/oracle/**", "tests/oracle/**", "docs/requirements/oracle.md"]
 
+[scopes.bench]
+description = "The metrics of the corpus, computed from the files of results that its runs write (ADR-0081)."
+paths = ["src/dokime/bench/**", "tests/bench/**", "docs/requirements/bench.md"]
+
 [scopes.verify]
 description = "The gates of a change and their aggregation: baseline, protected paths, existing tests, visible examples."
 paths = ["src/dokime/verify/**", "tests/verify/**", "docs/requirements/verify.md"]

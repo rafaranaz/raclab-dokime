@@ -882,7 +882,10 @@ its fix.
 gate runs the code of the change, and the container would be the only barrier between that code and
 the key. The maintainer runs the sealed audit locally before merging a pull request that adds or
 changes a case or a contract with a sealed batch, and at the close of a block; nothing of it is
-posted to the pull request. Part c of the job `corpus` was split again (#240), as ADR-0078 asks.
+posted to the pull request. The sealed audit of this close is the run with the key of
+`held-out-run.toml`, made with the harness at `51d2ff2`; since then only `bench` and the README of
+`contract` (`3a597bb`) changed under `src/dokime`, and the tests of the corpus changed how they are
+run, not what dokime audits, so it is not repeated. Part c of the job `corpus` was split again (#240), as ADR-0078 asks.
 
 **What block B leaves open,** beyond the limits of each milestone above:
 

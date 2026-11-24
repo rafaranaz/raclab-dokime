@@ -26,8 +26,10 @@ itself, T5, is out of the scope of that threat model.
 ## Decision
 
 - **The gate `sealed-examples` does not run in CI in block B.** The key stays out of CI with the
-  mechanism of ADR-0073: the maintainer runs the sealed audit locally, before the merge, and types
-  the passphrase; in CI the gate stays not applicable, with the reason that the key is not here.
+  mechanism of ADR-0073: the maintainer runs the sealed audit locally and types the passphrase, not
+  on every pull request but before merging one that adds or changes a case or a contract with a
+  sealed batch, and at the close of a block; in CI the gate stays not applicable, with the reason
+  that the key is not here.
 - **Nothing of a local sealed run is posted to the pull request**: no status of the commit and no
   comment. Its evidence stays in the directory `--out` of the run on the machine of the maintainer;
   for the corpus, `held-out-run.toml` records each run.
@@ -65,5 +67,9 @@ no run of GitHub checked; the record in the repository is enough while one perso
 - A pull request shows nothing of the hold-out; whoever merges has to know that the maintainer ran
   the sealed audit, and the corpus keeps it in `held-out-run.toml`.
 - The hold-out depends on one person and one machine. The batches of the corpus were sealed for one
-  recipient only, so losing that identity loses them, though ADR-0073 asks for a second recipient.
+  recipient only, though ADR-0073 asks for a second, so losing that identity would lose them. Two
+  things lessen it: the maintainer keeps a copy of the identity, encrypted with its passphrase,
+  away from the machine where the work is done; and the batches sealed from now on carry the second
+  recipient that ADR-0073 asks for. The batches of today are not sealed again, since the files of a
+  case do not change once it is added (CORPUS-030).
 - Block C, where an agent writes the change, has to decide this again before it relies on the gate.

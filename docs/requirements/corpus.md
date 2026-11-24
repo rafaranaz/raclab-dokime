@@ -181,6 +181,14 @@ of a session of pytest, so that the images of a part are kept once and not once 
 - **CORPUS-096** The tests of the corpus that audit a case shall give every audit of a session of pytest the same `XDG_DATA_HOME`, a directory made empty for that session.
 - **CORPUS-097** If the `XDG_DATA_HOME` of a session holds `dokime/identity.age` when the session starts or when it ends, then the tests of the corpus shall fail, naming the file.
 
+### The results of a run ([ADR-0081](../adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md))
+
+The test of the cases runs the audits and `bench` computes the metrics from what it writes: one line
+of JSON for each case, with the commit of this repository that the run was made on, so that two
+files can be told to come from the same commit.
+
+- **CORPUS-098** Where `DOKIME_CORPUS_RESULTS` names a file, the test of the cases shall append to it, for each case it audits and before it judges the case, one line of JSON with the commit of this repository, the key of the case, its verdict, its first failing gate or `null`, and whether the key was given.
+
 ### Withdrawn cases ([ADR-0055](../adr/0055-a-case-of-the-corpus-is-labelled-by-how-it-is-built.md))
 
 A case that turns out wrong after it ran is not corrected: it is withdrawn, its files stay as they

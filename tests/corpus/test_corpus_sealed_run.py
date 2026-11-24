@@ -101,7 +101,7 @@ def sealed_gate(result: dict[str, Any]) -> dict[str, Any]:
 
 
 def test_a_sealed_contract_without_the_key_is_not_applicable_as_the_key_is_not_here(
-    tmp_path: Path,
+    tmp_path: Path, data_home: Path
 ) -> None:
     skip_unless_asked()
     require("git")
@@ -116,8 +116,7 @@ def test_a_sealed_contract_without_the_key_is_not_applicable_as_the_key_is_not_h
         },
         "the sealed contract of the measurement of B1",
     )
-    nowhere = tmp_path / "no-data-home"
-    result = audit(tmp_path, directory, pack, base, env={"XDG_DATA_HOME": str(nowhere)})
+    result = audit(tmp_path, directory, pack, base, env={"XDG_DATA_HOME": str(data_home)})
     print(f"sealed contract without the key: verdict {result['verdict']}, {sealed_gate(result)}")
     assert result["verdict"] == "PASS"
     assert sealed_gate(result) == {

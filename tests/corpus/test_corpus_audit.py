@@ -47,7 +47,9 @@ def first_failing(gates: list[dict[str, Any]]) -> str | None:
 
 
 @pytest.mark.parametrize("case", RUNNABLE, ids=lambda c: c.key)
-def test_a_case_gets_its_expected_verdict_at_its_gate(tmp_path: Path, case: Case) -> None:
+def test_a_case_gets_its_expected_verdict_at_its_gate(
+    tmp_path: Path, data_home: Path, case: Case
+) -> None:
     skip_unless_asked()
     require("git")
     require("podman")
@@ -70,7 +72,6 @@ def test_a_case_gets_its_expected_verdict_at_its_gate(tmp_path: Path, case: Case
     if writing is not None:
         os.write(writing, passphrase() + b"\n")
         os.close(writing)
-    nowhere = tmp_path / "no-data-home"
     done = subprocess.run(
         [
             sys.executable,
@@ -95,7 +96,7 @@ def test_a_case_gets_its_expected_verdict_at_its_gate(tmp_path: Path, case: Case
         capture_output=True,
         text=True,
         check=False,
-        env={**os.environ, "TMPDIR": str(temporary), "XDG_DATA_HOME": str(nowhere)},
+        env={**os.environ, "TMPDIR": str(temporary), "XDG_DATA_HOME": str(data_home)},
         pass_fds=() if reading is None else (reading,),
         timeout=3600,
     )

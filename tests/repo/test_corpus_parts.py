@@ -7,6 +7,10 @@ import pytest
 from tools.corpus_parts import PARTS, part_of
 
 AUDIT = "tests/corpus/test_corpus_audit.py::test_a_case_gets_its_expected_verdict_at_its_gate"
+HAND = (
+    "tests/corpus/test_corpus_holdout_by_hand.py"
+    "::test_a_special_cased_patch_passes_the_visible_and_fails_the_held_out"
+)
 
 
 @pytest.mark.parametrize(
@@ -23,6 +27,9 @@ AUDIT = "tests/corpus/test_corpus_audit.py::test_a_case_gets_its_expected_verdic
             "tests/corpus/test_corpus_holdout_by_hand.py::test_the_fixture_has_the_three_contracts",
             "c",
         ),
+        (f"{HAND}[format-a-blank-paragraph-between-blocks]", "g"),
+        (f"{HAND}[replace-keeps-the-constructor-error]", "c"),
+        (f"{HAND}[nextver-bumps-build-only-versions]", "c"),
         ("tests/corpus/test_corpus_sealed_run.py::test_a_sealed_contract", "c"),
         ("tests/corpus/test_corpus_sealed_run_fixture.py::test_the_fixture_seals", "d"),
         ("tests/corpus/test_corpus_self_check.py::test_the_pack[mdformat]", "d"),
@@ -67,11 +74,11 @@ def test_the_parts_hold_each_test_of_the_corpus_once() -> None:
 
 
 def test_a_part_that_is_not_one_stops_the_run() -> None:
-    result = collect("-p", "tools.corpus_parts", "--corpus-part", "g", "tests/corpus")
+    result = collect("-p", "tools.corpus_parts", "--corpus-part", "h", "tests/corpus")
     assert result.returncode != 0
-    assert "'g'" in result.stdout + result.stderr
+    assert "'h'" in result.stdout + result.stderr
     assert not ids(result)
 
 
-def test_there_are_six_parts() -> None:
-    assert PARTS == ("a", "b", "c", "d", "e", "f")
+def test_there_are_seven_parts() -> None:
+    assert PARTS == ("a", "b", "c", "d", "e", "f", "g")

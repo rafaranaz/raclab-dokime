@@ -5,19 +5,23 @@ and, with `--corpus-part`, deselects every test of another part. Part `d` is eve
 others do not take, so a new test falls into `d` unless a rule here takes it. The audits of a
 project are split in two, `a` and `e` for mdformat, `b` and `f` for python-semver and cachetools,
 by the lowest bit of the first byte of the sha256 of the key of the case, which keeps a case in its
-part as others are added.
+part as others are added; and part `g` takes from `c` the hold-out by hand of the contracts of
+mdformat.
 """
 
 import hashlib
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 
 import pytest
 
-PARTS = ("a", "b", "c", "d", "e", "f")
+PARTS = ("a", "b", "c", "d", "e", "f", "g")
 AUDIT = "test_corpus_audit.py"
 PROJECTS = {"mdformat": "a", "python-semver": "b", "cachetools": "b"}
 OTHER_HALF = {"a": "e", "b": "f"}
 MODULES = {"test_corpus_holdout_by_hand.py": "c", "test_corpus_sealed_run.py": "c"}
+HAND = "test_corpus_holdout_by_hand.py"
+HAND_OF_MDFORMAT = Path(__file__).resolve().parents[1] / "tests" / "corpus" / "holdout-by-hand"
+HAND_OF_MDFORMAT = HAND_OF_MDFORMAT / "mdformat"
 OPTION = "--corpus-part"
 
 
@@ -31,6 +35,10 @@ def part_of(nodeid: str) -> str:
         if part in OTHER_HALF and hashlib.sha256(key.encode()).digest()[0] & 1:
             return OTHER_HALF[part]
         return part
+    if module == HAND and "[" in name:
+        contract = name.split("[", 1)[1].rstrip("]")
+        if (HAND_OF_MDFORMAT / contract).is_dir():
+            return "g"
     return MODULES.get(module, "d")
 
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:ca5f8cffe8aebb66 -->
+<!-- translation-of: ROADMAP.md sha256:7fb44af7406d5b93 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -777,14 +777,65 @@ Sus límites:
 - **Ningún caso de B3d tiene una relación:** solo se mide `idempotent` en `cli`, en un caso de B2;
   `order-insensitive` y las relaciones en `function` siguen sin caso.
 
+**B3e se cerró el 2026-11-24.** `bench` calcula las métricas del corpus a partir de los ficheros de
+resultados que escriben sus ejecuciones ([ADR-0081](adr/0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md),
+que modifica la ADR-0030; #233 a #237). En el push a `main` de `fd16c21`, ejecutado dos veces, no da
+ningún acepto falso ni ningún rechazo falso en los 32 casos, todos los casos iguales en las dos
+ejecuciones, y la reserva convierte en 0 los 8 aceptos falsos de los casos que solo ella caza
+(`tests/corpus/runs/fd16c21/`).
+
+- [x] **Los resultados de una ejecución:** el test de los casos escribe una línea de JSON por caso,
+  con el commit de la ejecución (CORPUS-098, #234); cada trozo de CI deja su fichero, la
+  comprobación de trozos exige una línea por auditoría, todas de un mismo commit, y el trabajo
+  `corpus` los guarda como el artefacto `corpus-results`, también cuando un trozo falla (#235); el
+  fichero de un pull request registra el commit de merge que fabrica GitHub, así que las cifras
+  salen de un push a `main` (#236).
+- [x] **`bench`:** de BENCH-001 a BENCH-018 (#237). Un caso se acepta con `PASS` y se rechaza con
+  `FAIL`; `ASK` es una pregunta y `ERROR` se cuenta aparte; cada cuenta dice si su ejecución tenía
+  la clave y lleva su intervalo de Wilson del 95 %, que [Brown, Cai y DasGupta](https://projecteuclid.org/euclid.ss/1009213286)
+  recomiendan para n de 40 o menos.
+- [x] **Las cifras,** de la ejecución 45451573331 sobre `fd16c21`, sin la clave:
+
+  | | Todos los casos | Sin el caso de W30 |
+  |---|---|---|
+  | Rechazos falsos | 0 de 10 (0 a 0,28) | 0 de 9 (0 a 0,30) |
+  | Aceptos falsos, `fails-a-visible-example` | 0 de 8 (0 a 0,32) | igual |
+  | Aceptos falsos, `edits-tests` | 0 de 3 (0 a 0,56) | igual |
+  | Aceptos falsos, `breaks-existing-tests` | 0 de 2 (0 a 0,66) | igual |
+  | Aceptos falsos, `breaks-a-relation` | 0 de 1 (0 a 0,79) | igual |
+  | Aceptos falsos, `fails-a-held-out-example` | 8 de 8 (0,68 a 1), por diseño | igual |
+  | Preguntas, errores | 0 de 32 cada uno (0 a 0,11) | 0 de 31 cada uno |
+
+  El valor de la reserva: los 8 casos que solo ella caza son 8 aceptos falsos sin la clave y 0 de 8
+  (0 a 0,32) con ella, en la ejecución de `held-out-run.toml`.
+- [x] **Fuera:** la regla de la fila, un caso bueno cuyo testigo cualquiera de los dos lectores a
+  ciegas etiqueta como no aislado o indecidible, calculada de `tests/corpus/blind/` y
+  `witnesses.toml`, deja fuera solo `nextver-bumps-build-only-versions`, de W30; un test lo
+  comprueba.
+- [x] **Los retirados, aparte:** los cinco casos de G1, el bueno como rechazo falso causado por su
+  contrato, FAIL en `protected-paths`.
+- [x] **La estabilidad:** los dos intentos de la ejecución, el segundo relanzado desde la web por el
+  mantenedor, dieron el mismo veredicto y la misma primera puerta que falla en los 32 casos, y los
+  dos ficheros son idénticos byte a byte.
+
+Sus límites:
+
+- **Los intervalos son anchos:** con estas n, 0 aceptos falsos de 1 solo dice que la tasa está por
+  debajo de 0,79, y de 8 que está por debajo de 0,32; las cuentas muestran que en este corpus no se
+  escapó nada, no una tasa.
+- **La estabilidad se apoya en un solo par de ejecuciones** de un commit, con la misma imagen del
+  runner; un relanzamiento no cambia el código, así que solo mide lo que varía sin él.
+- **La ejecución con la clave se lee de `held-out-run.toml`**, hecha sobre un commit anterior de
+  `main` que no registra, y en la máquina del mantenedor.
+- **Los minutos de una persona por cambio**, una métrica de la ADR-0030, no se miden; los minutos de
+  la revisión de cada grupo de B3d están en `review.toml`, que no es lo mismo.
+- **Los ejemplos reservados de G2 son públicos** en los tests de su arreglo, como dice la nota de B3d.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Antes de B3e:** si la auditoría de cada caso del corpus guarda un almacén de podman propio, que
-  deja fuera de la auditoría la identidad de la máquina pero puede construir otra vez cada imagen, o
-  si los casos comparten uno y la identidad se deja fuera de otro modo; antes, medirlo en CI.
 - **Al cerrar el bloque B:** una sonda de un segundo lenguaje con Java, solo en la frontera `cli`, en
   dos fases: primero probarla sin tocar el código de dokime, después hacer pasar tres casos; con un
   tiempo limitado y sin cambiar las abstracciones centrales. Las partes de dokime que dependen de

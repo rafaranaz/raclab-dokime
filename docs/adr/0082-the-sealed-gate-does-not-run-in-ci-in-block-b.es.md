@@ -1,7 +1,7 @@
-<!-- translation-of: 0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md sha256:a77867fe5156429f -->
+<!-- translation-of: 0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md sha256:7b8af7e3401316a2 -->
 # ADR-0082 · La puerta sellada no corre en CI en el bloque B
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

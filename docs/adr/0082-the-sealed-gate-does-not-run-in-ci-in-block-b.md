@@ -1,6 +1,6 @@
 # ADR-0082 · The sealed gate does not run in CI in block B
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 

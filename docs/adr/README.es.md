@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:3c0b2f22f24010f8 -->
+<!-- translation-of: README.md sha256:fef2c3551958d1c6 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -85,7 +85,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0070](0070-the-evidence-of-a-pull-request-goes-in-the-summary-of-its-job.es.md) | La evidencia de una pull request va en el resumen de su job y en un artefacto | Aceptada |
 | [0071](0071-the-harness-that-audits-a-pull-request-is-that-of-its-base.es.md) | El arnés que audita una pull request es el de su base | Aceptada |
 | [0072](0072-the-sealed-store-is-encrypted-with-age-for-a-list-of-recipients.es.md) | El almacén sellado se cifra con age para una lista de destinatarios | Aceptada |
-| [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md) | La clave de la reserva vive fuera de CI hasta B4 | Aceptada |
+| [0073](0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.es.md) | La clave de la reserva vive fuera de CI hasta B4 | Aceptada, enmendada por el 0082 |
 | [0074](0074-a-witness-is-isolated-when-it-is-a-fix-and-nothing-else.es.md) | Un testigo está aislado cuando es un arreglo y nada más | Aceptada |
 | [0075](0075-the-predicate-v0-3-records-the-hold-out.es.md) | El predicado v0.3 registra la reserva | Aceptada |
 | [0076](0076-a-relation-runs-on-the-visible-examples-of-its-requirement.es.md) | Una relación se ejecuta sobre los ejemplos visibles de su requisito | Aceptada |
@@ -94,4 +94,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Aceptada |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.es.md) | Cada ejemplo se observa en un contenedor propio | Aceptada |
 | [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md) | bench calcula las métricas de los resultados que escribe el corpus | Aceptada |
-| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.es.md) | La puerta sellada no corre en CI en el bloque B | Propuesta |
+| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.es.md) | La puerta sellada no corre en CI en el bloque B | Aceptada |

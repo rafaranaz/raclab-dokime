@@ -1,7 +1,7 @@
-<!-- translation-of: 0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md sha256:b45d23156e93ee5d -->
+<!-- translation-of: 0073-the-key-of-the-hold-out-lives-outside-ci-until-b4.md sha256:d68b77b933a8903d -->
 # ADR-0073 · La clave de la reserva vive fuera de CI hasta B4
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.es.md)
 
 ## Contexto
 

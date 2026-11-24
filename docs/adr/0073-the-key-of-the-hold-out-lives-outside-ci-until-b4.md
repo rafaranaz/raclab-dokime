@@ -1,6 +1,6 @@
 # ADR-0073 · The key of the hold-out lives outside CI until B4
 
-**Status:** accepted
+**Status:** accepted, amended by [ADR-0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md)
 
 ## Context
 

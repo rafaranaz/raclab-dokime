@@ -801,6 +801,10 @@ Its limits:
 - **The intervals are wide:** with these n, 0 false accepts of 1 says only that the rate is below
   0.79, and of 8 that it is below 0.32; the counts show that nothing was missed on this corpus, not
   a rate.
+- **The artifact of the first attempt, 14947688746, no longer exists:** the second attempt
+  replaced it, and GitHub gives 404 for it. Its file was downloaded before the run was started
+  again and is kept in `tests/corpus/runs/fd16c21/` with its sha256, which only this repository
+  vouches for.
 - **Stability rests on one pair of runs** of one commit, on the same runner image; a rerun does not
   change the code, so it measures only what varies without it.
 - **The run with the key is read from `held-out-run.toml`**, made on an earlier commit of `main`

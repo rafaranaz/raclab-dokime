@@ -33,6 +33,7 @@ whether its run had the key.
 
 - **BENCH-011** The bench shall give each count twice: over every case, and leaving out each good case whose witness the blind reading of B3a labels not isolated.
 - **BENCH-012** The bench shall take a witness as labelled not isolated by the blind reading when either reader gives it, as its last label, `not-isolated` or `undecidable` in `tests/corpus/blind/`, finding the witness of a good case by its commit in `tests/corpus/witnesses.toml`.
+- **BENCH-018** If a reader of the blind reading gives no label for a witness of `tests/corpus/blind/draw.toml`, then the bench shall stop with an error that names the reader and the witness.
 
 ## The withdrawn cases
 

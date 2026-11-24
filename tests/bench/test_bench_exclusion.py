@@ -1,9 +1,11 @@
-# SDD-EARS: BENCH-011 BENCH-012
+# SDD-EARS: BENCH-011 BENCH-012 BENCH-018
 from pathlib import Path
+
+import pytest
 
 from dokime.bench.corpus import read_corpus
 from dokime.bench.metrics import Count, counts
-from dokime.bench.results import read_run
+from dokime.bench.results import BenchError, read_run
 from tests.bench.corpora import RUNNABLE, write_corpus, write_results
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -31,3 +33,13 @@ def test_undecidable_counts_as_not_isolated_and_the_last_label_of_a_reader_count
 def test_in_the_corpus_of_this_repository_only_the_case_of_w30_is_left_out() -> None:
     corpus = read_corpus(REPOSITORY / "tests" / "corpus")
     assert corpus.excluded == frozenset({"python-semver/nextver-bumps-build-only-versions"})
+
+
+def test_a_reader_without_the_label_of_a_witness_stops_bench_naming_both(tmp_path: Path) -> None:
+    root = write_corpus(tmp_path / "corpus")
+    answer = root / "blind" / "answers" / "A-1.txt"
+    answer.write_text(answer.read_text().replace("W03 | isolated | - | r\n", "W03 isolated\n"))
+    with pytest.raises(BenchError) as stopped:
+        read_corpus(root)
+    assert "A" in str(stopped.value)
+    assert "W03" in str(stopped.value)

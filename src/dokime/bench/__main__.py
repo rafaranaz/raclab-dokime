@@ -8,7 +8,15 @@ from pathlib import Path
 from typing import Any
 
 from dokime.bench.corpus import read_corpus
-from dokime.bench.metrics import Count, Counts, changes, counts, hold_out, withdrawals
+from dokime.bench.metrics import (
+    Count,
+    Counts,
+    changes,
+    check_run,
+    counts,
+    hold_out,
+    withdrawals,
+)
 from dokime.bench.results import BenchError, read_run
 
 
@@ -46,7 +54,9 @@ def report(corpus_directory: Path, results: Path, again: Path | None) -> dict[st
         },
     }
     if again is not None:
-        found["changes"] = changes(run, read_run(again))
+        second = read_run(again)
+        check_run(corpus, second)
+        found["changes"] = changes(run, second)
     return found
 
 

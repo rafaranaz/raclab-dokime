@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from dokime.bench.__main__ import report
 from dokime.bench.corpus import read_corpus
 from dokime.bench.metrics import check_run
 from dokime.bench.results import BenchError, Result, read_run
@@ -48,3 +49,12 @@ def test_a_case_that_the_audit_runs_and_the_file_lacks_is_refused(tmp_path: Path
     run = read_run(write_results(tmp_path / "r.jsonl", lacking))
     with pytest.raises(BenchError, match="p/bad-held"):
         check_run(corpus, run)
+
+
+def test_a_second_file_that_lacks_a_case_is_refused_naming_it(tmp_path: Path) -> None:
+    corpus = write_corpus(tmp_path / "corpus")
+    first = write_results(tmp_path / "1.jsonl", RUNNABLE)
+    lacking = {k: v for k, v in RUNNABLE.items() if k != "p/bad-held"}
+    second = write_results(tmp_path / "2.jsonl", lacking)
+    with pytest.raises(BenchError, match="p/bad-held"):
+        report(corpus, first, second)

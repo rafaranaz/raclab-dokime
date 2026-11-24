@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:7fb44af7406d5b93 -->
+<!-- translation-of: ROADMAP.md sha256:baf99f5ec4a8980c -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -823,6 +823,9 @@ Sus límites:
 - **Los intervalos son anchos:** con estas n, 0 aceptos falsos de 1 solo dice que la tasa está por
   debajo de 0,79, y de 8 que está por debajo de 0,32; las cuentas muestran que en este corpus no se
   escapó nada, no una tasa.
+- **El artefacto del primer intento, 14947688746, ya no existe:** el segundo intento lo sustituyó, y
+  GitHub da 404 para él. Su fichero se descargó antes de relanzar la ejecución y se guarda en
+  `tests/corpus/runs/fd16c21/` con su sha256, que solo avala este repositorio.
 - **La estabilidad se apoya en un solo par de ejecuciones** de un commit, con la misma imagen del
   runner; un relanzamiento no cambia el código, así que solo mide lo que varía sin él.
 - **La ejecución con la clave se lee de `held-out-run.toml`**, hecha sobre un commit anterior de

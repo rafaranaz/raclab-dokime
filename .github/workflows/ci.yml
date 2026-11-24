@@ -97,6 +97,7 @@ jobs:
         if: steps.changes.outputs.run == 'true'
         env:
           DOKIME_CORPUS: "1"
+          DOKIME_CORPUS_RESULTS: ${{ github.workspace }}/results.jsonl
         run: |
           start=$(date +%s)
           set +e
@@ -119,6 +120,7 @@ jobs:
           echo "$RAN" > "parts/$PART/ran"
           echo "$STATUS" > "parts/$PART/status"
           if [ -f corpus.xml ]; then cp corpus.xml "parts/$PART/corpus.xml"; fi
+          if [ -f results.jsonl ]; then cp results.jsonl "parts/$PART/results.jsonl"; fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -158,11 +160,18 @@ jobs:
             results+=("--result=$part=$(cat "parts/$part/status" 2>/dev/null || echo nothing)")
           done
           uv run python -m tools.check_corpus_parts --parts parts --collection collection.txt \
-            "${results[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+            --results results.jsonl "${results[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$PARTS" != success ]; then
             echo "[corpus] the parts ended in $PARTS" | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+      # The results of every case of the run, one line each, that bench computes from (ADR-0081).
+      - uses: actions/upload-artifact@v7
+        if: hashFiles('results.jsonl') != ''
+        with:
+          name: corpus-results
+          path: results.jsonl
+          if-no-files-found: error
 
   governance:
     name: governance checks

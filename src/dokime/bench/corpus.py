@@ -89,6 +89,9 @@ def _not_isolated(blind: Path) -> frozenset[str]:
         for answer in sorted((blind / "answers").glob(f"{reader}-*.txt")):
             for witness, label, _ in _LABEL.findall(answer.read_text()):
                 last[witness] = label
+        missing = sorted(set(commits) - set(last))
+        if missing:
+            raise BenchError(f"reader {reader} of the blind reading gives no label for {missing}")
         found |= {commits[w] for w, label in last.items() if label in NOT_ISOLATED}
     return frozenset(found)
 

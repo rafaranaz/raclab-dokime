@@ -30,9 +30,10 @@ command writes JSON:
 - **`changes`**, with `--again`: the cases whose verdict or first failing gate differ between two
   files of results of the same commit; files of different commits are refused.
 
-`bench` stops with an error when a file of results gives more than one commit or differs in
-whether the key was given, names a case that the corpus does not hold, or lacks one that the audit
-of the corpus runs.
+`bench` stops with an error when a file of results, the second of `--again` included, gives more
+than one commit or differs in whether the key was given, names a case that the corpus does not
+hold, or lacks one that the audit of the corpus runs; and when a reader of the blind reading gives
+no label for a witness of `draw.toml`, naming the reader and the witness.
 
 Its limits:
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:871121c6e7787b02 -->
+<!-- translation-of: ROADMAP.md sha256:ca5f8cffe8aebb66 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -717,16 +717,16 @@ su veredicto y su primera puerta que falla esperados (#229, `tests/corpus/held-o
   observa cada ejemplo en un contenedor propio (#215, #216), con un arranque mediano de 0,503
   segundos en CI.
 - [x] **Los grupos,** sobre seis testigos que los dos lectores de B3a etiquetan como aislados,
-  cuatro en `function`, W07 y W34 gracias a las llamadas de la ADR-0079:
-  G1′ sobre W07 (`returns-not-implemented-for-a-malformed-collection` y cuatro malos, entre ellos la
-  comparación sobrecargada, un objeto igual a todo), G2 sobre W34 (cuatro, entre ellos el estado
-  guardado entre llamadas), G3 sobre W36 (tres: el gemelo de `nextver-bumps-build-only-versions`, el
-  gemelo de `nextver-changes-the-tests-to-fit` que cambia el token por defecto y una ocultación que
-  no toca ningún test), G4 sobre W16 (cuatro, sobreajuste que devuelve los resultados visibles y que
+  cuatro en `function`, W07 y W34 gracias a las llamadas de la ADR-0079: G1′ sobre W07
+  (`returns-not-implemented-for-a-malformed-collection` y cuatro malos, entre ellos la comparación
+  sobrecargada, un objeto igual a todo), G2 sobre W34 (cuatro, entre ellos el estado guardado entre
+  llamadas), G3 sobre W36 (tres: el gemelo de `nextver-bumps-build-only-versions`, el gemelo de
+  `nextver-changes-the-tests-to-fit` que cambia el token por defecto y una ocultación que no toca
+  ningún test), G4 sobre W16 (cuatro, sobreajuste que devuelve los resultados visibles y que
   coincide con las entradas visibles) y G5 sobre W20 y W18 (cuatro, gemelos sellados de
-  `replace-fixes-only-major` y de `fixes-only-a-code-block-before-the-blank`). La revisión llevó 20,
-  15, 15, 15 y 20 minutos, cada una con ayuda de la sesión que revisa el trabajo, y 15 más la del G1
-  retirado.
+  `replace-fixes-only-major` y de `fixes-only-a-code-block-before-the-blank`). La revisión llevó 20
+  minutos la de G1′, 20 la de G2 y 15 cada una las de G3, G4 y G5, todas con ayuda de la sesión que
+  revisa el trabajo, y 15 la del G1 retirado.
 - [x] **Los casos que solo caza la reserva:** ocho, etiquetados `fails-a-held-out-example` con
   `sealed-examples` como puerta; en CI no falla ninguna puerta y la puerta no se aplica, «the key is
   not here»; con la clave, que está en la máquina del mantenedor, cada uno falla en ella.
@@ -751,6 +751,8 @@ su veredicto y su primera puerta que falla esperados (#229, `tests/corpus/held-o
 
 Sus límites:
 
+- **La reserva se midió solo en dos proyectos:** python-semver, con cuatro contratos en
+  `function`, y mdformat, con uno en `cli`; cachetools no tiene ningún caso con lote sellado.
 - **Un `repr` falseado para todas las entradas pasa también los ejemplos reservados** (#219): un
   `$repr` es un texto, y la reserva solo caza un falseo limitado a lo visible.
 - **Los ejemplos reservados de G2 son entradas de los tests que añade el arreglo**, públicas en el

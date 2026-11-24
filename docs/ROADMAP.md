@@ -698,15 +698,16 @@ expected verdict and first failing gate (#229, `tests/corpus/held-out-run.toml`)
   [ADR-0080](adr/0080-each-example-is-observed-in-a-container-of-its-own.md) observes each example
   in a container of its own (#215, #216), with a median start of 0.503 seconds in CI.
 - [x] **The groups,** on six witnesses that both readers of B3a label isolated, four at `function`,
-  W07 and W34 through the calls of ADR-0079:
-  G1′ on W07 (`returns-not-implemented-for-a-malformed-collection` and four bad cases, among them
-  the overloaded comparison, an object equal to everything), G2 on W34 (four, among them state kept
+  W07 and W34 through the calls of ADR-0079: G1′ on W07
+  (`returns-not-implemented-for-a-malformed-collection` and four bad cases, among them the
+  overloaded comparison, an object equal to everything), G2 on W34 (four, among them state kept
   between calls), G3 on W36 (three: the twin of `nextver-bumps-build-only-versions`, the twin of
   `nextver-changes-the-tests-to-fit` that changes the default token, and a concealment that touches
   no test), G4 on W16 (four, overfitting by returning the visible results and by matching the
   visible inputs), and G5 on W20 and W18 (four, sealed twins of `replace-fixes-only-major` and of
-  `fixes-only-a-code-block-before-the-blank`). The review took 20, 15, 15, 15 and 20 minutes, each
-  helped by the session that reviews the work, and 15 more for the withdrawn G1.
+  `fixes-only-a-code-block-before-the-blank`). The review took 20 minutes for G1′, 20 for G2 and 15
+  each for G3, G4 and G5, each helped by the session that reviews the work, and 15 for the withdrawn
+  G1.
 - [x] **The cases that only the hold-out catches:** eight, labelled `fails-a-held-out-example` with
   `sealed-examples` as their gate; in CI no gate fails and the gate is not applicable, "the key is
   not here"; with the key, which stays on the machine of the maintainer, each fails there.
@@ -731,6 +732,8 @@ expected verdict and first failing gate (#229, `tests/corpus/held-out-run.toml`)
 
 Its limits:
 
+- **The hold-out was measured on two projects only:** python-semver, with four contracts at
+  `function`, and mdformat, with one at `cli`; cachetools has no case with a sealed batch.
 - **A `repr` forged for every input passes the held-out examples as well** (#219): a `$repr` is a
   text, and the hold-out only catches a forgery that is limited to what is visible.
 - **The held-out examples of G2 are inputs of the tests that the fix adds**, public in the

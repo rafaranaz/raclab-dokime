@@ -1,7 +1,7 @@
-<!-- translation-of: 0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md sha256:7ffffbc90aa989c8 -->
+<!-- translation-of: 0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md sha256:736fdc8ac46f2b1e -->
 # ADR-0030 · El arnés se mide sobre un conjunto de casos con veredicto conocido
 
-**Estado:** aceptada
+**Estado:** aceptada, enmendada por el [ADR-0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md)
 
 ## Contexto
 

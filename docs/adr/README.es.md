@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:7382d1b6ca295187 -->
+<!-- translation-of: README.md sha256:8fac9d219b55ac38 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -42,7 +42,7 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0027](0027-memory-has-one-layout-and-three-scopes.es.md) | La memoria tiene una estructura, dos almacenamientos y tres alcances | Aceptada |
 | [0028](0028-language-support-is-a-declarative-pack-with-levels.es.md) | El soporte de un lenguaje es un pack declarativo con niveles | Aceptada |
 | [0029](0029-build-order-starts-with-auditing.es.md) | El orden de construcción empieza por auditar un cambio que ya existe | Aceptada |
-| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Aceptada |
+| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.es.md) | El arnés se mide sobre un conjunto de casos con veredicto conocido | Aceptada, enmendada por el 0081 |
 | [0031](0031-modules-depend-only-on-core.es.md) | Los módulos dependen solo de core; los adaptadores solo los importa la raíz de composición | Aceptada |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.es.md) | La persona trabaja en su idioma, y la aprobación firma lo que se le mostró | Aceptada |
 | [0033](0033-a-specification-from-another-tool-enters-as-proposals.es.md) | Una especificación de otra herramienta entra como propuestas | Aceptada |
@@ -93,4 +93,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.es.md) | El job corpus se reparte en cuatro trozos y un job que los reúne | Aceptada |
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Aceptada |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.es.md) | Cada ejemplo se observa en un contenedor propio | Aceptada |
-| [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md) | bench calcula las métricas de los resultados que escribe el corpus | Propuesta |
+| [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md) | bench calcula las métricas de los resultados que escribe el corpus | Aceptada |

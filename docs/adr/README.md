@@ -40,7 +40,7 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0027](0027-memory-has-one-layout-and-three-scopes.md) | Memory has one layout, two storages and three scopes | Accepted |
 | [0028](0028-language-support-is-a-declarative-pack-with-levels.md) | Language support is a declarative pack with support levels | Accepted |
 | [0029](0029-build-order-starts-with-auditing.md) | The build order starts with auditing a change that already exists | Accepted |
-| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md) | The harness is measured on a corpus with known verdicts | Accepted |
+| [0030](0030-the-harness-is-measured-on-a-corpus-with-known-verdicts.md) | The harness is measured on a corpus with known verdicts | Accepted, amended by 0081 |
 | [0031](0031-modules-depend-only-on-core.md) | Modules depend only on core; adapters are imported only by the composition root | Accepted |
 | [0032](0032-bilingual-interaction-signs-what-was-shown.md) | The person works in their language, and the approval signs what was shown | Accepted |
 | [0033](0033-a-specification-from-another-tool-enters-as-proposals.md) | A specification from another tool enters as proposals | Accepted |
@@ -91,4 +91,4 @@ The [adr](../../.claude/skills/adr/SKILL.md) skill describes the format.
 | [0078](0078-the-job-corpus-is-split-into-four-parts-and-a-job-that-gathers-them.md) | The job corpus is split into four parts and a job that gathers them | Accepted |
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.md) | An example at function may call the methods of an object | Accepted |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.md) | Each example is observed in a container of its own | Accepted |
-| [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md) | bench computes the metrics from the results that the corpus writes | Proposed |
+| [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md) | bench computes the metrics from the results that the corpus writes | Accepted |

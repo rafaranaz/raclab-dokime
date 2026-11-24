@@ -1,7 +1,7 @@
-<!-- translation-of: 0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md sha256:2587120979ba7387 -->
+<!-- translation-of: 0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md sha256:4813475efaf4a7e5 -->
 # ADR-0081 · bench calcula las métricas de los resultados que escribe el corpus
 
-**Estado:** propuesta
+**Estado:** aceptada
 
 ## Contexto
 

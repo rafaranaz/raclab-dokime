@@ -1,4 +1,4 @@
-<!-- translation-of: 0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md sha256:e5a057afcad36a17 -->
+<!-- translation-of: 0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.md sha256:2587120979ba7387 -->
 # ADR-0081 · bench calcula las métricas de los resultados que escribe el corpus
 
 **Estado:** propuesta
@@ -24,11 +24,12 @@ Esto modifica la ADR-0030 en quién ejecuta las auditorías; el resto se mantien
 
 - **El test del corpus ejecuta las auditorías** y escribe, por cada caso que audita, una línea de
   JSON en un fichero de resultados: la clave del caso, su veredicto, su primera puerta que falla y
-  si se dio la clave. El trabajo `corpus` guarda los ficheros de sus trozos como artefacto.
+  si se dio la clave. Cada fichero registra el commit del repositorio en que corrió. El trabajo
+  `corpus` guarda los ficheros de sus trozos como artefacto.
 - **`bench` solo calcula.** Lee uno o más ficheros de resultados, con los datos del corpus en el
   repositorio: las etiquetas de los casos, `withdrawn.toml`, la lectura a ciegas de B3a,
   `witnesses.toml` y `held-out-run.toml`. No ejecuta ninguna auditoría, y no necesita ni la red ni
-  podman.
+  podman. Se niega a comparar para la estabilidad dos ficheros que corrieron en commits distintos.
 - **Cada cuenta dice si la ejecución tenía la clave.** Sin ella, un caso etiquetado
   `fails-a-held-out-example` pasa por diseño; para esa etiqueta, el valor de la reserva da las dos
   cifras, sin la clave y con ella.
@@ -56,8 +57,8 @@ que escribe la ejecución es lo que hace del cálculo un test propio, sin red.
 
 - `bench` es barato y se prueba sin red; la estabilidad necesita dos ficheros de resultados del
   mismo commit, lo que obliga a ejecutar otra vez el trabajo `corpus`.
-- El formato del fichero de resultados es un contrato entre el test del corpus y `bench`, y cambia
-  en los dos a la vez.
+- El formato del fichero de resultados, incluido el commit en que corrió, es un contrato entre el
+  test del corpus y `bench`, y cambia en los dos a la vez.
 - Un artefacto de CI caduca, así que los ficheros de resultados en los que se apoyan las cifras de
   una versión tienen que guardarse con esa versión.
 - Los minutos de una persona por cambio, una métrica de la ADR-0030, no los calcula B3e.

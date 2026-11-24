@@ -22,11 +22,12 @@ This amends ADR-0030 in who runs the audits; the rest of it stands.
 
 - **The test of the corpus runs the audits** and writes, for each case it audits, one line of JSON
   to a file of results: the key of the case, its verdict, its first failing gate, and whether the
-  key was given. The job `corpus` keeps the files of its parts as an artifact.
+  key was given. Each file records the commit of the repository that it ran on. The job `corpus`
+  keeps the files of its parts as an artifact.
 - **`bench` only computes.** It reads one or more files of results, with the data of the corpus
   in the repository: the labels of the cases, `withdrawn.toml`, the blind reading of B3a,
   `witnesses.toml` and `held-out-run.toml`. It runs no audit, and needs neither the network nor
-  podman.
+  podman. It refuses to compare two files for stability when they ran on different commits.
 - **Every count says whether the run had the key.** Without it, a case labelled
   `fails-a-held-out-example` passes by design; for that label the value of the hold-out gives both
   figures, without the key and with it.
@@ -54,8 +55,8 @@ network.
 
 - `bench` is cheap and tested without the network; stability needs two files of results of the
   same commit, which means running the job `corpus` again.
-- The format of the file of results is a contract between the test of the corpus and `bench`, and
-  changes in both at once.
+- The format of the file of results, the commit it ran on included, is a contract between the test
+  of the corpus and `bench`, and changes in both at once.
 - An artifact of CI expires, so the files of results that the figures of a version rest on have to
   be kept with that version.
 - The minutes of a person per change, a metric of ADR-0030, are not computed by B3e.

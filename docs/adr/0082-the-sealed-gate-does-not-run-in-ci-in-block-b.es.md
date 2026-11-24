@@ -1,4 +1,4 @@
-<!-- translation-of: 0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md sha256:9f3a9120379902da -->
+<!-- translation-of: 0082-the-sealed-gate-does-not-run-in-ci-in-block-b.md sha256:a77867fe5156429f -->
 # ADR-0082 · La puerta sellada no corre en CI en el bloque B
 
 **Estado:** propuesta
@@ -27,8 +27,10 @@ contra el propio arnés, T5, queda fuera del alcance de ese modelo de amenazas.
 ## Decisión
 
 - **La puerta `sealed-examples` no corre en CI en el bloque B.** La clave sigue fuera de CI con el
-  mecanismo de la ADR-0073: el mantenedor ejecuta la auditoría sellada en local, antes de fusionar, y
-  escribe la contraseña; en CI la puerta sigue sin aplicarse, con el motivo de que la clave no está.
+  mecanismo de la ADR-0073: el mantenedor ejecuta la auditoría sellada en local y escribe la
+  contraseña, no en cada pull request sino antes de fusionar uno que añade o cambia un caso o un
+  contrato con lote sellado, y al cerrar un bloque; en CI la puerta sigue sin aplicarse, con el motivo
+  de que la clave no está.
 - **No se publica en el pull request nada de una ejecución sellada local**: ni un estado del commit
   ni un comentario. Su evidencia se queda en el directorio `--out` de la ejecución, en la máquina del
   mantenedor; para el corpus, `held-out-run.toml` registra cada ejecución.
@@ -68,7 +70,10 @@ una sola persona ejecuta la puerta.
 - Un pull request no muestra nada de la reserva; quien fusiona tiene que saber que el mantenedor
   ejecutó la auditoría sellada, y el corpus lo guarda en `held-out-run.toml`.
 - La reserva depende de una persona y de una máquina. Los lotes del corpus se sellaron para un solo
-  destinatario, así que perder esa identidad los pierde, aunque la ADR-0073 pide un segundo
-  destinatario.
+  destinatario, aunque la ADR-0073 pide un segundo, así que perder esa identidad los perdería. Dos
+  cosas lo atenúan: el mantenedor guarda una copia de la identidad, cifrada con su contraseña, fuera
+  de la máquina en la que se hace el trabajo; y los lotes que se sellen a partir de ahora llevan el
+  segundo destinatario que pide la ADR-0073. Los lotes de hoy no se vuelven a sellar, porque los
+  ficheros de un caso no cambian una vez añadido (CORPUS-030).
 - El bloque C, en el que un agente escribe el cambio, tiene que decidir esto otra vez antes de
   apoyarse en la puerta.

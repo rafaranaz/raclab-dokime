@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:8fac9d219b55ac38 -->
+<!-- translation-of: README.md sha256:3c0b2f22f24010f8 -->
 <!-- translation-of: README.md sha256:7517fc99ee866217 -->
 # Registro de decisiones (ADR)
 
@@ -94,3 +94,4 @@ una razón clara: la nueva mejora lo que existe o resuelve un problema que se en
 | [0079](0079-an-example-at-function-may-call-the-methods-of-an-object.es.md) | Un ejemplo en function puede llamar a los métodos de un objeto | Aceptada |
 | [0080](0080-each-example-is-observed-in-a-container-of-its-own.es.md) | Cada ejemplo se observa en un contenedor propio | Aceptada |
 | [0081](0081-bench-computes-the-metrics-from-the-results-that-the-corpus-writes.es.md) | bench calcula las métricas de los resultados que escribe el corpus | Aceptada |
+| [0082](0082-the-sealed-gate-does-not-run-in-ci-in-block-b.es.md) | La puerta sellada no corre en CI en el bloque B | Propuesta |

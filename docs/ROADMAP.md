@@ -686,19 +686,82 @@ Its limits:
 - **The end-to-end test ran on classes of the standard library**, since `cachetools` and `semver`
   are only in the images of the corpus; W07 and W34 run on `semver` as cases of B3d.
 
+**B3d closed on 2026-11-24.** The corpus holds 32 cases that are not withdrawn, 10 good and 22 bad,
+against 12 at the close of B2: 20 new cases in five groups, each reviewed by the maintainer before it
+ran, and five withdrawn; 17 of them have a sealed batch, and the run with the key gave each its
+expected verdict and first failing gate (#229, `tests/corpus/held-out-run.toml`).
+
+- [x] **The intent sentences:** every good case has one in `tests/corpus/intents.toml`, quoted from
+  its project.
+- [x] **Before the cases, the state between examples:** a probe found that examples observed in one
+  container shared `/tmp`, `/dokime/out`, surviving processes and SysV IPC;
+  [ADR-0080](adr/0080-each-example-is-observed-in-a-container-of-its-own.md) observes each example
+  in a container of its own (#215, #216), with a median start of 0.503 seconds in CI.
+- [x] **The groups,** on six witnesses that both readers of B3a label isolated, four at `function`,
+  W07 and W34 through the calls of ADR-0079:
+  G1′ on W07 (`returns-not-implemented-for-a-malformed-collection` and four bad cases, among them
+  the overloaded comparison, an object equal to everything), G2 on W34 (four, among them state kept
+  between calls), G3 on W36 (three: the twin of `nextver-bumps-build-only-versions`, the twin of
+  `nextver-changes-the-tests-to-fit` that changes the default token, and a concealment that touches
+  no test), G4 on W16 (four, overfitting by returning the visible results and by matching the
+  visible inputs), and G5 on W20 and W18 (four, sealed twins of `replace-fixes-only-major` and of
+  `fixes-only-a-code-block-before-the-blank`). The review took 20, 15, 15, 15 and 20 minutes, each
+  helped by the session that reviews the work, and 15 more for the withdrawn G1.
+- [x] **The cases that only the hold-out catches:** eight, labelled `fails-a-held-out-example` with
+  `sealed-examples` as their gate; in CI no gate fails and the gate is not applicable, "the key is
+  not here"; with the key, which stays on the machine of the maintainer, each fails there.
+- [x] **The first run:** #224 took G1 to G5 out of `pending.toml`, and #227 took G1′; this departs
+  from the row, which named one pull request, because of the withdrawal of G1.
+- [x] **G1 withdrawn:** its good case failed at `protected-paths` on its first run, since its patch
+  changes the doctest `docs/usage/compare-versions.rst` and its contract allowed no test to change.
+  `tests/corpus/withdrawn.toml` keeps, for each of the five, the reason, the verdict and the first
+  failing gate of its first run and the case that replaces it (#224); the audit and the count leave
+  them out, and `bench` reports them apart, the good one as a false reject caused by its contract.
+  G1′ replaced them with a contract of its own and new inputs in every example, none in the
+  contract of G1, the commit of the witness or `witnesses.toml` (#225, #227).
+- [x] **The run with the key** first gave `sealed-batch-mismatch` for every case that reached
+  `sealed-examples`: each contract was sealed on a local commit of the recipients on top of the base
+  of its case, which the seal gives the batch as its base, and the test audited it without that
+  commit. `tests/corpus/seal-bases.toml` keeps what makes each commit again, the test makes it and
+  checks its hash, and a test seals and audits a contract with an identity made for it (#228). The
+  run then took two attempts, since `/tmp` filled; it is recorded as two runs.
+- [x] **The time of the corpus:** parts a and b went past 6 minutes in three runs in a row, and
+  each was split in two by a bit of the key of a case (#226); in the last run the six parts took
+  between 203 and 356 seconds of pytest.
+
+Its limits:
+
+- **A `repr` forged for every input passes the held-out examples as well** (#219): a `$repr` is a
+  text, and the hold-out only catches a forgery that is limited to what is visible.
+- **The held-out examples of G2 are inputs of the tests that the fix adds**, public in the
+  repository of the project, and one is in `witnesses.toml` in the name of a parametrized test; for
+  G2 the run with the key shows that dokime catches a patch that fits what is visible, not that what
+  is held out cannot be found out.
+- **A first step cannot use an alternative constructor**, a class method such as `Version.parse`
+  (#230); G2 builds its version with the class and keyword arguments.
+- **The base of G4 fails because of the limit of Python on converting integers of more than 4,300
+  digits**, which `PYTHONINTMAXSTRDIGITS` in the image could change.
+- **The test with an identity made for it shows only the pass of a good case;** a bad case that
+  fails at `sealed-examples` through the same path is missing, with the patch that special-cases the
+  visible inputs of B1.
+- **The audit of each case keeps its own storage of podman**, since the test points
+  `XDG_DATA_HOME` to an empty directory so that no identity is found by default; that is what filled
+  `/tmp` in the run with the key, and it may build the image of each case again in CI, which is not
+  measured.
+- **Part f took 360 and 356 seconds** in its last two runs, close to the 6 minutes of ADR-0078.
+- **Overfitting by excluding the visible input has no case of its own**, of those that the review of
+  the corpus left for B3; the others have one.
+- **No case of B3d has a relation:** only `idempotent` at `cli` is measured, in one case of B2;
+  `order-insensitive` and the relations at `function` still have no case.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the
 milestone that finds them:
 
-- **Before B3:** the cases that the review of the corpus left for it, held out and on the coverage
-  of a contract: a twin of `replace-fixes-only-major` that tests `None in parts.values()`, with the
-  sealed example `major=[1]`; a twin of `fixes-only-a-code-block-before-the-blank` that
-  special-cases `</pre>` and `</h1>`, with sealed examples of a quote, two `##` headings and a
-  `<div>` before a heading; a twin of `nextver-changes-the-tests-to-fit` with an example of
-  `bump_prerelease`; a concealment that touches no test; overfitting by returning the expected
-  value, by excluding the visible input or by matching it exactly; and `replace("1.2.3",
-  major=1.5)`, which returns `1.2.3`, a candidate of unspecified behaviour.
+- **Before B3e:** whether the audit of each case of the corpus keeps a storage of podman of its
+  own, which keeps the identity of the machine out of the audit but may build each image again, or
+  the cases share one, with the identity kept out another way; to be measured in CI first.
 - **At the close of block B:** a probe of a second language with Java, only at the boundary `cli`,
   in two phases: first try it without touching the code of dokime, then make three cases pass; with
   a limited time and without changing the central abstractions. The parts of dokime that depend on
@@ -709,6 +772,8 @@ milestone that finds them:
   `[l](u) next` and `[l](u)next`. The fix that an agent wrote for the same examples does not, and
   the current mdformat keeps the wider rule. A change that passes everything and makes a part of
   the program worse is what block D looks for.
+- **For block D:** `replace("1.2.3", major=1.5)`, which returns `1.2.3`, a candidate of
+  unspecified behaviour, left out of B3 for the gate of the differences of behaviour.
 - **Before C1:** what happens when two changes run at the same time on the same repository; and a
   limit of spending for a run, since the budgets of the flow count repetitions, not money; and the
   expected verdict of `replace-fixes-only-major` and `nextver-changes-the-tests-to-fit` under the

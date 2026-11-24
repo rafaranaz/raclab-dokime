@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:e7a47135532f7689 -->
+<!-- translation-of: ROADMAP.md sha256:871121c6e7787b02 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -704,20 +704,85 @@ Sus límites:
   `cachetools` y `semver` solo están en las imágenes del corpus; W07 y W34 se ejecutan sobre
   `semver` como casos de B3d.
 
+**B3d se cerró el 2026-11-24.** El corpus tiene 32 casos no retirados, 10 buenos y 22 malos, frente a
+12 al cerrar B2: 20 casos nuevos en cinco grupos, cada uno revisado por el mantenedor antes de
+ejecutarse, y cinco retirados; 17 tienen un lote sellado, y la ejecución con la clave dio a cada uno
+su veredicto y su primera puerta que falla esperados (#229, `tests/corpus/held-out-run.toml`).
+
+- [x] **Las frases de intención:** cada caso bueno tiene la suya en `tests/corpus/intents.toml`,
+  citada de su proyecto.
+- [x] **Antes de los casos, el estado entre ejemplos:** una sonda encontró que los ejemplos
+  observados en un mismo contenedor compartían `/tmp`, `/dokime/out`, procesos que sobrevivían e
+  IPC de SysV; la [ADR-0080](adr/0080-each-example-is-observed-in-a-container-of-its-own.es.md)
+  observa cada ejemplo en un contenedor propio (#215, #216), con un arranque mediano de 0,503
+  segundos en CI.
+- [x] **Los grupos,** sobre seis testigos que los dos lectores de B3a etiquetan como aislados,
+  cuatro en `function`, W07 y W34 gracias a las llamadas de la ADR-0079:
+  G1′ sobre W07 (`returns-not-implemented-for-a-malformed-collection` y cuatro malos, entre ellos la
+  comparación sobrecargada, un objeto igual a todo), G2 sobre W34 (cuatro, entre ellos el estado
+  guardado entre llamadas), G3 sobre W36 (tres: el gemelo de `nextver-bumps-build-only-versions`, el
+  gemelo de `nextver-changes-the-tests-to-fit` que cambia el token por defecto y una ocultación que
+  no toca ningún test), G4 sobre W16 (cuatro, sobreajuste que devuelve los resultados visibles y que
+  coincide con las entradas visibles) y G5 sobre W20 y W18 (cuatro, gemelos sellados de
+  `replace-fixes-only-major` y de `fixes-only-a-code-block-before-the-blank`). La revisión llevó 20,
+  15, 15, 15 y 20 minutos, cada una con ayuda de la sesión que revisa el trabajo, y 15 más la del G1
+  retirado.
+- [x] **Los casos que solo caza la reserva:** ocho, etiquetados `fails-a-held-out-example` con
+  `sealed-examples` como puerta; en CI no falla ninguna puerta y la puerta no se aplica, «the key is
+  not here»; con la clave, que está en la máquina del mantenedor, cada uno falla en ella.
+- [x] **La primera ejecución:** #224 sacó de `pending.toml` los grupos G1 a G5, y #227 sacó G1′; se
+  aparta de la fila, que nombraba un solo pull request, por la retirada de G1.
+- [x] **G1 retirado:** su caso bueno falló en `protected-paths` en su primera ejecución, porque su
+  parche cambia el doctest `docs/usage/compare-versions.rst` y su contrato no permitía cambiar ningún
+  test. `tests/corpus/withdrawn.toml` guarda de cada uno de los cinco el motivo, el veredicto y la
+  primera puerta que falló en su primera ejecución y el caso que lo sustituye (#224); la auditoría y
+  el recuento los dejan fuera, y `bench` informa de ellos aparte, el bueno como rechazo falso causado
+  por su contrato. G1′ los sustituyó con un contrato propio y entradas nuevas en todos los ejemplos,
+  ninguna en el contrato de G1, en el commit del testigo ni en `witnesses.toml` (#225, #227).
+- [x] **La ejecución con la clave** dio al principio `sealed-batch-mismatch` en cada caso que llegaba
+  a `sealed-examples`: cada contrato se selló sobre un commit local de los destinatarios encima de la
+  base de su caso, que el sellado da al lote como base, y el test lo auditaba sin ese commit.
+  `tests/corpus/seal-bases.toml` guarda lo que rehace cada commit, el test lo rehace y comprueba su
+  hash, y un test sella y audita un contrato con una identidad creada para él (#228). Después la
+  ejecución costó dos intentos, porque se llenó `/tmp`; se registra como dos ejecuciones.
+- [x] **El tiempo del corpus:** los trozos a y b pasaron de 6 minutos en tres ejecuciones seguidas,
+  y cada uno se partió en dos por un bit de la clave de un caso (#226); en la última ejecución los
+  seis trozos tardaron entre 203 y 356 segundos de pytest.
+
+Sus límites:
+
+- **Un `repr` falseado para todas las entradas pasa también los ejemplos reservados** (#219): un
+  `$repr` es un texto, y la reserva solo caza un falseo limitado a lo visible.
+- **Los ejemplos reservados de G2 son entradas de los tests que añade el arreglo**, públicas en el
+  repositorio del proyecto, y una está en `witnesses.toml` en el nombre de un test parametrizado;
+  para G2, la ejecución con la clave muestra que dokime caza un parche que encaja con lo visible, no
+  que lo reservado no se pueda averiguar.
+- **Un primer paso no puede usar un constructor alternativo**, un método de clase como
+  `Version.parse` (#230); G2 construye su versión con la clase y argumentos con nombre.
+- **La base de G4 falla por el límite de Python al convertir enteros de más de 4.300 dígitos**, que
+  `PYTHONINTMAXSTRDIGITS` en la imagen podría cambiar.
+- **El test con una identidad creada para él solo muestra el paso de un caso bueno;** falta un caso
+  malo que falle en `sealed-examples` por el mismo camino, con el parche de B1 que trata aparte las
+  entradas visibles.
+- **La auditoría de cada caso guarda su propio almacén de podman**, porque el test apunta
+  `XDG_DATA_HOME` a un directorio vacío para que no se encuentre ninguna identidad por defecto; eso
+  es lo que llenó `/tmp` en la ejecución con la clave, y puede que en CI construya otra vez la imagen
+  de cada caso, lo que no está medido.
+- **El trozo f tardó 360 y 356 segundos** en sus dos últimas ejecuciones, cerca de los 6 minutos de
+  la ADR-0078.
+- **El sobreajuste que excluye la entrada visible no tiene caso propio**, de los que la revisión del
+  corpus dejó para B3; los demás lo tienen.
+- **Ningún caso de B3d tiene una relación:** solo se mide `idempotent` en `cli`, en un caso de B2;
+  `order-insensitive` y las relaciones en `function` siguen sin caso.
+
 ### Queda por decidir
 
 Queda por decidir antes de abrir un hito. Se apunta aquí y no se decide en el hito que lo
 encuentra:
 
-- **Antes de B3:** los casos que la revisión del conjunto dejó para él, reservados y sobre
-  la cobertura de un contrato: un gemelo de `replace-fixes-only-major` que comprueba `None in
-  parts.values()`, con el ejemplo sellado `major=[1]`; un gemelo de
-  `fixes-only-a-code-block-before-the-blank` que trata aparte `</pre>` y `</h1>`, con ejemplos
-  sellados de una cita, dos encabezados `##` y un `<div>` antes de un encabezado; un gemelo de
-  `nextver-changes-the-tests-to-fit` con un ejemplo de `bump_prerelease`; una ocultación que no toca
-  ningún test; el sobreajuste que devuelve el valor esperado, excluye la entrada visible o coincide
-  con ella exactamente; y `replace("1.2.3", major=1.5)`, que devuelve `1.2.3`, un candidato de
-  comportamiento no especificado.
+- **Antes de B3e:** si la auditoría de cada caso del corpus guarda un almacén de podman propio, que
+  deja fuera de la auditoría la identidad de la máquina pero puede construir otra vez cada imagen, o
+  si los casos comparten uno y la identidad se deja fuera de otro modo; antes, medirlo en CI.
 - **Al cerrar el bloque B:** una sonda de un segundo lenguaje con Java, solo en la frontera `cli`, en
   dos fases: primero probarla sin tocar el código de dokime, después hacer pasar tres casos; con un
   tiempo limitado y sin cambiar las abstracciones centrales. Las partes de dokime que dependen de
@@ -728,6 +793,9 @@ encuentra:
   `a *b*` y `a*b*`, `[l](u) next` y `[l](u)next`. El arreglo que escribió un agente para los mismos
   ejemplos no lo hace, y el mdformat actual conserva la regla más amplia. Un cambio que lo pasa todo
   y empeora una parte del programa es lo que busca el bloque D.
+- **Para el bloque D:** `replace("1.2.3", major=1.5)`, que devuelve `1.2.3`, un candidato de
+  comportamiento no especificado, que queda fuera de B3 para la puerta de las diferencias de
+  comportamiento.
 - **Antes de C1:** qué pasa cuando dos cambios se ejecutan a la vez sobre el mismo repositorio; y un
   tope de gasto por ejecución, porque los presupuestos del flujo cuentan repeticiones, no dinero; y
   el veredicto esperado de `replace-fixes-only-major` y `nextver-changes-the-tests-to-fit` bajo el

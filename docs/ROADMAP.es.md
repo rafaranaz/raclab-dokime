@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:1c758f0daf1a83b2 -->
+<!-- translation-of: ROADMAP.md sha256:f8f7a7114bd2b318 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -979,7 +979,8 @@ nombran estos requisitos en la tabla de los invariantes. Lo que no cubre: el con
 a propósito, fuera del modelo de amenazas, y el lanzamiento del agente, bloque C. El registro de una
 ejecución que acaba en `sentinel-in-out` conserva el `evidence.built` de la evidencia que no se
 escribió. La auditoría sellada del corpus con la clave, con R2b fusionado, la ejecuta el mantenedor
-antes de R3.
+antes de R3. Queda para después: la búsqueda de `verify/sentinel.py` se hace pública y `interfaces`
+la usa, para que las dos búsquedas sean una sola.
 
 ### Queda por decidir
 

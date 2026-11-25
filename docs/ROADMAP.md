@@ -952,7 +952,9 @@ evidence when found, saying to move `--out` out of the reach of an agent ([#250]
 these requirements in the table of the invariants. What it does not cover: content transformed on
 purpose, outside the threat model, and the launch of the agent, block C. The ledger of a run that
 ends in `sentinel-in-out` keeps the `evidence.built` of the evidence that was not written. The
-sealed audit of the corpus with the key, with R2b merged, is run by the maintainer before R3.
+sealed audit of the corpus with the key, with R2b merged, is run by the maintainer before R3. Left
+for later: the search of `verify/sentinel.py` is made public and `interfaces` uses it, so that the
+two searches are one.
 
 ### Still to decide
 

@@ -72,4 +72,4 @@ def test_the_adaptations_give_only_their_fields_for_each_project() -> None:
     for name, entry in adaptations.items():
         assert sorted(entry) == ["files", "image", "minutes", "setup", "test"], name
         assert all(isinstance(text, str) for text in entry["files"].values()), name
-        assert entry["minutes"] is None or isinstance(entry["minutes"], int), name
+        assert entry["minutes"] == "not measured" or isinstance(entry["minutes"], int), name

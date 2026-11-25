@@ -1,0 +1,22 @@
+# The adaptations of each project for swarm-verify, the equivalent of its pack: made once for the
+# project, before any result is seen, the same for all its cases, and added to a local copy of the
+# base, never to the original. A value of `files` is the content of the file, or `generate: ` and
+# the command that writes it at the base. `minutes` is what the adaptation cost a person, or
+# "not measured".
+
+# A trial outside the corpus, at its commit 823ad60, to test the mount; not a project of R2.
+[humanize]
+image = "ghcr.io/astral-sh/uv@sha256:47965cdc9d53a515f68f78241161c901e70051ce428f12e791bd7fe19f6a631a"
+setup = "export SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 && uv sync --frozen --all-extras"
+test = "SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 uv run --frozen --all-extras python -m pytest -q"
+minutes = "not measured"
+
+[humanize.files]
+"swarm.toml" = """
+[verify]
+setup = "export SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 && uv sync --frozen --all-extras"
+
+[checks]
+test = { command = "SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 uv run --frozen --all-extras python -m pytest -q", kind = "test" }
+"""
+"uv.lock" = "generate: SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 uv lock"

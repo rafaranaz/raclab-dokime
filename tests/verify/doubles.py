@@ -127,7 +127,8 @@ class ObserverDouble:
     """The port that observes, in memory: each example returns what `answers.json` of the project
     says, a mapping from the example to the value, or a list of them, one for each call in turn; an
     example it does not name raises. A value `{"not_json": type}` is a value that JSON cannot hold,
-    with its `repr` when the mapping has `repr`."""
+    with its `repr` when the mapping has `repr`, and a value `{"reversed": text}` returns the text
+    reversed, so that a value can be answered without being written in the project."""
 
     calls: list[tuple[dict[str, str], tuple[ExampleRequest, ...]]] = field(default_factory=list)
     refusal: RefusalError | None = None
@@ -172,6 +173,8 @@ def _answered(value: object) -> StepObservation:
     if isinstance(value, dict) and "not_json" in value:
         kind = str(value["not_json"])
         return not_json(kind, str(value["repr"])) if "repr" in value else NotJson(type=kind)
+    if isinstance(value, dict) and "reversed" in value:
+        return Returned(value=str(value["reversed"])[::-1])
     return Returned(value=value)
 
 

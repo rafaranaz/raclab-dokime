@@ -162,3 +162,16 @@ for the run of the tests as for the observation of the examples.
 
 - **SANDBOX-126** When the adapter observes a list of requests, the adapter shall observe each example in a container of its own, so that no file, process or IPC object that one example leaves reaches another.
 - **SANDBOX-127** The time limit of an example shall count from the start of its child process in its container, so that it does not include the start of the container, which the limits of a run bound.
+
+### What enters the zone
+
+What the adapter passes into the container of an example is fixed, so that the search for the
+sentinel of `verify` (VERIFY-191), over the tree of the change and the requests, covers all that
+enters it that a run can change (INV-2, INV-3). The arguments of `podman run`, the mounts, the
+directory of the program and the environment are each fixed here; a change to any of them fails
+its test, so that it is made on purpose.
+
+- **SANDBOX-128** When examples are observed, the podman adapter shall mount into the container only the project read-only at `/dokime/project`, the directory of the program read-only at `/dokime/probe` and the output directory writable at `/dokime/out`, besides the `/tmp` of SANDBOX-027.
+- **SANDBOX-129** When examples are observed, the podman adapter shall write in the directory of the program only the program that observes and `requests.json`, with the time and the bytes of one example and the requests, and nothing of what is expected.
+- **SANDBOX-130** When examples are observed, the podman adapter shall set no variable of the environment of the container, so that the environment is that of the image with only the `HOME`, `HOSTNAME` and `container` that podman sets.
+- **SANDBOX-131** When examples are observed, the podman adapter shall call `podman run` with only the name of the container, the arguments of SANDBOX-020 to SANDBOX-029 for the limits of the run, the mounts of SANDBOX-128, the working directory `/dokime/project`, the image and the command `python -I -S` of the main program with the paths of the directory of the program and of the output directory.

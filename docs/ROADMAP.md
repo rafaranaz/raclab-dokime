@@ -940,6 +940,20 @@ to a block or a milestone that has closed
 ([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). What it does not check: that the
 requirements named are enough for their invariant, which stays a judgement of review.
 
+**R2b closed on 2026-11-25.** The sentinel of a sealed batch is the impossible value of its canary,
+which exists only in the batch. Before each sealed run the gate `sealed-examples` looks for it in
+the tree of the change and in the requests, `sentinel-in-zone`
+([#248](https://github.com/rafaranaz/raclab-dokime/pull/248)); a test fixes what the podman adapter
+passes into the zone, its arguments, mounts, files and environment, so that the search covers all
+that a run can change there ([#249](https://github.com/rafaranaz/raclab-dokime/pull/249)); after the
+run the command looks for it in `--out` and in the evidence, `sentinel-in-out`, and writes no
+evidence when found, saying to move `--out` out of the reach of an agent ([#250](https://github.com/rafaranaz/raclab-dokime/pull/250)). Each is an
+`ERROR`: the hold-out is compromised, from the agent or from the harness. INV-2 and INV-3 name
+these requirements in the table of the invariants. What it does not cover: content transformed on
+purpose, outside the threat model, and the launch of the agent, block C. The ledger of a run that
+ends in `sentinel-in-out` keeps the `evidence.built` of the evidence that was not written. The
+sealed audit of the corpus with the key, with R2b merged, is run by the maintainer before R3.
+
 ### Still to decide
 
 Still to decide before a milestone opens. They are written down here and not decided in the

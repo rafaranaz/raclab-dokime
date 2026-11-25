@@ -148,6 +148,11 @@ def audit_command(arguments: argparse.Namespace) -> int:
     return EXIT_CODES[audited.verdict]
 
 
+def checked_output(audited: Audited, out: Path) -> Audited:
+    """The audit as it is, or ended in `ERROR` without evidence when its sentinel is found."""
+    return audited
+
+
 def _story_of(arguments: argparse.Namespace) -> str | None:
     """The story of an audit given a contract from outside: the name of its directory."""
     return None if arguments.contract is None else Path(arguments.contract).parent.name

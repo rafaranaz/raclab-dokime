@@ -224,7 +224,9 @@ Found, the audit ends in `ERROR` with `sentinel-in-out` under `audit`, whose mes
 not the value, and no evidence is written: that output holds held-out content in clear, whether
 from the agent or from the harness (INV-3). The ledger was already written, and keeps its
 `evidence.built` and its `run.finished`; the missing evidence and the exit code say that the run is
-not taken as good.
+not taken as good. The files stay in `--out` for the diagnosis of the leak, so that directory holds
+held-out content in clear, which INV-3 does not allow within the reach of an agent: the message
+says to move it out of that reach, or to delete it once it has been looked at.
 
 ### The gate of the relations in `audit`
 

@@ -161,7 +161,8 @@ def checked_output(audited: Audited, out: Path) -> Audited:
         return audited
     message = (
         f"the sentinel of the sealed batch is in {where}: the output holds held-out content in"
-        " clear, so no evidence is written"
+        " clear, so no evidence is written; move the output directory out of the reach of an"
+        " agent, or have it deleted once it has been looked at"
     )
     found = Finding(code="sentinel-in-out", message=message, verdict=Verdict.ERROR)
     return replace(

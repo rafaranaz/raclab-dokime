@@ -299,6 +299,7 @@ def sealed_examples(
         observer,
         limits,
         1,
+        sentinel=batch.canary.expected,
     )
     if isinstance(observed, GateResult):
         return observed

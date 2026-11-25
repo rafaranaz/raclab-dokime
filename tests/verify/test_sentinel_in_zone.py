@@ -4,7 +4,7 @@ from tests.verify.gates import codes
 from tests.verify.sealed_contracts import IMPOSSIBLE, batch_of, held, run, split
 
 PAIR = (("E-h1", held("E-h1")), ("E-h2", held("E-h2")))
-HOLDS = {"E-h1": 2, "E-h2": 2}
+HOLDS: dict[str, object] = {"E-h1": 2, "E-h2": 2}
 
 
 def sentinel_in_zone(files: dict[str, str | tuple[str, str]]) -> None:

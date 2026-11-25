@@ -29,6 +29,7 @@ from dokime.core.verdicts import Verdict
 from dokime.oracle.compare import Comparison, compare
 from dokime.packs.model import Pack
 from dokime.verify.result import Checks, GateResult, checks_of
+from dokime.verify.sentinel import in_zone
 from dokime.verify.trees import base_tree, change_tree
 
 BASELINE = "baseline"
@@ -140,8 +141,12 @@ def _observe(
     observer: ExampleObserver,
     limits: ObservationLimits,
     runs: int,
+    sentinel: str | None = None,
 ) -> list[list[Comparison]] | GateResult:
-    """The comparisons of each example in each run, or the result of a gate that could not run."""
+    """The comparisons of each example in each run, or the result of a gate that could not run.
+
+    With a `sentinel`, the extracted tree and the requests are searched for it before anything is
+    observed, and a sentinel found is the only finding of the gate."""
     if not contract.examples:
         return GateResult(gate=gate, findings=())
     requests = tuple(request_of(example) for example in contract.examples)
@@ -151,6 +156,9 @@ def _observe(
             project = Path(work) / "project"
             project.mkdir()
             repository.extract(composed, project)
+            leaked = None if sentinel is None else in_zone(sentinel, project, requests)
+            if leaked is not None:
+                return GateResult(gate=gate, findings=(leaked,))
             observations = [observer.observe(image, project, requests, limits) for _ in range(runs)]
     except RefusalError as refusal:
         return GateResult(gate=gate, findings=(refusal.finding,))

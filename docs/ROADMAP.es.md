@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:4585317204c9a5a3 -->
+<!-- translation-of: ROADMAP.md sha256:1c758f0daf1a83b2 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -965,6 +965,21 @@ cuando una fila no tiene ni requisito ni destino, nombra un requisito que no exi
 bloque o un hito que se ha cerrado
 ([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). Lo que no comprueba: que los
 requisitos nombrados basten para su invariante, que sigue siendo un juicio de la revisión.
+
+**R2b se cerró el 2026-11-25.** El centinela de un lote sellado es el valor imposible de su
+canario, que solo existe en el lote. Antes de cada ejecución sellada la puerta `sealed-examples` lo
+busca en el árbol del cambio y en las peticiones, `sentinel-in-zone`
+([#248](https://github.com/rafaranaz/raclab-dokime/pull/248)); un test fija lo que el adaptador de
+podman pasa a la zona, sus argumentos, montajes, ficheros y entorno, para que la búsqueda cubra todo
+lo que una ejecución puede cambiar ahí ([#249](https://github.com/rafaranaz/raclab-dokime/pull/249));
+después de la ejecución la orden lo busca en `--out` y en la evidencia, `sentinel-in-out`, y no
+escribe evidencia si lo encuentra, diciendo que se aparte `--out` del alcance de un agente ([#250](https://github.com/rafaranaz/raclab-dokime/pull/250)).
+Cada uno es un `ERROR`: la reserva queda comprometida, venga del agente o del arnés. INV-2 e INV-3
+nombran estos requisitos en la tabla de los invariantes. Lo que no cubre: el contenido transformado
+a propósito, fuera del modelo de amenazas, y el lanzamiento del agente, bloque C. El registro de una
+ejecución que acaba en `sentinel-in-out` conserva el `evidence.built` de la evidencia que no se
+escribió. La auditoría sellada del corpus con la clave, con R2b fusionado, la ejecuta el mantenedor
+antes de R3.
 
 ### Queda por decidir
 

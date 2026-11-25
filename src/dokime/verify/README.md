@@ -104,6 +104,13 @@ result = sealed_examples(
   it holds, the gate gives `canary-passed`, an `ERROR`: the comparison accepts what cannot hold,
   the side of a false accept. When it fails, which it has to, it is no finding and no check, so it
   never counts as the failure of a requirement nor reaches the agent.
+- **The sentinel** is the impossible text of the canary, which exists only in the batch. Before
+  anything is observed, `verify.sentinel` looks for it in the tree of the change extracted for the
+  zone, in every path, in the bytes of every file and in the target of every link, never followed,
+  and in the JSON of every request. Found, the gate gives `sentinel-in-zone`, an `ERROR` whose
+  message does not hold the text, and observes nothing: the hold-out is not sealed, whether the
+  agent or the harness put it there. It looks for the text as it is; content transformed on
+  purpose is outside the threat model (INV-2, INV-3).
 - **The batch is checked before anything is observed**: it has to hold exactly the held-out
   examples of the contract, each with the digest of its salt and its text that the contract gives,
   and each text has to read as the example of its id, requirement and case. The split drawn again

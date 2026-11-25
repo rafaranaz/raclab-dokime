@@ -235,6 +235,12 @@ the conversion of the examples of a contract into black-box checks that swarm-ve
 the arm S2, and the adaptations of each project. Nothing of it runs on the corpus before the
 criteria of R1 are approved.
 
+The held-out examples of the corpus exist in clear only on the machine of the maintainer: the
+conversion of the held-out examples, their sealing for swarm-verify and the runs of S1 and S2 with
+sealed checks happen there, by commands that come with the runs of R2 and are reviewed before they
+run, because swarm-verify keeps its sealed checks, and the evidence of each run, in clear. What
+leaves that machine is the status of each case and the counts of each arm, after review.
+
 - **CORPUS-100** When examples of a contract are converted, the conversion shall write a new directory with the program that observes of dokime and the modules `core`, `contract`, `oracle` and `sandbox` of dokime, each as it is in `src/dokime`, one file for each example, a runner and a test file of pytest.
 - **CORPUS-101** When an example is converted, the conversion shall write it as JSON from which the runner rebuilds the same example that dokime read from the contract, its expectations included, with no code run to read it.
 - **CORPUS-102** If the directory to write already exists, or an id names no example of the contract, or the contract has a finding that keeps it from being read, then the conversion shall refuse with a message that says why and write nothing.
@@ -244,3 +250,4 @@ criteria of R1 are approved.
 - **CORPUS-106** Where the project has `.venv/bin/python`, the runner shall run the program that observes with it, so that the child imports what the environment of the project installed.
 - **CORPUS-107** When pytest collects the test file, the test file shall give one test for each example converted, which passes only when the runner exits with 0 for that example.
 - **CORPUS-108** The file of the adaptations shall give, for each project, the files that it adds to a local copy of the base, the image, the command of setup and the command of the tests, and the minutes that the adaptation cost, and nothing else; the minutes are a whole number for every project of the corpus, and only a project outside it may give `"not measured"`.
+- **CORPUS-109** The code of the contrast in `tests/corpus/contrast/` shall open no sealed batch of the corpus and use no identity of the sealed store, so that this machine never holds a held-out example of the corpus in clear.

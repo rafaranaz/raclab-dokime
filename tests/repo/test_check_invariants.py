@@ -18,7 +18,8 @@ REQUIREMENTS = frozenset({"CORE-001", "VERIFY-003"})
 
 
 def readme(*rows: str) -> str:
-    return "# Architecture\n\n## Invariants\n\nText.\n\n" + HEADER + "\n".join(rows) + "\n\n## Next\n"
+    table = HEADER + "\n".join(rows)
+    return "# Architecture\n\n## Invariants\n\nText.\n\n" + table + "\n\n## Next\n"
 
 
 def messages(text: str, roadmap: str = ROADMAP) -> list[str]:

@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-100 CORPUS-101 CORPUS-102 CORPUS-108
+# SDD-EARS: CORPUS-100 CORPUS-101 CORPUS-102 CORPUS-108 CORPUS-109
 """The conversion of the examples of a contract into black-box checks for swarm-verify (R2, S2),
 written for a small project of its own, never for the corpus."""
 
@@ -78,3 +78,22 @@ def test_the_adaptations_give_only_their_fields_for_each_project() -> None:
             assert isinstance(entry["minutes"], int), name
         else:
             assert entry["minutes"] == "not measured" or isinstance(entry["minutes"], int), name
+
+
+FORBIDDEN = (
+    "sealed.age",
+    "sealed_store",
+    "read_batch",
+    "load_identity",
+    "default_identity_path",
+    "AgeSealedStore",
+    "pyrage",
+    "DOKIME_CORPUS_IDENTITY",
+)
+
+
+def test_the_code_of_the_contrast_opens_no_sealed_batch_and_uses_no_identity() -> None:
+    for source in sorted(CONTRAST.glob("*.py")):
+        text = source.read_text()
+        found = [name for name in FORBIDDEN if name in text]
+        assert found == [], (source.name, found)

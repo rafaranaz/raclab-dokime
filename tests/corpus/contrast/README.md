@@ -10,6 +10,28 @@ expected values never enter the zone (INV-2).
 
 Nothing here runs on the corpus before the maintainer approves the criteria of R1.
 
+## Where the held-out examples of the corpus live
+
+The held-out examples of a case of the corpus exist in clear only where its sealed batch is opened,
+on the machine of the maintainer, and never on the machine where this code is written:
+
+- **On the machine of the maintainer only**, by commands that come with the runs of R2 and are
+  reviewed before they run: the conversion of the held-out examples, their sealing for swarm-verify
+  and the runs of S1 and S2 with sealed checks. Each run has its `SWARM_HOME` in a directory of its
+  own, deleted when the run ends; the bundles of evidence stay on that machine.
+- **What leaves that machine**, after review: the status of each case and, for each arm, how many
+  visible and how many held-out checks passed and how many failed. No id of a held-out check, no
+  `sealed/files/` and no log.
+- **Here**, the code of the contrast opens no sealed batch and uses no identity (CORPUS-109).
+
+The reason is a limit of swarm-verify, and a result for the table of R2: **its sealed checks and the
+evidence of its runs are in clear.** Both `seal` and `sealFiles` write the sealed files unencrypted
+in `$SWARM_HOME/sealed/<key>/files/`, in directories of mode 0700
+(`dist/verify/sealed-store.js` of 3.1.0, lines 97–104 and 181–185), and each bundle of evidence
+publishes them under `sealed/files/` (line 202). "Sealed" in swarm-verify means kept out of the
+workspace of the candidate, not encrypted. `sealFiles` (line 173) takes the files in memory, so the
+conversion need not write them to a workspace or a temporary file, though the store writes them.
+
 ## The arms
 
 R2 runs [swarm-verify](https://github.com/moonrunnerkc/swarm-verify) 3.1.0, from npm, pinned by

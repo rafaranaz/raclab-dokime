@@ -108,6 +108,7 @@ with the same commands.
 | Markdown links | `uv run python -m tools.check_links` | No broken links |
 | Spanish translations | `uv run python -m tools.check_translations` | Every document translated and up to date |
 | Decision records | `uv run python -m tools.check_adrs` | Every ADR from 0008 on states its basis; every ADR agrees with the index |
+| Invariants | `uv run python -m tools.check_invariants` | Every invariant names a requirement that enforces it or an open target; every requirement named exists; no target is closed |
 | Mermaid diagrams | `npm ci` once, then `uv run python -m tools.check_mermaid` | Every diagram renders; fails if the renderer is missing |
 | Tracked files that are ignored | `git ls-files --cached --ignored --exclude-standard` | Empty output |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <branch>` | No findings |

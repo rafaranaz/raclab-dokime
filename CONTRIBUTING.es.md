@@ -1,4 +1,4 @@
-<!-- translation-of: CONTRIBUTING.md sha256:44b9669b39270e89 -->
+<!-- translation-of: CONTRIBUTING.md sha256:eec14127b2751b95 -->
 # Cómo se trabaja en raclab-dokime
 
 *Read in [English](CONTRIBUTING.md).*
@@ -109,6 +109,7 @@ en local con los mismos comandos.
 | Enlaces en Markdown | `uv run python -m tools.check_links` | Sin enlaces rotos |
 | Traducciones al español | `uv run python -m tools.check_translations` | Todo documento traducido y al día |
 | Registros de decisión | `uv run python -m tools.check_adrs` | Todo ADR desde el 0008 dice en qué se apoya; todo ADR coincide con el índice |
+| Invariantes | `uv run python -m tools.check_invariants` | Todo invariante nombra un requisito que lo hace cumplir o un destino abierto; todo requisito nombrado existe; ningún destino está cerrado |
 | Diagramas Mermaid | `npm ci` una vez, y luego `uv run python -m tools.check_mermaid` | Todo diagrama se renderiza; falla si falta el renderizador |
 | Ficheros versionados e ignorados | `git ls-files --cached --ignored --exclude-standard` | Salida vacía |
 | Commits | `uv run python -m tools.check_commits --base origin/main --branch <rama>` | Sin hallazgos |

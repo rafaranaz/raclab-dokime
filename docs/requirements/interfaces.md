@@ -184,6 +184,7 @@ the identity of `--identity`, or of its default path when a file is there.
 - **INTERFACES-190** When the run opened the sealed batch, the run shall give the command the impossible value of the canary of the batch, the sentinel of VERIFY-191, so that the command can look for it in what the run wrote.
 - **INTERFACES-191** When the run that opened the sealed batch has ended, the command shall search, before it writes the evidence, for the sentinel in the path and the bytes of every file in `--out`, the target of a link as its text and never followed, and in the bytes of the evidence.
 - **INTERFACES-192** If the sentinel is in a path, a file or a link of `--out`, or in the evidence, then the command shall write no evidence, and end with the verdict `ERROR` and a finding `sentinel-in-out` under `audit` that names where it is and not the value, since that output holds held-out content in clear, whether from the agent or from the harness (INV-3).
+- **INTERFACES-193** When the command gives the finding `sentinel-in-out`, the command shall say in its message that the output directory holds held-out content in clear and has to be moved out of the reach of an agent, or deleted, once it has been looked at, since the files stay there for the diagnosis of the leak (INV-3).
 
 ## `audit`: the relations ([ADR-0076](../adr/0076-a-relation-runs-on-the-visible-examples-of-its-requirement.md))
 

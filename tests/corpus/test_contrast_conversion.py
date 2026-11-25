@@ -19,8 +19,10 @@ from tests.corpus.contrast.sample import (
     examples,
     project,
 )
+from tests.corpus.projects import PROJECTS
 
 __all__ = ["converted", "project"]
+CORPUS = {one.name for one in PROJECTS}
 
 
 def test_the_directory_holds_the_program_the_modules_the_examples_and_the_runner(
@@ -72,4 +74,7 @@ def test_the_adaptations_give_only_their_fields_for_each_project() -> None:
     for name, entry in adaptations.items():
         assert sorted(entry) == ["files", "image", "minutes", "setup", "test"], name
         assert all(isinstance(text, str) for text in entry["files"].values()), name
-        assert entry["minutes"] == "not measured" or isinstance(entry["minutes"], int), name
+        if name in CORPUS:
+            assert isinstance(entry["minutes"], int), name
+        else:
+            assert entry["minutes"] == "not measured" or isinstance(entry["minutes"], int), name

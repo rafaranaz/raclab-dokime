@@ -50,7 +50,9 @@ digest in `adaptations.toml`; the default image of swarm-verify is on Python 3.1
 `adaptations.toml` holds, for each project, what was added to a local copy of its base so that
 swarm-verify runs it: the files, the image, the command of setup and of the tests, and the minutes
 it cost. They are the equivalent of a pack: made once for the project, before any result is seen,
-and the same for all its cases. The entry `humanize` is the trial of the mount outside the corpus.
+and the same for all its cases. Every project of the corpus gives its minutes as a whole number;
+only a project outside it may give `"not measured"`, as the entry `humanize` does, the trial of the
+mount outside the corpus, which was not timed.
 
 ## What the trial on humanize found
 
@@ -68,8 +70,10 @@ And these are of the mount, solved by the adaptations:
 - swarm-verify hides `.git` in the container, so a project whose version comes from git
   (setuptools-scm) is `blocked` until the version is given in its setup.
 - `init --seal` checks on the host, outside the container, that the held-out check fails at the
-  base and passes on a reference patch, so the command of the tests has to run on both; `uv run
-  --frozen` with a `uv.lock` in the base does.
+  base and passes on a reference patch: `dist/verify/held-out-validation.js` of swarm-verify 3.1.0
+  runs it with `execution: hostExecution` (line 24), and the trial showed it, a command of
+  `.venv/bin/python` failing with exit 127 on the host. So the command of the tests has to run on
+  both; `uv run --frozen` with a `uv.lock` in the base does.
 - A requirement mapped to a whole check stays `unverified`: swarm-verify asks for a test that fails
   before the change and passes after it, so the requirements are mapped to tests by name,
   `test_dokime_example[<id>]`.

@@ -120,3 +120,12 @@ run, so that filling it fails on its size and not on the memory limit, and every
 within 64 MiB (`--ulimit fsize`), in the mounts of the disk too. Known limit: the output directory
 is a mount of the disk, whose total podman cannot bound; many files, each within 64 MiB, are bounded
 only by the time of the run.
+
+What enters the container of an example is fixed, each part by its test in
+`tests/sandbox/test_what_enters_the_zone.py`: the arguments of `podman run`, exactly; three mounts,
+the project and `/dokime/probe` read-only and `/dokime/out` writable, besides `/tmp`; in the
+directory of the program only the program and `requests.json`, with the limits of one example and
+the requests, nothing of what is expected; and no variable of the environment set by the adapter,
+so that the environment is that of the image with the `HOME`, `HOSTNAME` and `container` that
+podman sets. That is what lets the search for the sentinel of `verify`, over the tree of the change
+and the requests, cover all that a run can change in what enters (INV-2, INV-3).

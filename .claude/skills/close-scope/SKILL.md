@@ -52,6 +52,10 @@ disable it or lower its threshold without an ADR.
 its Spanish version in the same pull request:
 
 - Tick the exit criteria met.
+- **The note of a milestone or a block that closes begins in bold** with `**<id> closed on
+  <date>**`, `**<id> is done.**`, `**Block X closed on <date>**` or `**…, and block X with it**`.
+  `check_invariants` reads only those phrases to know that a target has closed (REPO-184): written
+  another way, a row of the invariants that still points to it passes in silence.
 - **When the scope closes a milestone**, update the note of the milestone with what was measured,
   the hypotheses it resolved (in the table of hypotheses) and the list "Still to decide": remove
   what was decided, and add what the milestone showed has to be decided before a later one.

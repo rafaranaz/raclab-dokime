@@ -906,7 +906,8 @@ block B:
   cases; the table of hypotheses says it becomes optional if it fails.
 - How the sealed gate runs when nobody is there to type a passphrase, in block C.
 - The second recipient of the sealed batches, and where the copy of the identity is kept.
-- The review of the work done and of the plan left, before block C opens.
+- The review of the work done and of the plan left, before block C opens: it is
+  [phase R](#phase-r--reconcile).
 
 ### Phase R · Reconcile
 
@@ -924,6 +925,20 @@ a real agent, and because the environment has changed. Block C does not open unt
 | R4 Outside pilot | A project and a person from outside, with a wrong example planted; minutes measured | Done, or postponed with its reason if there is no person |
 | R5 Boundaries and languages | A study of which boundaries and languages come after Python, `cli` and `function`; its scope is set by the maintainer | There is a recommendation |
 | R6 Course | The decision, with the criteria of R1 in front of it; an ADR of scope; the roadmap from block C on rewritten; each row of the invariants that points to R6 gets its block | Merged |
+
+**R0 closed on 2026-11-25.** The README and its Spanish version say the status at 0.2.0: which
+commands exist, what each checks and what is not built yet, with its block
+([#242](https://github.com/rafaranaz/raclab-dokime/pull/242)). The row of the decisions of the
+architecture index no longer gives a range
+([#243](https://github.com/rafaranaz/raclab-dokime/pull/243)). Phase R is in the roadmap
+([#244](https://github.com/rafaranaz/raclab-dokime/pull/244)). The table of the invariants says,
+for each one, the requirements that enforce it today and what is not built, with its block or
+milestone; it no longer describes as existing a replay command or a validator of the flow file
+([#245](https://github.com/rafaranaz/raclab-dokime/pull/245)). `check_invariants` fails in CI when
+a row has neither a requirement nor a target, names a requirement that does not exist, or points
+to a block or a milestone that has closed
+([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). What it does not check: that the
+requirements named are enough for their invariant, which stays a judgement of review.
 
 ### Still to decide
 

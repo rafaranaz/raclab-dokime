@@ -243,4 +243,4 @@ criteria of R1 are approved.
 - **CORPUS-105** If the program that observes ends with an error, then the runner shall exit with 2.
 - **CORPUS-106** Where the project has `.venv/bin/python`, the runner shall run the program that observes with it, so that the child imports what the environment of the project installed.
 - **CORPUS-107** When pytest collects the test file, the test file shall give one test for each example converted, which passes only when the runner exits with 0 for that example.
-- **CORPUS-108** The file of the adaptations shall give, for each project, the files that it adds to a local copy of the base, the image, the command of setup and the command of the tests, and the minutes that the adaptation cost, and nothing else.
+- **CORPUS-108** The file of the adaptations shall give, for each project, the files that it adds to a local copy of the base, the image, the command of setup and the command of the tests, and the minutes that the adaptation cost, and nothing else; the minutes are a whole number for every project of the corpus, and only a project outside it may give `"not measured"`.

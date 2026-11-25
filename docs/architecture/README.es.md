@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:a6eb1abe78eb44c5 -->
+<!-- translation-of: README.md sha256:ed6fec6fff7a4032 -->
 # Arquitectura de referencia
 
 *Read in [English](README.md).*
@@ -29,7 +29,7 @@ evidencia lo dice.
 | [03-data-and-evidence.es.md](03-data-and-evidence.es.md) | El contrato, el registro, la evidencia y un cambio de extremo a extremo |
 | [04-states-and-flows.es.md](04-states-and-flows.es.md) | Qué puede decir un fichero de flujo, qué rechaza el validador, las puertas y los dos flujos iniciales |
 | [glossary.es.md](glossary.es.md) | Los términos en que se apoyan los invariantes y las decisiones |
-| [Decisiones](../adr/README.es.md) | ADR 0008 a 0032, cada uno con su base y sus alternativas |
+| [Decisiones](../adr/README.es.md) | Cada decisión con su estado; desde el ADR-0008, cada uno dice su base y las alternativas consideradas |
 
 Las fases y los bloques de construcción están en la [hoja de ruta](../ROADMAP.es.md).
 

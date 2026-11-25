@@ -28,7 +28,7 @@ the same, the evidence says so.
 | [03-data-and-evidence.md](03-data-and-evidence.md) | The contract, the ledger, the evidence and a change from end to end |
 | [04-states-and-flows.md](04-states-and-flows.md) | What a flow file can say, what the validator rejects, the gates and the two starting flows |
 | [glossary.md](glossary.md) | The terms the invariants and the decisions rely on |
-| [Decisions](../adr/README.md) | ADRs 0008 to 0032, each with its basis and alternatives |
+| [Decisions](../adr/README.md) | Every decision with its status; from ADR-0008 on, each states its basis and the alternatives considered |
 
 The phases and the blocks of construction are in the [roadmap](../ROADMAP.md).
 

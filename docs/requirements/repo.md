@@ -57,6 +57,25 @@ template and has at least one test that declares it in its `SDD-EARS:` marker.
 - **REPO-091** When a decision record has no row in the index of decision records, the decision-record check shall report the record.
 - **REPO-092** When the status of a decision record differs from the status in its index row, the decision-record check shall report both statuses.
 
+## Invariants (`tools/check_invariants.py`)
+
+The table of the invariants in `docs/architecture/README.md` says, for each invariant, the
+requirements that enforce it today and what is not built yet with the block or the milestone of
+`docs/ROADMAP.md` that brings it. A requirement is named by its id, `<SCOPE>-<number>`; the ids
+that begin with `ADR-` or `INV-` are not requirements. A target is named as `block X`, a block of
+the table of blocks, or by the id of a milestone, a letter, a number and an optional lower-case
+letter (`R2b`), which is the start of the first cell of a row of a table of milestones.
+
+- **REPO-178** If `docs/architecture/README.md` has no table under its heading `## Invariants` whose columns are `Id`, `Invariant`, `Enforced today by` and `Not yet`, then the invariants check shall report the file with the columns it expects.
+- **REPO-179** If an id of an invariant appears in more than one row of the table, then the invariants check shall report the id.
+- **REPO-180** If a row names no requirement in `Enforced today by` and its `Not yet` is `—`, then the invariants check shall report the row, since its invariant then has neither a mechanism nor a target.
+- **REPO-181** If `Enforced today by` names a requirement that no file of `docs/requirements/` defines, then the invariants check shall report the row and the requirement.
+- **REPO-182** If `Not yet` is not `—` and names no target, then the invariants check shall report the row.
+- **REPO-183** If a target names a block that the table of blocks of `docs/ROADMAP.md` does not hold, or a milestone that no table of milestones of `docs/ROADMAP.md` holds, then the invariants check shall report the row and the target.
+- **REPO-184** The invariants check shall take a milestone as closed when `docs/ROADMAP.md` holds a bold text that begins with its id followed by `closed on` or `is done`, and a block as closed when it holds a bold text that begins with `Block X closed on` or ends with `and block X with it`.
+- **REPO-185** If a target of `Not yet` is closed, then the invariants check shall report the row and the target, since what the row says is not built has outlived the block or the milestone that was to bring it.
+- **REPO-186** The table of the invariants of this repository shall pass the invariants check.
+
 ## Import contracts (`pyproject.toml`, section `tool.importlinter`)
 
 - **REPO-100** When a module of the package imports a module that the dependency rules of the architecture forbid, the import check shall reject the package.

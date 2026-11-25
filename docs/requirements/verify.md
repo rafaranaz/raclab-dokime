@@ -139,6 +139,16 @@ decides when. Where the key is not, the gate is not applicable.
 - **VERIFY-167** The reason of the gate `sealed-examples` where the key is not shall be `the key is not here`.
 - **VERIFY-168** When the digests of the batch hold, the gate shall draw the split again from the seed, the examples kept visible and the order of the batch, over the visible and the held-out examples, and if the examples it holds out, or the cases that hold out nothing with their reasons, differ from those of the batch, then give the finding `sealed-batch-mismatch` and observe nothing.
 
+### The sentinel
+
+The impossible value of the canary is the sentinel of the batch: 32 hexadecimal digits from the
+randomness of the system, which exist only in the batch, so that finding them anywhere else means
+that the content of the batch left it in clear (INV-2, INV-3). A held-out example has no value that
+could serve so, since its expected values may be any common text.
+
+- **VERIFY-191** When the digests of the batch hold, the gate shall search, before it observes anything, for the impossible value of the canary in the path and the bytes of every file of the tree of the change that it extracted, the target of a link as its text and never followed, and in the JSON of every request that it gives the port that observes.
+- **VERIFY-192** If the impossible value of the canary is in a path, a file or a link of the tree of the change, or in a request, then the gate shall give a finding `sentinel-in-zone` of the verdict `ERROR` and observe nothing, since the hold-out is then not sealed, whether the agent or the harness put it there.
+
 ### What was already published
 
 An example is published when a version of the contract of the story in the history has it, by its

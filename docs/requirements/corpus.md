@@ -227,3 +227,20 @@ the value of a hold-out with secret examples, which B3 and B4 measure.
 - **CORPUS-070** When the tests of the corpus are asked for, the test of the audit of each case shall demand that the gate `sealed-examples`, when the run reaches it, is not applicable with the reason `the contract holds out no example`.
 - **CORPUS-071** When the tests of the corpus are asked for, the test of the sealed run shall seal a contract with an identity made for the test, audit a patch with that identity and its passphrase through a descriptor, and demand that no call of git or podman holds the path of the identity or its passphrase in its arguments, its environment or its build context, nor inherits the descriptor.
 - **CORPUS-072** The fixture of the sealed run shall record, for each patch, the verdict, the gate and the outcome of the gate `sealed-examples` that its sealed audit gave, each equal to the one it expected, and keep the evidence of that audit, which holds the hold-out when the gate observed and names no held-out example.
+
+### The contrast with swarm-verify (R2)
+
+R2 runs swarm-verify 3.1.0 on the cases of the corpus in three arms; `tests/corpus/contrast/` holds
+the conversion of the examples of a contract into black-box checks that swarm-verify can run, for
+the arm S2, and the adaptations of each project. Nothing of it runs on the corpus before the
+criteria of R1 are approved.
+
+- **CORPUS-100** When examples of a contract are converted, the conversion shall write a new directory with the program that observes of dokime and the modules `core`, `contract`, `oracle` and `sandbox` of dokime, each as it is in `src/dokime`, one file for each example, a runner and a test file of pytest.
+- **CORPUS-101** When an example is converted, the conversion shall write it as JSON from which the runner rebuilds the same example that dokime read from the contract, its expectations included, with no code run to read it.
+- **CORPUS-102** If the directory to write already exists, or an id names no example of the contract, or the contract has a finding that keeps it from being read, then the conversion shall refuse with a message that says why and write nothing.
+- **CORPUS-103** When the runner is run on an example from the root of a project, the runner shall observe the example with the program that observes in a process of its own, give it the request that the podman adapter gives for that example, and compare the observation with the oracle of dokime.
+- **CORPUS-104** When the example holds, the runner shall exit with 0, and when it does not hold, with 1.
+- **CORPUS-105** If the program that observes ends with an error, then the runner shall exit with 2.
+- **CORPUS-106** Where the project has `.venv/bin/python`, the runner shall run the program that observes with it, so that the child imports what the environment of the project installed.
+- **CORPUS-107** When pytest collects the test file, the test file shall give one test for each example converted, which passes only when the runner exits with 0 for that example.
+- **CORPUS-108** The file of the adaptations shall give, for each project, the files that it adds to a local copy of the base, the image, the command of setup and the command of the tests, and the minutes that the adaptation cost, and nothing else.

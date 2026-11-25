@@ -217,6 +217,15 @@ ADR-0075. With `--contract`, the entries `held_out` of the contract given have t
 base: a whole contract that was sealed, without them, is a `sealed-batch-mismatch` that says a
 local audit is made with the visible contract. The gate runs once `verify` lists it in `BUILT`.
 
+When the run opened the batch, it gives the command its sentinel, the impossible value of the
+canary (`Audited.sentinel`). Before it writes the evidence, the command looks for it in every path,
+file and link, never followed, of `--out`, where the ledger is, and in the bytes of the evidence.
+Found, the audit ends in `ERROR` with `sentinel-in-out` under `audit`, whose message says where and
+not the value, and no evidence is written: that output holds held-out content in clear, whether
+from the agent or from the harness (INV-3). The ledger was already written, and keeps its
+`evidence.built` and its `run.finished`; the missing evidence and the exit code say that the run is
+not taken as good.
+
 ### The gate of the relations in `audit`
 
 The command draws the seed of the relations of each audit from the randomness of the system, and

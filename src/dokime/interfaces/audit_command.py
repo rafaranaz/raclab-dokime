@@ -14,7 +14,7 @@ import os
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from dokime.core.findings import Finding
@@ -123,7 +123,7 @@ def audit_command(arguments: argparse.Namespace) -> int:
     out: Path = arguments.out
     as_json = arguments.format == "json"
     asked: list[CommitName | None] = []
-    audited = _audit(arguments, as_json, asked)
+    audited = checked_output(_audit(arguments, as_json, asked), Path(out))
     harness = Harness(_version(), asked[0] if asked else None, asked=bool(asked))
     evidence = None
     if audited.evidence is not None:
@@ -149,8 +149,40 @@ def audit_command(arguments: argparse.Namespace) -> int:
 
 
 def checked_output(audited: Audited, out: Path) -> Audited:
-    """The audit as it is, or ended in `ERROR` without evidence when its sentinel is found."""
-    return audited
+    """The audit as it is, or ended in `ERROR` without evidence when the sentinel of the batch
+    it opened is in a path, a file or a link of `out`, or in its evidence (INV-3)."""
+    if audited.sentinel is None:
+        return audited
+    sentinel = audited.sentinel.encode()
+    where = _in_output(sentinel, out)
+    if where is None and audited.evidence is not None and sentinel in audited.evidence.data:
+        where = "the evidence"
+    if where is None:
+        return audited
+    message = (
+        f"the sentinel of the sealed batch is in {where}: the output holds held-out content in"
+        " clear, so no evidence is written"
+    )
+    found = Finding(code="sentinel-in-out", message=message, verdict=Verdict.ERROR)
+    return replace(
+        audited, verdict=Verdict.ERROR, findings=(*audited.findings, found), evidence=None
+    )
+
+
+def _in_output(sentinel: bytes, out: Path) -> str | None:
+    """The first path of `out` whose name, target or bytes hold the sentinel; links not followed."""
+    for directory, directories, files in os.walk(out, followlinks=False):
+        for name in sorted((*directories, *files)):
+            path = Path(directory) / name
+            relative = path.relative_to(out).as_posix()
+            if sentinel in relative.encode():
+                return "a path of the output"
+            if path.is_symlink():
+                if sentinel in os.fsencode(os.readlink(path)):
+                    return f"the link {relative} of the output"
+            elif path.is_file() and sentinel in path.read_bytes():
+                return f"the file {relative} of the output"
+    return None
 
 
 def _story_of(arguments: argparse.Namespace) -> str | None:

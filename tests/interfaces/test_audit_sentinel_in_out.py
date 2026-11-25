@@ -8,7 +8,7 @@ from dokime.evidence.statement import Evidence
 from dokime.interfaces.audit import Audited
 from dokime.interfaces.audit_command import checked_output
 from tests.interfaces.audit_runs import audit
-from tests.interfaces.sealed_audits import IMPOSSIBLE, BATCH_BASE, StoreDouble, history
+from tests.interfaces.sealed_audits import BATCH_BASE, IMPOSSIBLE, StoreDouble, history
 from tests.interfaces.test_audit_sealed import HOLDS, run
 
 EVIDENCE = Evidence(

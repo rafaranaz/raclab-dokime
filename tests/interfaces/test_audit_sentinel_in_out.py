@@ -1,4 +1,4 @@
-# SDD-EARS: INTERFACES-190 INTERFACES-191 INTERFACES-192
+# SDD-EARS: INTERFACES-190 INTERFACES-191 INTERFACES-192 INTERFACES-193
 from pathlib import Path
 
 from dokime.core.findings import Finding
@@ -85,3 +85,11 @@ def test_an_audit_without_a_sentinel_is_not_searched(tmp_path: Path) -> None:
     out = output(tmp_path, {"ledger.jsonl": IMPOSSIBLE.encode()})
     unsealed = Audited(verdict=Verdict.PASS, evidence=EVIDENCE)
     assert checked_output(unsealed, out) == unsealed
+
+
+def test_the_message_says_to_move_or_delete_the_output_once_looked_at(tmp_path: Path) -> None:
+    out = output(tmp_path, {"ledger.jsonl": IMPOSSIBLE.encode()})
+    found = sentinel_in_out(checked_output(PASSED, out))
+    assert "held-out content in clear" in found.message
+    assert "out of the reach of an agent" in found.message
+    assert "deleted once it has been looked at" in found.message

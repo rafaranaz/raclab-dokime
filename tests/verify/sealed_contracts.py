@@ -122,14 +122,16 @@ def run(
     *,
     history: Callable[[CommitName], HistoryDouble] | None = None,
     ancestors: tuple[CommitName, ...] = (CommitName(BASE),),
+    files: dict[str, str | tuple[str, str]] | None = None,
 ) -> tuple[GateResult, ObserverDouble]:
     """Run the gate on a patch after which the observer returns `answers` by example, with the
     history of the contract that `history` gives for the base of the change, `history_of` unless
-    given, and the commits that the base of the change reaches."""
+    given, the commits that the base of the change reaches, and the other `files` that the patch
+    sets."""
     repository, observer = AuditedDouble(), ObserverDouble()
     base = repository.add({"answers.json": b"{}", "src/p.py": b"code"})
     repository.ancestry[base] = ancestors
-    changed = patch({"answers.json": json.dumps(answers), "src/p.py": "new"})
+    changed = patch({"answers.json": json.dumps(answers), "src/p.py": "new", **(files or {})})
     result = sealed_examples(
         PACK,
         contract,

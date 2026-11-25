@@ -37,7 +37,9 @@ def test_a_held_out_example_of_a_model_asks() -> None:
 def test_a_canary_that_holds_is_an_error_of_its_own() -> None:
     contract, sealed = split(*PAIR)
     result, _ = run(
-        contract, batch_of(contract, sealed), {"E-h1": 2, "E-h2": 2, "E-cana": IMPOSSIBLE}
+        contract,
+        batch_of(contract, sealed),
+        {"E-h1": 2, "E-h2": 2, "E-cana": {"reversed": IMPOSSIBLE[::-1]}},
     )
     (found,) = result.findings
     assert codes([found]) == [("canary-passed", Verdict.ERROR)]
@@ -46,7 +48,9 @@ def test_a_canary_that_holds_is_an_error_of_its_own() -> None:
 def test_no_finding_holds_a_value_an_input_or_an_identifier() -> None:
     contract, sealed = split(*PAIR)
     result, _ = run(
-        contract, batch_of(contract, sealed), {"E-h1": 99, "E-h2": 98, "E-cana": IMPOSSIBLE}
+        contract,
+        batch_of(contract, sealed),
+        {"E-h1": 99, "E-h2": 98, "E-cana": {"reversed": IMPOSSIBLE[::-1]}},
     )
     assert len(result.findings) == 3
     for finding in result.findings:

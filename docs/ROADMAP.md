@@ -77,6 +77,9 @@ closes. The order of blocks B and C was confirmed when block A closed: B before 
 C feeds the failures back to the agent until the change passes, and the hold-out is the defence
 against overfitting the visible examples ([ADR-0029](adr/0029-build-order-starts-with-auditing.md)).
 
+Between blocks B and C runs [phase R](#phase-r--reconcile), with no version. Block C does not open
+until its last milestone, R6, closes.
+
 **Block A closed on 2026-11-18**, with version 0.1.0; its
 [closing note](#block-a--closing-note) is after its milestones. Its first milestone, A0, had no
 code: it tested by hand the formats that the rest of the block depends on.
@@ -904,6 +907,23 @@ block B:
 - How the sealed gate runs when nobody is there to type a passphrase, in block C.
 - The second recipient of the sealed batches, and where the copy of the identity is kept.
 - The review of the work done and of the plan left, before block C opens.
+
+### Phase R · Reconcile
+
+Between blocks B and C, with no version. It opens because two hypotheses that the plan rests on are
+not tested, that dokime catches what a neighbouring verifier does not and that the hold-out catches
+a real agent, and because the environment has changed. Block C does not open until R6 closes.
+
+| Milestone | What | Closes when |
+|---|---|---|
+| R0 Cleanup | The README, the architecture index and the traceability of the invariants: the table and `check_invariants` | Merged |
+| R1 Criteria | The criteria of the decision of R6, written before anything is measured; the maintainer keeps them outside the repository until R6 | The maintainer has approved them |
+| R2 Contrast | swarm-verify, at a pinned version, on the 32 cases of the corpus | There is a table by technique |
+| R2b Sentinel | The search for the sentinel string in the zone before each sealed run (INV-2, INV-3) | Merged, before R3 |
+| R3 Real agents | Patches of two or three agents on the sealed contracts of the corpus, labelled blind and audited with and without the key | The value of the hold-out is known on patches that we did not write |
+| R4 Outside pilot | A project and a person from outside, with a wrong example planted; minutes measured | Done, or postponed with its reason if there is no person |
+| R5 Boundaries and languages | A study of which boundaries and languages come after Python, `cli` and `function`; its scope is set by the maintainer | There is a recommendation |
+| R6 Course | The decision, with the criteria of R1 in front of it; an ADR of scope; the roadmap from block C on rewritten; each row of the invariants that points to R6 gets its block | Merged |
 
 ### Still to decide
 

@@ -121,6 +121,7 @@ class Audited:
     gates: tuple[evidence.Gate, ...] = ()
     evidence: Evidence | None = None
     sentinel: str | None = None
+    """The impossible value of the canary of the sealed batch, when the run opened it."""
 
 
 def convert(
@@ -211,6 +212,7 @@ class _Run:
         self.sealed_decided: GateResult | None = None
         self.sealed_bytes: bytes | None = None
         self.holdout: evidence.Holdout | None = None
+        self.sentinel: str | None = None
         self.relation_runs: list[RelationsOutcome] = []
         """The outcome of the gate `relations` in each run of the verification."""
 
@@ -235,7 +237,12 @@ class _Run:
                         "findings": [f.code for f in outcome.findings],
                     },
                 )
-                return Audited(verdict=Verdict.ERROR, findings=outcome.findings, gates=tuple(gates))
+                return Audited(
+                    verdict=Verdict.ERROR,
+                    findings=outcome.findings,
+                    gates=tuple(gates),
+                    sentinel=self.sentinel,
+                )
             gates.extend(
                 convert(
                     entry,
@@ -250,7 +257,7 @@ class _Run:
         built = build(self._evidence(story, tree, verdict, tuple(gates)))
         self.ledger.record("evidence.built", {"digest": built.digest})
         self.ledger.record("run.finished", {"verdict": verdict.value})
-        return Audited(verdict=verdict, gates=tuple(gates), evidence=built)
+        return Audited(verdict=verdict, gates=tuple(gates), evidence=built, sentinel=self.sentinel)
 
     def _results(self, names: tuple[str, ...]) -> tuple[GateResult, ...]:
         """The results of the gates of a state; those of `verifying` as many times as the policy
@@ -407,6 +414,7 @@ class _Run:
             raise ValueError("the gate of the sealed examples runs only with its key and batch")
         try:
             batch = read_batch(store.open(sealed))
+            self.sentinel = batch.canary.expected
             changed = self._image_of_the_change(pack, contract, dockerfile)
         except RefusalError as refusal:
             return GateResult(gate=SEALED, findings=(refusal.finding,))

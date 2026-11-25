@@ -120,6 +120,7 @@ class Audited:
     findings: tuple[Finding, ...] = ()
     gates: tuple[evidence.Gate, ...] = ()
     evidence: Evidence | None = None
+    sentinel: str | None = None
 
 
 def convert(

@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:1e592e41645f3104 -->
+<!-- translation-of: ROADMAP.md sha256:662c457f106d0f67 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -79,6 +79,9 @@ cierra. El orden de los bloques B y C se confirmó al cerrar el bloque A: B ante
 bucle de C devuelve los fallos al agente hasta que el cambio pasa, y la reserva es la defensa contra
 el sobreajuste a los ejemplos visibles
 ([ADR-0029](adr/0029-build-order-starts-with-auditing.es.md)).
+
+Entre los bloques B y C va la [fase R](#fase-r--reconciliar), sin versión. El bloque C no se abre
+hasta que cierra su último hito, R6.
 
 **El bloque A se cerró el 2026-11-18**, con la versión 0.1.0; su
 [nota de cierre](#bloque-a--nota-de-cierre) está tras sus hitos. Su primer hito, A0, no tuvo código:
@@ -930,6 +933,23 @@ B:
 - Cómo corre la puerta sellada cuando no hay nadie para escribir una contraseña, en el bloque C.
 - El segundo destinatario de los lotes sellados, y dónde se guarda la copia de la identidad.
 - La revisión del trabajo hecho y del plan restante, antes de abrir el bloque C.
+
+### Fase R · Reconciliar
+
+Entre los bloques B y C, sin versión. Se abre porque dos hipótesis en las que descansa el plan no
+están probadas, que dokime caza lo que un verificador vecino no caza y que la reserva caza a un
+agente real, y porque el entorno ha cambiado. El bloque C no se abre hasta que cierra R6.
+
+| Hito | Qué | Cierra cuando |
+|---|---|---|
+| R0 Limpieza | El README, el índice de la arquitectura y la trazabilidad de los invariantes: la tabla y `check_invariants` | Fusionado |
+| R1 Criterios | Los criterios de la decisión de R6, escritos antes de medir nada; el mantenedor los guarda fuera del repositorio hasta R6 | El mantenedor los ha aprobado |
+| R2 Contraste | swarm-verify, en una versión fijada, sobre los 32 casos del corpus | Hay una tabla por técnica |
+| R2b Centinela | La búsqueda de la cadena centinela en la zona antes de cada ejecución sellada (INV-2, INV-3) | Fusionado, antes de R3 |
+| R3 Agentes reales | Parches de dos o tres agentes sobre los contratos sellados del corpus, etiquetados a ciegas y auditados con y sin la clave | Se conoce el valor de la reserva con parches que no escribimos |
+| R4 Piloto ajeno | Un proyecto y una persona de fuera, con un ejemplo erróneo plantado; minutos medidos | Hecho, o aplazado con su motivo si no hay persona |
+| R5 Fronteras y lenguajes | Un estudio de qué fronteras y lenguajes vienen después de Python, `cli` y `function`; su alcance lo fija el mantenedor | Hay una recomendación |
+| R6 Rumbo | La decisión, con los criterios de R1 delante; un ADR de alcance; la hoja de ruta del bloque C en adelante rehecha; cada fila de los invariantes que apunta a R6 recibe su bloque | Fusionado |
 
 ### Queda por decidir
 

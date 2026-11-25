@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:662c457f106d0f67 -->
+<!-- translation-of: ROADMAP.md sha256:4585317204c9a5a3 -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -932,7 +932,8 @@ B:
   construidos; la tabla de hipótesis dice que pasa a ser opcional si falla.
 - Cómo corre la puerta sellada cuando no hay nadie para escribir una contraseña, en el bloque C.
 - El segundo destinatario de los lotes sellados, y dónde se guarda la copia de la identidad.
-- La revisión del trabajo hecho y del plan restante, antes de abrir el bloque C.
+- La revisión del trabajo hecho y del plan restante, antes de abrir el bloque C: es la
+  [fase R](#fase-r--reconciliar).
 
 ### Fase R · Reconciliar
 
@@ -950,6 +951,20 @@ agente real, y porque el entorno ha cambiado. El bloque C no se abre hasta que c
 | R4 Piloto ajeno | Un proyecto y una persona de fuera, con un ejemplo erróneo plantado; minutos medidos | Hecho, o aplazado con su motivo si no hay persona |
 | R5 Fronteras y lenguajes | Un estudio de qué fronteras y lenguajes vienen después de Python, `cli` y `function`; su alcance lo fija el mantenedor | Hay una recomendación |
 | R6 Rumbo | La decisión, con los criterios de R1 delante; un ADR de alcance; la hoja de ruta del bloque C en adelante rehecha; cada fila de los invariantes que apunta a R6 recibe su bloque | Fusionado |
+
+**R0 se cerró el 2026-11-25.** El README y su versión en español dicen el estado en la 0.2.0: qué
+órdenes existen, qué comprueba cada una y qué no está construido todavía, con su bloque
+([#242](https://github.com/rafaranaz/raclab-dokime/pull/242)). La fila de las decisiones del
+índice de la arquitectura ya no da un rango
+([#243](https://github.com/rafaranaz/raclab-dokime/pull/243)). La fase R está en la hoja de ruta
+([#244](https://github.com/rafaranaz/raclab-dokime/pull/244)). La tabla de los invariantes dice,
+para cada uno, los requisitos que lo hacen cumplir hoy y lo que no está construido, con su bloque o
+su hito; ya no describe como existentes una orden de repetición ni un validador del fichero de flujo
+([#245](https://github.com/rafaranaz/raclab-dokime/pull/245)). `check_invariants` falla en CI
+cuando una fila no tiene ni requisito ni destino, nombra un requisito que no existe, o apunta a un
+bloque o un hito que se ha cerrado
+([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). Lo que no comprueba: que los
+requisitos nombrados basten para su invariante, que sigue siendo un juicio de la revisión.
 
 ### Queda por decidir
 

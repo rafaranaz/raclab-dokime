@@ -940,6 +940,11 @@ to a block or a milestone that has closed
 ([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). What it does not check: that the
 requirements named are enough for their invariant, which stays a judgement of review.
 
+**R1 closed on 2026-11-25.** The maintainer approved the criteria of the decision of R6 on that
+day, before anything of R2 to R5 was measured. They stay outside the repository until R6; their
+sha256 is written here so that R6 can show they did not change:
+`651cf8f3bd81619acf1dd8ab9dbb16a9c9c3098e95c8197132171987bce3fc03`.
+
 **R2b closed on 2026-11-25.** The sentinel of a sealed batch is the impossible value of its canary,
 which exists only in the batch. Before each sealed run the gate `sealed-examples` looks for it in
 the tree of the change and in the requests, `sentinel-in-zone`

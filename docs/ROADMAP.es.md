@@ -1,4 +1,4 @@
-<!-- translation-of: ROADMAP.md sha256:f8f7a7114bd2b318 -->
+<!-- translation-of: ROADMAP.md sha256:d5b2c7d2fbb597cd -->
 # Hoja de ruta
 
 *Read in [English](ROADMAP.md).*
@@ -965,6 +965,11 @@ cuando una fila no tiene ni requisito ni destino, nombra un requisito que no exi
 bloque o un hito que se ha cerrado
 ([#246](https://github.com/rafaranaz/raclab-dokime/pull/246)). Lo que no comprueba: que los
 requisitos nombrados basten para su invariante, que sigue siendo un juicio de la revisión.
+
+**R1 se cerró el 2026-11-25.** El mantenedor aprobó ese día los criterios de la decisión de R6,
+antes de medir nada de R2 a R5. Siguen fuera del repositorio hasta R6; su sha256 se escribe aquí
+para que R6 pueda mostrar que no cambiaron:
+`651cf8f3bd81619acf1dd8ab9dbb16a9c9c3098e95c8197132171987bce3fc03`.
 
 **R2b se cerró el 2026-11-25.** El centinela de un lote sellado es el valor imposible de su
 canario, que solo existe en el lote. Antes de cada ejecución sellada la puerta `sealed-examples` lo

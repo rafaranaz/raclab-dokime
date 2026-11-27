@@ -114,9 +114,24 @@ def test_in_s1_the_held_out_tests_are_those_the_witness_turned_green() -> None:
         ],
     }
     witness = ["tests.test_a::test_green[1]", "tests.test_a::test_green[2]"]
-    entry = entry_of("p/c", "S1", RESULT, observations, turned_green_by(witness))
+    entry = entry_of("p/c", "S1", RESULT, observations, turned_green_by(witness, {}))
     assert (entry.held_out_passed, entry.held_out_failed) == (1, 1)
     assert (entry.visible_passed, entry.visible_failed) == (0, 0)
+
+
+def test_in_s1_the_witness_tests_are_counted_under_the_path_where_they_were_sealed() -> None:
+    observations = {
+        "checks": [],
+        "sealed": [
+            observed("tests.test_a_witness::test_green[1]", "pass"),
+            observed("docs.u.x_witness.rst::x_witness.rst", "fail"),
+            observed("tests.test_a::test_green[1]", "pass"),
+        ],
+    }
+    witness = ["tests.test_a::test_green[1]", "docs.u.x.rst::x.rst"]
+    moved = {"tests/test_a.py": "tests/test_a_witness.py", "docs/u/x.rst": "docs/u/x_witness.rst"}
+    entry = entry_of("p/c", "S1", RESULT, observations, turned_green_by(witness, moved))
+    assert (entry.held_out_passed, entry.held_out_failed) == (1, 1)
 
 
 def only(failing: list[str], state: str = "incomplete") -> bool:

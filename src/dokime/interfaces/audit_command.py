@@ -38,6 +38,7 @@ from dokime.platform.sealed_store import (
     read_passphrase,
 )
 from dokime.sandbox.podman import PodmanRuntime
+from dokime.verify.sentinel import find_in_tree
 
 LEDGER = "ledger.jsonl"
 """The file of the ledger in the directory `--out`."""
@@ -171,19 +172,13 @@ def checked_output(audited: Audited, out: Path) -> Audited:
 
 
 def _in_output(sentinel: bytes, out: Path) -> str | None:
-    """The first path of `out` whose name, target or bytes hold the sentinel; links not followed."""
-    for directory, directories, files in os.walk(out, followlinks=False):
-        for name in sorted((*directories, *files)):
-            path = Path(directory) / name
-            relative = path.relative_to(out).as_posix()
-            if sentinel in relative.encode():
-                return "a path of the output"
-            if path.is_symlink():
-                if sentinel in os.fsencode(os.readlink(path)):
-                    return f"the link {relative} of the output"
-            elif path.is_file() and sentinel in path.read_bytes():
-                return f"the file {relative} of the output"
-    return None
+    """Where in `out` the sentinel is, named by its path unless the path itself holds it."""
+    place = find_in_tree(sentinel, out)
+    if place is None:
+        return None
+    if place.kind == "path":
+        return "a path of the output"
+    return f"the {place.kind} {place.relative} of the output"
 
 
 def _story_of(arguments: argparse.Namespace) -> str | None:

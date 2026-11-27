@@ -124,12 +124,12 @@ def test_in_s1_the_witness_tests_are_counted_under_the_path_where_they_were_seal
         "checks": [],
         "sealed": [
             observed("tests.test_a_witness::test_green[1]", "pass"),
-            observed("docs.u.x_witness.rst::x_witness.rst", "fail"),
+            observed("guide.u.x_witness.rst::x_witness.rst", "fail"),
             observed("tests.test_a::test_green[1]", "pass"),
         ],
     }
-    witness = ["tests.test_a::test_green[1]", "docs.u.x.rst::x.rst"]
-    moved = {"tests/test_a.py": "tests/test_a_witness.py", "docs/u/x.rst": "docs/u/x_witness.rst"}
+    witness = ["tests.test_a::test_green[1]", "guide.u.x.rst::x.rst"]
+    moved = {"tests/test_a.py": "tests/test_a_witness.py", "guide/u/x.rst": "guide/u/x_witness.rst"}
     entry = entry_of("p/c", "S1", RESULT, observations, turned_green_by(witness, moved))
     assert (entry.held_out_passed, entry.held_out_failed) == (1, 1)
 

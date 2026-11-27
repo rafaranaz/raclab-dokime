@@ -94,7 +94,10 @@ One thing that setup showed goes to the table of R2 as a result, as the maintain
 not adapted away. The three good patches of mdformat give in S0 `regression found`: the witness
 `27e2ba3` fixes the code and takes the mark `xfail` off the test that the fix turns green, while the
 good patch of the corpus holds only the code, so that test, still marked and with
-`xfail_strict = true`, passes and pytest counts it as failed. The bad cases of mdformat share the base.
+`xfail_strict = true`, passes and pytest counts it as failed. The bad cases of mdformat share the base. Each run records whether its rejection comes only
+from that test, public in the witness, and such rejections are counted apart, for good and bad cases
+alike, as blocked runs and failures of the mount are, so that they count neither as caught nor as a
+cost.
 
 ## What the trial on humanize found
 

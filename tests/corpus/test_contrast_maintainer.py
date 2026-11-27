@@ -39,6 +39,7 @@ ADAPTATION = {
     },
 }
 WITNESS_TEST = "def test_add():\n    from proj import add\n    assert add(1, 2) == 3\n"
+NEW_TEST = "def test_new():\n    pass\n"
 
 STAND_IN = r"""
 import json, os, subprocess, sys
@@ -117,6 +118,7 @@ def spec(tmp_path: Path, opened: tuple[AgeSealedStore, Path]) -> Spec:
     git(origin, "commit", "-q", "-m", "base")
     base = git(origin, "rev-parse", "HEAD")
     (origin / "tests" / "test_proj.py").write_text(WITNESS_TEST)
+    (origin / "tests" / "test_new.py").write_text(NEW_TEST)
     (origin / "README").write_text("the witness\n")
     git(origin, "add", "-A")
     git(origin, "commit", "-q", "-m", "witness")
@@ -228,10 +230,25 @@ def test_s1_seals_the_test_files_that_the_witness_changed_as_at_the_witness(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sealed = run(spec, "S1", opened, tmp_path, monkeypatch)["request"]["sealed"]
-    assert sealed["files"] == [{"path": "tests/test_proj.py", "content": WITNESS_TEST}]
+    assert sealed["files"] == [
+        {"path": "tests/test_new.py", "content": NEW_TEST},
+        {"path": "tests/test_proj_witness.py", "content": WITNESS_TEST},
+    ]
     (check,) = sealed["checks"]
-    assert check["command"] == check_command(TEST, ["tests/test_proj.py"])
+    paths = ["tests/test_new.py", "tests/test_proj_witness.py"]
+    assert check["command"] == check_command(TEST, paths)
     assert check["kind"] == "test"
+
+
+def test_s1_seals_no_file_at_a_path_that_the_base_tracks(
+    spec: Spec,
+    opened: tuple[AgeSealedStore, Path],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = run(spec, "S1", opened, tmp_path, monkeypatch)
+    sealed = {file["path"] for file in record["request"]["sealed"]["files"]}
+    assert sealed.isdisjoint(record["base_files"])
 
 
 def test_s2_lays_the_visible_examples_in_the_base_and_seals_the_held_out_ones(

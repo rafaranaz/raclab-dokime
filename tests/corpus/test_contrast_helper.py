@@ -82,6 +82,16 @@ REQUEST: dict[str, Any] = {
         }
     ],
     "sealed": None,
+    "requirements": [
+        {
+            "id": "R1",
+            "text": "a requirement",
+            "source": "user",
+            "kind": "fix",
+            "required": True,
+            "evidence": {"tests": [{"name": "t::test_x[E-1]"}]},
+        }
+    ],
 }
 
 
@@ -97,6 +107,7 @@ def test_the_helper_gives_the_request_to_verify_and_writes_its_result(tmp_path: 
     assert request["base"] == {"commit": "a" * 40}
     assert request["candidate"] == {"kind": "commit", "commit": "b" * 40}
     assert request["checks"] == REQUEST["checks"]
+    assert request["requirements"] == REQUEST["requirements"]
     assert request["artifacts"] == {"directory": "/work/evidence"}
     assert request["policy"]["execution"]["image"] == REQUEST["image"]
 

@@ -1,7 +1,7 @@
 """The command of the runs of R2, for the machine of the maintainer only, with docker.
 
     DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maintainer \\
-        OUT RESULTS [--clones DIR] [--case KEY]...
+        OUT RESULTS [--work DIR] [--clones DIR] [--case KEY]...
 
 asks for the passphrase of the identity on the terminal, then runs the arms S0, S1 and S2 of each
 case of the corpus that is not withdrawn, or of the cases given, with swarm-verify through
@@ -54,6 +54,7 @@ HERE = Path(__file__).resolve().parent
 CORPUS = HERE.parent
 HELPER = ("node", str(HERE / "run_arm.mjs"))
 ARMS = ("S0", "S1", "S2")
+REQUIREMENT = "R1"
 IDENTITY = "DOKIME_CORPUS_IDENTITY"
 AUTHOR = {
     "GIT_AUTHOR_NAME": "dokime contrast",
@@ -136,20 +137,26 @@ def held_out_examples(contract: str, batch: bytes) -> list[Example]:
 
 
 def run_arm(
-    spec: Spec, arm: str, opener: Opener, out: Path, helper: Sequence[str] = HELPER
+    spec: Spec,
+    arm: str,
+    opener: Opener,
+    out: Path,
+    helper: Sequence[str] = HELPER,
+    work: Path | None = None,
 ) -> Entry:
     """Run one arm on one case and give its entry; a failure of the mount or of the helper is
-    recorded by its kind, and the next run goes on."""
+    recorded by its kind, and the next run goes on. The local copy and the `SWARM_HOME` are made
+    in `work`, or in the temporary directory of the system."""
     evidence = out / spec.key.replace("/", "--") / arm
     with (
-        tempfile.TemporaryDirectory(prefix="dokime-r2-") as work,
-        tempfile.TemporaryDirectory(prefix="dokime-swarm-home-") as home,
+        tempfile.TemporaryDirectory(prefix="dokime-r2-", dir=work) as copy,
+        tempfile.TemporaryDirectory(prefix="dokime-swarm-home-", dir=work) as home,
     ):
         try:
-            prepared = _prepare(spec, arm, opener, Path(work))
+            prepared = _prepare(spec, arm, opener, Path(copy))
         except (subprocess.CalledProcessError, OSError, ValueError, KeyError):
             return failed_run(spec.key, arm, "mount")
-        repository, base, candidate, checks, sealed, held_out = prepared
+        repository, base, candidate, checks, sealed, held_out, requirements = prepared
         request = {
             "repository": str(repository),
             "base": base,
@@ -158,6 +165,7 @@ def run_arm(
             "out": str(evidence),
             "checks": checks,
             "sealed": sealed,
+            "requirements": requirements,
         }
         ended = subprocess.run(
             list(helper),
@@ -179,15 +187,25 @@ def run_arm(
 
 def _prepare(
     spec: Spec, arm: str, opener: Opener, work: Path
-) -> tuple[Path, str, str, list[dict[str, Any]], dict[str, Any] | None, Callable[[str], bool]]:
-    """The local copy of a run, its supplied checks, what it seals and which tests are held out."""
+) -> tuple[
+    Path,
+    str,
+    str,
+    list[dict[str, Any]],
+    dict[str, Any] | None,
+    Callable[[str], bool],
+    list[dict[str, Any]],
+]:
+    """The local copy of a run, its supplied checks, what it seals, which tests are held out and
+    the requirement it gives, none in S0."""
     test = str(spec.adaptation["test"])
+    read = check(spec.contract).contract
+    if read is None:
+        raise ValueError("the contract cannot be read")
     laid: dict[str, bytes] = {}
     checks: list[dict[str, Any]] = []
+    evidence: list[str] = []
     if arm == "S2":
-        read = check(spec.contract).contract
-        if read is None:
-            raise ValueError("the contract cannot be read")
         visible = files_of({example.id: example for example in read.examples})
         laid = {f"{VISIBLE}/{path}": content for path, content in visible.items()}
         command = check_command(test, [VISIBLE])
@@ -199,13 +217,15 @@ def _prepare(
                 "authority": "user-acceptance",
             }
         ]
+        module = VISIBLE.replace("/", ".") + ".test_dokime_examples"
+        evidence = [f"{module}::test_dokime_example[{example.id}]" for example in read.examples]
     repository, base, candidate = _mount(spec, work, laid)
     sealed: dict[str, Any] | None = None
     held_out: Callable[[str], bool] = in_held_out_conversion
     if arm == "S1":
-        files = _witness_files(spec, repository)
+        files, moved = _witness_files(spec, repository, base)
         sealed = _sealed(files, check_command(test, sorted(files)))
-        held_out = turned_green_by(spec.turned_green)
+        held_out = turned_green_by(spec.turned_green, moved)
     if arm == "S2" and spec.sealed is not None:
         examples = held_out_examples(spec.contract, opener(spec.sealed.read_bytes()))
         named = {f"h{n}": example for n, example in enumerate(examples, start=1)}
@@ -214,13 +234,32 @@ def _prepare(
             for path, content in files_of(named).items()
         }
         sealed = _sealed(files, check_command(test, [HELD_OUT]))
-    return repository, base, candidate, checks, sealed, held_out
+    requirements = []
+    if arm != "S0":
+        requirements = [
+            {
+                "id": REQUIREMENT,
+                "text": " ".join(requirement.text for requirement in read.requirements),
+                "source": "user",
+                "kind": "fix",
+                "required": True,
+                "evidence": {"tests": [{"name": name} for name in evidence]},
+            }
+        ]
+    return repository, base, candidate, checks, sealed, held_out, requirements
 
 
 def _sealed(files: Mapping[str, str], command: str) -> dict[str, Any]:
     return {
         "files": [{"path": path, "content": content} for path, content in sorted(files.items())],
-        "checks": [{"name": HELD_OUT_CHECK, "command": command, "kind": "test"}],
+        "checks": [
+            {
+                "name": HELD_OUT_CHECK,
+                "command": command,
+                "kind": "test",
+                "requirements": [REQUIREMENT],
+            }
+        ],
     }
 
 
@@ -254,18 +293,30 @@ def _mount(spec: Spec, work: Path, laid: Mapping[str, bytes]) -> tuple[Path, str
     return repository, base, _git(repository, "rev-parse", "HEAD")
 
 
-def _witness_files(spec: Spec, repository: Path) -> dict[str, str]:
-    """The files of the tests of the pack that the witness changed, as they are at the witness."""
+def _witness_files(
+    spec: Spec, repository: Path, base: str
+) -> tuple[dict[str, str], dict[str, str]]:
+    """The files of the tests of the pack that the witness changed, as they are at the witness,
+    each at a path that the base does not track, and the paths that were moved to get there."""
     changed = _git(
         repository, "diff", "--name-only", "--no-renames", f"{spec.witness}^", spec.witness
     )
-    files = {}
+    tracked = set(_git(repository, "ls-tree", "-r", "--name-only", base).splitlines())
+    files: dict[str, str] = {}
+    moved: dict[str, str] = {}
     for name in changed.splitlines():
         if any(PurePosixPath(name).full_match(glob) for glob in spec.pack_paths):
-            files[name] = _git(repository, "show", f"{spec.witness}:{name}", strip=False)
+            path = name
+            if name in tracked:
+                old = PurePosixPath(name)
+                path = str(old.with_name(f"{old.stem}_witness{old.suffix}"))
+                moved[name] = path
+            if path in tracked:
+                raise ValueError("the base tracks the path where the witness file goes")
+            files[path] = _git(repository, "show", f"{spec.witness}:{name}", strip=False)
     if not files:
         raise ValueError("the witness changed no file of the tests of the pack")
-    return files
+    return files, moved
 
 
 def _write(repository: Path, name: str, data: bytes) -> None:
@@ -298,6 +349,7 @@ def main(
     parser.add_argument("results", type=Path)
     parser.add_argument("--clones", type=Path)
     parser.add_argument("--case", action="append", default=[])
+    parser.add_argument("--work", type=Path)
     arguments = parser.parse_args(argv)
     identity = environ.get(IDENTITY, "")
     if not identity or not Path(identity).is_file():
@@ -310,7 +362,7 @@ def main(
     chosen = [case for case in ACTIVE if not arguments.case or case.key in arguments.case]
     for spec in specs(arguments.clones, chosen):
         for arm in ARMS:
-            entry = run_arm(spec, arm, store.open, arguments.out, helper)
+            entry = run_arm(spec, arm, store.open, arguments.out, helper, arguments.work)
             with arguments.results.open("a", encoding="utf-8") as results:
                 results.write(toml_of(entry))
             print(f"{entry.key} {entry.arm} {entry.state or entry.failure}", flush=True)

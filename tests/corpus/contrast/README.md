@@ -75,8 +75,13 @@ On the machine of the maintainer, with git, uv, node and docker:
 
 ```console
 $ (cd tests/corpus/contrast && npm ci)
-$ DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maintainer OUT RESULTS
+$ DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maintainer \
+    OUT RESULTS --work DIR
 ```
+
+`--work DIR` makes the local copies and the `SWARM_HOME` of each run in `DIR`, which should be on
+a disk with room: without it they go to the temporary directory of the system, `TMPDIR` or `/tmp`,
+which on the machine of the maintainer is a tmpfs of 2 GB (CORPUS-125).
 
 `maintainer.py` asks for the passphrase on the terminal and refuses to start without an identity
 (CORPUS-114). For each of the 32 cases that are not withdrawn, `--clones DIR` taking each project
@@ -88,7 +93,17 @@ from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it 
   the contract is committed in the base too, at `tests/dokime_visible/`, and given as a check of
   authority `user-acceptance` that runs the command of the tests of the adaptation on it alone.
 - **S1** seals the files of the tests of the pack that the witness of the good case changed, as
-  they are at the witness, with a check that runs the same command on them (CORPUS-117).
+  they are at the witness, with a check that runs the same command on them (CORPUS-117). A file
+  that the base already tracks is sealed beside it, as `<name>_witness<suffix>`, for the reason
+  below, and its tests are counted there (CORPUS-121).
+- **The requirement.** S1 and S2 give swarm-verify one requirement for the contract, `R1`, of the
+  kind `fix` and required, its text the requirements of the contract, with the sealed check bound to
+  it and, in S2, the tests of the visible conversion as its evidence (CORPUS-124). Without it a
+  check that fails at the base and still fails holds, as `inherited-failures`
+  (`dist/verify/acceptance.js:84`), so a patch that leaves a visible example failing would give
+  `complete`; with it, swarm-verify knows, as dokime does, that each example has to pass: a fix
+  needs a test that fails before and passes after, chosen by someone else than the author of the
+  patch (`acceptance.js:26-56`), and a mapped test that fails makes it `failed`.
 - **S2** seals, when the contract holds out examples (17 of the 32 cases, the 5 good ones with a
   batch and the bad ones derived from them), the conversion of the held-out examples of its batch,
   at `tests/dokime_held_out/`, under the names `h1`, `h2`... that carry no id (CORPUS-118). The
@@ -110,15 +125,27 @@ of the run that failed is the strict-xfail test of mdformat (CORPUS-122). `failu
 `helper` when the mount or the helper of Node failed, with no message, and the next run goes on
 (CORPUS-123).
 
-What it does not give swarm-verify: requirements. S2 gives its examples as checks, not mapped to
-requirements, so the status of the requirements is not measured; the state, the regression and
-the counts are.
+**Why a sealed file cannot go where the base tracks one**, from swarm-verify 3.1.0, a limit that
+goes to the table of R2. After the checks of the candidate, `dist/verify/candidate.js:149` keeps as
+the paths to restore only the test files that the candidate changed. `runSealedOnCandidate`
+(`dist/verify/held-out.js:126-139`) lays the sealed files into the tree of the candidate, runs
+them, restores only those paths, and records "the held-out run rewrote tracked files of the
+candidate" when the digest of the tree differs. That problem makes `policyMet` false
+(`dist/verify/assess.js:95`), and the state is `complete` only with it true
+(`dist/verify/acceptance.js:96`). So a sealed file at a tracked path the candidate did not change
+makes every run `incomplete`, whatever the patch: 8 of the 10 witnesses change test files that the
+base has, `tests/test_api.py` or `tests/test_replace.py` among them. A user of swarm-verify can hold
+out only new files.
 
 Before the review, the command ran its three arms here on the small project of its tests, with the
-real swarm-verify and docker and a batch made for the test, not on the corpus: S0 `complete`; S1
-`incomplete`, its held-out test passed; S2 `complete`, 5 visible examples passed and 1 failed, the
-one that the contract of the test gets wrong on purpose, and its held-out example passed. The only
-file that held the held-out example was the evidence of swarm-verify, under `sealed/files/`.
+real swarm-verify and docker and a batch made for the test, not on the corpus, its patch a comment
+that fixes nothing. The first time, with no requirement and the witness file at its own path, S1
+gave `incomplete` with its held-out test green, for the tracked file above, and S2 `complete` with
+a visible example failing, for the inherited failures. As it is now: S0 `complete`; S1 `incomplete`
+with `policyMet` true, its requirement `unverified` since the witness test passes at the base too;
+S2 `incomplete`, its requirement `failed` on the example that the contract of the test gets wrong
+on purpose, 5 visible examples passed and 1 failed, and the held-out one passed. The only file that
+held the held-out example was the evidence of swarm-verify, under `sealed/files/`.
 
 ## The adaptations of each project
 

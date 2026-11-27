@@ -3,6 +3,8 @@
 written for a small project of its own, never for the corpus."""
 
 import json
+import subprocess
+import sys
 import tomllib
 from pathlib import Path
 
@@ -38,6 +40,30 @@ def test_the_directory_holds_the_program_the_modules_the_examples_and_the_runner
     assert sorted(p.name for p in (converted / "examples").iterdir()) == [f"{i}.json" for i in IDS]
     assert (converted / "run.py").read_bytes() == (CONTRAST / "runner.py").read_bytes()
     assert (converted / "test_dokime_examples.py").is_file()
+    assert (converted / "conftest.py").is_file()
+
+
+def test_pytest_collects_only_the_examples_where_the_copies_cannot_be_imported(
+    converted: Path,
+) -> None:
+    project = converted.parents[1]
+    (project / "yaml.py").write_text('raise ImportError("PyYAML is not in this environment")\n')
+    collected = subprocess.run(
+        [
+            *(sys.executable, "-m", "pytest", "-p", "no:cacheprovider", "--collect-only", "-q"),
+            *("--doctest-modules", "tests/dokime_examples"),
+        ],
+        cwd=project,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert collected.returncode == 0, collected.stdout + collected.stderr
+    items = [line for line in collected.stdout.splitlines() if "::" in line]
+    assert sorted(items) == sorted(
+        f"tests/dokime_examples/test_dokime_examples.py::test_dokime_example[{name}]"
+        for name in IDS
+    )
 
 
 def test_each_example_is_rebuilt_from_its_json_as_dokime_read_it(converted: Path) -> None:

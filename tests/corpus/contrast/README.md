@@ -64,7 +64,10 @@ test check of the project collects it:
   `.venv/bin/python` of the project when it has one, and compares the observation with the oracle:
   exit 0 when the example holds, 1 when it does not, 2 when the program ended with an error;
 - `test_dokime_examples.py`, a copy of `checks_file.py`: one pytest test for each example, which
-  passes only when `run.py` exits with 0.
+  passes only when `run.py` exits with 0;
+- `conftest.py`, which keeps pytest from collecting the copies of dokime, `observe_program.py` and
+  `run.py`: they import what the project may not install, PyYAML among them, and a project that
+  collects the doctests of its modules, as python-semver does, would fail on them.
 
 The copies of dokime need Python 3.13, so the image of a run is uv on Python 3.13, pinned by its
 digest in `adaptations.toml`; the default image of swarm-verify is on Python 3.12.
@@ -79,7 +82,8 @@ $ DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maint
     OUT RESULTS --work DIR
 ```
 
-`--work DIR` makes the local copies and the `SWARM_HOME` of each run in `DIR`, which should be on
+`--work DIR` makes the local copies and the `SWARM_HOME` of each run in `DIR`, created when it does
+not exist, which should be on
 a disk with room: without it they go to the temporary directory of the system, `TMPDIR` or `/tmp`,
 which on the machine of the maintainer is a tmpfs of 2 GB (CORPUS-125).
 
@@ -93,7 +97,9 @@ from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it 
   the contract is committed in the base too, at `tests/dokime_visible/`, and given as a check of
   authority `user-acceptance` that runs the command of the tests of the adaptation on it alone.
 - **S1** seals the files of the tests of the pack that the witness of the good case changed, as
-  they are at the witness, with a check that runs the same command on them (CORPUS-117). A file
+  they are at the witness, with a check that runs the command of the tests of the adaptation as it
+  is, which collects them with the rest of the suite, since a file of tests may need what the rest
+  sets up (CORPUS-117). A file
   that the base already tracks is sealed beside it, as `<name>_witness<suffix>`, for the reason
   below, and its tests are counted there (CORPUS-121).
 - **The requirement.** S1 and S2 give swarm-verify one requirement for the contract, `R1`, of the
@@ -117,13 +123,31 @@ from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it 
 after review (CORPUS-120): the key of the case, the arm, the `state` and the `regression` that
 swarm-verify gave, `visible_passed` and `visible_failed`, `held_out_passed` and
 `held_out_failed`, `xfail_only` and `failure`, and nothing else. The counts are of tests, as they
-ran: the visible ones are the tests of `tests/dokime_visible/` in the visible check, one for each
-example; the held-out ones are, in S1, the tests that the witness turned green and, in S2, the
-tests of `tests/dokime_held_out/`, each as it ran in the sealed check (CORPUS-121). A test that did
+ran: the visible ones are the tests of the examples of `tests/dokime_visible/` in the visible check,
+one for each example (CORPUS-126); the held-out ones are, in S1, the tests that the witness turned green and, in S2, the
+tests of the examples of `tests/dokime_held_out/`, each as it ran in the sealed check
+(CORPUS-121). A test that did
 not pass counts as failed. `xfail_only` is true when the state is not `complete` and the only test
 of the run that failed is the strict-xfail test of mdformat (CORPUS-122). `failure` is `mount` or
 `helper` when the mount or the helper of Node failed, with no message, and the next run goes on
 (CORPUS-123).
+
+**The smoke run** of the maintainer on `python-semver/nextver-bumps-build-only-versions`, a good case
+with no batch, which dokime gives PASS, found two faults of the mount, both reproduced and fixed
+here, and neither a result:
+
+- S2 gave `complete` with 8 visible tests failed. They were no examples: under `--doctest-modules`
+  pytest imported 8 modules of the copies of dokime, which need PyYAML, absent from the environment
+  of the project, and failed on them at the base and after; the 13 examples passed. The conversion
+  now writes `conftest.py`, and the counts take only the tests of the examples.
+- S1 gave `incomplete` with 1 held-out test failed: the witness doctest of
+  `docs/usage/increase-parts-of-a-version_prereleases.rst`, which uses `Version` from the namespace
+  that the autouse fixture of `tests/conftest.py` fills, and so fails when the check runs the sealed
+  files alone, at its own path as well. The check now runs the whole command.
+
+Run again here after the fixes: S0 `complete`; S1 `complete`, its 6 witness tests passed and R1
+`satisfied`; S2 `complete`, 13 visible examples passed and none failed, R1 `satisfied`. The three
+arms of that case took about ten minutes on this machine.
 
 **Why a sealed file cannot go where the base tracks one**, from swarm-verify 3.1.0, a limit that
 goes to the table of R2. After the checks of the candidate, `dist/verify/candidate.js:149` keeps as

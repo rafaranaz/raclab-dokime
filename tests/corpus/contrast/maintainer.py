@@ -224,7 +224,7 @@ def _prepare(
     held_out: Callable[[str], bool] = in_held_out_conversion
     if arm == "S1":
         files, moved = _witness_files(spec, repository, base)
-        sealed = _sealed(files, check_command(test, sorted(files)))
+        sealed = _sealed(files, test)
         held_out = turned_green_by(spec.turned_green, moved)
     if arm == "S2" and spec.sealed is not None:
         examples = held_out_examples(spec.contract, opener(spec.sealed.read_bytes()))
@@ -359,6 +359,8 @@ def main(
     if findings:
         sys.stderr.write(f"maintainer: {', '.join(f.code for f in findings)}\n")
         return 2
+    if arguments.work is not None:
+        arguments.work.mkdir(parents=True, exist_ok=True)
     chosen = [case for case in ACTIVE if not arguments.case or case.key in arguments.case]
     for spec in specs(arguments.clones, chosen):
         for arm in ARMS:

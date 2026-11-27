@@ -19,6 +19,11 @@ from tests.corpus.contrast.runner import encode
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE.parents[2] / "src" / "dokime"
 MODULES = ("core", "contract", "oracle", "sandbox")
+CONFTEST = '''"""Only test_dokime_examples.py is collected here: the copies of dokime, the
+program that observes and the runner import what the project may not install."""
+
+collect_ignore = ["dokime", "observe_program.py", "run.py"]
+'''
 
 
 class ConversionError(Exception):
@@ -54,6 +59,7 @@ def files_of(examples: Mapping[str, Example]) -> dict[str, bytes]:
     files["observe_program.py"] = (SOURCE / "sandbox" / "observe_program.py").read_bytes()
     files["run.py"] = (HERE / "runner.py").read_bytes()
     files["test_dokime_examples.py"] = (HERE / "checks_file.py").read_bytes()
+    files["conftest.py"] = CONFTEST.encode("utf-8")
     for name, example in examples.items():
         text = json.dumps(encode(example), indent=2, ensure_ascii=False) + "\n"
         files[f"examples/{name}.json"] = text.encode("utf-8")

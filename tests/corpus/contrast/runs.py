@@ -66,7 +66,7 @@ def entry_of(
         for check in checks
         if check.get("name") == VISIBLE_CHECK
         for test in check.get("tests", [])
-        if str(test["id"]).startswith(_module(VISIBLE))
+        if _is_example(str(test["id"]), VISIBLE)
     ]
     sealed = [test for test in observations.get("sealed") or [] if held_out(str(test["id"]))]
     ran = [test for check in checks for test in check.get("tests", [])]
@@ -91,8 +91,13 @@ def entry_of(
 
 
 def in_held_out_conversion(test_id: str) -> bool:
-    """Whether a test is one of the sealed conversion of S2."""
-    return test_id.startswith(_module(HELD_OUT))
+    """Whether a test is one of the examples of the sealed conversion of S2."""
+    return _is_example(test_id, HELD_OUT)
+
+
+def _is_example(test_id: str, directory: str) -> bool:
+    """Whether a test is the test of an example of the conversion laid at `directory`."""
+    return test_id.startswith(f"{_module(directory)}test_dokime_examples::test_dokime_example[")
 
 
 def turned_green_by(witness: Iterable[str], moved: Mapping[str, str]) -> Callable[[str], bool]:

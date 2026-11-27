@@ -250,6 +250,27 @@ leaves that machine is the status of each case and the counts of each arm, after
 - **CORPUS-106** Where the project has `.venv/bin/python`, the runner shall run the program that observes with it, so that the child imports what the environment of the project installed.
 - **CORPUS-107** When pytest collects the test file, the test file shall give one test for each example converted, which passes only when the runner exits with 0 for that example.
 - **CORPUS-108** The file of the adaptations shall give, for each project, the files that it adds to a local copy of the base, the image, the command of setup and the command of the tests, and the minutes that the adaptation cost, and nothing else; the minutes are a whole number for every project of the corpus, and only a project outside it may give `"not measured"`.
-- **CORPUS-109** The code of the contrast in `tests/corpus/contrast/` shall open no sealed batch of the corpus and use no identity of the sealed store, so that this machine never holds a held-out example of the corpus in clear.
+- **CORPUS-109** Where a module of the contrast in `tests/corpus/contrast/` is not the command of the runs `maintainer.py`, the module shall open no sealed batch of the corpus and use no identity of the sealed store, so that the held-out examples of the corpus are in clear only where the maintainer runs that command.
 - **CORPUS-110** The file of the adaptations shall give an entry for every project of the corpus that has a case, so that every case of R2 runs with the adaptation of its project.
 - **CORPUS-111** The file of the adaptations shall give the image of every entry pinned by its digest, so that every run of a project uses the same image.
+
+#### The runs of R2
+
+`maintainer.py` runs the three arms on the machine of the maintainer, with docker, and is reviewed
+before it runs. It opens the sealed batches of the corpus there with the identity of the maintainer,
+so it is never run with that identity on the machine where this code is written, and its tests use
+an identity and a batch made for them. `run_arm.mjs` gives one request to swarm-verify, pinned by
+`package-lock.json`.
+
+- **CORPUS-112** The package of the contrast shall pin swarm-verify to the version 3.1.0 with its integrity `sha512-xpAfXmNioZQVadKqldljIjLX6cAtLAqxqU08CFZ1Nu6Qt6Ha7saJBd0UZsTUksue5oTb/u2XnHcrhU95e8DlGw==`.
+- **CORPUS-113** When the helper of Node is given a request on its input, the helper shall seal the files that the request gives in memory with `sealFiles`, when it gives any, call `verify()` of swarm-verify, and write the result as JSON on its output.
+- **CORPUS-114** If the variable `DOKIME_CORPUS_IDENTITY` does not name a file, then the command of the runs shall refuse with a message that says so and run nothing.
+- **CORPUS-115** When the command of the runs is run, the command shall run the arms S0, S1 and S2 for each case of the corpus that is not withdrawn, each in a local copy of the base of the case with the adaptation of its project and the patch of the case on top, and keep the evidence of each run in the directory given.
+- **CORPUS-116** When the command runs an arm, the command shall give swarm-verify a `SWARM_HOME` in a directory of its own and delete that directory when the run ends.
+- **CORPUS-117** When the command runs the arm S1, the command shall seal the files of the tests of the pack that the witness of the good case changed, as they are at the witness, with a check that runs the command of the tests of the adaptation.
+- **CORPUS-118** When the command runs the arm S2, the command shall lay the conversion of the visible examples of the contract in the base, give it as a check of authority `user-acceptance`, and seal the conversion of the held-out examples of its batch, when the contract holds out any, under names that carry no id of an example.
+- **CORPUS-119** The command shall give the held-out examples to the helper of Node only through its input, and write none of them to a file.
+- **CORPUS-120** When a run ends, the command shall write in the file of the results one entry with the key of the case, the arm, the state and the regression that swarm-verify gave, the tests of the visible checks and of the held-out checks that passed and that did not pass, whether the rejection comes only from the strict-xfail test of mdformat, and the kind of failure of the mount, and nothing else.
+- **CORPUS-121** When the command counts the held-out tests of a run, the command shall count, in S1, the tests that the witness turned green and, in S2, the tests of the sealed conversion, each as it ran in the sealed check.
+- **CORPUS-122** When swarm-verify does not give the state `complete` and the only test of the run that failed is the test of mdformat that the witness `27e2ba3` takes out of `xfail`, the command shall record that the rejection comes only from that test.
+- **CORPUS-123** If the mount of a run fails, or the helper of Node ends with an error, then the command shall record the kind of failure, `mount` or `helper`, with no message, and go on with the next run.

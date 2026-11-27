@@ -72,9 +72,29 @@ digest in `adaptations.toml`; the default image of swarm-verify is on Python 3.1
 `adaptations.toml` holds, for each project, what was added to a local copy of its base so that
 swarm-verify runs it: the files, the image, the command of setup and of the tests, and the minutes
 it cost. They are the equivalent of a pack: made once for the project, before any result is seen,
-and the same for all its cases. Every project of the corpus gives its minutes as a whole number;
-only a project outside it may give `"not measured"`, as the entry `humanize` does, the trial of the
-mount outside the corpus, which was not timed.
+and the same for all its cases. Every project of the corpus with a case has one (CORPUS-110), its
+image pinned by its digest (CORPUS-111). Every project of the corpus gives its minutes as a whole
+number; only a project outside it may give `"not measured"`, as the entry `humanize` does, the trial
+of the mount outside the corpus, which was not timed.
+
+The entries of mdformat and python-semver were set up on 2026-11-27, before any bad case ran:
+
+- **No file of the project is changed.** The tools of the tests are those of the pack, at the
+  versions of its Dockerfile, in an environment of their own under `.contrast/` with its `uv.lock`;
+  the project is imported from `src/`, as the pack does. A patch therefore cannot touch the
+  adaptation.
+- **The runs that set them up are setup, not results of R2**, and were not kept. Each adaptation was
+  laid on the base of every good case of its project with the good patch, and the tests were run on
+  the host; one good case of each project was run in the arm S0 with docker, to see the mount work
+  in the container.
+- **The minutes** are those of the session that set both up, about seven by the clock, split four
+  for mdformat and three for python-semver; they are not the minutes of a person.
+
+One thing that setup showed goes to the table of R2 as a result, as the maintainer decided, and was
+not adapted away. The three good patches of mdformat give in S0 `regression found`: the witness
+`27e2ba3` fixes the code and takes the mark `xfail` off the test that the fix turns green, while the
+good patch of the corpus holds only the code, so that test, still marked and with
+`xfail_strict = true`, passes and pytest counts it as failed. The bad cases of mdformat share the base.
 
 ## What the trial on humanize found
 

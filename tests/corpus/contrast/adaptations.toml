@@ -20,3 +20,79 @@ setup = "export SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 && uv sync --frozen --all-
 test = { command = "SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 uv run --frozen --all-extras python -m pytest -q", kind = "test" }
 """
 "uv.lock" = "generate: SETUPTOOLS_SCM_PRETEND_VERSION=4.15.0 uv lock"
+
+# The projects of the corpus, set up on 2026-11-27 before any bad case ran. The tools of the tests
+# are those of the pack, at the versions of its Dockerfile, in an environment of their own under
+# .contrast/, so that no file of the project is changed; the project is imported from src/, as in
+# the pack. The minutes are those of the session that set them up, by the clock, not of a person.
+[mdformat]
+image = "ghcr.io/astral-sh/uv@sha256:47965cdc9d53a515f68f78241161c901e70051ce428f12e791bd7fe19f6a631a"
+setup = "uv sync --frozen --project .contrast"
+test = "PYTHONPATH=src uv run --frozen --project .contrast python -m pytest -p no:cacheprovider -q tests"
+minutes = 4
+
+[mdformat.files]
+".contrast/pyproject.toml" = """
+[project]
+name = "contrast"
+version = "0"
+requires-python = "==3.13.*"
+dependencies = [
+    "pytest==8.3.4",
+    "pluggy==1.7.0",
+    "iniconfig==2.3.1",
+    "packaging==26.3",
+    "markdown-it-py==3.0.0",
+    "mdurl==0.1.2",
+]
+
+[tool.uv]
+package = false
+"""
+".contrast/.gitignore" = """
+.venv/
+"""
+".contrast/uv.lock" = "generate: uv lock --project .contrast"
+"swarm.toml" = """
+[verify]
+setup = "uv sync --frozen --project .contrast"
+
+[checks]
+test = { command = "PYTHONPATH=src uv run --frozen --project .contrast python -m pytest -p no:cacheprovider -q tests", kind = "test" }
+"""
+
+[python-semver]
+image = "ghcr.io/astral-sh/uv@sha256:47965cdc9d53a515f68f78241161c901e70051ce428f12e791bd7fe19f6a631a"
+setup = "uv sync --frozen --project .contrast"
+test = "PYTHONPATH=src COVERAGE_FILE=/tmp/.coverage uv run --frozen --project .contrast python -m pytest -p no:cacheprovider -q"
+minutes = 3
+
+[python-semver.files]
+".contrast/pyproject.toml" = """
+[project]
+name = "contrast"
+version = "0"
+requires-python = "==3.13.*"
+dependencies = [
+    "pytest==8.3.4",
+    "pluggy==1.7.0",
+    "iniconfig==2.3.1",
+    "packaging==26.3",
+    "pytest-cov==6.0.0",
+    "coverage==7.17.3",
+]
+
+[tool.uv]
+package = false
+"""
+".contrast/.gitignore" = """
+.venv/
+"""
+".contrast/uv.lock" = "generate: uv lock --project .contrast"
+"swarm.toml" = """
+[verify]
+setup = "uv sync --frozen --project .contrast"
+
+[checks]
+test = { command = "PYTHONPATH=src COVERAGE_FILE=/tmp/.coverage uv run --frozen --project .contrast python -m pytest -p no:cacheprovider -q", kind = "test" }
+"""

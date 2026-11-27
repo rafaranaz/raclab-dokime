@@ -92,8 +92,15 @@ FORBIDDEN = (
 )
 
 
-def test_the_code_of_the_contrast_opens_no_sealed_batch_and_uses_no_identity() -> None:
-    for source in sorted(CONTRAST.glob("*.py")):
-        text = source.read_text()
-        found = [name for name in FORBIDDEN if name in text]
-        assert found == [], (source.name, found)
+EXCEPTION = "maintainer.py"
+"""The command of the runs, the one module of the contrast that opens a sealed batch."""
+
+
+def test_only_the_command_of_the_runs_opens_a_sealed_batch_or_uses_an_identity() -> None:
+    using = sorted(
+        source.name
+        for source in CONTRAST.glob("*.*")
+        if source.suffix in (".py", ".mjs")
+        and any(name in source.read_text() for name in FORBIDDEN)
+    )
+    assert using == [EXCEPTION]

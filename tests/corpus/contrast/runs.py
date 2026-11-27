@@ -10,6 +10,7 @@ import json
 import shlex
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, fields
+from pathlib import PurePosixPath
 from typing import Any
 
 VISIBLE = "tests/dokime_visible"
@@ -94,10 +95,27 @@ def in_held_out_conversion(test_id: str) -> bool:
     return test_id.startswith(_module(HELD_OUT))
 
 
-def turned_green_by(witness: Iterable[str]) -> Callable[[str], bool]:
-    """Whether a test is one of those that the witness turned green, for S1."""
-    chosen = frozenset(witness)
+def turned_green_by(witness: Iterable[str], moved: Mapping[str, str]) -> Callable[[str], bool]:
+    """Whether a test is one of those that the witness turned green, for S1, under the path where
+    its file was sealed: `moved` maps the path of a file at the witness to that path."""
+    chosen = frozenset(_renamed(test_id, moved) for test_id in witness)
     return lambda test_id: test_id in chosen
+
+
+def _renamed(test_id: str, moved: Mapping[str, str]) -> str:
+    """The id of a test whose file was sealed at another path, as pytest gives it there: the dotted
+    path of the file, and for a document of doctests also the name of the file after `::`."""
+    module, _, rest = test_id.partition("::")
+    for old, new in moved.items():
+        if module == _dotted(old):
+            if rest == PurePosixPath(old).name:
+                rest = PurePosixPath(new).name
+            return f"{_dotted(new)}::{rest}"
+    return test_id
+
+
+def _dotted(path: str) -> str:
+    return path.removesuffix(".py").replace("/", ".")
 
 
 def toml_of(entry: Entry) -> str:

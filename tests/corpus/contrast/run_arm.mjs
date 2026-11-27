@@ -3,9 +3,10 @@
 //   node run_arm.mjs < REQUEST.json
 //
 // The request gives `repository`, `base`, `candidate` (a commit), `image`, `out` (the directory of
-// the evidence), `checks` (the supplied checks) and `sealed`: null, or the `files` to seal, each a
-// `path` and its `content` as text, with the `checks` that run them. The sealed files come only
-// through the input, and are sealed with sealFiles from memory into the SWARM_HOME of the process.
+// the evidence), `checks` (the supplied checks), `requirements` and `sealed`: null, or the `files`
+// to seal, each a `path` and its `content` as text, with the `checks` that run them. The sealed
+// files come only through the input, and are sealed with sealFiles from memory into the
+// SWARM_HOME of the process.
 import { requestVersion, sealFiles, verifierVersion, verify } from "swarm-verify";
 
 const chunks = [];
@@ -30,7 +31,7 @@ const result = await verify(
     repository: given.repository,
     base: { commit: given.base },
     candidate: { kind: "commit", commit: given.candidate },
-    requirements: [],
+    requirements: given.requirements,
     checks: given.checks,
     policy: { execution: { mode: "isolated", dependencies: "prepare", image: given.image } },
     artifacts: { directory: given.out },

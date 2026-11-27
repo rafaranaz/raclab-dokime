@@ -22,7 +22,9 @@ on the machine of the maintainer, and never on the machine where this code is wr
 - **What leaves that machine**, after review: the status of each case and, for each arm, how many
   visible and how many held-out checks passed and how many failed. No id of a held-out check, no
   `sealed/files/` and no log.
-- **Here**, the code of the contrast opens no sealed batch and uses no identity (CORPUS-109).
+- **Here**, no module of the contrast but `maintainer.py` opens a sealed batch or uses an identity
+  (CORPUS-109), and `maintainer.py` is run here only by its tests, with an identity and a batch made
+  for them.
 
 The reason is a limit of swarm-verify, and a result for the table of R2: **its sealed checks and the
 evidence of its runs are in clear.** Both `seal` and `sealFiles` write the sealed files unencrypted
@@ -66,6 +68,57 @@ test check of the project collects it:
 
 The copies of dokime need Python 3.13, so the image of a run is uv on Python 3.13, pinned by its
 digest in `adaptations.toml`; the default image of swarm-verify is on Python 3.12.
+
+## The runs
+
+On the machine of the maintainer, with git, uv, node and docker:
+
+```console
+$ (cd tests/corpus/contrast && npm ci)
+$ DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maintainer OUT RESULTS
+```
+
+`maintainer.py` asks for the passphrase on the terminal and refuses to start without an identity
+(CORPUS-114). For each of the 32 cases that are not withdrawn, `--clones DIR` taking each project
+from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it runs S0, S1 and S2
+(CORPUS-115):
+
+- **The mount.** A local copy of the base of the case, the adaptation of its project committed on
+  it, and the patch of the case committed on top. In S2 the conversion of the visible examples of
+  the contract is committed in the base too, at `tests/dokime_visible/`, and given as a check of
+  authority `user-acceptance` that runs the command of the tests of the adaptation on it alone.
+- **S1** seals the files of the tests of the pack that the witness of the good case changed, as
+  they are at the witness, with a check that runs the same command on them (CORPUS-117).
+- **S2** seals, when the contract holds out examples (17 of the 32 cases, the 5 good ones with a
+  batch and the bad ones derived from them), the conversion of the held-out examples of its batch,
+  at `tests/dokime_held_out/`, under the names `h1`, `h2`... that carry no id (CORPUS-118). The
+  batch is opened in memory and the files go to `run_arm.mjs` only through its input, which seals
+  them with `sealFiles` (CORPUS-113, CORPUS-119); the canary is not among them.
+- **Each run** gives swarm-verify a `SWARM_HOME` of its own, deleted when it ends (CORPUS-116), and
+  keeps its evidence in `OUT/<project>--<case>/<arm>/`. That evidence holds the sealed files in
+  clear, as said above, and stays on that machine.
+
+`RESULTS` receives one table `[[run]]` for each run, the only thing meant to leave that machine,
+after review (CORPUS-120): the key of the case, the arm, the `state` and the `regression` that
+swarm-verify gave, `visible_passed` and `visible_failed`, `held_out_passed` and
+`held_out_failed`, `xfail_only` and `failure`, and nothing else. The counts are of tests, as they
+ran: the visible ones are the tests of `tests/dokime_visible/` in the visible check, one for each
+example; the held-out ones are, in S1, the tests that the witness turned green and, in S2, the
+tests of `tests/dokime_held_out/`, each as it ran in the sealed check (CORPUS-121). A test that did
+not pass counts as failed. `xfail_only` is true when the state is not `complete` and the only test
+of the run that failed is the strict-xfail test of mdformat (CORPUS-122). `failure` is `mount` or
+`helper` when the mount or the helper of Node failed, with no message, and the next run goes on
+(CORPUS-123).
+
+What it does not give swarm-verify: requirements. S2 gives its examples as checks, not mapped to
+requirements, so the status of the requirements is not measured; the state, the regression and
+the counts are.
+
+Before the review, the command ran its three arms here on the small project of its tests, with the
+real swarm-verify and docker and a batch made for the test, not on the corpus: S0 `complete`; S1
+`incomplete`, its held-out test passed; S2 `complete`, 5 visible examples passed and 1 failed, the
+one that the contract of the test gets wrong on purpose, and its held-out example passed. The only
+file that held the held-out example was the evidence of swarm-verify, under `sealed/files/`.
 
 ## The adaptations of each project
 

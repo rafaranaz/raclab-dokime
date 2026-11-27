@@ -8,11 +8,12 @@ of dokime as they are, one JSON file for each example, `run.py` and `test_dokime
 """
 
 import json
-import shutil
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 
 from dokime.contract.check import check
+from dokime.contract.model import Example
 from tests.corpus.contrast.runner import encode
 
 HERE = Path(__file__).resolve().parent
@@ -36,18 +37,27 @@ def convert(contract_text: str, ids: list[str], out: Path) -> None:
     missing = [name for name in ids if name not in examples]
     if missing:
         raise ConversionError(f"no example of the contract has the id {', '.join(missing)}")
-    ignored = shutil.ignore_patterns("__pycache__", "README.md")
-    (out / "dokime").mkdir(parents=True)
-    shutil.copy(SOURCE / "__init__.py", out / "dokime" / "__init__.py")
+    for path, content in files_of({name: examples[name] for name in ids}).items():
+        target = out / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
+
+
+def files_of(examples: Mapping[str, Example]) -> dict[str, bytes]:
+    """The files of the conversion of `examples`, each under the name of its JSON file, by their
+    path relative to the directory of the conversion, in memory."""
+    files: dict[str, bytes] = {"dokime/__init__.py": (SOURCE / "__init__.py").read_bytes()}
     for module in MODULES:
-        shutil.copytree(SOURCE / module, out / "dokime" / module, ignore=ignored)
-    shutil.copy(SOURCE / "sandbox" / "observe_program.py", out / "observe_program.py")
-    shutil.copy(HERE / "runner.py", out / "run.py")
-    shutil.copy(HERE / "checks_file.py", out / "test_dokime_examples.py")
-    (out / "examples").mkdir()
-    for name in ids:
-        text = json.dumps(encode(examples[name]), indent=2, ensure_ascii=False) + "\n"
-        (out / "examples" / f"{name}.json").write_text(text, encoding="utf-8")
+        for path in sorted((SOURCE / module).rglob("*")):
+            if path.is_file() and "__pycache__" not in path.parts and path.name != "README.md":
+                files[f"dokime/{path.relative_to(SOURCE).as_posix()}"] = path.read_bytes()
+    files["observe_program.py"] = (SOURCE / "sandbox" / "observe_program.py").read_bytes()
+    files["run.py"] = (HERE / "runner.py").read_bytes()
+    files["test_dokime_examples.py"] = (HERE / "checks_file.py").read_bytes()
+    for name, example in examples.items():
+        text = json.dumps(encode(example), indent=2, ensure_ascii=False) + "\n"
+        files[f"examples/{name}.json"] = text.encode("utf-8")
+    return files
 
 
 def main(argv: list[str]) -> int:

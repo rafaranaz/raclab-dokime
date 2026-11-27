@@ -44,10 +44,10 @@ from tests.corpus.contrast.runs import (
     Entry,
     check_command,
     entry_of,
+    example_tests,
     failed_run,
-    in_held_out_conversion,
     toml_of,
-    turned_green_by,
+    witness_tests,
 )
 
 HERE = Path(__file__).resolve().parent
@@ -156,7 +156,7 @@ def run_arm(
             prepared = _prepare(spec, arm, opener, Path(copy))
         except (subprocess.CalledProcessError, OSError, ValueError, KeyError):
             return failed_run(spec.key, arm, "mount")
-        repository, base, candidate, checks, sealed, held_out, requirements = prepared
+        repository, base, candidate, checks, sealed, visible, held_out, requirements = prepared
         request = {
             "repository": str(repository),
             "base": base,
@@ -182,7 +182,7 @@ def run_arm(
             observations = json.loads((evidence / "observations.json").read_text())
         except (OSError, ValueError):
             return failed_run(spec.key, arm, "helper")
-    return entry_of(spec.key, arm, result, observations, held_out)
+    return entry_of(spec.key, arm, result, observations, visible, held_out)
 
 
 def _prepare(
@@ -193,11 +193,12 @@ def _prepare(
     str,
     list[dict[str, Any]],
     dict[str, Any] | None,
-    Callable[[str], bool],
+    frozenset[str],
+    frozenset[str],
     list[dict[str, Any]],
 ]:
-    """The local copy of a run, its supplied checks, what it seals, which tests are held out and
-    the requirement it gives, none in S0."""
+    """The local copy of a run, its supplied checks, what it seals, the visible and the held-out
+    tests it expects, and the requirement it gives, none in S0."""
     test = str(spec.adaptation["test"])
     read = check(spec.contract).contract
     if read is None:
@@ -206,8 +207,8 @@ def _prepare(
     checks: list[dict[str, Any]] = []
     evidence: list[str] = []
     if arm == "S2":
-        visible = files_of({example.id: example for example in read.examples})
-        laid = {f"{VISIBLE}/{path}": content for path, content in visible.items()}
+        converted = files_of({example.id: example for example in read.examples})
+        laid = {f"{VISIBLE}/{path}": content for path, content in converted.items()}
         command = check_command(test, [VISIBLE])
         checks = [
             {
@@ -221,11 +222,12 @@ def _prepare(
         evidence = [f"{module}::test_dokime_example[{example.id}]" for example in read.examples]
     repository, base, candidate = _mount(spec, work, laid)
     sealed: dict[str, Any] | None = None
-    held_out: Callable[[str], bool] = in_held_out_conversion
+    visible = example_tests(VISIBLE, [e.id for e in read.examples] if arm == "S2" else [])
+    held_out: frozenset[str] = frozenset()
     if arm == "S1":
         files, moved = _witness_files(spec, repository, base)
         sealed = _sealed(files, test)
-        held_out = turned_green_by(spec.turned_green, moved)
+        held_out = witness_tests(spec.turned_green, moved)
     if arm == "S2" and spec.sealed is not None:
         examples = held_out_examples(spec.contract, opener(spec.sealed.read_bytes()))
         named = {f"h{n}": example for n, example in enumerate(examples, start=1)}
@@ -234,6 +236,7 @@ def _prepare(
             for path, content in files_of(named).items()
         }
         sealed = _sealed(files, check_command(test, [HELD_OUT]))
+        held_out = example_tests(HELD_OUT, named)
     requirements = []
     if arm != "S0":
         requirements = [
@@ -246,7 +249,7 @@ def _prepare(
                 "evidence": {"tests": [{"name": name} for name in evidence]},
             }
         ]
-    return repository, base, candidate, checks, sealed, held_out, requirements
+    return repository, base, candidate, checks, sealed, visible, held_out, requirements
 
 
 def _sealed(files: Mapping[str, str], command: str) -> dict[str, Any]:

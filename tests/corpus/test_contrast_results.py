@@ -1,4 +1,4 @@
-# SDD-EARS: CORPUS-120 CORPUS-121 CORPUS-122 CORPUS-123
+# SDD-EARS: CORPUS-120 CORPUS-121 CORPUS-122 CORPUS-123 CORPUS-126
 """The entry of the results that a run of R2 leaves, the only thing meant to leave the machine of
 the maintainer: its fields, its counts and the strict xfail of mdformat."""
 
@@ -51,6 +51,7 @@ OBSERVATIONS = {
         {
             "name": "dokime-visible",
             "tests": [
+                observed("tests.dokime_visible.dokime.core.policy", "fail"),
                 observed(visible("E-1"), "pass"),
                 observed(visible("E-2"), "fail"),
                 observed(visible("E-3"), "pass"),
@@ -59,6 +60,7 @@ OBSERVATIONS = {
         },
     ],
     "sealed": [
+        observed("tests.dokime_held_out.dokime.core.policy", "fail"),
         observed(held("h1"), "pass"),
         observed(held("h2"), "fail"),
         observed(held("h3"), "error"),

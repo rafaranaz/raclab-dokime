@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from dokime.platform.sealed_store import AgeSealedStore
+from tests.corpus.contrast import maintainer
 from tests.corpus.contrast.maintainer import Spec, run_arm
 from tests.corpus.contrast.runs import VISIBLE
 from tests.corpus.test_contrast_maintainer import opened, ran, run, spec, stand_in
@@ -75,3 +76,23 @@ def test_the_work_of_a_run_is_made_in_the_directory_given(
     assert Path(record["request"]["repository"]).is_relative_to(work)
     assert Path(record["home"]).is_relative_to(work)
     assert list(work.iterdir()) == []
+
+
+def test_a_work_directory_that_does_not_exist_is_created(
+    opened: tuple[AgeSealedStore, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    helper, log = stand_in(tmp_path, monkeypatch)
+    identity = tmp_path / "identity" / "identity.age"
+    work = tmp_path / "missing" / "work"
+    code = maintainer.main(
+        [
+            *(str(tmp_path / "out"), str(tmp_path / "results.toml")),
+            *("--work", str(work), "--case", "no/such-case"),
+        ],
+        environ={"DOKIME_CORPUS_IDENTITY": str(identity)},
+        passphrase=lambda: "a disposable passphrase",
+        helper=helper,
+    )
+    assert code == 0
+    assert work.is_dir()
+    assert ran(log) == []

@@ -235,8 +235,7 @@ def test_s1_seals_the_test_files_that_the_witness_changed_as_at_the_witness(
         {"path": "tests/test_proj_witness.py", "content": WITNESS_TEST},
     ]
     (check,) = sealed["checks"]
-    paths = ["tests/test_new.py", "tests/test_proj_witness.py"]
-    assert check["command"] == check_command(TEST, paths)
+    assert check["command"] == TEST
     assert check["kind"] == "test"
 
 

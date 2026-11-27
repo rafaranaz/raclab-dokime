@@ -8,7 +8,7 @@ mount; no id of a test, no path and no log, so that it can leave that machine af
 
 import json
 import shlex
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass, fields
 from pathlib import PurePosixPath
 from typing import Any
@@ -56,19 +56,20 @@ def entry_of(
     arm: str,
     result: Mapping[str, Any],
     observations: Mapping[str, Any],
-    held_out: Callable[[str], bool],
+    visible: Collection[str],
+    held_out: Collection[str],
 ) -> Entry:
     """The entry of a run from the result of `verify()` and the observations of its evidence;
-    `held_out` says which tests of the sealed check count as held out."""
+    `visible` and `held_out` are the ids of the tests expected in the visible and sealed checks."""
     checks = observations.get("checks", [])
-    visible = [
+    shown = [
         test
         for check in checks
         if check.get("name") == VISIBLE_CHECK
         for test in check.get("tests", [])
-        if _is_example(str(test["id"]), VISIBLE)
+        if str(test["id"]) in visible
     ]
-    sealed = [test for test in observations.get("sealed") or [] if held_out(str(test["id"]))]
+    sealed = [test for test in observations.get("sealed") or [] if str(test["id"]) in held_out]
     ran = [test for check in checks for test in check.get("tests", [])]
     ran += list(observations.get("sealed") or [])
     failing = {str(test["id"]) for test in ran if test.get("after") in ("fail", "error")}
@@ -81,8 +82,8 @@ def entry_of(
         arm=arm,
         state=state,
         regression=str(regression or ""),
-        visible_passed=_passed(visible),
-        visible_failed=len(visible) - _passed(visible),
+        visible_passed=_passed(shown),
+        visible_failed=len(shown) - _passed(shown),
         held_out_passed=_passed(sealed),
         held_out_failed=len(sealed) - _passed(sealed),
         xfail_only=state != "complete" and failing == {XFAIL},
@@ -90,21 +91,17 @@ def entry_of(
     )
 
 
-def in_held_out_conversion(test_id: str) -> bool:
-    """Whether a test is one of the examples of the sealed conversion of S2."""
-    return _is_example(test_id, HELD_OUT)
+def example_tests(directory: str, names: Iterable[str]) -> frozenset[str]:
+    """The ids of the tests of the examples `names` of the conversion laid at `directory`."""
+    return frozenset(
+        f"{_module(directory)}test_dokime_examples::test_dokime_example[{name}]" for name in names
+    )
 
 
-def _is_example(test_id: str, directory: str) -> bool:
-    """Whether a test is the test of an example of the conversion laid at `directory`."""
-    return test_id.startswith(f"{_module(directory)}test_dokime_examples::test_dokime_example[")
-
-
-def turned_green_by(witness: Iterable[str], moved: Mapping[str, str]) -> Callable[[str], bool]:
-    """Whether a test is one of those that the witness turned green, for S1, under the path where
-    its file was sealed: `moved` maps the path of a file at the witness to that path."""
-    chosen = frozenset(_renamed(test_id, moved) for test_id in witness)
-    return lambda test_id: test_id in chosen
+def witness_tests(witness: Iterable[str], moved: Mapping[str, str]) -> frozenset[str]:
+    """The ids of the tests that the witness turned green, for S1, under the path where its file
+    was sealed: `moved` maps the path of a file at the witness to that path."""
+    return frozenset(_renamed(test_id, moved) for test_id in witness)
 
 
 def _renamed(test_id: str, moved: Mapping[str, str]) -> str:

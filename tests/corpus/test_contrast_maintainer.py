@@ -61,6 +61,7 @@ record = {
     "home_existed": os.path.isdir(home),
     "base_files": git("ls-tree", "-r", "--name-only", request["base"]).split(),
     "candidate_proj": git("show", request["candidate"] + ":proj.py"),
+    "swarm_toml": git("show", request["base"] + ":swarm.toml"),
     "found_in_copy": found,
 }
 with open(os.environ["STAND_IN_LOG"], "a") as log:

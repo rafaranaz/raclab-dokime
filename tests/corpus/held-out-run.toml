@@ -119,3 +119,105 @@ failing_gate = "sealed-examples"
 key = "python-semver/special-cases-the-visible-tokens"
 verdict = "FAIL"
 failing_gate = "sealed-examples"
+
+[[run]]
+date = "2026-11-27"
+key_given = true
+launched = 32
+harness = "a4828ca"
+source = "the lines that the test printed for each case, as the maintainer gave them; the date is that of the file they were kept in"
+scope = "the sealed audit of the corpus with the key that the close of R2b asks for before R3; the fifteen cases without a sealed batch ran in it without the key, each gave its expected verdict and first failing gate, and they are not recorded here"
+pytest = "32 passed in 2430.46s (0:40:30)"
+
+[[run.case]]
+key = "mdformat/drops-a-blank-paragraph-after-any-block"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "mdformat/strips-the-space-only-at-the-visible-tags"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2
+
+[[run.case]]
+key = "python-semver/answers-equal-to-a-malformed-collection"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/compares-long-numeric-prereleases"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/fixes-equality-and-leaves-the-ordering"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/forges-the-repr-for-the-visible-malformed-collections"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2
+
+[[run.case]]
+key = "python-semver/keeps-the-first-next-prerelease"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/matches-the-family-without-refusing-a-token"
+verdict = "FAIL"
+failing_gate = "visible-examples"
+
+[[run.case]]
+key = "python-semver/next-version-matches-a-dotted-token"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/orders-by-value-only-the-visible-identifiers"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 4
+
+[[run.case]]
+key = "python-semver/orders-by-value-only-the-visible-lengths"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 4
+
+[[run.case]]
+key = "python-semver/re-raises-only-for-the-visible-kinds-of-value"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 3
+
+[[run.case]]
+key = "python-semver/replace-keeps-the-error-of-any-part"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/returns-not-implemented-for-a-malformed-collection"
+verdict = "PASS"
+failing_gate = ""
+
+[[run.case]]
+key = "python-semver/returns-the-visible-results"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 4
+
+[[run.case]]
+key = "python-semver/special-cases-the-visible-malformed-collections"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2
+
+[[run.case]]
+key = "python-semver/special-cases-the-visible-tokens"
+verdict = "FAIL"
+failing_gate = "sealed-examples"
+sealed_example_fails = 2

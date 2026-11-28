@@ -30,6 +30,7 @@ FIELDS = [
     "held_out_failed",
     "xfail_only",
     "failure",
+    "without_strict_xfail",
 ]
 
 
@@ -226,3 +227,13 @@ def test_a_test_that_is_not_expected_is_not_counted() -> None:
     }
     entry = entry_of("p/c", "S2", RESULT, observations, (), ())
     assert (entry.visible_failed, entry.held_out_failed) == (0, 0)
+
+
+def test_an_entry_is_of_the_default_run_unless_the_command_says_otherwise() -> None:
+    entries = [
+        entry_of("p/c", "S0", RESULT, OBSERVATIONS, (), ()),
+        failed_run("p/c", "S1", "mount"),
+    ]
+    for entry in entries:
+        (run,) = tomllib.loads(toml_of(entry))["run"]
+        assert run["without_strict_xfail"] is False

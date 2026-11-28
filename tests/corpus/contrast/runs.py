@@ -67,9 +67,10 @@ def entry_of(
         for check in checks
         if check.get("name") == VISIBLE_CHECK
         for test in check.get("tests", [])
-        if str(test["id"]) in visible
     ]
-    sealed = [test for test in observations.get("sealed") or [] if str(test["id"]) in held_out]
+    sealed = list(observations.get("sealed") or [])
+    visible_passed = _passed(shown, visible)
+    held_out_passed = _passed(sealed, held_out)
     ran = [test for check in checks for test in check.get("tests", [])]
     ran += list(observations.get("sealed") or [])
     failing = {str(test["id"]) for test in ran if test.get("after") in ("fail", "error")}
@@ -82,10 +83,10 @@ def entry_of(
         arm=arm,
         state=state,
         regression=str(regression or ""),
-        visible_passed=_passed(shown),
-        visible_failed=len(shown) - _passed(shown),
-        held_out_passed=_passed(sealed),
-        held_out_failed=len(sealed) - _passed(sealed),
+        visible_passed=visible_passed,
+        visible_failed=len(set(visible)) - visible_passed,
+        held_out_passed=held_out_passed,
+        held_out_failed=len(set(held_out)) - held_out_passed,
         xfail_only=state != "complete" and failing == {XFAIL},
         failure="",
     )
@@ -143,5 +144,6 @@ def _module(directory: str) -> str:
     return directory.replace("/", ".") + "."
 
 
-def _passed(tests: list[Mapping[str, Any]]) -> int:
-    return sum(1 for test in tests if test.get("after") == "pass")
+def _passed(tests: list[Mapping[str, Any]], expected: Collection[str]) -> int:
+    """How many of the tests expected passed where they ran; one that did not run did not pass."""
+    return len({str(test["id"]) for test in tests if test.get("after") == "pass"} & set(expected))

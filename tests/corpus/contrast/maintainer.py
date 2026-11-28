@@ -47,10 +47,11 @@ from tests.corpus.contrast.runs import (
     XFAIL_NODE,
     Entry,
     check_command,
-    deselected,
     entry_of,
     example_tests,
     failed_run,
+    loading,
+    plugin_of,
     toml_of,
     witness_tests,
 )
@@ -62,6 +63,8 @@ ARMS = ("S0", "S1", "S2")
 REQUIREMENT = "R1"
 STRICT_XFAIL = "mdformat"
 """The project whose tests hold the strict-xfail test that `--without-strict-xfail` deselects."""
+PLUGIN = "dokime_strict_xfail"
+"""The plugin of pytest that deselects it, laid in `.contrast/` with the adaptation."""
 IDENTITY = "DOKIME_CORPUS_IDENTITY"
 AUTHOR = {
     "GIT_AUTHOR_NAME": "dokime contrast",
@@ -123,14 +126,17 @@ def specs(clones: Path | None = None, cases: Sequence[Case] = ACTIVE) -> list[Sp
 
 
 def without_strict_xfail(spec: Spec) -> Spec:
-    """The spec with the command of the tests of mdformat deselecting the strict-xfail test of its
-    witness, in the adaptation and in its `swarm.toml`, so in every check that runs the command;
-    the spec of another project as it is."""
+    """The spec with the command of the tests of mdformat loading a plugin that deselects the
+    strict-xfail test of its witness, in the adaptation and in its `swarm.toml`, so in every check
+    that runs the command, and the plugin laid with the adaptation; the spec of another project as
+    it is. A `--deselect` would name that test with backticks, and swarm-verify attaches no reporter
+    to a command with them."""
     if spec.key.partition("/")[0] != STRICT_XFAIL:
         return spec
     test = str(spec.adaptation["test"])
-    command = deselected(test, XFAIL_NODE)
+    command = loading(test, ".contrast", PLUGIN)
     files = dict(spec.adaptation["files"])
+    files[f".contrast/{PLUGIN}.py"] = plugin_of(XFAIL_NODE)
     given = f"command = {json.dumps(test)}"
     if files["swarm.toml"].count(given) != 1:
         raise ValueError("the swarm.toml of the adaptation does not run its command of the tests")

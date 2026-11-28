@@ -8,6 +8,7 @@ it can leave that machine after review.
 """
 
 import json
+import re
 import shlex
 from collections.abc import Collection, Iterable, Mapping
 from dataclasses import dataclass, fields
@@ -26,8 +27,8 @@ XFAIL = "tests.test_api::test_output_is_equal[```\\na\\n```\\n\\u2003\\n# A\\n]"
 the corpus, which holds the fix without the change to the test, makes pass under `xfail_strict`."""
 
 XFAIL_NODE = "tests/test_api.py::" + XFAIL.partition("::")[2]
-"""That test as `--deselect` names it: pytest escapes the newline and the U+2003 of its parameter in
-its node id, so they are written `\\n` and `\\u2003`, as text; the characters themselves match no
+"""That test as pytest names it in its node id: pytest escapes the newline and the U+2003 of its
+parameter, so they are written `\\n` and `\\u2003`, as text; the characters themselves match no
 test."""
 
 FAILURES = ("", "mount", "helper")
@@ -147,14 +148,38 @@ def check_command(test: str, paths: Iterable[str]) -> str:
     return shlex.join([*words, *paths])
 
 
-def deselected(test: str, node: str) -> str:
-    """The command of the tests with a `--deselect` of `node` before its trailing arguments that
-    are not options, where `check_command` keeps it when it puts other paths in their place."""
+def loading(test: str, directory: str, module: str) -> str:
+    """The command of the tests loading the plugin `module` of `directory`: the directory added to
+    its `PYTHONPATH` and `-pmodule`, one word, before its trailing arguments that are not options,
+    where `check_command` keeps it when it puts other paths in their place. The command gains no
+    syntax of the shell, so swarm-verify still attaches the reporter of pytest to it."""
     words = shlex.split(test)
+    assigned = 0
+    while assigned < len(words) and re.fullmatch(r"[A-Za-z_]\w*=.*", words[assigned]):
+        assigned += 1
+    paths = [at for at in range(assigned) if words[at].startswith("PYTHONPATH=")]
+    if paths:
+        words[paths[0]] += f":{directory}"
+    else:
+        words.insert(0, f"PYTHONPATH={directory}")
     end = len(words)
     while end and not words[end - 1].startswith("-"):
         end -= 1
-    return shlex.join([*words[:end], f"--deselect={node}", *words[end:]])
+    return shlex.join([*words[:end], f"-p{module}", *words[end:]])
+
+
+def plugin_of(node: str) -> str:
+    """The source of a plugin of pytest that deselects the test `node` and no other."""
+    return (
+        '"""Deselects one test, named by its node id, for the check of R2 made without the\n'
+        'strict-xfail test of mdformat (CORPUS-127)."""\n\n'
+        f"NODE = {node!r}\n\n\n"
+        "def pytest_collection_modifyitems(config, items):\n"
+        "    chosen = [item for item in items if item.nodeid == NODE]\n"
+        "    if chosen:\n"
+        "        config.hook.pytest_deselected(items=chosen)\n"
+        "        items[:] = [item for item in items if item.nodeid != NODE]\n"
+    )
 
 
 def _module(directory: str) -> str:

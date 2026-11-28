@@ -1,11 +1,13 @@
 # SDD-EARS: CORPUS-120 CORPUS-127 CORPUS-128
 """The check of R2 without the strict-xfail test of mdformat, made after the results, and the
 choice of the arms: on the small project of the tests of the command, on the adaptations as they
-are, and on the collection of the tests of mdformat at the base of its cases."""
+are, and on the plugin of pytest that deselects that test."""
 
 import json
+import os
 import shlex
 import subprocess
+import sys
 import tomllib
 from dataclasses import replace
 from pathlib import Path
@@ -14,8 +16,6 @@ from typing import Any
 import pytest
 
 from dokime.platform.sealed_store import AgeSealedStore
-from tests.corpus.cases import ACTIVE
-from tests.corpus.clones import clone, skip_unless_asked
 from tests.corpus.contrast import maintainer
 from tests.corpus.contrast.maintainer import Spec, specs, without_strict_xfail
 from tests.corpus.contrast.runs import (
@@ -26,12 +26,11 @@ from tests.corpus.contrast.runs import (
     XFAIL_NODE,
     check_command,
 )
-from tests.corpus.projects import PROJECTS
 from tests.corpus.test_contrast_maintainer import TEST, opened, ran, spec, stand_in
-from tests.sandbox.engines import require
 
 __all__ = ["opened", "spec"]
-DESELECT = f"--deselect={XFAIL_NODE}"
+PLUGIN = "dokime_strict_xfail"
+"""The module of the plugin of pytest that the option lays in `.contrast/` and loads with `-p`."""
 HERE = Path(__file__).parent
 
 
@@ -55,10 +54,13 @@ def test_the_command_of_mdformat_deselects_that_test_in_each_check() -> None:
         given = str(one.adaptation["test"])
         test = str(without_strict_xfail(one).adaptation["test"])
         words = shlex.split(given)
-        assert shlex.split(test) == [*words[:-1], DESELECT, words[-1]]
-        swarm = tomllib.loads(without_strict_xfail(one).adaptation["files"]["swarm.toml"])
-        assert swarm["checks"]["test"]["command"] == test
-        assert shlex.split(check_command(test, [VISIBLE])) == [*words[:-1], DESELECT, VISIBLE]
+        assert words[0] == "PYTHONPATH=src"
+        loaded = ["PYTHONPATH=src:.contrast", *words[1:-1], "-p", PLUGIN]
+        assert shlex.split(test) == [*loaded, words[-1]]
+        files = without_strict_xfail(one).adaptation["files"]
+        assert f".contrast/{PLUGIN}.py" in files
+        assert tomllib.loads(files["swarm.toml"])["checks"]["test"]["command"] == test
+        assert shlex.split(check_command(test, [VISIBLE])) == [*loaded, VISIBLE]
 
 
 def test_the_command_of_every_other_project_is_left_as_it_is() -> None:
@@ -97,6 +99,12 @@ def main(
     return ran(log), tomllib.loads(results.read_text())["run"]
 
 
+def loads(command: str) -> int:
+    """How many times the command loads the plugin."""
+    words = shlex.split(command)
+    return sum(1 for at, word in enumerate(words[:-1]) if (word, words[at + 1]) == ("-p", PLUGIN))
+
+
 def commands(record: dict[str, Any]) -> list[str]:
     request = record["request"]
     checks = [*request["checks"], *(request["sealed"] or {"checks": []})["checks"]]
@@ -120,7 +128,7 @@ def test_without_the_strict_xfail_every_check_of_mdformat_deselects_it(
     assert [check["name"] for check in s2["request"]["sealed"]["checks"]] == [HELD_OUT_CHECK]
     assert [len(commands(record)) for record in records] == [2, 3]
     for record in records:
-        assert all(shlex.split(command).count(DESELECT) == 1 for command in commands(record))
+        assert all(loads(command) == 1 for command in commands(record))
 
 
 def test_by_default_every_arm_runs_and_no_check_deselects_anything(
@@ -132,7 +140,7 @@ def test_by_default_every_arm_runs_and_no_check_deselects_anything(
     records, entries = main(mdformat_like(spec), [], opened, tmp_path, monkeypatch)
     assert [entry["arm"] for entry in entries] == ["S0", "S1", "S2"]
     assert all(entry["without_strict_xfail"] is False for entry in entries)
-    assert all("--deselect" not in command for record in records for command in commands(record))
+    assert all(PLUGIN not in command for record in records for command in commands(record))
 
 
 def test_another_project_with_the_option_runs_its_command_as_it_is(
@@ -145,7 +153,7 @@ def test_another_project_with_the_option_runs_its_command_as_it_is(
     options = ["--without-strict-xfail", "--arm", "S1"]
     records, entries = main(other, options, opened, tmp_path, monkeypatch)
     assert [(entry["arm"], entry["without_strict_xfail"]) for entry in entries] == [("S1", True)]
-    assert all("--deselect" not in command for record in records for command in commands(record))
+    assert all(PLUGIN not in command for record in records for command in commands(record))
 
 
 def test_an_arm_that_is_not_one_of_the_three_is_refused(tmp_path: Path) -> None:
@@ -154,46 +162,37 @@ def test_an_arm_that_is_not_one_of_the_three_is_refused(tmp_path: Path) -> None:
     assert refused.value.code == 2
 
 
-def collected(image: str, checkout: Path, *options: str) -> list[str]:
-    done = subprocess.run(
-        [
-            *(require("podman"), "run", "--rm", "--network", "none"),
-            *("-v", f"{checkout}:/dokime/project:ro", "-w", "/dokime/project", image),
-            *("python", "-m", "pytest", "-p", "no:cacheprovider", "-q", "--collect-only"),
-            *(*options, "tests"),
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-        timeout=600,
-    )
-    return [line for line in done.stdout.splitlines() if "::" in line]
+PARAMETERS = ["```\na\n```\n" + chr(0x2003) + "\n# A\n", "```\na\n```\n"]
+"""The parameter of the strict-xfail test, and one that its node id begins the same way."""
+TESTS = (
+    f"import pytest\n\n\n@pytest.mark.parametrize('text', {PARAMETERS!r})\n"
+    "def test_output_is_equal(text):\n    pass\n"
+)
 
 
-def test_the_deselect_takes_out_that_test_and_no_other_at_the_base_of_mdformat(
-    tmp_path: Path,
-) -> None:
-    skip_unless_asked()
-    require("git")
-    podman = require("podman")
-    (project,) = [p for p in PROJECTS if p.name == "mdformat"]
-    (base,) = {str(case.fields["base"]) for case in ACTIVE if case.project == "mdformat"}
-    checkout = clone(project, tmp_path / "project")
-    subprocess.run(["git", "-C", str(checkout), "checkout", "-q", base], check=True)
-    image = subprocess.run(
-        [podman, "build", "--quiet", "-f", str(project.directory / "Dockerfile")],
-        cwd=project.directory,
-        capture_output=True,
-        text=True,
-        check=True,
-        timeout=900,
-    ).stdout.strip()
-    first = of("mdformat")[0]
-    test = shlex.split(str(without_strict_xfail(first).adaptation["test"]))
-    options = [word for word in test if word.startswith("--deselect")]
-    assert options == [DESELECT]
-    every = collected(image, checkout)
-    kept = collected(image, checkout, *options)
-    assert sorted(set(every) - set(kept)) == [XFAIL_NODE]
-    assert set(kept) <= set(every)
-    assert len(kept) == len(every) - 1
+def test_the_plugin_deselects_that_test_and_no_other(tmp_path: Path) -> None:
+    (first,) = of("mdformat")[:1]
+    files = without_strict_xfail(first).adaptation["files"]
+    (tmp_path / ".contrast").mkdir()
+    (tmp_path / ".contrast" / f"{PLUGIN}.py").write_text(files[f".contrast/{PLUGIN}.py"])
+    (tmp_path / "tests").mkdir()
+    for name in ("test_api.py", "test_api_witness.py"):
+        (tmp_path / "tests" / name).write_text(TESTS)
+
+    def collected(*options: str) -> set[str]:
+        done = subprocess.run(
+            [
+                *(sys.executable, "-m", "pytest", "-p", "no:cacheprovider", "-q"),
+                *("--collect-only", *options, "tests"),
+            ],
+            cwd=tmp_path,
+            env={**os.environ, "PYTHONPATH": ".contrast"},
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return {line for line in done.stdout.splitlines() if "::" in line}
+
+    every = collected()
+    assert len(every) == 4
+    assert set(every) - collected("-p", PLUGIN) == {XFAIL_NODE}

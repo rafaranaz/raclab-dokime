@@ -122,13 +122,15 @@ from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it 
 `RESULTS` receives one table `[[run]]` for each run, the only thing meant to leave that machine,
 after review (CORPUS-120): the key of the case, the arm, the `state` and the `regression` that
 swarm-verify gave, `visible_passed` and `visible_failed`, `held_out_passed` and
-`held_out_failed`, `xfail_only` and `failure`, and nothing else. The counts are of tests, as they
-ran: the visible ones are the tests of the examples of `tests/dokime_visible/` in the visible check,
-one for each example (CORPUS-126); the held-out ones are, in S1, the tests that the witness turned green and, in S2, the
-tests of the examples of `tests/dokime_held_out/`, each as it ran in the sealed check
-(CORPUS-121). A test that did
-not pass counts as failed. `xfail_only` is true when the state is not `complete` and the only test
-of the run that failed is the strict-xfail test of mdformat (CORPUS-122). `failure` is `mount` or
+`held_out_failed`, `xfail_only` and `failure`, and nothing else. The counts are of the tests
+expected, one for each: the visible ones are the tests of the examples of `tests/dokime_visible/`
+in the visible check (CORPUS-126); the held-out ones are, in S1, the tests that the witness turned
+green, under the path where they were sealed, and, in S2, the tests of the examples of
+`tests/dokime_held_out/`, in the sealed check (CORPUS-121). A test that did not pass counts as
+failed, and so does a test expected that did not run, since nothing collected it, so that a sealed
+file that the command of the tests does not collect cannot leave the count. `xfail_only`
+is true when the state is not `complete` and the only test of the run that failed is the
+strict-xfail test of mdformat (CORPUS-122). `failure` is `mount` or
 `helper` when the mount or the helper of Node failed, with no message, and the next run goes on
 (CORPUS-123).
 

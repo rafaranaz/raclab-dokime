@@ -118,10 +118,9 @@ def test_without_the_strict_xfail_every_check_of_mdformat_deselects_it(
     assert [check["name"] for check in s1["request"]["sealed"]["checks"]] == [HELD_OUT_CHECK]
     assert [check["name"] for check in s2["request"]["checks"]] == [VISIBLE_CHECK]
     assert [check["name"] for check in s2["request"]["sealed"]["checks"]] == [HELD_OUT_CHECK]
+    assert [len(commands(record)) for record in records] == [2, 3]
     for record in records:
-        found = commands(record)
-        assert len(found) == 2
-        assert all(shlex.split(command).count(DESELECT) == 1 for command in found)
+        assert all(shlex.split(command).count(DESELECT) == 1 for command in commands(record))
 
 
 def test_by_default_every_arm_runs_and_no_check_deselects_anything(

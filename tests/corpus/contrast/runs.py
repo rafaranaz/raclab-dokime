@@ -2,8 +2,9 @@
 
 An entry holds the key of the case, the arm, the state and the regression that swarm-verify gave,
 how many tests of the visible checks and of the held-out checks passed and did not pass, whether
-the rejection comes only from the strict-xfail test of mdformat, and the kind of a failure of the
-mount; no id of a test, no path and no log, so that it can leave that machine after review.
+the rejection comes only from the strict-xfail test of mdformat, the kind of a failure of the
+mount, and whether the run was made without that test; no id of a test, no path and no log, so that
+it can leave that machine after review.
 """
 
 import json
@@ -24,6 +25,11 @@ XFAIL = "tests.test_api::test_output_is_equal[```\\na\\n```\\n\\u2003\\n# A\\n]"
 """The test of mdformat that its witness `27e2ba3` takes out of `xfail`, and that the good patch of
 the corpus, which holds the fix without the change to the test, makes pass under `xfail_strict`."""
 
+XFAIL_NODE = "tests/test_api.py::" + XFAIL.partition("::")[2]
+"""That test as `--deselect` names it: pytest escapes the newline and the U+2003 of its parameter in
+its node id, so they are written `\\n` and `\\u2003`, as text; the characters themselves match no
+test."""
+
 FAILURES = ("", "mount", "helper")
 """The kinds of failure of a run: none, the mount of the local copy, or the helper of Node."""
 
@@ -42,6 +48,7 @@ class Entry:
     held_out_failed: int
     xfail_only: bool
     failure: str
+    without_strict_xfail: bool = False
 
 
 def failed_run(key: str, arm: str, failure: str) -> Entry:
@@ -138,6 +145,16 @@ def check_command(test: str, paths: Iterable[str]) -> str:
     while words and not words[-1].startswith("-"):
         words.pop()
     return shlex.join([*words, *paths])
+
+
+def deselected(test: str, node: str) -> str:
+    """The command of the tests with a `--deselect` of `node` before its trailing arguments that
+    are not options, where `check_command` keeps it when it puts other paths in their place."""
+    words = shlex.split(test)
+    end = len(words)
+    while end and not words[end - 1].startswith("-"):
+        end -= 1
+    return shlex.join([*words[:end], f"--deselect={node}", *words[end:]])
 
 
 def _module(directory: str) -> str:

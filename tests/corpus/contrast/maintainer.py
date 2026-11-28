@@ -1,15 +1,18 @@
 """The command of the runs of R2, for the machine of the maintainer only, with docker.
 
     DOKIME_CORPUS_IDENTITY=<identity> uv run python -m tests.corpus.contrast.maintainer \\
-        OUT RESULTS [--work DIR] [--clones DIR] [--case KEY]...
+        OUT RESULTS [--work DIR] [--clones DIR] [--case KEY]... [--arm ARM]... \\
+        [--without-strict-xfail]
 
-asks for the passphrase of the identity on the terminal, then runs the arms S0, S1 and S2 of each
-case of the corpus that is not withdrawn, or of the cases given, with swarm-verify through
-`run_arm.mjs`. Each run is made in a local copy of the base of its case, with the adaptation of its
-project and the patch on top, and gives swarm-verify a `SWARM_HOME` of its own, deleted when the
-run ends. The evidence of each run stays in `OUT/<project>--<case>/<arm>/`, held-out checks
-included, since swarm-verify keeps them in clear; `RESULTS` receives one entry of `runs.py` for each
-run, the only thing meant to leave this machine, after review.
+asks for the passphrase of the identity on the terminal, then runs the arms S0, S1 and S2, or the
+arms given, of each case of the corpus that is not withdrawn, or of the cases given, with
+swarm-verify through `run_arm.mjs`. Each run is made in a local copy of the base of its case, with
+the adaptation of its project and the patch on top, and gives swarm-verify a `SWARM_HOME` of its
+own, deleted when the run ends. The evidence of each run stays in `OUT/<project>--<case>/<arm>/`,
+held-out checks included, since swarm-verify keeps them in clear; `RESULTS` receives one entry of
+`runs.py` for each run, the only thing meant to leave this machine, after review.
+`--without-strict-xfail` runs the tests of mdformat without the strict-xfail test of its witness
+`27e2ba3`, a check made after the results of R2, not the run.
 
 This is the one module of the contrast that opens a sealed batch of the corpus (CORPUS-109). The
 held-out examples go to the helper of Node only through its input, never to a file written here.
@@ -24,7 +27,7 @@ import sys
 import tempfile
 import tomllib
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -41,8 +44,10 @@ from tests.corpus.contrast.runs import (
     HELD_OUT_CHECK,
     VISIBLE,
     VISIBLE_CHECK,
+    XFAIL_NODE,
     Entry,
     check_command,
+    deselected,
     entry_of,
     example_tests,
     failed_run,
@@ -55,6 +60,8 @@ CORPUS = HERE.parent
 HELPER = ("node", str(HERE / "run_arm.mjs"))
 ARMS = ("S0", "S1", "S2")
 REQUIREMENT = "R1"
+STRICT_XFAIL = "mdformat"
+"""The project whose tests hold the strict-xfail test that `--without-strict-xfail` deselects."""
 IDENTITY = "DOKIME_CORPUS_IDENTITY"
 AUTHOR = {
     "GIT_AUTHOR_NAME": "dokime contrast",
@@ -113,6 +120,22 @@ def specs(clones: Path | None = None, cases: Sequence[Case] = ACTIVE) -> list[Sp
             )
         )
     return found
+
+
+def without_strict_xfail(spec: Spec) -> Spec:
+    """The spec with the command of the tests of mdformat deselecting the strict-xfail test of its
+    witness, in the adaptation and in its `swarm.toml`, so in every check that runs the command;
+    the spec of another project as it is."""
+    if spec.key.partition("/")[0] != STRICT_XFAIL:
+        return spec
+    test = str(spec.adaptation["test"])
+    command = deselected(test, XFAIL_NODE)
+    files = dict(spec.adaptation["files"])
+    given = f"command = {json.dumps(test)}"
+    if files["swarm.toml"].count(given) != 1:
+        raise ValueError("the swarm.toml of the adaptation does not run its command of the tests")
+    files["swarm.toml"] = files["swarm.toml"].replace(given, f"command = {json.dumps(command)}")
+    return replace(spec, adaptation={**spec.adaptation, "test": command, "files": files})
 
 
 def held_out_examples(contract: str, batch: bytes) -> list[Example]:
@@ -353,6 +376,8 @@ def main(
     parser.add_argument("--clones", type=Path)
     parser.add_argument("--case", action="append", default=[])
     parser.add_argument("--work", type=Path)
+    parser.add_argument("--arm", action="append", choices=ARMS, default=[])
+    parser.add_argument("--without-strict-xfail", action="store_true")
     arguments = parser.parse_args(argv)
     identity = environ.get(IDENTITY, "")
     if not identity or not Path(identity).is_file():
@@ -365,9 +390,14 @@ def main(
     if arguments.work is not None:
         arguments.work.mkdir(parents=True, exist_ok=True)
     chosen = [case for case in ACTIVE if not arguments.case or case.key in arguments.case]
+    arms = [arm for arm in ARMS if not arguments.arm or arm in arguments.arm]
+    without = arguments.without_strict_xfail
     for spec in specs(arguments.clones, chosen):
-        for arm in ARMS:
+        if without:
+            spec = without_strict_xfail(spec)
+        for arm in arms:
             entry = run_arm(spec, arm, store.open, arguments.out, helper, arguments.work)
+            entry = replace(entry, without_strict_xfail=without)
             with arguments.results.open("a", encoding="utf-8") as results:
                 results.write(toml_of(entry))
             print(f"{entry.key} {entry.arm} {entry.state or entry.failure}", flush=True)

@@ -122,7 +122,7 @@ from `DIR/<project>` instead of its address and `--case KEY` choosing cases, it 
 `RESULTS` receives one table `[[run]]` for each run, the only thing meant to leave that machine,
 after review (CORPUS-120): the key of the case, the arm, the `state` and the `regression` that
 swarm-verify gave, `visible_passed` and `visible_failed`, `held_out_passed` and
-`held_out_failed`, `xfail_only` and `failure`, and nothing else. The counts are of the tests
+`held_out_failed`, `xfail_only`, `failure` and `without_strict_xfail`, and nothing else. The counts are of the tests
 expected, one for each: the visible ones are the tests of the examples of `tests/dokime_visible/`
 in the visible check (CORPUS-126); the held-out ones are, in S1, the tests that the witness turned
 green, under the path where they were sealed, and, in S2, the tests of the examples of
@@ -132,7 +132,27 @@ file that the command of the tests does not collect cannot leave the count. `xfa
 is true when the state is not `complete` and the only test of the run that failed is the
 strict-xfail test of mdformat (CORPUS-122). `failure` is `mount` or
 `helper` when the mount or the helper of Node failed, with no message, and the next run goes on
-(CORPUS-123).
+(CORPUS-123). `without_strict_xfail` says whether the run was made with the option of that name,
+below.
+
+**The check without the strict-xfail test** is a check made after the results of R2 were seen, on
+2026-11-28. It does not replace the run: the results of R2 are those of the run as it was set up,
+and the entries of the check are told apart by `without_strict_xfail = true`. In the full run, every
+run of mdformat that was not `complete` had `xfail_only = true`: it failed only on the strict-xfail
+test that the witness `27e2ba3` takes out of `xfail`, described below, so those rejections say
+nothing of what swarm-verify catches in mdformat. The maintainer reruns a few runs of mdformat
+without that one test to see what swarm-verify gives without the artefact:
+
+- `--without-strict-xfail` adds to the command of the tests of mdformat, in its adaptation and in
+  its `swarm.toml`, so in every check that runs it, the sealed check of S1 included,
+  `--deselect=tests/test_api.py::test_output_is_equal[...]` with the id of that test, before the
+  paths, where the checks of the conversions keep it (CORPUS-127). Pytest escapes the newline and
+  the U+2003 of its parameter in the id, so the option carries them as `\n` and `\u2003`, as
+  text; the characters themselves match no test. At the base of the cases of mdformat, in the image
+  of its pack, it takes that test and no other out of the 4269 collected, which a test of the
+  corpus checks. The command of python-semver is left as it is.
+- `--arm ARM`, which may be repeated, runs only the arms given, in the order S0, S1, S2; without it
+  the three run (CORPUS-128).
 
 **The smoke run** of the maintainer on `python-semver/nextver-bumps-build-only-versions`, a good case
 with no batch, which dokime gives PASS, found two faults of the mount, both reproduced and fixed

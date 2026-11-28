@@ -55,7 +55,7 @@ def test_the_command_of_mdformat_deselects_that_test_in_each_check() -> None:
         test = str(without_strict_xfail(one).adaptation["test"])
         words = shlex.split(given)
         assert words[0] == "PYTHONPATH=src"
-        loaded = ["PYTHONPATH=src:.contrast", *words[1:-1], "-p", PLUGIN]
+        loaded = ["PYTHONPATH=src:.contrast", *words[1:-1], f"-p{PLUGIN}"]
         assert shlex.split(test) == [*loaded, words[-1]]
         files = without_strict_xfail(one).adaptation["files"]
         assert f".contrast/{PLUGIN}.py" in files
@@ -101,8 +101,7 @@ def main(
 
 def loads(command: str) -> int:
     """How many times the command loads the plugin."""
-    words = shlex.split(command)
-    return sum(1 for at, word in enumerate(words[:-1]) if (word, words[at + 1]) == ("-p", PLUGIN))
+    return shlex.split(command).count(f"-p{PLUGIN}")
 
 
 def commands(record: dict[str, Any]) -> list[str]:
@@ -195,4 +194,4 @@ def test_the_plugin_deselects_that_test_and_no_other(tmp_path: Path) -> None:
 
     every = collected()
     assert len(every) == 4
-    assert set(every) - collected("-p", PLUGIN) == {XFAIL_NODE}
+    assert set(every) - collected(f"-p{PLUGIN}") == {XFAIL_NODE}

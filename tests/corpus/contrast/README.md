@@ -143,14 +143,24 @@ test that the witness `27e2ba3` takes out of `xfail`, described below, so those 
 nothing of what swarm-verify catches in mdformat. The maintainer reruns a few runs of mdformat
 without that one test to see what swarm-verify gives without the artefact:
 
-- `--without-strict-xfail` adds to the command of the tests of mdformat, in its adaptation and in
-  its `swarm.toml`, so in every check that runs it, the sealed check of S1 included,
-  `--deselect=tests/test_api.py::test_output_is_equal[...]` with the id of that test, before the
-  paths, where the checks of the conversions keep it (CORPUS-127). Pytest escapes the newline and
-  the U+2003 of its parameter in the id, so the option carries them as `\n` and `\u2003`, as
-  text; the characters themselves match no test. At the base of the cases of mdformat, in the image
-  of its pack, it takes that test and no other out of the 4269 collected, which a test of the
-  corpus checks. The command of python-semver is left as it is.
+- `--without-strict-xfail` lays with the adaptation of mdformat a plugin of pytest,
+  `.contrast/dokime_strict_xfail.py`, that deselects that test by its node id and no other, and
+  loads it in the command of the tests, in its adaptation and in its `swarm.toml`, so in every check
+  that runs it, the sealed check of S1 included: `.contrast` is added to `PYTHONPATH` and
+  `-pdokime_strict_xfail`, one word, goes before the paths, where the checks of the conversions keep
+  it (CORPUS-127). Pytest escapes the newline and the U+2003 of the parameter in the node id, so the
+  plugin names them as `\n` and `\u2003`, as text. The command of python-semver is left as it is.
+- **Why a plugin and not `--deselect`.** The first version, merged in #259, put
+  `--deselect=tests/test_api.py::test_output_is_equal[...]` in the command. Pytest ran it as
+  meant, `4267 passed, 1 skipped, 1 deselected`, but the id has backticks, and swarm-verify 3.1.0
+  attaches the reporter of pytest, `--junitxml`, only to a command with none of
+  `` ; & | < > ` `` , a newline or `$(` (`dist/verify/report-plan.js:18` and `52`). With no report
+  each check was judged as one outcome, by its exit code (`dist/verify/sealed-evidence.js:29-44`),
+  so the rerun of the maintainer gave S1 `complete` with its witness test not observed, and so
+  counted as failed, and S2 `incomplete` with its visible examples not observed. A test of the corpus runs the command of S1
+  through the `reportPlan` of swarm-verify, with `/bin/sh -c` in the image of the adaptation at the
+  copy of a good case with the witness file laid, and checks in the report that the witness test
+  passes, that the deselected test did not run and that no other test is missing.
 - `--arm ARM`, which may be repeated, runs only the arms given, in the order S0, S1, S2; without it
   the three run (CORPUS-128).
 
